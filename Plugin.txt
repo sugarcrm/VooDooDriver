@@ -1,0 +1,52 @@
+VooDooDriver Plugins:
+
+(*)What is a VooDooDriver plugin?
+The plugins a at their very base just javascript files.  You can provide a javascript file to be executed before or after a given event occurs for a Soda element.
+
+(*)Loading plugins:
+Plugins are loaded using the --plugin=myplugin.xml command line flag with the Java-Soda jar file.
+
+(*)Example Plugin XML file:
+<plugin>
+   <name>my plugin</name>
+   <control>button</control>
+   <event>beforeclick</event>
+   <jsfile>/tmp/foo.js</jsfile>
+</plugin>
+
+(*)Example Plugin XML elements breakdown:
+1.) In order to create a plugin you must first create a <plugin> XML element that contains the following XML elements.
+  A.)<name></name>: this tag is just for giving simple name to your plugin.  This is mostly used for logging, as every time this plugin is executed Java-Soda will log that it it has been fired, and then log the results.
+
+  B.)<control></control>: This is the VooDooDriver control element type that you want this plugin to be executed for.  All valid Java-Soda control elements are found in the elements.xml file.
+
+  C.)<event></event>: This is the event to fire the plugin on.  Currently for clickable controls you can use: "beforeclick" or "afterclick".  For non-clickable controls you can only use: "afterfound", which is fired directly after Java-Soda finds the control in the web page.
+
+  D.)<jsfile></jsfile>: This is the source file to be executed on the event.
+
+(*)Different Browsers & Javascript:
+Javascript can be different for every browser, it is up to your plugin to detect which browser is being used and to do the right thing.
+
+(*)Plugin results:
+All plugin Javascript code must return the value -1 or 0, -1 meaning failure, and 0 meaning success.  This is how VooDooDriver will know if your code has executed correctly and can report back it's findings.
+
+(*)Plugin life span:
+Once a plugin has been loaded it will no be unloaded until after VooDooDriver has finished executing and returned control back to the calling process or shell.
+
+(*)Control element access:
+You will be able to access the internal control that was found for your Control, but using the Javascript var called CONTROL.
+When setting the controls you want to use in order to keep plugin files smaller you can set the control element to use more 
+then one control by making it a comma delimited list of control names.
+
+(*)Plugin using Java classes
+You can also load and execte a plugin using compiled Java Classes.
+
+(*)Example Plugin XML file loading Java classes:
+<plugin>
+   <classname>FakeClass</classname>
+   <control>button,div,radio,checkbox,select</control>
+   <event>afterfound</event>
+   <classfile>/Users/trichmond/Desktop/FakeClass.class</classfile>
+</plugin>
+
+

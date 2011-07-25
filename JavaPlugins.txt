@@ -1,0 +1,48 @@
+(*)VooDooDriver Java Class Plugins:
+VDD supports loading and executing Java classes as VDD plugins. A VDD Java plugin is simply a Java class that implements the Java “VDDPluginInterface” interface. Any class that implements this interface can be loaded and executed by VDD at runtime.
+
+Question:
+I thought the whole point of VDD was to allow none programmers to write tests using XML, so why added a plugin interface that is only for programmers?
+
+Answer:
+I have found that there is always a case to be made when testing complex websites for custom actions inside a test. I have also found that developers will write a workaround or make code changes to the existing testing system such as VDD to make theses changes. So I have added this feature to allow developers access to the machine driving VDD tests.
+
+Question:
+What does the program allow you access to?
+
+Answer:
+The plugin allows access to VDD's SodaBrowser instance, also if the plugin is parented by other VDD command’s such as :
+
+<div id="foo">
+  <javaplugin classname="myclass" />
+</div>
+
+Then the plugin will get passed the WebElement for the div in the parent argument.  See below for more examples on how to use java plugins.
+
+Example Test: Loading & Executing a Plugin:
+<soda>
+  <browser url="http://www.google.com" />
+  <!-- Load the plugin into VDD --> 
+  <pluginloader file="plugins/java/FakeClass.class" classname="FakeClass" />
+
+  <!-- Executed the loaded plugin -->
+  <javaplugin classname="FakeClass" />
+   <browser action="close" />
+</soda>
+
+
+Question:
+How do I pass arguments to my plugin from a VDD test?
+
+Answer:
+The VDD <javaplugin> command supports child XML elements called: <arg>.  Each child <arg> can contain a string: <arg>my first arg</arg>.  All arguments are processed in order and stored in a Java String array: String[], which is passed to your class at runtime.
+
+Question:
+How do I compile my Java code into a plugin class?
+
+Answer:
+Calling this command line will compile your Java class:
+(*)javac -classpath /home/me/VooDooDriver.jar myjavacode.java
+
+
+
