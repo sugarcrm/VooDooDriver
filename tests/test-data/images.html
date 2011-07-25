@@ -1,0 +1,30 @@
+<html>
+    <script>
+    function overImage(num){
+        switch (num){
+            case 1:
+                document.getElementById('status').innerHTML = "sugarcrm-logo.jpg";
+                break;
+            case 2:
+                document.getElementById('status').innerHTML = "cube";
+                break;
+            default:
+                document.getElementById('status').innerHTML = "mudkip";
+                break;
+        }   
+    }
+    function resetStatus(){
+        document.getElementById('status').innerHTML = "status message";
+    }
+        
+    </script>
+    <body>
+    <img id="image" src="sugarcrm-logo.jpg" alt="sugarcrm-logo" usemap="logomap" onmouseover="overImage(1)" onmouseout="resetStatus()"/>
+    <map name="logomap">
+        <area id="area1" alt="cube" coords="5,5,10,10" onmouseover="overImage(2)" onmouseout="resetStatus()" />
+    </map>
+       
+    <hr />
+    <p><b id='status'>status message</b>
+    </body>
+</html>

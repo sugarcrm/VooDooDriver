@@ -1,0 +1,25 @@
+<html>
+    <script type="text/javascript">
+    function checkValue(){
+        if (document.getElementById('text1').value == null || document.getElementById('text1').value == ""){
+            document.getElementById('status').innerHTML = 'empty!';
+        }
+        else{
+            document.getElementById('status').innerHTML = 'textfield: '+document.getElementById('text1').value;
+        }
+        
+    }
+    </script>
+    <body>
+        <form id="form1">
+            java plugin - fill data<br />
+            <input type="text" id="text1" /><br />
+            <input type='button' id="button" value='check field' onclick="checkValue()" />
+        </form>
+        <hr />
+        <p>
+            <b id='status'>status message</b>
+        </p>
+    </body>
+</html>
+        

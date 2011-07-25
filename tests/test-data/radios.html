@@ -1,0 +1,39 @@
+<html>
+    <script type="text/javascript">
+        function getCheckedValue(radioObj) {
+            if(!radioObj)
+		return "";
+            var radioLength = radioObj.length;
+            if(radioLength == undefined)
+		if(radioObj.checked)
+		    return radioObj.value;
+		else
+		    return "";
+            for(var i = 0; i < radioLength; i++) {
+		if(radioObj[i].checked) {
+		    return radioObj[i].value;
+		}
+            }
+            return "";
+        }
+        function displayStatus(number){
+            if (number == ""){
+                document.getElementById('status').innerHTML="nothing clicked!";
+            }
+            else {
+                document.getElementById('status').innerHTML=number;
+            } 
+        }
+    </script>
+    <body>
+        <form name="radios">
+            <input type="radio" value="0" id ="r0" name="number" />0<br />
+            <input type="radio" value="1" id="r1" name="number" />1<br />
+            <input type="radio" value="2" id="r2" name="number" />2<br />
+            <input type="radio" value="3" id="r3" name="number" />3<br />
+        </form>
+        <p><b id='status'>status message</b>
+            <input type='button' id="button" value='check radios' onclick="displayStatus(getCheckedValue(document.forms['radios'].elements['number']))" />
+        </p>
+    </body>
+</html>

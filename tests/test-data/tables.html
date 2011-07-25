@@ -1,0 +1,43 @@
+<html>
+    <script>
+    function setStatus(){
+        document.getElementById('status').innerHTML = "table";
+    }
+    function setDefault(){
+        document.getElementById('status').innerHTML = "not table";
+    }
+    function setClick(num){
+        if (num == 1){
+            document.getElementById('status').innerHTML = "row two, col one";
+        }
+        else if (num == 2){
+            document.getElementById('status').innerHTML = "row two, col two";
+        }
+        else if (num == 3){
+            document.getElementById('status').innerHTML = "row three, col one";
+        }
+        else{
+            document.getElementById('status').innerHTML = "row three, col two";
+        }
+    }
+    </script>
+    <body>
+        <table id="table" onmouseover="setStatus()" onmouseout="setDefault()" border="1">
+            <tr id="tr1">
+                <td name="1"><input type="text" name="text1" /></td>
+                <td name="2"><input type="text" name="text2" /></td>
+            </tr>
+            <tr id="tr2">
+                <td name="1"><input type="button" name="button1" value="row two, col one" onclick="setClick(1)"/></td>
+                <td name="2"><input type="button" name="button2" value="row two, col two" onclick="setClick(2)"/></td>
+            </tr>
+            <tr id="tr3">
+                <td name="1"><a href="#" name="link1" onclick="setClick(3)">link_1</a></td>
+                <td name="2"><a href="#" name="link2" onclick="setClick(4)">link_2</a></td>
+            </tr>
+        </table>
+               
+        <hr />
+        <p><b id='status'>status message</b>
+    </body>
+</html>

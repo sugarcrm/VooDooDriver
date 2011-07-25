@@ -1,0 +1,23 @@
+<html>
+    <script type="text/javascript">
+    function checkStatus(chk){
+        var count = 0;
+        for (i = 0; i < chk.length; i++){
+            if (chk[i].checked == true){
+                count ++;
+            }
+        }
+        document.getElementById('status').innerHTML = "checked "+count+" boxes";
+    }
+    </script>
+    <body>
+        <form id="chkboxform">
+            <input type="checkbox" name="chkbox" value="1" />box one<br />
+            <input type="checkbox" name="chkbox" value="2" />box two<br />
+            <input type="checkbox" name="chkbox" value="3" />box three<br />
+        </form>
+        <hr />
+        <p><b id='status'>status message</b> <br />
+        <input type="button" id="button" value="check value" onclick="checkStatus(document.getElementsByName('chkbox'))"/>
+    </body>
+</html>

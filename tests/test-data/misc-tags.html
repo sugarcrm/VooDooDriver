@@ -1,0 +1,51 @@
+<html>
+    <script>
+    function mouseClick(){
+        document.getElementById('status').innerHTML = 'div1 button';  
+    }
+    function linkMessage(){
+        document.getElementById('status').innerHTML = 'link';  
+    }
+    function resetStatus(){
+        document.getElementById('status').innerHTML = 'status message'; 
+    }
+    function popUp(url){
+        newWindow = window.open(url, 'name', 'height=200,width=150');
+        if (window.focus){
+            newWindow.focus();
+        }
+        document.getElementById('status').innerHTML = 'popup clicked';
+        return false;
+    }
+    </script>
+    <body>
+        <div id="div1">
+            div test <br />
+            <input type="button" id="button" value="button" onmouseup="mouseClick()" />
+            <br />
+        </div>
+        <hr />
+        <span class="span_class">
+            span test <br />
+            test message <br />
+        </span>
+        <hr />
+        <form id="test_form">
+            hidden test <br />
+            <input type="text" value="some text" /> <br />
+            <input type="hidden" name="hidden" value="hidden_value" />
+        </form>
+        
+        <!-- links -->
+        <hr />
+        <a href="#top" id="link" onmouseover="linkMessage()" onmouseout="resetStatus()">Go to top of page</a>
+        
+        <!-- popup -->
+        <hr />
+        <a href="popup.html" id="popup" onclick="return popUp('popup.html')" >pop up</a>
+        
+        <hr />
+        <p><b id="status">status message</b></p>
+    </body>
+</html>
+        

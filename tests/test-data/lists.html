@@ -1,0 +1,25 @@
+<html>
+    <script>
+    function setStatus(num){
+        if (num == 1){
+            document.getElementById('status').innerHTML="UL one";
+        }
+        else if (num == 2){
+            document.getElementById('status').innerHTML="UL two";
+
+        }
+        else{
+            document.getElementById('status').innerHTML="status message";
+        }
+    }
+    
+    </script>
+    <body>
+        <ul id="ul">
+            <li name="1" onclick="setStatus(1)">UL one</li>
+            <li name="2" onclick="setStatus(2)">UL two</li>
+        </ul>
+        <hr />
+        <p><b id='status'>status message</b>
+    </body>
+</html>

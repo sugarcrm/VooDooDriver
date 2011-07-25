@@ -1,0 +1,43 @@
+<html>
+    <script type="text/javascript">
+    function checkTextfield(){
+        for (var i = 1; i < 5; i++){
+            if (document.getElementById(i).value == "" || document.getElementById(i).value == null){
+                document.getElementById('status').innerHTML = "empty textfield!";
+            }
+            else{
+               document.getElementById('status').innerHTML = "good"; 
+            }
+        }
+    }
+    function checkFilefield(){
+        if (document.getElementById('file').value == "" || document.getElementById('file').value == null){
+            document.getElementById('status').innerHTML = "empty filefield!"; 
+        }
+        else{
+            document.getElementById('status').innerHTML = "file exists";
+        }
+        
+    }
+    </script>
+    <body>
+        <form id='textboxes'>
+            <input type='text' id='1' /><br />
+            <input type='text' id='2' /><br />
+            <input type='text' id='3' /><br />
+            <input type='text' id='4' /><br />
+            File: <input type="file" id='file' />
+            <br />
+            <textarea id="textarea"></textarea>
+        </form>
+        
+        <hr />
+        <input type='button' id="button" value='check boxes' onclick="checkTextfield()" />
+            <br />
+            <input type='button' id='button2' value='check file field' onclick='checkFilefield()' />
+            <br /><hr />
+              <p><b id='status'>status message</b>
+        </p>
+    </body>
+</html>
+            

@@ -1,0 +1,31 @@
+<html>
+    <script type="text/javascript">
+    function checkListValue(){
+        var value = document.getElementById('list').value;
+        if (value == 0){
+            document.getElementById('status').innerHTML="selected zero";
+        }
+        else if (value == 1){
+            document.getElementById('status').innerHTML="selected one";
+        }
+        else if (value == 2){
+            document.getElementById('status').innerHTML="selected two";
+        }
+        else {
+            document.getElementById('status').innerHTML="selected nothing";
+        }
+    }
+    </script>
+    <body>
+        <select id="list">
+            <option value="null">please select something</option>
+            <option value="0">zero</option>
+            <option value="1">one</option>
+            <option value="2">two</option>
+        </select>
+        
+        <p><b id='status'>status message</b>
+            <input type='button' id="button" value='check list' onclick="checkListValue()" />
+        </p>
+    </body>
+</html>
