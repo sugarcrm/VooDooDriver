@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+   
+   <plugin>
+      <name>My Plugin</name>
+      <control>button</control>
+      <event>beforeclick</event>
+      <jsfile>plugins/button-highlight.js</jsfile>
+   </plugin>
+   
+   <plugin>
+      <name>My Plugin -1</name>
+      <control>div</control>
+      <event>afterfound</event>
+      <jsfile>plugins/button-highlight.js</jsfile>
+   </plugin>
+   
+</data>
+
