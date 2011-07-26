@@ -16,9 +16,12 @@ limitations under the License.
 
 #include "VDD-DND.h"
 #include "vdd-lib.h"
+#include <X11/Xlib.h>
+#include <X11/X.h>
+#include <X11/Xutil.h>
+#include <pcre.h>
+#include <string.h>
+#include <X11/extensions/XTest.h>
+#include <X11/keysymdef.h>
 
 
-void foo(void) {
-   TRACE("FOOBAR!");
-   printf("FOOBAR-printf\n");
-}

@@ -19,12 +19,36 @@ limitations under the License.
 #include "vdd-lib.h"
 #include <getopt.h>
 
+static char *opt_string = "h";
+static int help_flag;
 
 int main (int argc, char *argv[]) {
    int err = 0;
+   int option_index = 0;
+   int current_opt = 0;
+   static struct option long_options[] = {
+      {"help", no_argument, 0, 'h'}
+   };
 
    TRACE("Starting: %s", argv[0]);
-   foo();
+
+   for (option_index = 0; option_index <= argc-1; option_index++) {
+      current_opt = getopt_long_only(argc, argv, opt_string, long_options, 
+         &option_index);
+
+      switch (current_opt) {
+      case 'h':
+
+      break;
+
+
+      default:
+         TRACE("Unknown option value: %d!", current_opt);
+      }
+
+   }
+
+
 
    return err;
 

@@ -22,13 +22,6 @@ limitations under the License.
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/X.h>
-#include <X11/Xutil.h>
-#include <pcre.h>
-#include <string.h>
-#include <X11/extensions/XTest.h>
-#include <X11/keysymdef.h>
 
 /*
 TRACE: 
