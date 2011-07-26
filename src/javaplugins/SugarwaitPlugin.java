@@ -32,16 +32,40 @@ import voodoodriver.SodaBrowser;
 import voodoodriver.VDDPluginInterface;
 
 /**
- * When this plugin is enabled, it causes the browser to wait until all ajax actions are finished
+ * When this plugin is enabled, it causes the browser to wait on all ajax requests, then continue when 
+ * it's finished
  * @author Lehan
  *
  */
 public class SugarwaitPlugin implements VDDPluginInterface {
 
+	
+	/**
+	 * function called by SodaEvent to execute sugarwait
+	 * 
+	 * @param args - additional arguments, probably not used.
+	 * @param browser - the current browser instance
+	 * @param element - a WebElement this function has control to. probably not used either
+	 */
 	@Override
 	public int execute(String[] args, SodaBrowser browser, WebElement element) {
-		// TODO Auto-generated method stub
+		
+		
 		return 0;
+	}
+	
+	/**
+	 * Executes the given script in the browser
+	 * 
+	 * @param jscript - javascript to get executed
+	 * @param browser - the WebDriver browser to execute the script in
+	 * @return -1 on the error else the javascript result.
+	 */
+	private String executeScript(String jscript, SodaBrowser browser){
+		String result = "";
+		
+		
+		return result;
 	}
 
 }
