@@ -32,7 +32,7 @@ DEBUG_FLAGS= $(FLAGS) -DDEBUG
 ARCH := $(shell uname -m)
 VOODOO-DBD=$(BINDIR)/VooDooDriver-DND-$(ARCH)
 
-firefoxsave: clean init
+main: clean init
 	gcc $(FLAGS) main.c -o $(VOODOO-DBD)
 
 debug: clean init

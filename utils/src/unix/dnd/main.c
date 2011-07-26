@@ -22,7 +22,8 @@ limitations under the License.
 int main (int argc, char *argv[]) {
    int err = 0;
 
-   TRACE("testing: %d", 666);
+   TRACE("Starting: %s", argv[0]);
+
 
    return err;
 
