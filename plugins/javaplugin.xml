@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<plugin>
+		<classname>javaplugins.CmdJavaPlugin</classname>
+		<control>button</control>
+		<event>beforeclick</event>
+		<classfile>plugins/java/CmdJavaPlugin.class</classfile>
+	</plugin>
+
+</data>
