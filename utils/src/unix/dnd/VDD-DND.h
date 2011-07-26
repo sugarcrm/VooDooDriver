@@ -14,6 +14,11 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
+#ifndef __VDD_HEADER__
+
+#define __VDD_HEADER__ 1
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -24,7 +29,6 @@ limitations under the License.
 #include <string.h>
 #include <X11/extensions/XTest.h>
 #include <X11/keysymdef.h>
-#include <getopt.h>
 
 /*
 TRACE: 
@@ -36,6 +40,8 @@ TRACE:
          __LINE__, ##args) 
 #else
    #define TRACE(a,args...) 
+#endif
+
 #endif
 
 

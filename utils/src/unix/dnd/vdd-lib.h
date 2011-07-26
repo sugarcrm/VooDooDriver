@@ -14,20 +14,11 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// needed include files //
-#include "VDD-DND.h"
-#include "vdd-lib.h"
-#include <getopt.h>
+#ifndef __VDD_LIB_HEADER__
 
+#define __VDD_LIB_HEADER__ 1
 
-int main (int argc, char *argv[]) {
-   int err = 0;
+void foo(void);
 
-   TRACE("Starting: %s", argv[0]);
-   foo();
-
-   return err;
-
-}
-
+#endif
 

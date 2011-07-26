@@ -28,15 +28,23 @@
 
 BINDIR=bin
 FLAGS= -lX11 -lpcre -lXtst -lXext
-DEBUG_FLAGS= $(FLAGS) -DDEBUG
+DEBUG_FLAGS= $(FLAGS) -DDEBUG -ggdb
 ARCH := $(shell uname -m)
-VOODOO-DBD=$(BINDIR)/VooDooDriver-DND-$(ARCH)
+LIBS=vdd-lib.o
+HEADERS=VDD-DND.h
+VOODOO-DND=$(BINDIR)/VooDooDriver-DND-$(ARCH)
 
-main: clean init
-	gcc $(FLAGS) main.c -o $(VOODOO-DBD)
+main: clean init libs
+	gcc $(FLAGS) main.c $(LIBS) -o $(VOODOO-DND)
 
-debug: clean init
-	gcc -ggdb $(DEBUG_FLAGS) main.c -o $(VOODOO-DBD)
+libs: clean init
+	gcc $(FLAGS) -fPIC -c vdd-lib.c 
+
+debug-libs: clean init
+	gcc $(DEBUG_FLAGS) -fPIC -c vdd-lib.c 
+
+debug: debug-libs
+	gcc $(DEBUG_FLAGS) main.c $(LIBS) -o $(VOODOO-DND)
 
 init:
 	mkdir $(BINDIR)
