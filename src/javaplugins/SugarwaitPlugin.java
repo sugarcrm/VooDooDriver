@@ -45,7 +45,11 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 	Boolean done = false;
 	int result = 0, undef_count = 0;
 	long t1, t2;
-	String jscript = "if(typeof(SUGAR) != 'undefined' && SUGAR.util && !SUGAR.util.ajaxCallInProgress()) return 'true'; else return 'false';";
+	String jscript = "if(typeof(SUGAR) != 'undefined' && SUGAR.util && !SUGAR.util.ajaxCallInProgress())"+
+					"return 'true';" + 
+					"else if (typeof(SUGAR) == 'undefined')" +
+					"return 'undefined';" +
+					"else return 'false';";
 	String str_res = "";
 	WebDriver driver = null;
 	
@@ -66,7 +70,6 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 	@Override
 	public int execute(String[] args, SodaBrowser browser, WebElement element) {
 		//pretty important: get the WebDriver from SodaBrowser browser
-		driver = browser.getDriver();
 		//String storing javascript execution result
 		String temp = "";
 		
@@ -77,9 +80,9 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 			Thread.sleep(100);
 			//maximum 15 second wait time
 			for (int i = 0; i < 31; i ++){
-				//TODO: better way to wait for page load
-				browser.wait(100);
-				temp = this.executeScript(jscript, driver);
+				//TODO: wait for page to completely load? 
+				//execute script
+				temp = (String)browser.executeJS(jscript, null);
 				
 				if (temp.compareToIgnoreCase("false") == 0){
 					temp = "false";
@@ -107,17 +110,16 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 				
 				Thread.sleep(500);
 			}
+			t2 = System.currentTimeMillis();
+			System.out.printf("(*)Sugarwait finished. Result: "+str_res+", Total time: "+(t2-t1)+"\n");
 			
 		} catch (InterruptedException e) {
-			System.out.printf("(!)Problem in calling sugarwait, thread cannot sleep");
+			System.out.printf("(!)Problem in calling sugarwait, thread cannot sleep \n");
 			e.printStackTrace();
 		} catch (Exception e){
-			System.out.printf("(!)Error in calling sugarwait");
+			System.out.printf("(!)Error in calling sugarwait \n");
 			e.printStackTrace();
 		}
-		
-		t2 = System.currentTimeMillis();
-		System.out.printf("(*)Sugarwait finished. Result: "+str_res+", Total time: "+(t2-t1)+"\n");
 		
 		if (done){
 			result = 0;
@@ -141,7 +143,7 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 			//might need to escape the javascript
 			String js = "current_browser_id = 0;" +
 					"if (current_browser_id > -1){" +
-						"var target = getWindows()[current_browser_id];" +
+						"var target = this.selectWindow();" +
 						"var browser = target.getBrowser();" +
 						"var content = target.content;" +
 						"var doc = browser.contentDocument;" +
