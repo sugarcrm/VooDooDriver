@@ -80,7 +80,11 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 			Thread.sleep(100);
 			//maximum 15 second wait time
 			for (int i = 0; i < 31; i ++){
-				//TODO: wait for page to completely load? 
+				/**
+				 * add wait for page load?
+				 * WebDriver is designed to automatically wait for page loads before actions are executed, so may 
+				 * not need in this case
+				 */
 				//execute script
 				temp = (String)browser.executeJS(jscript, null);
 				
