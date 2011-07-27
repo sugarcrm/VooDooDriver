@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<plugin>
+		<classname>javaplugins.SugarwaitPlugin</classname>
+		<control>button,link,submit</control>
+		<event>afterclick</event>
+		<classfile>plugins/java/SugarwaitPlugin.class</classfile>
+	</plugin>
+
+</data>

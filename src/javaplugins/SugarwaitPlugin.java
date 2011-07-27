@@ -27,9 +27,12 @@
 package javaplugins;
 
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.JavascriptExecutor;
 
 import voodoodriver.SodaBrowser;
 import voodoodriver.VDDPluginInterface;
+import java.lang.System;
 
 /**
  * When this plugin is enabled, it causes the browser to wait on all ajax requests, then continue when 
@@ -38,7 +41,20 @@ import voodoodriver.VDDPluginInterface;
  *
  */
 public class SugarwaitPlugin implements VDDPluginInterface {
-
+	
+	Boolean done = false;
+	int result = 0, undef_count = 0;
+	long t1, t2;
+	String jscript = "if(typeof(SUGAR) != 'undefined' && SUGAR.util && !SUGAR.util.ajaxCallInProgress()) return 'true'; else return 'false';";
+	String str_res = "";
+	WebDriver driver = null;
+	
+	/**
+	 * Constructor
+	 */
+	public SugarwaitPlugin(){
+		
+	}
 	
 	/**
 	 * function called by SodaEvent to execute sugarwait
@@ -49,9 +65,66 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 	 */
 	@Override
 	public int execute(String[] args, SodaBrowser browser, WebElement element) {
+		//pretty important: get the WebDriver from SodaBrowser browser
+		driver = browser.getDriver();
+		//String storing javascript execution result
+		String temp = "";
 		
+		System.out.printf("(*)Sugarwait starting... \n");
+		t1 = System.currentTimeMillis();	
+		try {
+			//this is to make sure the browser has enough time to start the ajax call. probably don't need it
+			Thread.sleep(100);
+			//maximum 15 second wait time
+			for (int i = 0; i < 31; i ++){
+				//TODO: better way to wait for page load
+				browser.wait(100);
+				temp = this.executeScript(jscript, driver);
+				
+				if (temp.compareToIgnoreCase("false") == 0){
+					temp = "false";
+					str_res = "false";
+				}
+				else if (temp.compareToIgnoreCase("true") == 0){
+					temp = "true";
+					str_res = "true";
+					done = true;
+					break;
+				}
+				else if (temp.compareToIgnoreCase("undefined") == 0){
+					str_res = "undefined";
+					temp = null;
+					undef_count ++;
+				}else{
+					System.out.printf("(W)Sugarwait failed: unknown result: "+temp+"!\n");
+				}
+				
+				if (undef_count > 30){
+					System.out.printf("(W)Sugarwait failed: Can't find SUGAR object after 30 tries! \n");
+					done = false;
+					break;
+				}
+				
+				Thread.sleep(500);
+			}
+			
+		} catch (InterruptedException e) {
+			System.out.printf("(!)Problem in calling sugarwait, thread cannot sleep");
+			e.printStackTrace();
+		} catch (Exception e){
+			System.out.printf("(!)Error in calling sugarwait");
+			e.printStackTrace();
+		}
 		
-		return 0;
+		t2 = System.currentTimeMillis();
+		System.out.printf("(*)Sugarwait finished. Result: "+str_res+", Total time: "+(t2-t1)+"\n");
+		
+		if (done){
+			result = 0;
+		}else{
+			result = -1;
+		}
+		return result;
 	}
 	
 	/**
@@ -61,9 +134,46 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 	 * @param browser - the WebDriver browser to execute the script in
 	 * @return -1 on the error else the javascript result.
 	 */
-	private String executeScript(String jscript, SodaBrowser browser){
+	private String executeScript(String jscript, WebDriver browser){
 		String result = "";
 		
+		if (jscript.length() > 0){
+			//might need to escape the javascript
+			String js = "current_browser_id = 0;" +
+					"if (current_browser_id > -1){" +
+						"var target = getWindows()[current_browser_id];" +
+						"var browser = target.getBrowser();" +
+						"var content = target.content;" +
+						"var doc = browser.contentDocument;" +
+						"var d = doc.createElement(\"script\");" +
+						"var tmp = null;" +
+						"" +
+						"tmp = doc.getElementById(\"Sodahack\");" +
+						"if (tmp != null) {" +
+							"doc.body.removeChild(tmp);" +
+							"}" +
+						"" +
+						"d.setAttribute(\"id\", \"Sodahack\");" +
+						"var src = \"document.soda_js_result = (function(){"+jscript+"})()\";" +
+						"d.innerHTML = src;" +
+						"if(typeof(doc) != \"undefined\" && typeof(doc.body) != \"undefined\")" +
+						"{" +
+							"doc.body.appendChild(d);" +
+							"result = doc.soda_js_result;" +
+						"}else{" +
+							"result = \"No Document Object to use\";" +
+						"}" +
+					"}else {" +
+						"result = \"No Browser to use\";" +
+					"}" +
+					"return result;";
+			//create a javascriptExecutor for WebDriver
+			JavascriptExecutor jse = (JavascriptExecutor) driver;
+			//actually execute the js in browser
+			result = (String)jse.executeScript(js);		
+		}else{
+			result = "No script passed";
+		}
 		
 		return result;
 	}
