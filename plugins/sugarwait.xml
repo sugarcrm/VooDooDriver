@@ -2,7 +2,7 @@
 <data>
 	<plugin>
 		<classname>javaplugins.SugarwaitPlugin</classname>
-		<control>button,link,submit</control>
+		<control>button,link</control>
 		<event>afterclick</event>
 		<classfile>plugins/java/SugarwaitPlugin.class</classfile>
 	</plugin>

@@ -90,11 +90,11 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 				
 				if (temp.compareToIgnoreCase("false") == 0){
 					temp = "false";
-					str_res = "false";
+					str_res = "failed";
 				}
 				else if (temp.compareToIgnoreCase("true") == 0){
 					temp = "true";
-					str_res = "true";
+					str_res = "passed";
 					done = true;
 					break;
 				}
@@ -104,6 +104,8 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 					undef_count ++;
 				}else{
 					System.out.printf("(W)Sugarwait failed: unknown result: "+temp+"!\n");
+					done = false;
+					break;
 				}
 				
 				if (undef_count > 30){
