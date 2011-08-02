@@ -26,6 +26,7 @@
 */
 package javaplugins;
 
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.JavascriptExecutor;
@@ -54,13 +55,6 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 	WebDriver driver = null;
 	
 	/**
-	 * Constructor
-	 */
-	public SugarwaitPlugin(){
-		
-	}
-	
-	/**
 	 * function called by SodaEvent to execute sugarwait
 	 * 
 	 * @param args - additional arguments, probably not used.
@@ -77,7 +71,7 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 		t1 = System.currentTimeMillis();	
 		try {
 			//this is to make sure the browser has enough time to start the ajax call. probably don't need it
-			Thread.sleep(100);
+			Thread.sleep(50);
 			//maximum 15 second wait time
 			for (int i = 0; i < 31; i ++){
 				/**
@@ -114,16 +108,19 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 					break;
 				}
 				
-				Thread.sleep(500);
+				Thread.sleep(50);
 			}
 			t2 = System.currentTimeMillis();
 			System.out.printf("(*)Sugarwait finished. Result: "+str_res+", Total time: "+(t2-t1)+"\n");
 			
 		} catch (InterruptedException e) {
-			System.out.printf("(!)Problem in calling sugarwait, thread cannot sleep \n");
+			System.out.printf("(!)Problem in calling sugarwait, thread cannot sleep. \n");
 			e.printStackTrace();
-		} catch (Exception e){
-			System.out.printf("(!)Error in calling sugarwait \n");
+		}catch (WebDriverException e){
+			System.out.printf("(W)Sugarwait plugin session has no driver. \n");
+			return 0;
+		}catch (Exception e){
+			System.out.printf("(!)Unknown error calling sugarwait. \n");
 			e.printStackTrace();
 		}
 		
