@@ -582,8 +582,17 @@ public class LogConverter{
 		String[] msgData = message.split(":");
 		String temp = msgData[0].substring(msgData[0].indexOf("'"), msgData[0].indexOf("by")-1);
 		msgData[0] = msgData[0].replaceFirst(temp, "<b>"+temp+"</b> ");
-		msgData[1] = msgData[1].replaceFirst("'", "<b>'");
-		msgData[1] += "</b>";	
+		if (msgData[1].contains("href")){
+			msgData[1] = msgData[1].replaceFirst("'", "<b>'");
+			for (int i = 2; i < msgData.length; i++){
+				msgData[1] += ":"+msgData[i];
+			}
+			msgData[1] += "</b>";
+		}
+		else{
+			msgData[1] = msgData[1].replaceFirst("'", "<b>'");
+			msgData[1] += "</b>";	
+		}
 		
 		rowData[2] = msgData[0] + msgData[1];
 		return rowData;
