@@ -53,10 +53,6 @@
 	<browser assert="link" />
 	<link id="link" click="false" jscriptevent="onmouseout" />
 	<browser assert="status message" />
-	<link href="#top" click="false" jscriptevent="onmouseover" />
-	<browser assert="link" />
-	<link href="#top" click="false" jscriptevent="onmouseout" />
-	<browser assert="status message" />
 	
 	<!-- testing popup -->
 	<link id="popup" click="true" />

@@ -37,6 +37,5 @@
 	<script file="tests/test-scripts/tests/image-test.xml" />  
 	<script file="tests/test-scripts/tests/javaplugin-test.xml" />
 	<script file="tests/test-scripts/tests/cleanup.xml" />
-	<script file="tests/test-scripts/tests/sugarwaittest.xml" />
   
 </soda>

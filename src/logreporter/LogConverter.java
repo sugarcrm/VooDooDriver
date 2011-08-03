@@ -131,7 +131,7 @@ public class LogConverter{
 		 * case switches for different message types
 		 */
 		//assertion passed
-		if (message.contains("Assert Passed")){
+		if (message.contains("Assert Passed") || (message.contains("Assert Failed") && message.contains("as expected"))){
 			rowData = formatAssertionPassed(line, message);
 			trStyle = "tr_assert_passed";
 		}
