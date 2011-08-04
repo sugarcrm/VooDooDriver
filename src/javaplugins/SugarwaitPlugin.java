@@ -71,7 +71,7 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 		t1 = System.currentTimeMillis();	
 		try {
 			//this is to make sure the browser has enough time to start the ajax call. probably don't need it
-			Thread.sleep(50);
+			Thread.sleep(100);
 			//maximum 15 second wait time
 			for (int i = 0; i < 31; i ++){
 				/**
@@ -129,57 +129,6 @@ public class SugarwaitPlugin implements VDDPluginInterface {
 		}else{
 			result = -1;
 		}
-		return result;
-	}
-	
-	/**
-	 * Executes the given script in the browser
-	 * 
-	 * @param jscript - javascript to get executed
-	 * @param browser - the WebDriver browser to execute the script in
-	 * @return -1 on the error else the javascript result.
-	 */
-	private String executeScript(String jscript, WebDriver browser){
-		String result = "";
-		
-		if (jscript.length() > 0){
-			//might need to escape the javascript
-			String js = "current_browser_id = 0;" +
-					"if (current_browser_id > -1){" +
-						"var target = this.selectWindow();" +
-						"var browser = target.getBrowser();" +
-						"var content = target.content;" +
-						"var doc = browser.contentDocument;" +
-						"var d = doc.createElement(\"script\");" +
-						"var tmp = null;" +
-						"" +
-						"tmp = doc.getElementById(\"Sodahack\");" +
-						"if (tmp != null) {" +
-							"doc.body.removeChild(tmp);" +
-							"}" +
-						"" +
-						"d.setAttribute(\"id\", \"Sodahack\");" +
-						"var src = \"document.soda_js_result = (function(){"+jscript+"})()\";" +
-						"d.innerHTML = src;" +
-						"if(typeof(doc) != \"undefined\" && typeof(doc.body) != \"undefined\")" +
-						"{" +
-							"doc.body.appendChild(d);" +
-							"result = doc.soda_js_result;" +
-						"}else{" +
-							"result = \"No Document Object to use\";" +
-						"}" +
-					"}else {" +
-						"result = \"No Browser to use\";" +
-					"}" +
-					"return result;";
-			//create a javascriptExecutor for WebDriver
-			JavascriptExecutor jse = (JavascriptExecutor) driver;
-			//actually execute the js in browser
-			result = (String)jse.executeScript(js);		
-		}else{
-			result = "No script passed";
-		}
-		
 		return result;
 	}
 
