@@ -41,7 +41,7 @@
 	<!-- testing span -->
 	<span class="span_class" assert="span test" />
 	<span class="span_class" assert="test message" />
-	<span class="span_class" assertnot="div test" />
+	<span class="span_class" assertnot="does not exist" />
 	
 	<!-- testing hiden -->
 	<form id="test_form">
@@ -58,7 +58,7 @@
 	<link id="popup" click="true" />
 	<attach title="popup">
 		<browser assert="this is a popup" />
-		<browser action="close" />
+		<link id="close" />
 	</attach>
 	<browser assert="popup clicked" />
 	<browser action="close" />
