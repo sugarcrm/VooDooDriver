@@ -215,6 +215,7 @@ public class LogReporter {
 			
 		}catch(NullPointerException e){
 			System.err.println("invalid path");
+			e.printStackTrace();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

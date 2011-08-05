@@ -131,7 +131,7 @@ public class LogConverter{
 		 * case switches for different message types
 		 */
 		//assertion passed
-		if (message.contains("Assert Passed")){
+		if (message.contains("Assert Passed") || (message.contains("Assert Failed") && message.contains("as expected"))){
 			rowData = formatAssertionPassed(line, message);
 			trStyle = "tr_assert_passed";
 		}
@@ -582,8 +582,17 @@ public class LogConverter{
 		String[] msgData = message.split(":");
 		String temp = msgData[0].substring(msgData[0].indexOf("'"), msgData[0].indexOf("by")-1);
 		msgData[0] = msgData[0].replaceFirst(temp, "<b>"+temp+"</b> ");
-		msgData[1] = msgData[1].replaceFirst("'", "<b>'");
-		msgData[1] += "</b>";	
+		if (msgData[1].contains("href")){
+			msgData[1] = msgData[1].replaceFirst("'", "<b>'");
+			for (int i = 2; i < msgData.length; i++){
+				msgData[1] += ":"+msgData[i];
+			}
+			msgData[1] += "</b>";
+		}
+		else{
+			msgData[1] = msgData[1].replaceFirst("'", "<b>'");
+			msgData[1] += "</b>";	
+		}
 		
 		rowData[2] = msgData[0] + msgData[1];
 		return rowData;
