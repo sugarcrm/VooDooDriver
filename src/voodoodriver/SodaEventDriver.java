@@ -349,6 +349,9 @@ public class SodaEventDriver implements Runnable {
 		case JAVAPLUGIN:
 			result = javapluginEvent(event, parent);
 			break;
+      case DELETE:
+         result = deleteEvent(event);
+         break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -364,7 +367,35 @@ public class SodaEventDriver implements Runnable {
 		
 		return result;
 	}
-	
+
+
+   private boolean deleteEvent(SodaHash event) {
+		boolean result = false;
+		
+		this.report.Log("Delete event starting.");
+		if (event.containsKey("name")) {
+			String name = event.get("name").toString();
+			name = this.replaceString(name);
+			
+			if (this.ElementStore.containsKey(name)) {
+				this.ElementStore.remove(name);
+				this.report.Log("Deleted stored var.");
+				result = true;
+			} else {
+				result = false;
+				String msg = String.format(
+               "Error: failed to find variable to delete by name: '%s'!", name);
+				this.report.ReportError(msg);
+			}
+		} else {
+			this.report.ReportError("Error: delete command missing name attribute!");
+			result = false;
+		}
+
+		this.report.Log("Finsihed Delete event.");	
+		return result;
+	}
+
 	private boolean javapluginEvent(SodaHash event, WebElement parent) {
 		boolean result = false;
 		String[] args = null;
@@ -776,23 +807,15 @@ public class SodaEventDriver implements Runnable {
 			Action dnd = null;
 			WebElement Esrc = (WebElement)this.ElementStore.get(src);
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
-			
+
 			builder = new Actions(this.Browser.getDriver());
 			builder.dragAndDrop(Esrc, Edst);
 			dnd = builder.build();
 			dnd.perform();
-			//dnd = builder.clickAndHold(Esrc).moveToElement(Edst).release(Edst).build();
-			//dnd.perform();
-			
-			//action = new Actions(this.Browser.getDriver());
-			//System.out.printf("Starting DND!\n");
-			//action.dragAndDrop(Esrc, Edst);
-			//action.clickAndHold(Esrc);
-			//action.moveToElement(Edst);
-			//action.release(Edst);
-			System.out.printf("Finished DND!\n");
 		}
-		
+	
+      this.report.Log("DND event finished.");
+
 		return result;
 	}
 	

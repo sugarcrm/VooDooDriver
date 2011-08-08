@@ -14,27 +14,11 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#ifndef __VDD_LIB_HEADER__
 
-#ifndef __VDD_HEADER__
+#define __VDD_LIB_HEADER__ 1
 
-#define __VDD_HEADER__ 1
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-
-/*
-TRACE: 
-   A debug macro for turning debug prints on when compiled with the
-   DEBUG flag set.  Really it is just a printf macro.
-*/
-#ifdef DEBUG
-   #define TRACE(a,args...) printf("[%s:%d]"#a"\n", __FUNCTION__,\
-         __LINE__, ##args) 
-#else
-   #define TRACE(a,args...) 
-#endif
+void foo(void);
 
 #endif
-
 
