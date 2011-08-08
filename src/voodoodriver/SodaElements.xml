@@ -862,5 +862,9 @@ limitations under the License.
    <javaplugin>
       <soda_attributes type="string">classname</soda_attributes>
    </javaplugin>
+
+   <delete>
+      <soda_attributes type="string">name</soda_attributes>
+   </delete>
 </soda>
 
