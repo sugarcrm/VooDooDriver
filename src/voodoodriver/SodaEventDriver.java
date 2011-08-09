@@ -28,7 +28,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -809,7 +811,26 @@ public class SodaEventDriver implements Runnable {
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
 
 			builder = new Actions(this.Browser.getDriver());
-			builder.dragAndDrop(Esrc, Edst);
+			
+			if (event.containsKey("x") && event.containsKey("y")) {
+				/*
+				String xstr = event.get("x").toString();
+				String ystr = event.get("y").toString();
+				xstr = this.replaceString(xstr);
+				ystr = this.replaceString(ystr);
+				int x = Integer.valueOf(xstr);
+				int y = Integer.valueOf(ystr);
+				Point dst_point = Edst.getLocation();
+				dst_point.x += x;
+				dst_point.y += y;
+				builder.dragAndDropBy(Esrc, dst_point.x, dst_point.y);
+				*/
+				
+				
+			} else {
+				builder.dragAndDrop(Esrc, Edst);
+			}
+			
 			dnd = builder.build();
 			dnd.perform();
 		}
