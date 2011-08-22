@@ -221,12 +221,19 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 * @return {@link String} results
 	 */
 	public String generateUIEvent(UIEvents type) {
-		String result = "var ele = arguments[0];\n"; 
-		result += "var evObj = document.createEvent('MouseEvents');\n";
-		result += "evObj.initMouseEvent( '" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+ 
-         "false, false, true, false, 0, null );\n";
-		result += "ele.dispatchEvent(evObj);\n";
-		result += "return 0;\n";
+		String result = "";
+		
+		if (type != UIEvents.FOCUS) {
+			result = "var ele = arguments[0];\n"; 
+			result += "var evObj = document.createEvent('MouseEvents');\n";
+			result += "evObj.initMouseEvent( '" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+ 
+	         "false, false, true, false, 0, null );\n";
+			result += "ele.dispatchEvent(evObj);\n";
+			result += "return 0;\n";
+		} else {
+			result = "var ele = arguments[0];\n";
+			result += "ele.focus();\nreturn 0;\n";
+		}
 		
 		return result;
 	}

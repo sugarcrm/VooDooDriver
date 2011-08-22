@@ -27,5 +27,6 @@ public enum UIEvents {
 	MOUSEDOWN,
 	MOUSEMOVE,
 	MOUSEOUT,
-	MOUSEOVER;
+	MOUSEOVER,
+	FOCUS;
 }
