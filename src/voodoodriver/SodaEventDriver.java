@@ -34,6 +34,12 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.ButtonReleaseAction;
+import org.openqa.selenium.interactions.ClickAndHoldAction;
+import org.openqa.selenium.interactions.MoveMouseAction;
+import org.openqa.selenium.interactions.MoveToOffsetAction;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.Select;
 
 public class SodaEventDriver implements Runnable {
@@ -795,6 +801,7 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (src == null) {
+			
 			this.report.ReportError("DVD command is missing 'src' attribute!");
 			result = false;
 		}
@@ -811,28 +818,40 @@ public class SodaEventDriver implements Runnable {
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
 
 			builder = new Actions(this.Browser.getDriver());
-			
 			if (event.containsKey("x") && event.containsKey("y")) {
-				/*
-				String xstr = event.get("x").toString();
-				String ystr = event.get("y").toString();
-				xstr = this.replaceString(xstr);
-				ystr = this.replaceString(ystr);
-				int x = Integer.valueOf(xstr);
-				int y = Integer.valueOf(ystr);
-				Point dst_point = Edst.getLocation();
-				dst_point.x += x;
-				dst_point.y += y;
-				builder.dragAndDropBy(Esrc, dst_point.x, dst_point.y);
-				*/
+				int x = Integer.valueOf(event.get("x").toString());
+				int y = Integer.valueOf(event.get("y").toString());
+				Mouse mouse = this.Browser.getMouse();
+				new ClickAndHoldAction(mouse, (Locatable)Esrc).perform();
+				//new MoveMouseAction(mouse, (Locatable)Edst).perform();
+				mouse.mouseMove(((Locatable)Edst).getCoordinates());
 				
+				try {
+					Point tmp = ((Locatable)Edst).getCoordinates().getLocationOnScreen();
+					Thread.currentThread();
+					Thread.sleep(1000);
+					int tmp_x = tmp.x + x;
+					int tmp_y = tmp.y + y;
+					//mouse.mouseMove(((Locatable)Edst).getCoordinates(), tmp_x, tmp_y);
+					mouse.mouseMove(null, tmp_x, tmp_y);
+				} catch (Exception exp) {
+					exp.printStackTrace();
+				}
+				
+				try {
+					Thread.sleep(2000);
+				} catch (Exception exp) {
+					exp.printStackTrace();
+				}
+				
+				new ButtonReleaseAction(mouse, null).perform();
 				
 			} else {
 				builder.dragAndDrop(Esrc, Edst);
+				dnd = builder.build();
+				dnd.perform();
 			}
-			
-			dnd = builder.build();
-			dnd.perform();
+
 		}
 	
       this.report.Log("DND event finished.");

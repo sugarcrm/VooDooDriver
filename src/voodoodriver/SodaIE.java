@@ -52,7 +52,7 @@ public class SodaIE extends SodaBrowser implements SodaBrowserInterface {
 	
 
 	public Mouse getMouse() {
-		return this.getMouse();
+		return ((InternetExplorerDriver)this.getDriver()).getMouse();
 	}
 	
 }

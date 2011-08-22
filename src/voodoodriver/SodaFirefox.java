@@ -96,6 +96,6 @@ public class SodaFirefox extends SodaBrowser implements SodaBrowserInterface {
 	}
 	
 	public Mouse getMouse() {
-		return this.getMouse();
+		return ((FirefoxDriver)this.getDriver()).getMouse();
 	}
 }

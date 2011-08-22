@@ -64,6 +64,6 @@ public class SodaChrome extends SodaBrowser {
 	}
 	
 	public Mouse getMouse() {
-		return this.getMouse();
+		return ((ChromeDriver)this.getDriver()).getMouse();
 	}
 }
