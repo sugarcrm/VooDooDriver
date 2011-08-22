@@ -817,41 +817,8 @@ public class SodaEventDriver implements Runnable {
 			WebElement Esrc = (WebElement)this.ElementStore.get(src);
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
 
-			builder = new Actions(this.Browser.getDriver());
-			if (event.containsKey("x") && event.containsKey("y")) {
-				int x = Integer.valueOf(event.get("x").toString());
-				int y = Integer.valueOf(event.get("y").toString());
-				Mouse mouse = this.Browser.getMouse();
-				new ClickAndHoldAction(mouse, (Locatable)Esrc).perform();
-				//new MoveMouseAction(mouse, (Locatable)Edst).perform();
-				mouse.mouseMove(((Locatable)Edst).getCoordinates());
-				
-				try {
-					Point tmp = ((Locatable)Edst).getCoordinates().getLocationOnScreen();
-					Thread.currentThread();
-					Thread.sleep(1000);
-					int tmp_x = tmp.x + x;
-					int tmp_y = tmp.y + y;
-					//mouse.mouseMove(((Locatable)Edst).getCoordinates(), tmp_x, tmp_y);
-					mouse.mouseMove(null, tmp_x, tmp_y);
-				} catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				
-				try {
-					Thread.sleep(2000);
-				} catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				
-				new ButtonReleaseAction(mouse, null).perform();
-				
-			} else {
-				builder.dragAndDrop(Esrc, Edst);
-				dnd = builder.build();
-				dnd.perform();
-			}
-
+			VDDMouse mouse = new VDDMouse(this.report);
+			mouse.DnD(Esrc, Edst);
 		}
 	
       this.report.Log("DND event finished.");
