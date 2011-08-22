@@ -28,18 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Mouse;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.ButtonReleaseAction;
-import org.openqa.selenium.interactions.ClickAndHoldAction;
-import org.openqa.selenium.interactions.MoveMouseAction;
-import org.openqa.selenium.interactions.MoveToOffsetAction;
-import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.Select;
 
 public class SodaEventDriver implements Runnable {
@@ -812,11 +802,8 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (result) {
-			Actions builder = null;
-			Action dnd = null;
 			WebElement Esrc = (WebElement)this.ElementStore.get(src);
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
-
 			VDDMouse mouse = new VDDMouse(this.report);
 			mouse.DnD(Esrc, Edst);
 		}
