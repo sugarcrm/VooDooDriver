@@ -117,7 +117,9 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
+			this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
+			this.report.Log("AssertPage finished.");
 		}
 	}
 	

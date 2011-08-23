@@ -334,7 +334,6 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 		
 		if (this.asserter == null && this.assertPageFile != null) {
 			try {
-				System.out.printf("FOOBAR!\n\n");
 				this.asserter = new SodaPageAsserter(this.assertPageFile, this.reporter);
 			} catch (Exception exp) {
 				this.reporter.ReportException(exp);
