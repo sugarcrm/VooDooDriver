@@ -1482,6 +1482,7 @@ public class SodaEventDriver implements Runnable {
 		boolean is_REGEX = false;
 		String finder = "";
 		String found_handle = null;
+		String msg = "";
 		int timeout = 10;
 		
 		try {
@@ -1556,7 +1557,7 @@ public class SodaEventDriver implements Runnable {
 			} // end timer loop //
 			
 			if (found_handle == null) {
-				String msg = String.format("Failed to find window matching: '%s!'", finder);
+				msg = String.format("Failed to find window matching: '%s!'", finder);
 				this.report.ReportError(msg);
 				result = false;
 				this.Browser.getDriver().switchTo().window(currentWindow);
@@ -1565,12 +1566,15 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			this.Browser.getDriver().switchTo().window(found_handle);
+			msg = String.format("Switching to window handle: '%s'.", found_handle);
+			this.report.Log(msg);
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), null);
 			}
 			
 			this.Browser.getDriver().switchTo().window(currentWindow);
-			
+			msg = String.format("Switching back to window handle: '%s'.", currentWindow);
+			this.report.Log(msg);
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
