@@ -1485,7 +1485,7 @@ public class SodaEventDriver implements Runnable {
 		int timeout = 10;
 		
 		try {
-			this.report.Log("Starting attach event.");
+			this.report.Log("Attach event starting.");
 			String currentWindow = this.Browser.getDriver().getWindowHandle();
 			this.report.Log(String.format("Current Window Handle: '%s'.", currentWindow));
 			
@@ -1574,6 +1574,8 @@ public class SodaEventDriver implements Runnable {
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
+		
+		this.report.Log("Attach event finished.");
 		
 		return result;
 	}
