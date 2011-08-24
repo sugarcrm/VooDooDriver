@@ -79,12 +79,15 @@ public class SodaEventDriver implements Runnable {
 				this.sodaVars.put(key, value);
 			}
 		}
-		
+
 		this.loadJavaEventPlugins();
 		this.stampEvent();
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		this.sodaVars.put("currentdate", df.format(new Date()));
 		this.threadTime = new Date();
 		this.runner = new Thread(this, "SodaEventDriver-Thread");
 		runner.start();
+
 	}
 	
 	private void loadJavaEventPlugins() {
