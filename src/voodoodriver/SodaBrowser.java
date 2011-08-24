@@ -355,25 +355,6 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 * 
 	 * @return {@link WebElement}
 	 */
-	public WebElement findElement_old(By by, int retryTime) {
-		WebElement result = null;
-		long end = System.currentTimeMillis() + retryTime * 1000;
-		
-		while (System.currentTimeMillis() < end) {
-			try {
-				result = this.Driver.findElement(by);
-			} catch (Exception exp) {
-				result = null;
-			}
-			
-			if (result != null) {
-				break;
-			}
-		}
-		
-		return result;
-	}
-
 	public WebElement findElement(By by, int retryTime) {
 		WebElement result = null;
 		long end = System.currentTimeMillis() + retryTime * 1000;
