@@ -22,6 +22,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+
 /**
  * An base class for adding new web browser support for VooDooDriver.
  * 
@@ -383,7 +385,7 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 * @param required
 	 * @return {@link WebElement}
 	 */
-	public WebElement findElements(By by, int retryTime, int index, boolean required) {
+	public WebElement findElements(By by, int retryTime, int index, boolean required, boolean exists) {
 		WebElement result = null;
 		List<WebElement> elements = null;
 		int len = 0;
@@ -398,6 +400,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 				if (len >= index) {
 					result = elements.get(index);
 				}
+			} catch (ElementNotFoundException expnot) { 
+				if (exists) {
+					this.reporter.ReportError("Failed to find element!");
+				} else {
+					break;
+				}
 			} catch (Exception exp) {
 				result = null;
 				this.reporter.ReportException(exp);
@@ -408,10 +416,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 			}
 		}
 
-		if (len < index && result == null && required != false) {
-			msg = String.format("Failed to find element by index '%d', index is out of bounds!", index);
-			this.reporter.ReportError(msg);
-			result = null;
+		if (exists) {
+			if (len < index && result == null && required != false) {
+				msg = String.format("Failed to find element by index '%d', index is out of bounds!", index);
+				this.reporter.ReportError(msg);
+				result = null;
+			}
 		}
 		
 		return result;

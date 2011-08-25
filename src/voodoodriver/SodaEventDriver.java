@@ -2051,10 +2051,15 @@ public class SodaEventDriver implements Runnable {
 		By by = null;
 		boolean href = false;
 		boolean value = false;
+		boolean exists = true;
 		String how = "";
 		String what = "";
 		int index = -1;
 		int timeout = 5;
+		
+		if (event.containsKey("exist")) {
+			exists = this.clickToBool(event.get("exist").toString());
+		}
 		
 		if (event.containsKey("timeout")) {
 			timeout = Integer.valueOf(event.get("timeout").toString());
@@ -2148,7 +2153,7 @@ public class SodaEventDriver implements Runnable {
 			}else {
 				if (parent == null) {
 					if (index > -1) {
-						element = this.Browser.findElements(by, timeout, index, required);
+						element = this.Browser.findElements(by, timeout, index, required, exists);
 					} else {
 						element = this.Browser.findElement(by, timeout);
 					}
@@ -2171,7 +2176,7 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 		} catch (NoSuchElementException exp) {
-			if (required) {
+			if (required && exists) {
 				this.report.ReportException(exp);
 				element = null;
 			}
@@ -2182,7 +2187,7 @@ public class SodaEventDriver implements Runnable {
 		
 		this.resetThreadTime();
 		
-		if (element == null) {
+		if (element == null && exists == true) {
 			if (required) {
 				String msg = String.format("Failed to find element: '%s' => '%s'", how, what);
 				this.report.ReportError(msg);
@@ -2190,6 +2195,10 @@ public class SodaEventDriver implements Runnable {
 				String msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'", how, what);
 				this.report.Log(msg);
 			}
+		} else if (element != null && exists != true) {
+			this.report.ReportError("Found element with exist => 'false'!");
+		} else if (element == null && exists != true) { 
+			this.report.Log("Did not find element as exist => 'false'.");
 		} else {
 			this.report.Log("Found element.");
 		}
@@ -2373,13 +2382,7 @@ public class SodaEventDriver implements Runnable {
 		try {
 			element = this.findElement(event, parent, required);
 			if (element == null) {
-				if (required) {
-					this.report.ReportError("Failed to find button!");
-				} else {
-					String msg = String.format("failed to find button, but required => '%s'.", required);
-					this.report.Log(msg);
-				}
-				
+				this.report.Log("Finished button event.");
 				return null;
 			}
 			
