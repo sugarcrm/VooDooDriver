@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
@@ -121,9 +122,9 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
-			this.report.Log("AssertPage Starting.");
+			//this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
-			this.report.Log("AssertPage finished.");
+			//this.report.Log("AssertPage finished.");
 		}
 	}
 	
@@ -356,6 +357,9 @@ public class SodaEventDriver implements Runnable {
       case DELETE:
          result = deleteEvent(event);
          break;
+      case ALERT:
+      	result = alertEvent(event);
+      	break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -373,6 +377,49 @@ public class SodaEventDriver implements Runnable {
 	}
 
 
+	private boolean alertEvent(SodaHash event) {
+		boolean result = false;
+		boolean alert_var = false;
+		String msg = "";
+		
+		this.report.Log("Alert event starting.");
+		
+		if (!event.containsKey("alert")) {
+			result = false;
+			this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
+			return result;
+		}
+		
+		String tmp = event.get("alert").toString();
+		alert_var = this.clickToBool(tmp);
+		
+		try {
+			Alert alert = this.Browser.getDriver().switchTo().alert();
+			tmp = alert.getText();
+			msg = String.format("Found Alert dialog: '%s'.", tmp);
+			this.report.Log(msg);
+			if (alert_var) {
+				this.report.Log("Alert is being Accepted.");
+				alert.accept();
+			} else {
+				this.report.Log("Alert is being Dismissed.");
+				alert.dismiss();
+			}
+			
+			this.Browser.getDriver().switchTo().defaultContent();
+			Thread.currentThread();
+			Thread.sleep(1000);
+			result = true;
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+			result = false;
+		}
+		
+		this.report.Log("Alert event finished.");
+		
+		return result;
+	}
+	
    private boolean deleteEvent(SodaHash event) {
 		boolean result = false;
 		
