@@ -1788,7 +1788,9 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			if (event.containsKey("set")) {
-				boolean check = this.clickToBool(event.get("set").toString());
+				String set = event.get("set").toString();
+				set = this.replaceString(set);
+				boolean check = this.clickToBool(set);
 				
 				if (!check) {
 					this.report.Log("Unchecking checkbox.");
