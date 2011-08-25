@@ -16,6 +16,7 @@ limitations under the License.
 
 package voodoodriver;
 
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
@@ -92,5 +93,9 @@ public class SodaFirefox extends SodaBrowser implements SodaBrowserInterface {
 			exp.printStackTrace();
 		}
 		this.setBrowserClosed();
+	}
+	
+	public Mouse getMouse() {
+		return ((FirefoxDriver)this.getDriver()).getMouse();
 	}
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package voodoodriver;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -73,5 +74,7 @@ public interface SodaBrowserInterface {
 	public void setAssertPageFile(String filename, SodaReporter reporter);
 	
 	public String getAssertPageFile();
+	
+	public Mouse getMouse();
 	
 }

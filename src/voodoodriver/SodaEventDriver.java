@@ -30,8 +30,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 public class SodaEventDriver implements Runnable {
@@ -81,12 +79,15 @@ public class SodaEventDriver implements Runnable {
 				this.sodaVars.put(key, value);
 			}
 		}
-		
+
 		this.loadJavaEventPlugins();
 		this.stampEvent();
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		this.sodaVars.put("currentdate", df.format(new Date()));
 		this.threadTime = new Date();
 		this.runner = new Thread(this, "SodaEventDriver-Thread");
 		runner.start();
+
 	}
 	
 	private void loadJavaEventPlugins() {
@@ -119,7 +120,9 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
+			this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
+			this.report.Log("AssertPage finished.");
 		}
 	}
 	
@@ -793,6 +796,7 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (src == null) {
+			
 			this.report.ReportError("DVD command is missing 'src' attribute!");
 			result = false;
 		}
@@ -803,15 +807,10 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (result) {
-			Actions builder = null;
-			Action dnd = null;
 			WebElement Esrc = (WebElement)this.ElementStore.get(src);
 			WebElement Edst = (WebElement)this.ElementStore.get(dst);
-
-			builder = new Actions(this.Browser.getDriver());
-			builder.dragAndDrop(Esrc, Edst);
-			dnd = builder.build();
-			dnd.perform();
+			VDDMouse mouse = new VDDMouse(this.report);
+			mouse.DnD(Esrc, Edst);
 		}
 	
       this.report.Log("DND event finished.");
@@ -1488,10 +1487,11 @@ public class SodaEventDriver implements Runnable {
 		boolean is_REGEX = false;
 		String finder = "";
 		String found_handle = null;
+		String msg = "";
 		int timeout = 10;
 		
 		try {
-			this.report.Log("Starting attach event.");
+			this.report.Log("Attach event starting.");
 			String currentWindow = this.Browser.getDriver().getWindowHandle();
 			this.report.Log(String.format("Current Window Handle: '%s'.", currentWindow));
 			
@@ -1562,7 +1562,7 @@ public class SodaEventDriver implements Runnable {
 			} // end timer loop //
 			
 			if (found_handle == null) {
-				String msg = String.format("Failed to find window matching: '%s!'", finder);
+				msg = String.format("Failed to find window matching: '%s!'", finder);
 				this.report.ReportError(msg);
 				result = false;
 				this.Browser.getDriver().switchTo().window(currentWindow);
@@ -1571,15 +1571,21 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			this.Browser.getDriver().switchTo().window(found_handle);
+			msg = String.format("Switching to window handle: '%s'.", found_handle);
+			this.report.Log(msg);
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), null);
 			}
 			
+			this.Browser.setBrowserState(false);
 			this.Browser.getDriver().switchTo().window(currentWindow);
-			
+			msg = String.format("Switching back to window handle: '%s'.", currentWindow);
+			this.report.Log(msg);
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
+		
+		this.report.Log("Attach event finished.");
 		
 		return result;
 	}
@@ -1783,7 +1789,9 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			if (event.containsKey("set")) {
-				boolean check = this.clickToBool(event.get("set").toString());
+				String set = event.get("set").toString();
+				set = this.replaceString(set);
+				boolean check = this.clickToBool(set);
 				
 				if (!check) {
 					this.report.Log("Unchecking checkbox.");
@@ -2046,10 +2054,15 @@ public class SodaEventDriver implements Runnable {
 		By by = null;
 		boolean href = false;
 		boolean value = false;
+		boolean exists = true;
 		String how = "";
 		String what = "";
 		int index = -1;
 		int timeout = 5;
+		
+		if (event.containsKey("exist")) {
+			exists = this.clickToBool(event.get("exist").toString());
+		}
 		
 		if (event.containsKey("timeout")) {
 			timeout = Integer.valueOf(event.get("timeout").toString());
@@ -2143,7 +2156,7 @@ public class SodaEventDriver implements Runnable {
 			}else {
 				if (parent == null) {
 					if (index > -1) {
-						element = this.Browser.findElements(by, timeout, index, required);
+						element = this.Browser.findElements(by, timeout, index, required, exists);
 					} else {
 						element = this.Browser.findElement(by, timeout);
 					}
@@ -2166,7 +2179,7 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 		} catch (NoSuchElementException exp) {
-			if (required) {
+			if (required && exists) {
 				this.report.ReportException(exp);
 				element = null;
 			}
@@ -2177,7 +2190,7 @@ public class SodaEventDriver implements Runnable {
 		
 		this.resetThreadTime();
 		
-		if (element == null) {
+		if (element == null && exists == true) {
 			if (required) {
 				String msg = String.format("Failed to find element: '%s' => '%s'", how, what);
 				this.report.ReportError(msg);
@@ -2185,6 +2198,10 @@ public class SodaEventDriver implements Runnable {
 				String msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'", how, what);
 				this.report.Log(msg);
 			}
+		} else if (element != null && exists != true) {
+			this.report.ReportError("Found element with exist => 'false'!");
+		} else if (element == null && exists != true) { 
+			this.report.Log("Did not find element as exist => 'false'.");
 		} else {
 			this.report.Log("Found element.");
 		}
@@ -2368,13 +2385,7 @@ public class SodaEventDriver implements Runnable {
 		try {
 			element = this.findElement(event, parent, required);
 			if (element == null) {
-				if (required) {
-					this.report.ReportError("Failed to find button!");
-				} else {
-					String msg = String.format("failed to find button, but required => '%s'.", required);
-					this.report.Log(msg);
-				}
-				
+				this.report.Log("Finished button event.");
 				return null;
 			}
 			

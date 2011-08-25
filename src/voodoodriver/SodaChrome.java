@@ -16,6 +16,7 @@ limitations under the License.
 
 package voodoodriver;
 
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 /**
@@ -60,5 +61,9 @@ public class SodaChrome extends SodaBrowser {
 	public void forceClose() {
 		SodaOSInfo.killProcesses(SodaOSInfo.getProcessIDs("Google Chrome"));
 		this.setBrowserClosed();
+	}
+	
+	public Mouse getMouse() {
+		return ((ChromeDriver)this.getDriver()).getMouse();
 	}
 }

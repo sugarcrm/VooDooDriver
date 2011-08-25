@@ -16,6 +16,7 @@ limitations under the License.
 
 package voodoodriver;
 
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 public class SodaIE extends SodaBrowser implements SodaBrowserInterface {
@@ -49,5 +50,9 @@ public class SodaIE extends SodaBrowser implements SodaBrowserInterface {
 		this.executeJS(alert_js, null);
 	}
 	
+
+	public Mouse getMouse() {
+		return ((InternetExplorerDriver)this.getDriver()).getMouse();
+	}
 	
 }

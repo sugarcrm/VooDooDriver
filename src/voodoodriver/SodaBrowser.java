@@ -22,6 +22,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+
 /**
  * An base class for adding new web browser support for VooDooDriver.
  * 
@@ -221,12 +223,19 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 * @return {@link String} results
 	 */
 	public String generateUIEvent(UIEvents type) {
-		String result = "var ele = arguments[0];\n"; 
-		result += "var evObj = document.createEvent('MouseEvents');\n";
-		result += "evObj.initMouseEvent( '" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+ 
-         "false, false, true, false, 0, null );\n";
-		result += "ele.dispatchEvent(evObj);\n";
-		result += "return 0;\n";
+		String result = "";
+		
+		if (type != UIEvents.FOCUS) {
+			result = "var ele = arguments[0];\n"; 
+			result += "var evObj = document.createEvent('MouseEvents');\n";
+			result += "evObj.initMouseEvent( '" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+ 
+	         "false, false, true, false, 0, null );\n";
+			result += "ele.dispatchEvent(evObj);\n";
+			result += "return 0;\n";
+		} else {
+			result = "var ele = arguments[0];\n";
+			result += "ele.focus();\nreturn 0;\n";
+		}
 		
 		return result;
 	}
@@ -327,7 +336,6 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 		
 		if (this.asserter == null && this.assertPageFile != null) {
 			try {
-				System.out.printf("FOOBAR!\n\n");
 				this.asserter = new SodaPageAsserter(this.assertPageFile, this.reporter);
 			} catch (Exception exp) {
 				this.reporter.ReportException(exp);
@@ -377,7 +385,7 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 * @param required
 	 * @return {@link WebElement}
 	 */
-	public WebElement findElements(By by, int retryTime, int index, boolean required) {
+	public WebElement findElements(By by, int retryTime, int index, boolean required, boolean exists) {
 		WebElement result = null;
 		List<WebElement> elements = null;
 		int len = 0;
@@ -392,6 +400,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 				if (len >= index) {
 					result = elements.get(index);
 				}
+			} catch (ElementNotFoundException expnot) { 
+				if (exists) {
+					this.reporter.ReportError("Failed to find element!");
+				} else {
+					break;
+				}
 			} catch (Exception exp) {
 				result = null;
 				this.reporter.ReportException(exp);
@@ -402,10 +416,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 			}
 		}
 
-		if (len < index && result == null && required != false) {
-			msg = String.format("Failed to find element by index '%d', index is out of bounds!", index);
-			this.reporter.ReportError(msg);
-			result = null;
+		if (exists) {
+			if (len < index && result == null && required != false) {
+				msg = String.format("Failed to find element by index '%d', index is out of bounds!", index);
+				this.reporter.ReportError(msg);
+				result = null;
+			}
 		}
 		
 		return result;
