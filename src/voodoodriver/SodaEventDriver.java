@@ -2215,7 +2215,8 @@ public class SodaEventDriver implements Runnable {
 			}
 		} catch (NoSuchElementException exp) {
 			if (required && exists) {
-				this.report.ReportException(exp);
+				this.report.ReportError("Failed to find element!");
+				//this.report.ReportException(exp);
 				element = null;
 			}
 		} catch (Exception exp) {
