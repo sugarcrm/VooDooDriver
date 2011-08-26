@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -560,6 +561,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -602,6 +605,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.AREA, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Area click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -647,6 +652,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -689,6 +696,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.OL, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("OL click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -848,6 +857,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.IMAGE, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Image click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -885,6 +896,8 @@ public class SodaEventDriver implements Runnable {
 				element.sendKeys(setvalue);
 				this.report.Log("Finished set.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -924,6 +937,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.LI, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -965,6 +980,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.TR, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1006,6 +1023,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.TD, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -1130,6 +1149,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children") && element != null) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1214,6 +1235,8 @@ public class SodaEventDriver implements Runnable {
 				this.report.Assert(msg, ischecked, expected);
 
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1367,6 +1390,8 @@ public class SodaEventDriver implements Runnable {
 					}
 				}
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1408,6 +1433,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children") && element != null) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1470,6 +1497,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1676,6 +1705,8 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
 			
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1804,6 +1835,8 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 			
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1871,6 +1904,8 @@ public class SodaEventDriver implements Runnable {
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2415,6 +2450,8 @@ public class SodaEventDriver implements Runnable {
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2479,6 +2516,8 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+		}catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2541,6 +2580,8 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
