@@ -1577,8 +1577,8 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents)event.get("children"), null);
 			}
 			
-			this.Browser.getDriver().switchTo().window(currentWindow);
 			this.Browser.setBrowserState(false);
+			this.Browser.getDriver().switchTo().window(currentWindow);
 			msg = String.format("Switching back to window handle: '%s'.", currentWindow);
 			this.report.Log(msg);
 		} catch (Exception exp) {
