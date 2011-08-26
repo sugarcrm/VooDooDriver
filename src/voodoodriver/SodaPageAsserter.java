@@ -58,7 +58,7 @@ public class SodaPageAsserter {
 	}
 	
 	public void assertPage(String pagesrc) {
-		this.reporter.Log("Page Assert Starting.");
+		//this.reporter.Log("Page Assert Starting.");
 		int ignore_len = this.ignores.size() -1;
 		int check_len = this.checkes.size() -1;
 		
@@ -90,7 +90,7 @@ public class SodaPageAsserter {
 			}
 		}
 		
-		this.reporter.Log("Page Assert Finished.");
+		//this.reporter.Log("Page Assert Finished.");
 	}
 	
 	private void parse(NodeList nodes) {
