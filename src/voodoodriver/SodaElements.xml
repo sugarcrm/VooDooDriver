@@ -869,6 +869,9 @@ limitations under the License.
    
    <alert>
    	<soda_attributes type="boolean">alert</soda_attributes>
+   	<soda_attributes type="boolean">exist</soda_attributes>
+   	<soda_attributes type="string">assert</soda_attributes>
+   	<soda_attributes type="string">assertnot</soda_attributes>
    </alert>
    
    <screenshot>

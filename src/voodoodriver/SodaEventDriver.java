@@ -30,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -403,23 +404,34 @@ public class SodaEventDriver implements Runnable {
 	private boolean alertEvent(SodaHash event) {
 		boolean result = false;
 		boolean alert_var = false;
+		boolean exists = true;
 		String msg = "";
+		String alert_text = "";
 		
 		this.report.Log("Alert event starting.");
 		
-		if (!event.containsKey("alert")) {
+		if (!event.containsKey("alert") && !event.containsKey("exist")) {
 			result = false;
 			this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
 			return result;
 		}
 		
-		String tmp = event.get("alert").toString();
-		alert_var = this.clickToBool(tmp);
+		if (event.containsKey("alert")) {
+			String tmp = event.get("alert").toString();
+			tmp = this.replaceString(tmp);
+			alert_var = this.clickToBool(tmp);
+		}
+		
+		if (event.containsKey("exist")) {
+			String tmp = event.get("exist").toString();
+			tmp = this.replaceString(tmp);
+			exists = this.clickToBool(tmp);
+		}
 		
 		try {
 			Alert alert = this.Browser.getDriver().switchTo().alert();
-			tmp = alert.getText();
-			msg = String.format("Found Alert dialog: '%s'.", tmp);
+			alert_text = alert.getText();
+			msg = String.format("Found Alert dialog: '%s'.", alert_text);
 			this.report.Log(msg);
 			if (alert_var) {
 				this.report.Log("Alert is being Accepted.");
@@ -432,7 +444,27 @@ public class SodaEventDriver implements Runnable {
 			this.Browser.getDriver().switchTo().defaultContent();
 			Thread.currentThread();
 			Thread.sleep(1000);
+			
+			if (event.containsKey("assert")) {
+				String ass = event.get("assert").toString();
+				this.report.Assert(ass, alert_text);
+			}
+			
+			if (event.containsKey("assertnot")) {
+				String ass = event.get("assertnot").toString();
+				this.report.AssertNot(ass, alert_text);
+			}
+			
 			result = true;
+		} catch (NoAlertPresentException exp) { 
+			if (!exists) {
+				msg = String.format("Alert dialog does next exist as expected.", exists);
+				this.report.Assert(msg, false, false);
+				result = true;
+			} else {
+				this.report.ReportError("Error: No alert dialog found!");
+				result = false;
+			}
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			result = false;
