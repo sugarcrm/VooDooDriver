@@ -360,6 +360,9 @@ public class SodaEventDriver implements Runnable {
       case ALERT:
       	result = alertEvent(event);
       	break;
+      case SCREENSHOT:
+      	result = screenshotEvent(event);
+      	break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -376,7 +379,27 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-
+	private boolean screenshotEvent(SodaHash event) {
+		boolean result = false;
+		String filename = "";
+		
+		this.report.Log("Screenshot event starting.");
+		
+		if (!event.containsKey("file")) {
+			result = false;
+			this.report.ReportError("Error: screenshot command missing 'file' attribute!");
+			this.report.Log("Screenshot event finished.");
+			return result;
+		} else {
+			filename = event.get("file").toString();
+			filename = this.replaceString(filename);
+			SodaUtils.takeScreenShot(filename, this.report);
+		}
+		
+		this.report.Log("Screenshot event finished.");
+		return result;
+	}
+	
 	private boolean alertEvent(SodaHash event) {
 		boolean result = false;
 		boolean alert_var = false;

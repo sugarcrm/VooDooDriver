@@ -870,5 +870,9 @@ limitations under the License.
    <alert>
    	<soda_attributes type="boolean">alert</soda_attributes>
    </alert>
+   
+   <screenshot>
+   	<soda_attributes type="string">file</soda_attributes>
+   </screenshot>
 </soda>
 

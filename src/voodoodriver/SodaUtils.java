@@ -136,13 +136,22 @@ public class SodaUtils {
 		return result;
 	}
 	
-	public boolean takeScreenShot(String outputFile, SodaReporter reporter) {
+	public static boolean takeScreenShot(String outputFile, SodaReporter reporter) {
 		boolean result = false;
 		Robot r = null;
+		String msg = "";
 
 		reporter.Log("Taking Screenshot.");
 		
 		try {
+			
+			File tmp = new File(outputFile);
+			if (tmp.exists()) {
+				msg = String.format("Existing screenshot file will be over written: '%s'.", outputFile);
+				reporter.Warn(msg);
+				tmp = null;
+			}
+			
 			r = new Robot();
 			Rectangle rec = new Rectangle();
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -150,6 +159,8 @@ public class SodaUtils {
 			rec.setSize(dim);
 			BufferedImage img = r.createScreenCapture(rec);
 			ImageIO.write(img, "png", new File(outputFile));
+			msg = String.format("Screenshot file: %s", outputFile);
+			reporter.Log(msg);
 		} catch (Exception exp) {
 			reporter.ReportException(exp);
 			result = false;
@@ -160,5 +171,4 @@ public class SodaUtils {
 		return result;
 		
 	}
-
 }
