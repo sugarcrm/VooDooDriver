@@ -405,6 +405,7 @@ public class SodaEventDriver implements Runnable {
 		boolean result = false;
 		boolean alert_var = false;
 		boolean exists = true;
+		boolean user_exists_true = false;
 		String msg = "";
 		String alert_text = "";
 		
@@ -426,6 +427,9 @@ public class SodaEventDriver implements Runnable {
 			String tmp = event.get("exist").toString();
 			tmp = this.replaceString(tmp);
 			exists = this.clickToBool(tmp);
+			if (exists) {
+				user_exists_true = true;
+			}
 		}
 		
 		try {
@@ -453,6 +457,10 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("assertnot")) {
 				String ass = event.get("assertnot").toString();
 				this.report.AssertNot(ass, alert_text);
+			}
+			
+			if (user_exists_true) {
+				this.report.Assert("Alert dialog does eixts.", true, true);
 			}
 			
 			result = true;
