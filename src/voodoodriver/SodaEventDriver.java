@@ -1958,12 +1958,19 @@ public class SodaEventDriver implements Runnable {
 	private WebElement linkEvent(SodaHash event, WebElement parent) {
 		boolean click = true;
 		boolean required = true;
+		boolean exists = true;
 		WebElement element = null;
 		
 		this.resetThreadTime();
 		
 		if (event.containsKey("required")) {
 			required = this.clickToBool(event.get("required").toString());
+		}
+		
+		if (event.containsKey("exist")) {
+			String tmp = event.get("exist").toString();
+			tmp = this.replaceString(tmp);
+			exists = this.clickToBool(tmp);
 		}
 		
 		try {
@@ -1975,9 +1982,13 @@ public class SodaEventDriver implements Runnable {
 			element = this.findElement(event, parent, required);
 
 			if (element == null) {
-				if (required) {
+				if (required && exists) {
 					String msg = String.format("Failed to find link: '%s' => '%s'!", how, value);
 					this.report.ReportError(msg);
+				}
+				
+				if (exists != true) {
+					this.report.Assert("Link does not exist.", false, false);
 				}
 				
 				element = null;
@@ -1991,6 +2002,7 @@ public class SodaEventDriver implements Runnable {
 				boolean alert = this.clickToBool(event.get("alert").toString());
 				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 			
 			if (event.containsKey("click")) {
@@ -2545,6 +2557,7 @@ public class SodaEventDriver implements Runnable {
 				boolean alert = this.clickToBool(event.get("alert").toString());
 				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 			
 			if (click) {

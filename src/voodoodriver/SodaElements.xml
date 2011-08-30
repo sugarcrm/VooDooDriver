@@ -877,5 +877,10 @@ limitations under the License.
    <screenshot>
    	<soda_attributes type="string">file</soda_attributes>
    </screenshot>
+   
+   <frame>
+   
+   </frame>
+   
 </soda>
 
