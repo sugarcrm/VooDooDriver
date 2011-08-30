@@ -879,7 +879,9 @@ limitations under the License.
    </screenshot>
    
    <frame>
-   
+		<accessor type="string">name</accessor>
+		<accessor type="string">id</accessor>
+		<accessor type="string">index</accessor>
    </frame>
    
 </soda>
