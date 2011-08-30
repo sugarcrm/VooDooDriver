@@ -32,6 +32,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -364,6 +365,9 @@ public class SodaEventDriver implements Runnable {
       case SCREENSHOT:
       	result = screenshotEvent(event);
       	break;
+      case FRAME:
+      		result = frameEvent(event);
+      		break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -380,6 +384,54 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
+	private boolean frameEvent(SodaHash event) {
+		boolean result = false;
+		int index = -1;
+		String frameid = null;
+		
+		this.report.Log("Frame event starting.");
+		
+		if (event.containsKey("index")) {
+			String tmp = event.get("index").toString();
+			tmp = this.replaceString(tmp);
+			index = Integer.valueOf(tmp);
+		}
+		
+		if (event.containsKey("id")) {
+			frameid = event.get("id").toString();
+			frameid = this.replaceString(frameid);
+		}
+		
+		if (event.containsKey("name")) {
+			frameid = event.get("name").toString();
+			frameid = this.replaceString(frameid);
+		}
+		
+		try {
+			if (index > -1) {
+				this.report.Log("Switching to frame by index: '" + index + "'.");
+				this.Browser.getDriver().switchTo().frame(index);
+			} else {
+				this.report.Log("Switching to frame by name: '" + frameid + "'.");
+				this.Browser.getDriver().switchTo().frame(frameid);
+			}
+		
+			if (event.containsKey("children")) {
+				this.processEvents((SodaEvents)event.get("children"), null);
+			} else {
+				this.report.Log("Switching back to default frame.");
+				this.Browser.getDriver().switchTo().defaultContent();
+			}
+		} catch (NoSuchFrameException exp) {
+			this.report.ReportError("Failed to find frame!");
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+		}
+		this.report.Log("Frame event finished.");
+		
+		return result;
+	}
+	
 	private boolean screenshotEvent(SodaHash event) {
 		boolean result = false;
 		String filename = "";
