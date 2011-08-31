@@ -27,8 +27,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -120,9 +124,9 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
-			this.report.Log("AssertPage Starting.");
+			//this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
-			this.report.Log("AssertPage finished.");
+			//this.report.Log("AssertPage finished.");
 		}
 	}
 	
@@ -355,6 +359,15 @@ public class SodaEventDriver implements Runnable {
       case DELETE:
          result = deleteEvent(event);
          break;
+      case ALERT:
+      	result = alertEvent(event);
+      	break;
+      case SCREENSHOT:
+      	result = screenshotEvent(event);
+      	break;
+      case FRAME:
+      		result = frameEvent(event);
+      		break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -371,7 +384,157 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-
+	private boolean frameEvent(SodaHash event) {
+		boolean result = false;
+		int index = -1;
+		String frameid = null;
+		
+		this.report.Log("Frame event starting.");
+		
+		if (event.containsKey("index")) {
+			String tmp = event.get("index").toString();
+			tmp = this.replaceString(tmp);
+			index = Integer.valueOf(tmp);
+		}
+		
+		if (event.containsKey("id")) {
+			frameid = event.get("id").toString();
+			frameid = this.replaceString(frameid);
+		}
+		
+		if (event.containsKey("name")) {
+			frameid = event.get("name").toString();
+			frameid = this.replaceString(frameid);
+		}
+		
+		try {
+			if (index > -1) {
+				this.report.Log("Switching to frame by index: '" + index + "'.");
+				this.Browser.getDriver().switchTo().frame(index);
+			} else {
+				this.report.Log("Switching to frame by name: '" + frameid + "'.");
+				this.Browser.getDriver().switchTo().frame(frameid);
+			}
+		
+			if (event.containsKey("children")) {
+				this.processEvents((SodaEvents)event.get("children"), null);
+			} else {
+				this.report.Log("Switching back to default frame.");
+				this.Browser.getDriver().switchTo().defaultContent();
+			}
+		} catch (NoSuchFrameException exp) {
+			this.report.ReportError("Failed to find frame!");
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+		}
+		this.report.Log("Frame event finished.");
+		
+		return result;
+	}
+	
+	private boolean screenshotEvent(SodaHash event) {
+		boolean result = false;
+		String filename = "";
+		
+		this.report.Log("Screenshot event starting.");
+		
+		if (!event.containsKey("file")) {
+			result = false;
+			this.report.ReportError("Error: screenshot command missing 'file' attribute!");
+			this.report.Log("Screenshot event finished.");
+			return result;
+		} else {
+			filename = event.get("file").toString();
+			filename = this.replaceString(filename);
+			SodaUtils.takeScreenShot(filename, this.report);
+		}
+		
+		this.report.Log("Screenshot event finished.");
+		return result;
+	}
+	
+	private boolean alertEvent(SodaHash event) {
+		boolean result = false;
+		boolean alert_var = false;
+		boolean exists = true;
+		boolean user_exists_true = false;
+		String msg = "";
+		String alert_text = "";
+		
+		this.report.Log("Alert event starting.");
+		
+		if (!event.containsKey("alert") && !event.containsKey("exist")) {
+			result = false;
+			this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
+			return result;
+		}
+		
+		if (event.containsKey("alert")) {
+			String tmp = event.get("alert").toString();
+			tmp = this.replaceString(tmp);
+			alert_var = this.clickToBool(tmp);
+		}
+		
+		if (event.containsKey("exist")) {
+			String tmp = event.get("exist").toString();
+			tmp = this.replaceString(tmp);
+			exists = this.clickToBool(tmp);
+			if (exists) {
+				user_exists_true = true;
+			}
+		}
+		
+		try {
+			Alert alert = this.Browser.getDriver().switchTo().alert();
+			alert_text = alert.getText();
+			msg = String.format("Found Alert dialog: '%s'.", alert_text);
+			this.report.Log(msg);
+			if (alert_var) {
+				this.report.Log("Alert is being Accepted.");
+				alert.accept();
+			} else {
+				this.report.Log("Alert is being Dismissed.");
+				alert.dismiss();
+			}
+			
+			this.Browser.getDriver().switchTo().defaultContent();
+			Thread.currentThread();
+			Thread.sleep(1000);
+			
+			if (event.containsKey("assert")) {
+				String ass = event.get("assert").toString();
+				this.report.Assert(ass, alert_text);
+			}
+			
+			if (event.containsKey("assertnot")) {
+				String ass = event.get("assertnot").toString();
+				this.report.AssertNot(ass, alert_text);
+			}
+			
+			if (user_exists_true) {
+				this.report.Assert("Alert dialog does eixts.", true, true);
+			}
+			
+			result = true;
+		} catch (NoAlertPresentException exp) { 
+			if (!exists) {
+				msg = String.format("Alert dialog does next exist as expected.", exists);
+				this.report.Assert(msg, false, false);
+				result = true;
+			} else {
+				this.report.ReportError("Error: No alert dialog found!");
+				result = false;
+			}
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+			result = false;
+		}
+		
+		this.report.Log("Alert event finished.");
+		
+		return result;
+	}
+	
    private boolean deleteEvent(SodaHash event) {
 		boolean result = false;
 		
@@ -560,6 +723,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -602,6 +767,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.AREA, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Area click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -647,6 +814,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -689,6 +858,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.OL, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("OL click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -848,6 +1019,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.IMAGE, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Image click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -885,6 +1058,8 @@ public class SodaEventDriver implements Runnable {
 				element.sendKeys(setvalue);
 				this.report.Log("Finished set.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -924,6 +1099,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.LI, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -965,6 +1142,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.TR, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1006,6 +1185,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.TD, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Click finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -1130,6 +1311,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children") && element != null) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1214,6 +1397,8 @@ public class SodaEventDriver implements Runnable {
 				this.report.Assert(msg, ischecked, expected);
 
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1367,6 +1552,8 @@ public class SodaEventDriver implements Runnable {
 					}
 				}
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1408,6 +1595,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children") && element != null) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1470,6 +1659,8 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1676,6 +1867,8 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
 			
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1804,6 +1997,8 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 			
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1815,12 +2010,19 @@ public class SodaEventDriver implements Runnable {
 	private WebElement linkEvent(SodaHash event, WebElement parent) {
 		boolean click = true;
 		boolean required = true;
+		boolean exists = true;
 		WebElement element = null;
 		
 		this.resetThreadTime();
 		
 		if (event.containsKey("required")) {
 			required = this.clickToBool(event.get("required").toString());
+		}
+		
+		if (event.containsKey("exist")) {
+			String tmp = event.get("exist").toString();
+			tmp = this.replaceString(tmp);
+			exists = this.clickToBool(tmp);
 		}
 		
 		try {
@@ -1832,9 +2034,13 @@ public class SodaEventDriver implements Runnable {
 			element = this.findElement(event, parent, required);
 
 			if (element == null) {
-				if (required) {
+				if (required && exists) {
 					String msg = String.format("Failed to find link: '%s' => '%s'!", how, value);
 					this.report.ReportError(msg);
+				}
+				
+				if (exists != true) {
+					this.report.Assert("Link does not exist.", false, false);
 				}
 				
 				element = null;
@@ -1848,6 +2054,7 @@ public class SodaEventDriver implements Runnable {
 				boolean alert = this.clickToBool(event.get("alert").toString());
 				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 			
 			if (event.containsKey("click")) {
@@ -1871,6 +2078,8 @@ public class SodaEventDriver implements Runnable {
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2180,7 +2389,8 @@ public class SodaEventDriver implements Runnable {
 			}
 		} catch (NoSuchElementException exp) {
 			if (required && exists) {
-				this.report.ReportException(exp);
+				this.report.ReportError("Failed to find element!");
+				//this.report.ReportException(exp);
 				element = null;
 			}
 		} catch (Exception exp) {
@@ -2399,6 +2609,7 @@ public class SodaEventDriver implements Runnable {
 				boolean alert = this.clickToBool(event.get("alert").toString());
 				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 			
 			if (click) {
@@ -2415,6 +2626,8 @@ public class SodaEventDriver implements Runnable {
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2479,6 +2692,8 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+		}catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2520,6 +2735,7 @@ public class SodaEventDriver implements Runnable {
 				String value = event.get("set").toString();
 				value = this.replaceString(value);
 				this.report.Log(String.format("Setting Value to: '%s'.", value));
+				element.clear();
 				element.sendKeys(value);
 			}
 			
@@ -2541,6 +2757,8 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+		} catch (ElementNotVisibleException exp) { 
+			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;

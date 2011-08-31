@@ -866,5 +866,23 @@ limitations under the License.
    <delete>
       <soda_attributes type="string">name</soda_attributes>
    </delete>
+   
+   <alert>
+   	<soda_attributes type="boolean">alert</soda_attributes>
+   	<soda_attributes type="boolean">exist</soda_attributes>
+   	<soda_attributes type="string">assert</soda_attributes>
+   	<soda_attributes type="string">assertnot</soda_attributes>
+   </alert>
+   
+   <screenshot>
+   	<soda_attributes type="string">file</soda_attributes>
+   </screenshot>
+   
+   <frame>
+		<accessor type="string">name</accessor>
+		<accessor type="string">id</accessor>
+		<accessor type="string">index</accessor>
+   </frame>
+   
 </soda>
 

@@ -16,11 +16,20 @@ limitations under the License.
 
 package voodoodriver;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.imageio.ImageIO;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -126,5 +135,40 @@ public class SodaUtils {
 		
 		return result;
 	}
+	
+	public static boolean takeScreenShot(String outputFile, SodaReporter reporter) {
+		boolean result = false;
+		Robot r = null;
+		String msg = "";
 
+		reporter.Log("Taking Screenshot.");
+		
+		try {
+			
+			File tmp = new File(outputFile);
+			if (tmp.exists()) {
+				msg = String.format("Existing screenshot file will be over written: '%s'.", outputFile);
+				reporter.Warn(msg);
+				tmp = null;
+			}
+			
+			r = new Robot();
+			Rectangle rec = new Rectangle();
+			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			dim.setSize(dim);
+			rec.setSize(dim);
+			BufferedImage img = r.createScreenCapture(rec);
+			ImageIO.write(img, "png", new File(outputFile));
+			msg = String.format("Screenshot file: %s", outputFile);
+			reporter.Log(msg);
+		} catch (Exception exp) {
+			reporter.ReportException(exp);
+			result = false;
+		}
+		
+		reporter.Log("Screenshot finished.");
+		
+		return result;
+		
+	}
 }
