@@ -2739,6 +2739,12 @@ public class SodaEventDriver implements Runnable {
 				element.sendKeys(value);
 			}
 			
+			if (event.containsKey("append")) {
+				String value = event.get("append").toString();
+				value = this.replaceString(value);
+				element.sendKeys(value);
+			}
+			
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "+ event.get("jscriptevent").toString());
 				this.Browser.fire_event(element, event.get("jscriptevent").toString());
