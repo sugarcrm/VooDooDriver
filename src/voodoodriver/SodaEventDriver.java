@@ -2735,6 +2735,7 @@ public class SodaEventDriver implements Runnable {
 				String value = event.get("set").toString();
 				value = this.replaceString(value);
 				this.report.Log(String.format("Setting Value to: '%s'.", value));
+				element.clear();
 				element.sendKeys(value);
 			}
 			
