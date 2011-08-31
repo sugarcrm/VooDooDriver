@@ -50,6 +50,8 @@ public class SodaEventDriver implements Runnable {
 	private SodaHash JavaPlugings = null;
 	private SodaHash ElementStore = null;
 	private VDDPluginsHash loadedPlugins = null;
+	private String currentHWnd = null;
+	private String orgHWnd = null;
 	
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events, SodaReporter reporter, SodaHash gvars,
 			SodaHash hijacks, SodaHash oldvars, SodaEvents plugins) {
@@ -89,9 +91,44 @@ public class SodaEventDriver implements Runnable {
 		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 		this.sodaVars.put("currentdate", df.format(new Date()));
 		this.threadTime = new Date();
+		String hwnd = this.Browser.getDriver().getWindowHandle();
+		this.setOrgHWND(hwnd);
+		this.setCurrentHWND(hwnd);
 		this.runner = new Thread(this, "SodaEventDriver-Thread");
 		runner.start();
-
+	}
+	
+	private boolean windowExists(String hwnd) {
+		boolean exists = false;
+		int i = 0;
+		Set<String> windows = this.Browser.getDriver().getWindowHandles();
+		
+		for (i = 0; i <= windows.size() -1; i++) {
+			String tmp = windows.toArray()[i].toString();
+			
+			if (hwnd.equals(tmp)) {
+				exists = true;
+				break;
+			}
+		}
+		
+		return exists;
+	}
+	
+	private void setOrgHWND(String hwnd) {
+		this.orgHWnd = hwnd;
+	}
+	
+	private String getOrgHWND() {
+		return this.orgHWnd;
+	}
+	
+	private void setCurrentHWND(String hwnd) {
+		this.currentHWnd = hwnd;
+	}
+	
+	private String getCurrentHWND() {
+		return this.currentHWnd;
 	}
 	
 	private void loadJavaEventPlugins() {
@@ -1762,6 +1799,7 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			this.Browser.getDriver().switchTo().window(found_handle);
+			this.setCurrentHWND(found_handle);
 			msg = String.format("Switching to window handle: '%s'.", found_handle);
 			this.report.Log(msg);
 			if (event.containsKey("children")) {
@@ -1770,6 +1808,7 @@ public class SodaEventDriver implements Runnable {
 			
 			this.Browser.setBrowserState(false);
 			this.Browser.getDriver().switchTo().window(currentWindow);
+			this.setCurrentHWND(currentWindow);
 			msg = String.format("Switching back to window handle: '%s'.", currentWindow);
 			this.report.Log(msg);
 		} catch (Exception exp) {
@@ -2564,8 +2603,14 @@ public class SodaEventDriver implements Runnable {
 			Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
 			
 			try {
+				int err = 0;
 				VDDPluginInterface inst = tmp_class.newInstance();
-				int err = inst.execute(null, this.Browser, element);
+				
+				String tmp_hwnd = this.getCurrentHWND();
+				if (this.windowExists(tmp_hwnd)) {
+					err = inst.execute(null, this.Browser, element);
+				}
+				
 				if (err != 0) {
 					String msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!", classname, err);
 					this.report.ReportError(msg);
@@ -2574,7 +2619,6 @@ public class SodaEventDriver implements Runnable {
 				this.report.ReportException(exp);
 				result = false;
 			}
-			
 		}
 		
 		return result;
