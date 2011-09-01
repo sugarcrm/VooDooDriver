@@ -51,7 +51,6 @@ public class SodaEventDriver implements Runnable {
 	private SodaHash ElementStore = null;
 	private VDDPluginsHash loadedPlugins = null;
 	private String currentHWnd = null;
-	private String orgHWnd = null;
 	
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events, SodaReporter reporter, SodaHash gvars,
 			SodaHash hijacks, SodaHash oldvars, SodaEvents plugins) {
@@ -92,7 +91,6 @@ public class SodaEventDriver implements Runnable {
 		this.sodaVars.put("currentdate", df.format(new Date()));
 		this.threadTime = new Date();
 		String hwnd = this.Browser.getDriver().getWindowHandle();
-		this.setOrgHWND(hwnd);
 		this.setCurrentHWND(hwnd);
 		this.runner = new Thread(this, "SodaEventDriver-Thread");
 		runner.start();
@@ -113,14 +111,6 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		return exists;
-	}
-	
-	private void setOrgHWND(String hwnd) {
-		this.orgHWnd = hwnd;
-	}
-	
-	private String getOrgHWND() {
-		return this.orgHWnd;
 	}
 	
 	private void setCurrentHWND(String hwnd) {
@@ -420,7 +410,7 @@ public class SodaEventDriver implements Runnable {
 		
 		return result;
 	}
-
+	
 	private boolean frameEvent(SodaHash event) {
 		boolean result = false;
 		int index = -1;
@@ -718,6 +708,7 @@ public class SodaEventDriver implements Runnable {
 		data = new SodaHash();
 		data.put("file", filename);
 		data.put("classname", classname);
+		data.put("enabled", true);
 		this.JavaPlugings.put(classname, data);
 		this.report.Log("PluginLoader event finished.");
 		
@@ -2600,6 +2591,7 @@ public class SodaEventDriver implements Runnable {
 		if (index > -1) {
 			SodaHash data = this.plugIns.get(index);
 			String classname = data.get("classname").toString();
+			String msg = "";
 			Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
 			
 			try {
@@ -2609,12 +2601,16 @@ public class SodaEventDriver implements Runnable {
 				String tmp_hwnd = this.getCurrentHWND();
 				if (this.windowExists(tmp_hwnd)) {
 					err = inst.execute(null, this.Browser, element);
+					
+					if (err != 0) {
+						msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!", classname, err);
+						this.report.ReportError(msg);
+					}
+				} else {
+					msg = "Found the browser window has been closed, skipping executing plugin.";
+					this.report.Log(msg);
 				}
 				
-				if (err != 0) {
-					String msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!", classname, err);
-					this.report.ReportError(msg);
-				}
 			} catch (Exception exp) {
 				this.report.ReportException(exp);
 				result = false;
