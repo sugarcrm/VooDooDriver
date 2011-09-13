@@ -99,17 +99,46 @@ public class VooDooDriver {
 		SodaConfigParser configParser = null;
 		String downloadDir = null;
 		String assertpage = null;
+		SodaHash gvars = null;
+		
+		SodaEvents configFileOpts = null;
 		
 		System.out.printf("Starting VooDooDriver...\n");
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
+			gvars = (SodaHash)cmdOpts.get("gvars");
 			
 			sodaConfigFD = new File(sodaConfigFile);
 			if (sodaConfigFD.exists()) {
 				System.out.printf("(*)Found VooDooDriver config file: %s\n", sodaConfigFile);
 				configParser = new SodaConfigParser(sodaConfigFD);
-				configParser.parse();
+				configFileOpts = configParser.parse();
+				int argsLen = configFileOpts.size() -1;
+				
+				for (int i = 0; i <= argsLen; i++) {
+					SodaHash tmp = configFileOpts.get(i);
+					String type = tmp.get("type").toString();
+					String name = null;
+					String value = null;
+
+					if (type.contains("gvar")) {
+						name = tmp.get("name").toString();
+						value = tmp.get("value").toString();
+						
+						if (!gvars.containsKey(name)) {
+							gvars.put(name, value);
+							System.out.printf("(*)Added Config-File gvar: '%s' => '%s'.\n", name, value);
+						}	
+					} else if (type.contains("cmdopt")) {
+						name = tmp.get("name").toString();
+						value = tmp.get("value").toString();
+						if (name.contains("browser")) {
+							cmdOpts.put("browser", value);
+						}
+					}
+				}
+				
 			}
 			
 			if ((Boolean)cmdOpts.get("help")) {
@@ -184,14 +213,14 @@ public class VooDooDriver {
 					System.exit(3);
 				}
 				
-				RunSuites(SodaSuitesList, resultdir, browserType, (SodaHash)cmdOpts.get("gvars"), 
+				RunSuites(SodaSuitesList, resultdir, browserType, gvars, 
 						(SodaHash)cmdOpts.get("hijacks"), blockList, plugins, savehtml, downloadDir,
 						assertpage);
 			}
 			
 			SodaTestsList = (ArrayList<String>)cmdOpts.get("tests");
 			if (!SodaTestsList.isEmpty()) {
-				RunTests(SodaTestsList, resultdir, browserType, (SodaHash)cmdOpts.get("gvars"), (SodaHash)cmdOpts.get("hijacks"),
+				RunTests(SodaTestsList, resultdir, browserType, gvars, (SodaHash)cmdOpts.get("hijacks"),
 						plugins, savehtml, downloadDir, assertpage);
 			}
 		} catch (Exception exp) {
