@@ -109,6 +109,11 @@ public class VooDooDriver {
 			cmdOpts = opts.getOptions();
 			gvars = (SodaHash)cmdOpts.get("gvars");
 			
+			if (cmdOpts.containsKey("config")) {
+				sodaConfigFile = cmdOpts.get("config").toString();
+				System.out.printf("(*)Overwriting default config file to: '%s'.\n", sodaConfigFile);
+			}
+			
 			sodaConfigFD = new File(sodaConfigFile);
 			if (sodaConfigFD.exists()) {
 				System.out.printf("(*)Found VooDooDriver config file: %s\n", sodaConfigFile);
@@ -135,6 +140,7 @@ public class VooDooDriver {
 						value = tmp.get("value").toString();
 						if (name.contains("browser")) {
 							cmdOpts.put("browser", value);
+							System.out.printf("(*)Added Confile-File cmdopts: '%s' => '%s'.\n", name, value);
 						}
 					}
 				}
