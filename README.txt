@@ -27,7 +27,11 @@ option called: --assertpagefile=<some file>  See more on assertPage in the Notes
 14.)<select> setreal: see the Notes section about this.
 15.)Finding elements using regex's is not supported by VooDooDriver at all.  You can however use css selectors for doing just this.
 16.)VooDooDriver now supports java class plugins.  See JavaPlugins.txt for more information.
-
+17.)--savehtml: The savehtml feature of VDD has changed from how SODA performed saves.  SODA used to preform saves every time
+	an assert would fail and a new html saved page would be written to disk.  In the case of VDD if there are more then one failed
+	asserts on a given page and the page source has not changed then only one html file will be written to disk.  This is to
+	save disk space over all and improve performance.
+	
 Known Issues:
 Windows:
 (*)http://code.google.com/p/selenium/issues/detail?id=2064
