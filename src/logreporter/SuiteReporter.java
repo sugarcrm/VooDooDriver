@@ -139,8 +139,7 @@ public class SuiteReporter {
 	 */
 	private void generateHTMLHeader() {
 		final String title = "suite "+suiteName+".xml test results";
-		String header = "";
-		header += "<html> \n" +
+		String header = "<html> \n" +
 				"<style type=\"text/css\"> \n" +
 				"table { \n" +
 				"\twidth: 100%; \n" +
@@ -247,10 +246,6 @@ public class SuiteReporter {
 				
 				repFile.print(header);
 	}
-	
-	/////////////////////////////
-	//misc. methods
-	/////////////////////////////
 	
 	/**
 	 * sets up FileReader and BufferedReader for the next report file
