@@ -26,22 +26,21 @@ import java.io.*;
  */
 public class SuiteReporter {
 	
-	@SuppressWarnings("unused")
 	private File folder = null;
-	private File[] filesList;
-	private int count;
-	private String suiteName;
-	private FileReader input;
-	private BufferedReader br;
-	private String strLine, tmp;
-	private FileOutputStream output;
-	private PrintStream repFile;
+	private File[] filesList = null;
+	private int count = 0;
+	private String suiteName = null;
+	private FileReader input = null;
+	private BufferedReader br = null;
+	private String strLine, tmp = null;
+	private FileOutputStream output = null;
+	private PrintStream repFile = null;
 	
 	/**
 	 * default constructor
 	 */
 	public SuiteReporter(){
-		this.folder = new File("");
+		folder = new File("");
 		filesList = new File[0];
 		count = 0;
 	}
@@ -51,7 +50,7 @@ public class SuiteReporter {
 	 * @param folder - the File folder in which the suite log files reside.
 	 */
 	public SuiteReporter(File folder){
-		this.folder = folder;
+		folder = folder;
 		filesList = folder.listFiles();
 		count = 0;
 		suiteName = folder.getName();
@@ -59,54 +58,53 @@ public class SuiteReporter {
 		/**
 		 * set up file output
 		 */
-		try{
+		try {
 			output = new FileOutputStream(folder.getAbsolutePath()+"/"+suiteName+".html");
 			repFile = new PrintStream(output);
-		}catch(Exception e){
+		} catch(Exception e) {
 			System.err.println("Error writing to file "+suiteName+".html");
 			e.printStackTrace();
 		}
-		
 	}
 	
 	/**
 	 * generates a html report file
 	 */
-	public void generateReport(){
+	public void generateReport() {
 		generateHTMLHeader();
+		
 		/**
 		 * find files in folder that ends with .log, and process them
 		 */
-		for (int i=0; i < filesList.length; i++){
+		for (int i=0; i < filesList.length; i++) {
 			//ignores nonfiles and hidden files
-			if (filesList[i].isFile() && !filesList[i].isHidden()){
+			if (filesList[i].isFile() && !filesList[i].isHidden()) {
 				//read if is .log file
-				if (filesList[i].getName().endsWith("log")){
+				if (filesList[i].getName().endsWith("log")) {
 					readNextLog(filesList[i]);
 					//remove the .log extention
 					String temp = filesList[i].getName().substring(0, filesList[i].getName().indexOf("."));
 					//get last line
 					try {
-						while ((tmp = br.readLine()) != null){
+						while ((tmp = br.readLine()) != null) {
 							strLine = tmp;
 						}
-					}catch (IOException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					//find log status, generate table row
-					if (strLine.contains("blocked:1")){
+					if (strLine.contains("blocked:1")) {
 						generateTableRow(temp, 2);
-					}
-					else if (strLine.contains("result:-1")){
+					} else if (strLine.contains("result:-1")) {
 						generateTableRow(temp, 0);
-					}
-					else{
+					} else {
 						generateTableRow(temp, 1);
 					}
 				}
 			}		
 		}
+		
 		repFile.print("\n</table>\n</body>\n</html>\n");
 		repFile.close();
 	}
@@ -123,15 +121,15 @@ public class SuiteReporter {
 				"onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
 		repFile.println("\t<td class=\"td_file_data\">"+count+"</td>");
 		repFile.println("\t<td class=\"td_file_data\">"+fileName+".xml</td>");
-		if (status == 0){
+		
+		if (status == 0) {
 			repFile.println("\t<td class=\"td_failed_data\">Failed</td>");
-		}
-		else if (status == 1){
+		} else if (status == 1) {
 			repFile.println("\t<td class=\"td_passed_data\">Passed</td>");
-		}
-		else {
+		} else {
 			repFile.println("\t<td class=\"_data\">Blocked</td>");
 		}
+		
 		repFile.println("\t<td class=\"td_report_data\"><a href='Report-"+fileName+".html'>Report Log</a></td>");
 		repFile.println("</tr>");
 	}
@@ -139,7 +137,7 @@ public class SuiteReporter {
 	/**
 	 * generates the html header for the report file
 	 */
-	private void generateHTMLHeader(){
+	private void generateHTMLHeader() {
 		final String title = "suite "+suiteName+".xml test results";
 		String header = "";
 		header += "<html> \n" +
@@ -258,17 +256,16 @@ public class SuiteReporter {
 	 * sets up FileReader and BufferedReader for the next report file
 	 * @param inputFile - a properly formatted .log SODA report file
 	 */
-	private void readNextLog(File inputFile){
+	private void readNextLog(File inputFile) {
 		try{
 			/*sets up file reader to read input one character at a time*/
 			input = new FileReader(inputFile);
 			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
-		}catch (FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			System.err.println("file not found: "+inputFile);
-		}catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("error reading file" + inputFile);
 		}
 	}
-
 }
