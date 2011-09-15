@@ -39,32 +39,21 @@ public class LogReporter {
 	 * @param getFolder - returns ArrayList of folders if true, ArrayList of files if false
 	 * @return ArrayList of folders/files
 	 */
-	private static ArrayList<File> getFolderContent(String path, boolean getFolder){
+	private static ArrayList<File> getFolderContent(String path, boolean getFolder) {
 		ArrayList<File> list = new ArrayList<File>();
-		/**
-		 * get the list of files/folders in given directory
-		 */
 		File folder = new File(path);
 		File[] filesList = folder.listFiles();
 		
 		/**
 		 * look through the given directory
 		 */
-		for (int i = 0; i < filesList.length; i++){
-			if (getFolder){
-				/**
-				 * check if is folder and not hidden
-				 */
-				if (filesList[i].isDirectory() && !filesList[i].isHidden()){
-					/**
-					 * put valid files in ArrayList 
-					 */
+		for (int i = 0; i < filesList.length; i++) {
+			if (getFolder) {
+				if (filesList[i].isDirectory() && !filesList[i].isHidden()) {
 					list.add(filesList[i]);
 				}
-			}
-			//get files instead
-			else {
-				if (filesList[i].isFile() && !filesList[i].isHidden() && filesList[i].getName().endsWith("xml")){
+			} else {
+				if (filesList[i].isFile() && !filesList[i].isHidden() && filesList[i].getName().endsWith("xml")) {
 					list.add(filesList[i]);
 				}
 			}
@@ -77,92 +66,86 @@ public class LogReporter {
 	 * processes the list of arguments, and returns a HashMap of options for main to use
 	 * @return 
 	 */
-	private static HashMap<String, Object> cmdLineOptions(String[] args){
+	private static HashMap<String, Object> cmdLineOptions(String[] args) {
 		HashMap<String, Object> options = new HashMap<String, Object>();
 		
-		try{
-			for (int i = 0; i < args.length; i++){
-				if (args[i].contains("--help")){
+		try {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].contains("--help")) {
 					options.put("help", true);
-				}
-				else if (args[i].contains("--suite=")){
+				} else if (args[i].contains("--suite=")) {
 					String str = args[i];
 					str = str.replace("--suite=", "");
-					/**
-					 * add "/" to the end of path if none was given, prevent errors
-					 */
-					if (!str.endsWith("/")){
+
+					if (!str.endsWith("/")) {
 						str = str + "/";
 					}
 					System.out.println("Processing suite: "+str);
 					options.put("suite", str);
-				}
-				else if (args[i].contains("--suitedir=")){
+				} else if (args[i].contains("--suitedir=")) {
 					String str = args[i];
 					str = str.replace("--suitedir=", "");
-					/**
-					 * add "/" to the end of path if none was given, prevent errors
-					 */
-					if (!str.endsWith("/")){
+
+					if (!str.endsWith("/")) {
 						str = str + "/";
 					}
+					
 					options.put("suitedir", str);
 				}
 			}
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		return options;
 	}
-	/**
-	 * main
-	 * @param args
-	 */
+	
 	public static void main(String[] args){
 		int count = 0;
-		try{
+		
+		try {
 			HashMap<String, Object> options = cmdLineOptions (args);
-			if (options.isEmpty()){
+			if (options.isEmpty()) {
 				printUsage();
 				System.exit(0);
 			}
-			if (options.containsKey("help")){
+			
+			if (options.containsKey("help")) {
 				printUsage();
 				System.exit(0);
 			}
-			if (options.containsKey("suitedir")){
+			
+			if (options.containsKey("suitedir")) {
 				String path = (String)options.get("suitedir");
 				ArrayList<File> foldersList = getFolderContent(path, true);
-				
-				//generate log reports
 				LogConverter htmlLogs = new LogConverter();
 				File[] filesList;
-				//look though folders
-				if (foldersList.size() == 0){
+				
+				if (foldersList.size() == 0) {
 					System.out.println("there are no directories to generate log reports from.");
 				}
-				for (int i = 0; i < foldersList.size(); i++){
+				
+				for (int i = 0; i < foldersList.size(); i++) {
 					System.out.println("checking directory: "+foldersList.get(i).getName());
-					//get files from folder
 					filesList = foldersList.get(i).listFiles();
 					System.out.println("number of files or folders: "+filesList.length);
-					for (int j = 0; j < filesList.length; j ++){
+					
+					for (int j = 0; j < filesList.length; j ++) {
 						//check is file, not hidden, and is a log file
-						if (!filesList[j].isHidden() && filesList[j].isFile() && filesList[j].getName().endsWith("log")){
+						if (!filesList[j].isHidden() && filesList[j].isFile() && filesList[j].getName().endsWith("log")) {
 							htmlLogs = new LogConverter(filesList[j].getAbsolutePath());
 							htmlLogs.generateReport();
 							count ++;
 						}
 					}
-					if (count == 0){
+					
+					if (count == 0) {
 						System.out.println("no log reports found.");
-					}
-					else {
+					} else {
 						System.out.println("generated "+count+" log report(s)");	
 					}
-					//generate tests summary
-					if (count != 0){
+					
+					if (count != 0) {
 						System.out.println("printing test summary for suite: "+ foldersList.get(i).getAbsolutePath());
 						SuiteReporter suiteSummary = new SuiteReporter(foldersList.get(i));
 						suiteSummary.generateReport();
@@ -172,16 +155,14 @@ public class LogReporter {
 				}
 				
 				//generate summary of suites
-				if (getFolderContent(path, false).size() == 0){
+				if (getFolderContent(path, false).size() == 0) {
 					System.out.println("There are no files containing suite test information");
-				}
-				else {
+				} else {
 					SummaryReporter summaryReport = new SummaryReporter(getFolderContent(path, false), path);
 					summaryReport.generateReport();
 					System.out.println("generated summary.html");
 				}	
-			}
-			else if (options.containsKey("suite")){
+			} else if (options.containsKey("suite")) {
 				String path = (String)options.get("suite");
 				File folder = new File(path);
 				File[] filesList = folder.listFiles();
@@ -189,21 +170,22 @@ public class LogReporter {
 				LogConverter htmlLogs = new LogConverter();
 				//look though folder
 				System.out.println("number of files or folders in "+path+": "+filesList.length);
-				for (int i = 0; i < filesList.length; i ++){
-					if (!filesList[i].isHidden() && filesList[i].isFile() && filesList[i].getName().endsWith("log")){
+				
+				for (int i = 0; i < filesList.length; i ++) {
+					if (!filesList[i].isHidden() && filesList[i].isFile() && filesList[i].getName().endsWith("log")) {
 						htmlLogs = new LogConverter(filesList[i].getAbsolutePath());
 						htmlLogs.generateReport();
 						count ++;
 					}
 				}
-				if (count == 0){
+				
+				if (count == 0) {
 					System.out.println("no log reports found.");
-				}
-				else {
+				} else {
 					System.out.println("generated "+count+" log report(s)");	
 				}
-				//generate tests summary
-				if (count != 0){
+
+				if (count != 0) {
 					System.out.println("printing test summary for suite: "+ path);
 					SuiteReporter suiteSummary = new SuiteReporter(folder);
 					suiteSummary.generateReport();
@@ -213,11 +195,10 @@ public class LogReporter {
 			}
 			
 			
-		}catch(NullPointerException e){
+		} catch(NullPointerException e) {
 			System.err.println("invalid path");
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
-		}
-		
-	}//end main
+		}	
+	}
 }
