@@ -31,33 +31,27 @@ import org.w3c.dom.NodeList;
  *
  */
 public class SummaryReporter {
+	
 	private int count;
 	private ArrayList<File> xmlFiles;
-	
-	/**
-	 * table-tallying variables
-	 */
-	int passedTests, failedTests, blockedTests, failedAsserts, passedAsserts, exceptions, errors, watchdog, failedTotal ;
-	int hours, minutes, seconds;
-	
-	/**
-	 * file output stuff
-	 */
+	private int passedTests = 0;
+	private int failedTests = 0;
+	private int blockedTests = 0;
+	private int failedAsserts = 0;
+	private int passedAsserts = 0;
+	private int exceptions = 0;
+	private int errors = 0;
+	private int watchdog = 0;
+	private int failedTotal =0;
+	private int hours = 0;
+	private int minutes = 0;
+	private int seconds = 0;
 	private FileOutputStream output;
 	private PrintStream repFile;
-	
-	/**
-	 * DOM stuff
-	 */
 	private Document dom;
-	
-	//////////////////////////////////
-	//Constructors
-	//////////////////////////////////
-	/**
-	 * default constructor
-	 */
-	public SummaryReporter(){
+
+	public SummaryReporter() {
+		
 	}
 	
 	/**
@@ -80,32 +74,23 @@ public class SummaryReporter {
 		minutes = 0;
 		seconds = 0;
 		
-		/**
-		 * sets up output file
-		 */
-		try{
+		try {
 			output = new FileOutputStream(path+	"summary.html");
 			repFile = new PrintStream(output);
-		}catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("Error writing to summary.html");
 			e.printStackTrace();
 		}
 	}
 	
-	/////////////////////////////////
-	//report-generating stuff
-	////////////////////////////////
-	/**
-	 * calls needed methods and generates the report
-	 */
 	public void generateReport(){
 		repFile.print(generateHTMLHeader());
-		//read the xml files
+		
 		for (int i = 0; i < xmlFiles.size(); i ++){
 			parseXMLFile(xmlFiles.get(i));
-			//process
 			repFile.print(generateTableRow(dom));
 		}
+		
 		repFile.print(generateHTMLFooter());
 		repFile.print("\n</body>\n</html>\n");
 		repFile.close();
@@ -122,7 +107,7 @@ public class SummaryReporter {
 		html += "<td class=\"td_file_data\">\n" +
 				"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
 				"</td>";
-		//parse rest of document
+		
 		passed = getAmtPassed(d);
 		blocked = getAmtBlocked(d);
 		failed = getAmtFailed(d) - blocked;  //blocked tests count as failed too
@@ -134,61 +119,60 @@ public class SummaryReporter {
 		total = assertsF + exceptions + errors;
 		
 		//"Tests" column
-		if (blocked == 0){
+		if (blocked == 0) {
 			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 			html += "\t <td class=\"td_blocked_data_zero\">0</td> \n";
-		}
-		else{
+		} else {
 			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed + blocked)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 			html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
 		}
 		//"Results" column
-		if (wd == 0){
+		if (wd == 0) {
 			html += "\t <td class=\"td_watchdog_data\">0</td> \n";
-		}
-		else {
+		} else {
 			html += "\t <td class=\"td_watchdog_error_data\">"+wd+"</td> \n";
 		}
+		
 		html += "\t <td class=\"td_assert_data\">"+asserts+"</td> \n";
-		if (assertsF == 0){
+		if (assertsF == 0) {
 			html += "\t <td class=\"td_assert_data\">0</td> \n";
-		}
-		else {
+		} else {
 			html += "\t <td class=\"td_assert_error_data\">"+assertsF+"</td> \n";
 		}
-		if (exceptions == 0){
+		
+		if (exceptions == 0) {
 			html += "\t <td class=\"td_exceptions_data\">0</td> \n";
-		}
-		else{
+		} else {
 			html += "\t <td class=\"td_exceptions_error_data\">"+exceptions+"</td> \n";
 		}
-		if (errors == 0){
+		
+		if (errors == 0) {
 			html += "\t <td class=\"td_exceptions_data\">0</td> \n";
-		}
-		else{
+		} else {
 			html += "\t <td class=\"td_exceptions_error_data\">"+errors+"</td> \n";
 		}
-		if (total == 0){
+		
+		if (total == 0) {
 			html += "\t <td class=\"td_total_data\">0</td> \n";
-		}
-		else{
+		} else {
 			html += "\t <td class=\"td_total_error_data\">"+total+"</td> \n";
 		}
 		
 		html += "\t <td class=\"td_time_data\">"+getRunTime(d)+"</td> \n";
 		html += "</tr>";
+		
 		return html;
 	}
 	
 	/**
-	 * generates the HTML table header for summary report, then returns it  
+	 * generates the HTML table header for summary report, then returns it
 	 * @return - String of html table header
 	 */
-	private String generateHTMLHeader(){
+	private String generateHTMLHeader() {
 		String header = "";
 		header += "<html> \n" +
 				"<style stype=\"text/css\">\n";
@@ -623,18 +607,14 @@ public class SummaryReporter {
 				
 		return footer;
 	}
-	////////////////////////////////
-	//misc methods
-	////////////////////////////////
-	/**
-	 * 
-	 */
+
 	private void parseXMLFile(File xml){
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try{
+		
+		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			dom = db.parse(xml);
-		}catch(Exception e){
+		} catch(Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -645,13 +625,14 @@ public class SummaryReporter {
 	 * @ return the number of tests that passed
 	 * 
 	 */
-	private int getAmtPassed(Document d){
+	private int getAmtPassed(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("result");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0){
+			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0) {
 				n ++;
 			}
 		}
@@ -660,19 +641,20 @@ public class SummaryReporter {
 		passedTests += n;
 		return n;
 	}
+	
 	/**
 	 * get the number of tests that failed within this suite document
 	 * @ param d - the Document containing suite run data
 	 * @ return the number of tests that failed
 	 * 
 	 */
-	private int getAmtFailed(Document d){
+	private int getAmtFailed(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("result");
 		for (int i = 0; i < nl.getLength(); i ++){
 			el = (Element)nl.item(i);
-			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0){
+			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
 				n ++;
 			}
 		}
@@ -681,19 +663,21 @@ public class SummaryReporter {
 		failedTests += n;
 		return n;
 	}
+	
 	/**
 	 * get the number of tests that was blocked within this suite document
 	 * @ param d - the Document containing suite run data
 	 * @ return the number of tests that was blocked
 	 * 
 	 */
-	private int getAmtBlocked(Document d){
+	private int getAmtBlocked(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("blocked");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0){
+			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0) {
 				n ++;
 			}
 		}
@@ -709,11 +693,12 @@ public class SummaryReporter {
 	 * @ return the number of passed assertions
 	 * 
 	 */
-	private int getAmtAsserts(Document d){
+	private int getAmtAsserts(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("passedasserts");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
@@ -730,13 +715,14 @@ public class SummaryReporter {
 	 * @ return the number of failed assertions
 	 * 
 	 */
-	private int getAmtAssertsF(Document d){
+	private int getAmtAssertsF(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("failedasserts");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
+			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -751,13 +737,14 @@ public class SummaryReporter {
 	 * @ return the number of watchdogs
 	 * 
 	 */
-	private int getAmtwatchdog(Document d){
+	private int getAmtwatchdog(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("watchdog");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
+			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -773,13 +760,14 @@ public class SummaryReporter {
 	 * @ return the number of exceptions
 	 * 
 	 */
-	private int getAmtExceptions(Document d){
+	private int getAmtExceptions(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("exceptions");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
+			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -788,13 +776,13 @@ public class SummaryReporter {
 		return n;
 	}
 	
-	private int getAmtErrors(Document d){
+	private int getAmtErrors(Document d) {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("errors");
-		for (int i = 0; i < nl.getLength(); i ++){
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
-			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
+			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -808,12 +796,13 @@ public class SummaryReporter {
 	 * @param d - document to get time data from
 	 * @return - total run time for this suite test in String
 	 */
-	private String getRunTime(Document d){
+	private String getRunTime(Document d) {
 		String  temp;
 		int h = 0, m = 0, s = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("totaltesttime");
-		for (int i = 0; i < nl.getLength(); i ++){
+		
+		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			temp = el.getFirstChild().getNodeValue();
 			h += Integer.parseInt(temp.substring(0, temp.indexOf(":")));
@@ -827,7 +816,6 @@ public class SummaryReporter {
 		return printTotalTime(h, m , s);
 	}
 	
-	
 	/**
 	 * formats and returns a correct String representation from inputs of hours, minutes and seconds
 	 * @param hours
@@ -835,23 +823,26 @@ public class SummaryReporter {
 	 * @param seconds
 	 * @return correctly formatted time in String
 	 */
-	private String printTotalTime(int h, int m, int s){
+	private String printTotalTime(int h, int m, int s) {
 		String time = "";
+		
 		//carry over seconds
-		while(s >= 60){
+		while (s >= 60) {
 			m ++;
 			s -= 60;
 		}
 		//carry over minutes
-		while(m >= 60){
+		while(m >= 60) {
 			h ++;
 			m -= 60;
 		}
+		
 		String ms = ""+ m, ss = ""+ s;
-		if (m < 10){
+		if (m < 10) {
 			ms = "0"+m;
 		}
-		if (s < 10){
+		
+		if (s < 10) {
 			ss = "0"+s;
 		}
 		time = "0"+h+":"+ms+":"+ss;
@@ -863,10 +854,11 @@ public class SummaryReporter {
 	 * @param d
 	 * @return
 	 */
-	private String getSuiteName(Document d){
+	private String getSuiteName(Document d) {
 		String name = "jfdjfajdlfea";
 		NodeList nl = d.getElementsByTagName("suitefile");
-		if (nl != null && nl.getLength() > 0){
+		
+		if (nl != null && nl.getLength() > 0) {
 			Element el = (Element)nl.item(0);
 			name = el.getFirstChild().getNodeValue();
 		}
