@@ -97,6 +97,7 @@
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
+   	
    	<!-- LogReporter build -->
    	<jar jarfile="${dist}/LogReporter.jar" basedir="${build}">
    	   	 <manifest>
@@ -140,6 +141,7 @@
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
+   	
    		<!-- LogReporter build -->
    		<jar jarfile="${dist}/LogReporter.jar" basedir="${build}">
    	    	<manifest>

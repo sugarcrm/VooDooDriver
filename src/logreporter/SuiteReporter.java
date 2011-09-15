@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 package logreporter;
+
 import java.io.*;
 
 /**
@@ -26,6 +27,7 @@ import java.io.*;
  */
 public class SuiteReporter {
 	
+	private String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
 	private File folder = null;
 	private File[] filesList = null;
 	private int count = 0;
@@ -138,113 +140,38 @@ public class SuiteReporter {
 	 * generates the html header for the report file
 	 */
 	private void generateHTMLHeader() {
-		final String title = "suite "+suiteName+".xml test results";
-		String header = "<html> \n" +
-				"<style type=\"text/css\"> \n" +
-				"table { \n" +
-				"\twidth: 100%; \n" +
-				"\tborder: 2px solid black; \n" +
-				"\tborder-collapse: collapse; \n" +
-				"\tpadding: 0px; \n" +
-				"\tbackground: #FFFFFF; \n" +
-				"} \n" +
-				".td_header_master { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\tbackground: #b6dde8; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_file_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: left; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_passed_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #00cc00; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				"._data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #FFCF10; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_failed_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #FF0000; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_failed_data_zero { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: normal; \n" +
-				"\tcolor: #FFFFFF; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +		
-				".td_report_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: normal; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n"+
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".highlight { \n" +
-				"\tbackground-color: #8888FF; \n" +
-				"} \n" +
-				".tr_normal { \n" +
-				"\tbackground-color: #e5eef3; \n" +
-				"} \n" +
-				"</style> \n" +
-				"<title>"+title+"</title> \n" +
-				"<body> \n" +
-				"<table id=\"tests\"> \n" +
-				"<tr id=\"header\"> \n" +
-				"\t<td class=\"td_header_master\" colspan=\"4\"> \n" +
-				"\tSuite: "+suiteName+".xml Test Results \n" +
-				"</td> \n" +
-				"<tr id=\"header_key\"> \n" +
-				"\t<td class=\"td_header_master\"></td> \n" +
-				"\t<td class=\"td_header_master\">Test File</td> \n" +
-				"\t<td class=\"td_header_master\">Status</td> \n" +
-				"\t<td class=\"td_header_master\">Report Log</td> \n" +
-				"</tr> \n";
+		String title = "suite "+suiteName+".xml test results";
+		String header = "";
+		File headerFD;
+		String line = null;
+		boolean found_title = false;
+		boolean found_suitename = false;
+		
+		try {
+			headerFD = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
+			BufferedReader br = new BufferedReader(new FileReader(headerFD));
+			
+			while ((line = br.readLine()) != null) {
+				if ( (found_title != true) && (line.contains("__TITLE__"))) {
+					line = line.replace("__TITLE__", title);
+					found_title = true;
+				}
 				
-				repFile.print(header);
+				if ((found_suitename != true) && (line.contains("__SUITENAME__")) ) {
+					line = line.replace("__SUITENAME__", suiteName);
+					found_suitename = true;
+				}
+				
+				header += line;
+				header += "\n";
+			}
+			
+		} catch (Exception exp) {
+			exp.printStackTrace();
+		}
+		
+		repFile.print(header);
+		
 	}
 	
 	/**

@@ -28,32 +28,14 @@ import java.util.regex.Pattern;
 public class LogConverter{
 	
 	private String fileName;
-	
-	/**
-	 * file reading stuff
-	 */
 	private FileReader input;
 	private BufferedReader br;
 	private String strLine;
-	
-	/**
-	 * file output stuff
-	 */
 	private FileOutputStream output;
 	private PrintStream repFile;
-	
-	/**
-	 * other stuff
-	 */
 	private int backTraceID;
 	private int eventDumpID;
 	
-	/////////////////
-	//constructors
-	/////////////////
-	/**
-	 * default constructor for class LogConverter
-	 */
 	public LogConverter(){
 		fileName = "";
 		strLine = "";
@@ -65,7 +47,7 @@ public class LogConverter{
 	 * Constructor for class LogConverter.
 	 * @param inputFile - name of the file to be converted. Should be in correct format, with .log extention
 	 */
-	public LogConverter(String inputFile){
+	public LogConverter(String inputFile) {
 		strLine = new String();
 		backTraceID = 0;
 		eventDumpID = 0 ;
@@ -73,14 +55,14 @@ public class LogConverter{
 		/**
 		 * set up file reading 
 		 */
-		try{
+		try {
 			/*sets up file reader to read input one character at a time*/
 			input = new FileReader(inputFile);
 			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
-		}catch (FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			System.err.println("file not found: "+inputFile);
-		}catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("error reading file" + inputFile);
 		}
 		
@@ -96,34 +78,28 @@ public class LogConverter{
 		/**
 		 * sets up output file
 		 */
-		try{
+		try {
 			output = new FileOutputStream(filePath+fileName);
 			repFile = new PrintStream(output);
-		}catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("Error writing to file "+fileName);
-			//e.printStackTrace();
 		}
 	}
 	
-	////////////////////////////////
-	//main report-creating methods
-	////////////////////////////////
 	/**
 	 * Generates a new html table row from a raw .log file line
 	 * 
 	 * @param line - A line from the raw .log file
 	 * @return A string of html that is a table row
+	 * 
+	 * index 0 = date
+	 * index 1 = message type
+	 * index 2 = message
 	 */
 	private String generateTableRow(String line){
 		String htmlRow = "";
-		/**
-		 * index 0 = date
-		 * index 1 = message type
-		 * index 2 = message
-		 */
 		String[] rowData = new String[3]; 
 		String trStyle = "tr_normal";
-		
 		char msgType = line.charAt(line.indexOf("(")+1); 
 		String message = line.substring(line.indexOf(")")+1, line.length());
 		
@@ -131,72 +107,43 @@ public class LogConverter{
 		 * case switches for different message types
 		 */
 		//assertion passed
-		if (message.contains("Assert Passed")){
+		if (message.contains("Assert Passed")) {
 			rowData = formatAssertionPassed(line, message);
 			trStyle = "tr_assert_passed";
-		}
-		//assertion failed
-		else if (message.contains("Assert Failed")){
+		} else if (message.contains("Assert Failed")) {
 			rowData = formatAssertionFailed(line, message);
 			trStyle = "tr_error";
-		}
-		//test modules
-		else if (message.startsWith("Test") || message.startsWith("Lib")|| message.startsWith("Module")){
+		} else if (message.startsWith("Test") || message.startsWith("Lib")|| message.startsWith("Module")) {
 			rowData = formatModuleLine(line, message);
 			trStyle = "tr_module";
-		}
-		//clicking elements
-		else if (message.startsWith("Clicking Link")){
+		} else if (message.startsWith("Clicking Link")) {
 			rowData = formatClickingElement(line, message);		
-		}
-		//setting element values
-		else if (message.startsWith("Setting Value") || message.startsWith("Setting Select") || message.startsWith("Setting SODA")){
+		} else if (message.startsWith("Setting Value") || message.startsWith("Setting Select") || message.startsWith("Setting SODA")) {
 			rowData = formatClickingElement(line, message);
-		}
-		//looking for element values
-		else if (message.startsWith("Looking for element:")){
+		} else if (message.startsWith("Looking for element:")) {
 			rowData = formatClickingElement(line, message);
-		}
-		//SODA test report line
-		else if (message.startsWith("Soda Test Report")){
+		} else if (message.startsWith("Soda Test Report")){
 			rowData = formatTestResults(line,message);
-		}
-		//Exception backtrace line
-		else if (message.startsWith("--Exception Backtrace")){
+		} else if (message.startsWith("--Exception Backtrace")){
 			rowData = formatExceptionBT(line,message);
-		}
-		//Major exception
-		else if (message.startsWith("Major Exception")){
+		} else if (message.startsWith("Major Exception")){
 			rowData = formatMajorException(line, message);
-		}
-		//HTML saved
-		else if (message.startsWith("(?i)html saved")){
+		} else if (message.startsWith("(?i)html saved")){
 			rowData = this.formatHTMLSavedResults(line, message, msgType);
-		}
-		//event dump
-		else if (msgType == 'E'){
+		} else if (msgType == 'E'){
 			rowData = formatEventDump(line, message);
-		}
-		//JS and CSS error
-		else if (message.contains("(?i)css error") || message.contains("(?i)javascript error")){
+		} else if (message.contains("(?i)css error") || message.contains("(?i)javascript error")){
 			rowData = formatJSError(line, message);
-		}
-		//replacing string
-		else if (message.contains("(?i)replacing string")){
+		} else if (message.contains("(?i)replacing string")){
 			rowData = formatReplaceString(line, message);
-		}
-		//trying to find element
-		else if (message.startsWith("Tring to find")){
+		} else if (message.startsWith("Tring to find")){
 			rowData = formatFindingElement(line, message);
-		}
-		//screenshot
-		else if (message.startsWith("(?i)element")){
+		} else if (message.startsWith("(?i)element")){
 			rowData = formatClickingElement(line, message);
 			if (message.contains("(?i)screenshot taken")){
 				rowData = formatScreenShot(line, message);
 			}	
-		}
-		else{
+		} else{
 			rowData = formatDefaultLine(line, message);
 		}
 		
@@ -330,7 +277,7 @@ public class LogConverter{
 	 * @param line - the "HTML saved" line from the raw SODA log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatHTMLSavedResults (String line, String message, char msgType){
+	private String[] formatHTMLSavedResults (String line, String message, char msgType) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
@@ -349,7 +296,7 @@ public class LogConverter{
 	 * @param line - the bt line from the raw SODA log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatExceptionBT (String line, String message){
+	private String[] formatExceptionBT (String line, String message) {
 		String[] rowData = new String[3];
 		String btID = "bt_div_"+backTraceID;
 		String hrefID = "href_div_"+backTraceID;
@@ -378,7 +325,7 @@ public class LogConverter{
 	 * @param line - the "exception" line from the raw .log
 	 * @return an array in the expected format
 	 */
-	private String[] formatMajorException (String line, String message){
+	private String[] formatMajorException (String line, String message) {
 		String[] rowData = new String[3];
 		
 		String[] msgData = message.split("--");
@@ -398,7 +345,7 @@ public class LogConverter{
 	 * @param line - the "assertion failed" line from the .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatAssertionFailed (String line, String message){
+	private String[] formatAssertionFailed (String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
@@ -418,7 +365,7 @@ public class LogConverter{
 	 * @param line - the "assertion passed" line from the .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatAssertionPassed(String line, String message){
+	private String[] formatAssertionPassed(String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
@@ -434,7 +381,7 @@ public class LogConverter{
 	 * @param line - event dump line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatEventDump (String line, String message){
+	private String[] formatEventDump (String line, String message) {
 		String[] rowData = new String[3];
 		String edID = "ed_div_"+eventDumpID;
 		String hrefID = "href_div_ed_"+eventDumpID;
@@ -452,7 +399,7 @@ public class LogConverter{
 		         "</a><br>\t<div id=\""+edID+"\" style=\"display: none\">\n";
 		
 		String[] eData = msgData.split("--");
-		for (int i = 0; i < eData.length; i ++){
+		for (int i = 0; i < eData.length; i ++) {
 			rowHTML += "\t\t"+eData[i]+"<br>\n";
 		}
 		
@@ -470,7 +417,7 @@ public class LogConverter{
 	 * @param line - the js error line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatJSError (String line, String message){
+	private String[] formatJSError (String line, String message) {
 		String[] rowData = new String[3];
 		String rowHTML = "";
 		
@@ -478,12 +425,11 @@ public class LogConverter{
 		rowData[1] = "Log";
 		
 		String[] msgData = message.split("--");
-		for (int i = 0; i < msgData.length; i++){
+		for (int i = 0; i < msgData.length; i++) {
 			String[] info = msgData[i].split("::");
-			if (info.length < 2){
+			if (info.length < 2) {
 				rowHTML += "\t<b>"+info[0]+"</b><br>\n";
-			}
-			else{
+			} else {
 				rowHTML += "\t<b>"+info[0]+":</b> "+info[1]+"<br>\n";
 			}
 		}
@@ -498,16 +444,14 @@ public class LogConverter{
 	 * @param line - the module line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatModuleLine (String line, String message){
+	private String[] formatModuleLine (String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
 		rowData[1] = "Un/Load";
-		
 		message = message.replaceFirst("Test:", "<b>Test:</b>");
 		message = message.replaceFirst("Lib:", "<b>Lib:</b>");
 		message = message.replaceFirst("Module:", "<b>Module:</b>");
-		
 		rowData[2] = message;
 		
 		return rowData;
@@ -519,15 +463,14 @@ public class LogConverter{
 	 * @param line - the screenshot line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatScreenShot(String line, String message){
+	private String[] formatScreenShot(String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
 		rowData[1] = "Log";
-		
 		String[] data = message.split(":");
-		
 		rowData[2] = "<b>"+data[0]+":</b> <a href=\""+data[1]+"\">#{data[1]}</a>";
+		
 		return rowData;
 	}
 	
@@ -537,12 +480,11 @@ public class LogConverter{
 	 * @param line - the replace string line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatReplaceString (String line, String message){
+	private String[] formatReplaceString (String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
 		rowData[1] = "Log";
-		
 		message = Pattern.quote(message);
 		rowData[2] = message.replaceAll("with", "<b>'"+message+"'</b>");
 		
@@ -555,7 +497,7 @@ public class LogConverter{
 	 * @param line - the "clicking element" line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatClickingElement(String line, String message){
+	private String[] formatClickingElement(String line, String message) {
 		String[] rowData = new String[3];
 		
 		rowData[0] = generateDateTime (line);
@@ -574,7 +516,7 @@ public class LogConverter{
 	 * @param line - the "trying to find" line from the raw .log file
 	 * @return an array in the expected format
 	 */
-	private String[] formatFindingElement(String line, String message){
+	private String[] formatFindingElement(String line, String message) {
 		String[] rowData = new String[3];
 		rowData[0] = generateDateTime (line);
 		rowData[1] = "Log";
@@ -589,17 +531,13 @@ public class LogConverter{
 		return rowData;
 	}
 	
-	/////////////////////
-	//misc. methods
-	/////////////////////
 	/** 
 	 * Generates the proper html header for the report file
 	 * 
 	 */
-	private void generateHtmlHeader(){
+	private void generateHtmlHeader() {
 		final String title = "SODA Test report";
-		String temp = "";
-		temp += "<html> \n" +
+		String temp = "<html> \n" +
 				"<script language=javascript type='text/javascript'> \n" +
 		 		"function hidediv(name, href_id) { \n" +
 		 		"\t document.getElementById(name).style.display = 'none'; \n" +
@@ -703,7 +641,6 @@ public class LogConverter{
 		str = str.replaceAll(">", "&gt;");
 		return str;
 	}
-	
 	
 	/**
 	 * returns the .html file name
