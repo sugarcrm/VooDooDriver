@@ -96,7 +96,7 @@ background-color: #8888FF;
 
 .tr_normal { 
 background-color: #e5eef3; 
-} 
+}
 </style> 
 <title>__TITLE__</title> 
 <body> 
