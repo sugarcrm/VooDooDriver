@@ -16,7 +16,10 @@ limitations under the License.
 
 package logreporter;
 import java.io.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.james.mime4j.field.address.parser.BaseNode;
 
 
 /**
@@ -128,7 +131,7 @@ public class LogConverter{
 			rowData = formatExceptionBT(line,message);
 		} else if (message.startsWith("Major Exception")){
 			rowData = formatMajorException(line, message);
-		} else if (message.startsWith("(?i)html saved")){
+		} else if (message.contains("HTML Saved:")){
 			rowData = this.formatHTMLSavedResults(line, message, msgType);
 		} else if (msgType == 'E'){
 			rowData = formatEventDump(line, message);
@@ -151,6 +154,7 @@ public class LogConverter{
 		 * if there are no data for some reason, return empty html row
 		 */
 		if (rowData[0].isEmpty() && rowData[2].isEmpty()){
+				System.out.printf("Empty...\n");
 	         return "";
 		}
 		
@@ -279,13 +283,26 @@ public class LogConverter{
 	 */
 	private String[] formatHTMLSavedResults (String line, String message, char msgType) {
 		String[] rowData = new String[3];
+		Pattern p = null;
+		Matcher m = null;
+		String path = "";
+		String url = "";
 		
-		rowData[0] = generateDateTime (line);
+		p = Pattern.compile("(html\\ssaved:\\s)(.*)", Pattern.CASE_INSENSITIVE);
+		m = p.matcher(line);
+		if (m.find()) {
+			path = m.group(2);
+		}
+		
+		p = Pattern.compile("(saved-html.*)");
+		m = p.matcher(path);
+		if (m.find()) {
+			url = m.group(1);
+		}
+		
+		rowData[0] = generateDateTime(line);
 		rowData[1] = "Log";
-		
-		String baseName = this.fileName;
-		rowData[2] = "<b>"+rowData[0]+"</b>" +
-		         "<a href=\""+baseName+"\" target=\"_blank\">"+msgType+"</a>";
+		rowData[2] = "HTML Saved: <a href=\""+url+"\" target=\"_blank\">" + url + "</a>";
 		
 		return rowData;
 	}

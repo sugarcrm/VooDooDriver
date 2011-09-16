@@ -180,10 +180,6 @@ public class SummaryReporter {
 		
 		try {
 			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
-			if (stream == null) {
-				System.out.printf("STREAM IS NULL!\n");
-				
-			}
 			
 			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
