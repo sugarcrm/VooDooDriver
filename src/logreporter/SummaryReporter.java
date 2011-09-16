@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
  */
 public class SummaryReporter {
 	
-	private String HTML_HEADER_RESOURCE = "summaryreporter-head.txt";
+	private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
 	private int count;
 	private ArrayList<File> xmlFiles;
 	private int passedTests = 0;
@@ -175,12 +175,18 @@ public class SummaryReporter {
 	 */
 	private String generateHTMLHeader() {
 		String header = "";
-		File headerFD = null;
 		String line = "";
+		InputStream stream = null;
 		
 		try {
-			headerFD = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
-			BufferedReader br = new BufferedReader(new FileReader(headerFD));
+			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			if (stream == null) {
+				System.out.printf("STREAM IS NULL!\n");
+				
+			}
+			
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
 			
 			while ((line = br.readLine()) != null) {
 				header += line;

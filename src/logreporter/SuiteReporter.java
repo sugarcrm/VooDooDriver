@@ -142,14 +142,15 @@ public class SuiteReporter {
 	private void generateHTMLHeader() {
 		String title = "suite "+suiteName+".xml test results";
 		String header = "";
-		File headerFD;
+		InputStream stream = null;
 		String line = null;
 		boolean found_title = false;
 		boolean found_suitename = false;
 		
 		try {
-			headerFD = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
-			BufferedReader br = new BufferedReader(new FileReader(headerFD));
+			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
 			
 			while ((line = br.readLine()) != null) {
 				if ( (found_title != true) && (line.contains("__TITLE__"))) {
