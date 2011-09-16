@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 package logreporter;
+
 import java.io.*;
 
 /**
@@ -26,22 +27,22 @@ import java.io.*;
  */
 public class SuiteReporter {
 	
-	@SuppressWarnings("unused")
+	private String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
 	private File folder = null;
-	private File[] filesList;
-	private int count;
-	private String suiteName;
-	private FileReader input;
-	private BufferedReader br;
-	private String strLine, tmp;
-	private FileOutputStream output;
-	private PrintStream repFile;
+	private File[] filesList = null;
+	private int count = 0;
+	private String suiteName = null;
+	private FileReader input = null;
+	private BufferedReader br = null;
+	private String strLine, tmp = null;
+	private FileOutputStream output = null;
+	private PrintStream repFile = null;
 	
 	/**
 	 * default constructor
 	 */
 	public SuiteReporter(){
-		this.folder = new File("");
+		folder = new File("");
 		filesList = new File[0];
 		count = 0;
 	}
@@ -51,7 +52,7 @@ public class SuiteReporter {
 	 * @param folder - the File folder in which the suite log files reside.
 	 */
 	public SuiteReporter(File folder){
-		this.folder = folder;
+		folder = folder;
 		filesList = folder.listFiles();
 		count = 0;
 		suiteName = folder.getName();
@@ -59,54 +60,53 @@ public class SuiteReporter {
 		/**
 		 * set up file output
 		 */
-		try{
+		try {
 			output = new FileOutputStream(folder.getAbsolutePath()+"/"+suiteName+".html");
 			repFile = new PrintStream(output);
-		}catch(Exception e){
+		} catch(Exception e) {
 			System.err.println("Error writing to file "+suiteName+".html");
 			e.printStackTrace();
 		}
-		
 	}
 	
 	/**
 	 * generates a html report file
 	 */
-	public void generateReport(){
+	public void generateReport() {
 		generateHTMLHeader();
+		
 		/**
 		 * find files in folder that ends with .log, and process them
 		 */
-		for (int i=0; i < filesList.length; i++){
+		for (int i=0; i < filesList.length; i++) {
 			//ignores nonfiles and hidden files
-			if (filesList[i].isFile() && !filesList[i].isHidden()){
+			if (filesList[i].isFile() && !filesList[i].isHidden()) {
 				//read if is .log file
-				if (filesList[i].getName().endsWith("log")){
+				if (filesList[i].getName().endsWith("log")) {
 					readNextLog(filesList[i]);
 					//remove the .log extention
 					String temp = filesList[i].getName().substring(0, filesList[i].getName().indexOf("."));
 					//get last line
 					try {
-						while ((tmp = br.readLine()) != null){
+						while ((tmp = br.readLine()) != null) {
 							strLine = tmp;
 						}
-					}catch (IOException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					//find log status, generate table row
-					if (strLine.contains("blocked:1")){
+					if (strLine.contains("blocked:1")) {
 						generateTableRow(temp, 2);
-					}
-					else if (strLine.contains("result:-1")){
+					} else if (strLine.contains("result:-1")) {
 						generateTableRow(temp, 0);
-					}
-					else{
+					} else {
 						generateTableRow(temp, 1);
 					}
 				}
 			}		
 		}
+		
 		repFile.print("\n</table>\n</body>\n</html>\n");
 		repFile.close();
 	}
@@ -123,15 +123,15 @@ public class SuiteReporter {
 				"onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
 		repFile.println("\t<td class=\"td_file_data\">"+count+"</td>");
 		repFile.println("\t<td class=\"td_file_data\">"+fileName+".xml</td>");
-		if (status == 0){
+		
+		if (status == 0) {
 			repFile.println("\t<td class=\"td_failed_data\">Failed</td>");
-		}
-		else if (status == 1){
+		} else if (status == 1) {
 			repFile.println("\t<td class=\"td_passed_data\">Passed</td>");
-		}
-		else {
+		} else {
 			repFile.println("\t<td class=\"_data\">Blocked</td>");
 		}
+		
 		repFile.println("\t<td class=\"td_report_data\"><a href='Report-"+fileName+".html'>Report Log</a></td>");
 		repFile.println("</tr>");
 	}
@@ -139,136 +139,56 @@ public class SuiteReporter {
 	/**
 	 * generates the html header for the report file
 	 */
-	private void generateHTMLHeader(){
-		final String title = "suite "+suiteName+".xml test results";
+	private void generateHTMLHeader() {
+		String title = "suite "+suiteName+".xml test results";
 		String header = "";
-		header += "<html> \n" +
-				"<style type=\"text/css\"> \n" +
-				"table { \n" +
-				"\twidth: 100%; \n" +
-				"\tborder: 2px solid black; \n" +
-				"\tborder-collapse: collapse; \n" +
-				"\tpadding: 0px; \n" +
-				"\tbackground: #FFFFFF; \n" +
-				"} \n" +
-				".td_header_master { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\tbackground: #b6dde8; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_file_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: left; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_passed_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #00cc00; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				"._data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #FFCF10; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_failed_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: bold; \n" +
-				"\tcolor: #FF0000; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".td_failed_data_zero { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: normal; \n" +
-				"\tcolor: #FFFFFF; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n" +
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +		
-				".td_report_data { \n" +
-				"\twhite-space: nowrap; \n" +
-				"\ttext-align: center; \n" +
-				"\tfont-family: Arial; \n" +
-				"\tfont-weight: normal; \n" +
-				"\tfont-size: 12px; \n" +
-				"\tborder-left: 0px solid black; \n"+
-				"\tborder-right: 2px solid black; \n" +
-				"\tborder-bottom: 2px solid black; \n" +
-				"} \n" +
-				".highlight { \n" +
-				"\tbackground-color: #8888FF; \n" +
-				"} \n" +
-				".tr_normal { \n" +
-				"\tbackground-color: #e5eef3; \n" +
-				"} \n" +
-				"</style> \n" +
-				"<title>"+title+"</title> \n" +
-				"<body> \n" +
-				"<table id=\"tests\"> \n" +
-				"<tr id=\"header\"> \n" +
-				"\t<td class=\"td_header_master\" colspan=\"4\"> \n" +
-				"\tSuite: "+suiteName+".xml Test Results \n" +
-				"</td> \n" +
-				"<tr id=\"header_key\"> \n" +
-				"\t<td class=\"td_header_master\"></td> \n" +
-				"\t<td class=\"td_header_master\">Test File</td> \n" +
-				"\t<td class=\"td_header_master\">Status</td> \n" +
-				"\t<td class=\"td_header_master\">Report Log</td> \n" +
-				"</tr> \n";
+		InputStream stream = null;
+		String line = null;
+		boolean found_title = false;
+		boolean found_suitename = false;
+		
+		try {
+			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
+			
+			while ((line = br.readLine()) != null) {
+				if ( (found_title != true) && (line.contains("__TITLE__"))) {
+					line = line.replace("__TITLE__", title);
+					found_title = true;
+				}
 				
-				repFile.print(header);
+				if ((found_suitename != true) && (line.contains("__SUITENAME__")) ) {
+					line = line.replace("__SUITENAME__", suiteName);
+					found_suitename = true;
+				}
+				
+				header += line;
+				header += "\n";
+			}
+			
+		} catch (Exception exp) {
+			exp.printStackTrace();
+		}
+		
+		repFile.print(header);
+		
 	}
-	
-	/////////////////////////////
-	//misc. methods
-	/////////////////////////////
 	
 	/**
 	 * sets up FileReader and BufferedReader for the next report file
 	 * @param inputFile - a properly formatted .log SODA report file
 	 */
-	private void readNextLog(File inputFile){
+	private void readNextLog(File inputFile) {
 		try{
 			/*sets up file reader to read input one character at a time*/
 			input = new FileReader(inputFile);
 			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
-		}catch (FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			System.err.println("file not found: "+inputFile);
-		}catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("error reading file" + inputFile);
 		}
 	}
-
 }

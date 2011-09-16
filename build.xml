@@ -12,6 +12,8 @@
    <property name="lib" location="./lib"/>
 	<property name="product-zip" location="${bin}/VooDooDriver.zip"/>
 	<property name="sodaelements" location="${src}/voodoodriver/SodaElements.xml"/>
+	<property name="suitereport-header" location="${src}/logreporter/suitereporter-header.txt" />
+	<property name="summaryreport-header" location="${src}/logreporter/summaryreporter-header.txt" />
 	<property name="officialName" value="VooDooDriver" />
 	<property name="version" value="0.0.1" />
 	<property name="year" value="2011" />
@@ -85,8 +87,10 @@
             <compilerarg value="-Xlint"/>
          </javac>
    	
-      <copy todir="${build}/voodoodriver" file="${sodaelements}"/>
-       
+      <copy todir="${build}/voodoodriver" file="${sodaelements}" />
+   	<copy todir="${build}/logreporter" file="${suitereport-header}" />
+   	<copy todir="${build}/logreporter" file="${summaryreport-header}" />
+   	
    	<jar jarfile="${dist}/VooDooDriver.jar" basedir="${build}">
          <fileset dir="${lib}">
             <include name="**/*.jar" />
@@ -97,6 +101,7 @@
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
+   	
    	<!-- LogReporter build -->
    	<jar jarfile="${dist}/LogReporter.jar" basedir="${build}">
    	   	 <manifest>
@@ -129,6 +134,8 @@
       </copy>
       
    	<copy todir="${build}/voodoodriver" file="${sodaelements}"/>
+   	<copy todir="${build}/logreporter" file="${suitereport-header}" />
+   	<copy todir="${build}/logreporter" file="${summaryreport-header}" />
    	
       <jar jarfile="${dist}/VooDooDriver.jar" basedir="${build}">
          <fileset dir="${lib}">
@@ -140,6 +147,7 @@
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
+   	
    		<!-- LogReporter build -->
    		<jar jarfile="${dist}/LogReporter.jar" basedir="${build}">
    	    	<manifest>

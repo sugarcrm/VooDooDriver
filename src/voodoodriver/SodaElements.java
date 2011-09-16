@@ -76,7 +76,8 @@ public enum SodaElements {
 	JAVAPLUGIN,
    DELETE,
    SCREENSHOT,
-   ALERT;
+   ALERT,
+   PLUGINCONTROL;
 	
 	static public boolean isMember(String aName) {
 		boolean result = false;

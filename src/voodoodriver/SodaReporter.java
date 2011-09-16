@@ -300,12 +300,12 @@ public class SodaReporter {
 				this.FailedAsserts += 1;
 				msg = String.format("(!)Assert Passed, Found: '%s'.", value);
 				this._log(msg);
+				this.SavePage();
 				result = false;
 			} else {
 				this.PassedAsserts += 1;
 				msg = String.format("Assert Failed for find: '%s' as expected.", value);
 				this.Log(msg);
-				this.SavePage();
 				result = true;
 			}
 		}

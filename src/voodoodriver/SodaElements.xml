@@ -109,6 +109,7 @@ limitations under the License.
 
       <soda_attributes>
          <accessor type="string">set</accessor>
+         <accessor type="string">append</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
