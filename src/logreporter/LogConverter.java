@@ -15,12 +15,10 @@ limitations under the License.
 */
 
 package logreporter;
+
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.james.mime4j.field.address.parser.BaseNode;
-
 
 /**
  * converts a single .log file into a readable HTML file. The output file will be in the same directory as the .log source
