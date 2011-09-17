@@ -291,7 +291,7 @@ public class SodaReporter {
 				result = false;
 			} else {
 				this.PassedAsserts += 1;
-				msg = String.format("Assert Failed for find: '%s' as expected.", value);
+				msg = String.format("Assert Passed did not find: '%s' as expected.", value);
 				this.Log(msg);
 				result = true;
 			}
@@ -304,7 +304,7 @@ public class SodaReporter {
 				result = false;
 			} else {
 				this.PassedAsserts += 1;
-				msg = String.format("Assert Failed for find: '%s' as expected.", value);
+				msg = String.format("Assert Passed did not find: '%s' as expected.", value);
 				this.Log(msg);
 				result = true;
 			}
