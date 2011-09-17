@@ -193,16 +193,9 @@ public class LogReporter {
 				}
 				count = 0;
 			}
-			
-			
 		} catch(NullPointerException e) {
 			System.err.println("invalid path");
-<<<<<<< HEAD
-			e.printStackTrace();
-		}catch(Exception e){
-=======
 		} catch(Exception e) {
->>>>>>> dev
 			e.printStackTrace();
 		}	
 	}
