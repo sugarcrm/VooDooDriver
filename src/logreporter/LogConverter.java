@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  *
  */
 public class LogConverter{
-	
 	private String fileName;
 	private FileReader input;
 	private BufferedReader br;
@@ -67,7 +66,6 @@ public class LogConverter{
 			System.err.println("error reading file" + inputFile);
 		}
 		
-			
 		/**
 		 * add the correct extension and "Report-" prefix to the output html
 		 */
@@ -107,6 +105,7 @@ public class LogConverter{
 		/**
 		 * case switches for different message types
 		 */
+		
 		//assertion passed
 		if (message.contains("Assert Passed")) {
 			rowData = formatAssertionPassed(line, message);
