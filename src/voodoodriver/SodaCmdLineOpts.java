@@ -47,6 +47,8 @@ public class SodaCmdLineOpts {
 	private String configfile = null;
 	private String downloaddir = null;
 	private String assertPageFile = null;
+	private int restartcount = 0;
+	private String restarttest = null;
 	
 	public SodaCmdLineOpts(String[] args) {
 		
@@ -119,6 +121,10 @@ public class SodaCmdLineOpts {
 						this.assertPageFile = this.assertPageFile.replace("--assertpagefile=", "");
 						this.assertPageFile = FilenameUtils.separatorsToSystem(this.assertPageFile);
 						System.out.printf("(*)Assertpagefile: %s\n", this.assertPageFile);
+				 } else if (args[i].contains("--restartcount")) {
+					 this.restartcount = Integer.valueOf(args[i]);
+				 } else if (args[i].contains("--restarttest")) {
+					 this.restarttest = args[i];
 				 }
 			}
 			

@@ -100,6 +100,8 @@ public class VooDooDriver {
 		String downloadDir = null;
 		String assertpage = null;
 		SodaHash gvars = null;
+		int restartCount = 0;
+		String restartTest = null; 
 		
 		SodaEvents configFileOpts = null;
 		
@@ -155,6 +157,24 @@ public class VooDooDriver {
 			if ((Boolean)cmdOpts.get("version")) {
 				System.out.printf("(*)VooDooDriver Version: %s\n", VooDooDriver.VERSION);
 				System.exit(0);
+			}
+			
+			restartTest = (String)cmdOpts.get("restarttest");
+			restartCount = (Integer)cmdOpts.get("restartcount");		
+			
+			if (restartCount > 0) {
+				System.out.printf("(*)Restart Count => '%d'\n", restartCount);
+				
+				if (restartTest != null) {
+					System.out.printf("(*)Restart Test => '%s'.\n", restartTest);
+					File retmp = new File(restartTest);
+					
+					if (!retmp.exists()) {
+						System.out.printf("(!)Error: failed to find Restart Test: => '%s'!\n\n", restartTest);
+						System.exit(5);
+					}
+				}
+				
 			}
 			
 			if (cmdOpts.get("browser") == null) {
@@ -221,7 +241,7 @@ public class VooDooDriver {
 				
 				RunSuites(SodaSuitesList, resultdir, browserType, gvars, 
 						(SodaHash)cmdOpts.get("hijacks"), blockList, plugins, savehtml, downloadDir,
-						assertpage);
+						assertpage, restartTest, restartCount);
 			}
 			
 			SodaTestsList = (ArrayList<String>)cmdOpts.get("tests");
@@ -303,7 +323,7 @@ public class VooDooDriver {
 	
 	private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, boolean savehtml,
-			String downloaddir, String assertpage) {
+			String downloaddir, String assertpage, String restartTest, int restartCount) {
 		int len = suites.size() -1;
 		File resultFD = null;
 		String report_file_name = resultdir;
