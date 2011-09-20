@@ -122,9 +122,11 @@ public class SodaCmdLineOpts {
 						this.assertPageFile = FilenameUtils.separatorsToSystem(this.assertPageFile);
 						System.out.printf("(*)Assertpagefile: %s\n", this.assertPageFile);
 				 } else if (args[i].contains("--restartcount")) {
-					 this.restartcount = Integer.valueOf(args[i]);
+					 String tmp = args[i].replaceAll("--restartcount=", "");
+					 this.restartcount = Integer.valueOf(tmp);
 				 } else if (args[i].contains("--restarttest")) {
 					 this.restarttest = args[i];
+					 this.restarttest = this.restarttest.replaceAll("--restarttest=", "");
 				 }
 			}
 			
@@ -147,6 +149,8 @@ public class SodaCmdLineOpts {
 			this.options.put("config", this.configfile);
 			this.options.put("downloaddir", this.downloaddir);
 			this.options.put("assertpagefile", this.assertPageFile);
+			this.options.put("restartcount", this.restartcount);
+			this.options.put("restarttest", this.restarttest);
 		} catch (Exception exp) {
 			exp.printStackTrace();
 			this.options = null;
