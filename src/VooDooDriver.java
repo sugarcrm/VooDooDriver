@@ -44,7 +44,7 @@ import voodoodriver.SodaUtils;
 
 public class VooDooDriver {
 
-	public static String VERSION = "1.0.0-Beta1";
+	public static String VERSION = "1.0.0";
 	
 	public static void printUsage() {
 		String msg = "VooDooDriver\n"+
