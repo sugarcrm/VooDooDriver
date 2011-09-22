@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class SuiteReporter {
 	
-	private String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
+	private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
 	private File folder = null;
 	private File[] filesList = null;
 	private int count = 0;
@@ -94,7 +94,6 @@ public class SuiteReporter {
 							strLine = tmp;
 						}
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					//find log status, generate table row
@@ -203,6 +202,7 @@ public class SuiteReporter {
 	 */
 	public void generateTableRow(String fileName, int status, String line){
 		String html = "\t<td class=\"td_issues_data\"></td>\n";
+		
 		count ++;
 		repFile.println("<tr id=\""+count+"\" onMouseOver=\"this.className='highlight'\" "+
 				"onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
@@ -274,15 +274,14 @@ public class SuiteReporter {
 	 * @param inputFile - a properly formatted .log SODA report file
 	 */
 	private void readNextLog(File inputFile) {
-		try{
-			/*sets up file reader to read input one character at a time*/
+		
+		try {
 			input = new FileReader(inputFile);
-			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
 		} catch (FileNotFoundException e) {
-			System.err.println("file not found: "+inputFile);
+			System.out.printf("(!)Error: Failed to find file: '%s'!\n", inputFile);
 		} catch (Exception e) {
-			System.err.println("error reading file" + inputFile);
+			System.out.printf("(!)Error: Reading file: '%s'!\n", inputFile);
 		}
 	}
 }
