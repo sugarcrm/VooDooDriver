@@ -124,12 +124,17 @@ public class SuiteReporter {
 		repFile.println("\t<td class=\"td_file_data\">"+count+"</td>");
 		repFile.println("\t<td class=\"td_file_data\">"+fileName+".xml</td>");
 		
-		if (status == 0) {
-			repFile.println("\t<td class=\"td_failed_data\">Failed</td>");
-		} else if (status == 1) {
-			repFile.println("\t<td class=\"td_passed_data\">Passed</td>");
-		} else {
-			repFile.println("\t<td class=\"_data\">Blocked</td>");
+		switch (status) {
+			case 0:
+				repFile.println("\t<td class=\"td_failed_data\">Failed</td>");
+			break;
+			
+			case 1:
+				repFile.println("\t<td class=\"td_passed_data\">Passed</td>");	
+			break;
+			
+			default:
+				repFile.println("\t<td class=\"_data\">Blocked</td>");
 		}
 		
 		repFile.println("\t<td class=\"td_report_data\"><a href='Report-"+fileName+".html'>Report Log</a></td>");
