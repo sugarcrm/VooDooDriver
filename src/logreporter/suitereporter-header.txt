@@ -1,13 +1,27 @@
 <html>
 <style type="text/css"> 
-table { 
+.table_master { 
 width: 100%; 
 border: 2px solid black; 
 border-collapse: collapse; 
 padding: 0px; 
 background: #FFFFFF; 
 }
- 
+
+.table_sub {
+font-family: Arial;
+font-size: 12px;
+font-weight: bold;
+table-layout: fixed;
+width: 100%;
+}
+
+.td_sub {
+text-align: left; 
+word-wrap: break-word;
+width: 75px;
+}
+
 .td_header_master { 
 white-space: nowrap; 
 background: #b6dde8; 
@@ -31,6 +45,18 @@ border-right: 2px solid black;
 border-bottom: 2px solid black; 
 }
  
+.td_issues_data { 
+white-space: nowrap; 
+text-align: center; 
+font-family: Arial; 
+font-weight: bold; 
+font-size: 12px; 
+border-left: 0px solid black; 
+border-right: 2px solid black; 
+border-bottom: 2px solid black; 
+width: 300px;
+}
+
 .td_passed_data { 
 white-space: nowrap; 
 text-align: center; 
@@ -100,16 +126,17 @@ background-color: #e5eef3;
 </style> 
 <title>__TITLE__</title> 
 <body> 
-<table id="tests"> 
+<table id="tests" class="table_master"> 
 <tr id="header"> 
-	<td class="td_header_master" colspan="4">
+	<td class="td_header_master" colspan="5">
 	Suite: __SUITENAME__.xml Test Results 
 	</td>
 </tr>
 	
 <tr id="header_key"> 
 	<td class="td_header_master"></td> 
-	<td class="td_header_master">Test File</td> 
+	<td class="td_header_master">Test File</td>
+	<td class="td_header_master">Issues</td>  
 	<td class="td_header_master">Status</td> 
 	<td class="td_header_master">Report Log</td> 
 </tr>

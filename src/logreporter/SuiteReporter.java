@@ -17,6 +17,8 @@ limitations under the License.
 package logreporter;
 
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Takes in a File type input (should be the directory of .log files), reads all the log files and 
@@ -78,7 +80,7 @@ public class SuiteReporter {
 		/**
 		 * find files in folder that ends with .log, and process them
 		 */
-		for (int i=0; i < filesList.length; i++) {
+		for (int i = 0; i < filesList.length; i++) {
 			//ignores nonfiles and hidden files
 			if (filesList[i].isFile() && !filesList[i].isHidden()) {
 				//read if is .log file
@@ -96,12 +98,13 @@ public class SuiteReporter {
 						e.printStackTrace();
 					}
 					//find log status, generate table row
+					
 					if (strLine.contains("blocked:1")) {
-						generateTableRow(temp, 2);
+						generateTableRow(temp, 2, null);
 					} else if (strLine.contains("result:-1")) {
-						generateTableRow(temp, 0);
+						generateTableRow(temp, 0, strLine);
 					} else {
-						generateTableRow(temp, 1);
+						generateTableRow(temp, 1, null);
 					}
 				}
 			}		
@@ -111,13 +114,92 @@ public class SuiteReporter {
 		repFile.close();
 	}
 	
+	private String GenMiniErrorTable(String line) {
+		String result = "";
+		Pattern p = null;
+		Matcher m = null;
+		String exceptions = "";
+		String watchdog = "";
+		String fasserts = "";
+		String errors = "";
+		String color = "";
+		
+		try {
+			p = Pattern.compile("failedasserts:(\\d+).*exceptions:(\\d+).*errors:(\\d+).*watchdog:(\\d+)", 
+					Pattern.CASE_INSENSITIVE);
+			m = p.matcher(line);
+			
+			if (!m.find()) {
+				System.out.printf("(!)Error: Failed to find needed matches when parsing a failed tests results line!\n");
+				System.out.printf("--)Line: '%s'\n\n", line);
+				return "";
+			}
+			
+			fasserts = m.group(1);
+			exceptions = m.group(2);
+			watchdog = m.group(3);
+			errors = m.group(4);
+			
+			result = "\t<td class=\"td_issues_data\">\n\t<table class=\"table_sub\">\n"+
+			"\t<tr>\n";
+			
+			if (Integer.valueOf(watchdog) > 0) {
+				color = "#FF0000";
+			} else {
+				color = "#000000";
+			}
+         
+         result += "\t\t<td class=\"td_sub\">"+
+               "WD:&nbsp;<font color=\"" + color + "\">" + watchdog + "</font></td>\n";
+         
+			if (Integer.valueOf(exceptions) > 0) {
+				color = "#FF0000";
+			} else {
+				color = "#000000";
+			}
+			
+			result += "\t\t<td class=\"td_sub\">Exp:&nbsp;<font color=\"" +
+					color + "\">" + exceptions + "</font></td>\n";
+			
+         if (Integer.valueOf(fasserts) > 0) {
+				color = "#FF0000";
+			} else {
+				color = "#000000";
+			}
+         
+         result += "\t\t<td class=\"td_sub\">"+
+               "FA:&nbsp;<font color=\"" + color + "\">" + fasserts + "</font></td>\n";
+			
+         if (Integer.valueOf(errors) > 0) {
+				color = "#FF0000";
+			} else {
+				color = "#000000";
+			}
+         
+         result += "\t\t<td class=\"td_sub\">"+
+               "E:&nbsp;<font color=\"" + color + "\">" + errors + "</font></td>\n"+
+               "\t</tr>\n\t</table>\n\t</td>\n";
+			
+		} catch (Exception exp) {
+			exp.printStackTrace();
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * generates a html table row based on data from .log report file
 	 * 
 	 * @param fileName - name of the .log report file this table row is representing
 	 * @param failed - status of the test. 0 = failed, 1 = passed, 2 = blocked
+	 * 
+	 * Note:
+	 * I find it odd that the intern needed to change failed = 0, when -1 was already
+	 * 0 and 0 always means success in C programming...
+	 * 
 	 */
-	public void generateTableRow(String fileName, int status){
+	public void generateTableRow(String fileName, int status, String line){
+		String html = "\t<td class=\"td_issues_data\"></td>\n";
 		count ++;
 		repFile.println("<tr id=\""+count+"\" onMouseOver=\"this.className='highlight'\" "+
 				"onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
@@ -126,15 +208,19 @@ public class SuiteReporter {
 		
 		switch (status) {
 			case 0:
-				repFile.println("\t<td class=\"td_failed_data\">Failed</td>");
+				html = GenMiniErrorTable(line);
+				html += "\t<td class=\"td_failed_data\">Failed</td>";
+				repFile.println(html);
 			break;
 			
 			case 1:
-				repFile.println("\t<td class=\"td_passed_data\">Passed</td>");	
+				html += "\t<td class=\"td_passed_data\">Passed</td>";
+				repFile.println(html);	
 			break;
 			
 			default:
-				repFile.println("\t<td class=\"_data\">Blocked</td>");
+				html += "\t<td class=\"_data\">Blocked</td>";
+				repFile.println(html);
 		}
 		
 		repFile.println("\t<td class=\"td_report_data\"><a href='Report-"+fileName+".html'>Report Log</a></td>");
