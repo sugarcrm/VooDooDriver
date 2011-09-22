@@ -152,7 +152,7 @@ public class SuiteReporter {
          result += "\t\t<td class=\"td_sub\">"+
                "WD:&nbsp;<font color=\"" + color + "\">" + watchdog + "</font></td>\n";
          
-			if (Integer.valueOf(exceptions) > 0) {
+         if (Integer.valueOf(exceptions) > 0) {
 				color = "#FF0000";
 			} else {
 				color = "#000000";
@@ -161,7 +161,7 @@ public class SuiteReporter {
 			result += "\t\t<td class=\"td_sub\">Exp:&nbsp;<font color=\"" +
 					color + "\">" + exceptions + "</font></td>\n";
 			
-         if (Integer.valueOf(fasserts) > 0) {
+			if (Integer.valueOf(fasserts) > 0) {
 				color = "#FF0000";
 			} else {
 				color = "#000000";
