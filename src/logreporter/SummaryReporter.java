@@ -43,7 +43,6 @@ public class SummaryReporter {
 	private int exceptions = 0;
 	private int errors = 0;
 	private int watchdog = 0;
-	private int failedTotal =0;
 	private int hours = 0;
 	private int minutes = 0;
 	private int seconds = 0;
@@ -69,8 +68,7 @@ public class SummaryReporter {
 		passedAsserts = 0; 
 		exceptions = 0; 
 		errors = 0; 
-		watchdog = 0; 
-		failedTotal = 0;
+		watchdog = 0;
 		hours = 0;
 		minutes = 0;
 		seconds = 0;

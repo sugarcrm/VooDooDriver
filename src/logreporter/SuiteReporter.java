@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 public class SuiteReporter {
 	
 	private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
-	private File folder = null;
+	private File dir = null;
 	private File[] filesList = null;
 	private int count = 0;
 	private String suiteName = null;
@@ -44,26 +44,26 @@ public class SuiteReporter {
 	 * default constructor
 	 */
 	public SuiteReporter(){
-		folder = new File("");
+		this.dir = new File("");
 		filesList = new File[0];
 		count = 0;
 	}
 	
 	/**
 	 * Constructor for class SuiteReporter
-	 * @param folder - the File folder in which the suite log files reside.
+	 * @param directory - the directory in which the suite log files reside.
 	 */
-	public SuiteReporter(File folder){
-		folder = folder;
-		filesList = folder.listFiles();
+	public SuiteReporter(File directory){
+		this.dir = directory;
+		filesList = this.dir.listFiles();
 		count = 0;
-		suiteName = folder.getName();
+		suiteName = this.dir.getName();
 		
 		/**
 		 * set up file output
 		 */
 		try {
-			output = new FileOutputStream(folder.getAbsolutePath()+"/"+suiteName+".html");
+			output = new FileOutputStream(this.dir.getAbsolutePath()+"/"+suiteName+".html");
 			repFile = new PrintStream(output);
 		} catch(Exception e) {
 			System.err.println("Error writing to file "+suiteName+".html");
@@ -242,7 +242,7 @@ public class SuiteReporter {
 		boolean found_suitename = false;
 		
 		try {
-			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			stream = getClass().getResourceAsStream(HTML_HEADER_RESOURCE);
 			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
 			
