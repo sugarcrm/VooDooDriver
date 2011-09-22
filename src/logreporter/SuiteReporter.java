@@ -114,6 +114,9 @@ public class SuiteReporter {
 		repFile.close();
 	}
 	
+	/*
+	 * 
+	 */
 	private String GenMiniErrorTable(String line) {
 		String result = "";
 		Pattern p = null;
