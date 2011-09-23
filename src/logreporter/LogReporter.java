@@ -122,13 +122,12 @@ public class LogReporter {
 				File[] filesList;
 				
 				if (foldersList.size() == 0) {
-					System.out.println("there are no directories to generate log reports from.");
+					System.out.printf("(*)There are no directories to generate log reports from.\n");
 				}
 				
 				for (int i = 0; i < foldersList.size(); i++) {
-					System.out.println("checking directory: "+foldersList.get(i).getName());
+					System.out.printf("(*)Checking directory: '%s'.\n", foldersList.get(i).getName());
 					filesList = foldersList.get(i).listFiles();
-					System.out.println("number of files or folders: "+filesList.length);
 					
 					for (int j = 0; j < filesList.length; j ++) {
 						//check is file, not hidden, and is a log file
@@ -140,27 +139,27 @@ public class LogReporter {
 					}
 					
 					if (count == 0) {
-						System.out.println("no log reports found.");
+						System.out.printf("(*)No log reports found.\n");
 					} else {
-						System.out.println("generated "+count+" log report(s)");	
+						System.out.printf("(*)Generated '%d' reports.\n", count);
 					}
 					
 					if (count != 0) {
-						System.out.println("printing test summary for suite: "+ foldersList.get(i).getAbsolutePath());
+						System.out.printf("(*)Creating test summary for suite: '%s'.\n", foldersList.get(i).getAbsolutePath());
 						SuiteReporter suiteSummary = new SuiteReporter(foldersList.get(i));
 						suiteSummary.generateReport();
-						System.out.println("generated test summary for suite: "+foldersList.get(i).getAbsolutePath());
+						System.out.printf("(*)Summary creation finished.\n");
 					}
 					count = 0;
 				}
 				
 				//generate summary of suites
 				if (getFolderContent(path, false).size() == 0) {
-					System.out.println("There are no files containing suite test information");
+					System.out.printf("(*)There are no files containing suite test information.\n");
 				} else {
 					SummaryReporter summaryReport = new SummaryReporter(getFolderContent(path, false), path);
 					summaryReport.generateReport();
-					System.out.println("generated summary.html");
+					System.out.printf("(*)Generated summary.html.\n");
 				}	
 			} else if (options.containsKey("suite")) {
 				String path = (String)options.get("suite");
@@ -169,7 +168,7 @@ public class LogReporter {
 				//generate log reports
 				LogConverter htmlLogs = new LogConverter();
 				//look though folder
-				System.out.println("number of files or folders in "+path+": "+filesList.length);
+				System.out.printf("(*)'%d' file found in directory '%s'.\n", filesList.length, path);
 				
 				for (int i = 0; i < filesList.length; i ++) {
 					if (!filesList[i].isHidden() && filesList[i].isFile() && filesList[i].getName().endsWith("log")) {
@@ -180,23 +179,22 @@ public class LogReporter {
 				}
 				
 				if (count == 0) {
-					System.out.println("no log reports found.");
+					System.out.printf("(*)No log reports found.\n");
 				} else {
-					System.out.println("generated "+count+" log report(s)");	
+					System.out.printf("(*)Generated '%d' report(s).\n", count);
 				}
 
 				if (count != 0) {
-					System.out.println("printing test summary for suite: "+ path);
+					System.out.printf("(*)Writing test summary for suite: '%s'.\n", path);
 					SuiteReporter suiteSummary = new SuiteReporter(folder);
 					suiteSummary.generateReport();
-					System.out.println("generated test summary for suite: "+ path);	
+					System.out.printf("(*)Finished writing summary.\n");	
 				}
 				count = 0;
 			}
 			
-			
 		} catch(NullPointerException e) {
-			System.err.println("invalid path");
+			System.out.printf("(!)Error: Invalid path!\n");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}	

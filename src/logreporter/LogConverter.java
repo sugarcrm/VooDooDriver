@@ -61,9 +61,9 @@ public class LogConverter{
 			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
 		} catch (FileNotFoundException e) {
-			System.err.println("file not found: "+inputFile);
+			System.out.printf("(!)Error: Failed to find file: '%s'!\n", inputFile);
 		} catch (Exception e) {
-			System.err.println("error reading file" + inputFile);
+			e.printStackTrace();
 		}
 		
 		/**
@@ -72,7 +72,7 @@ public class LogConverter{
 		fileName = inputFile.substring(inputFile.lastIndexOf("/")+1, inputFile.length()-4);
 		String filePath = inputFile.substring(0, inputFile.lastIndexOf('/')+1);
 		fileName = "Report-"+fileName+".html";
-		System.out.println(fileName);
+		System.out.printf("(*)Generating report: '%s'.\n", fileName);
 		
 		/**
 		 * sets up output file
@@ -81,8 +81,10 @@ public class LogConverter{
 			output = new FileOutputStream(filePath+fileName);
 			repFile = new PrintStream(output);
 		} catch (Exception e) {
-			System.err.println("Error writing to file "+fileName);
+			System.out.printf("(!)Error: Failed trying to write to file: '%s'!\n", fileName);
 		}
+		
+		System.out.printf("(*)Finished report generation.\n");
 	}
 	
 	/**

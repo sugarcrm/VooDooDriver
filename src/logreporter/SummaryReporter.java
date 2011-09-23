@@ -59,7 +59,7 @@ public class SummaryReporter {
 	 *@param file - an ArrayList of xml files containing suite test data
 	 */
 	public SummaryReporter(ArrayList<File> xmlFiles, String path){
-		count = 0;
+		this.count = 0;
 		this.xmlFiles = xmlFiles;
 		passedTests = 0; 
 		failedTests = 0; 
@@ -77,7 +77,7 @@ public class SummaryReporter {
 			output = new FileOutputStream(path+	"summary.html");
 			repFile = new PrintStream(output);
 		} catch (Exception e) {
-			System.err.println("Error writing to summary.html");
+			System.out.printf("(!)Error: Failed trying to write file: '%s/%s'!\n",path, "summary.html");
 			e.printStackTrace();
 		}
 	}

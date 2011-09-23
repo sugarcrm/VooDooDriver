@@ -58,15 +58,17 @@ public class SuiteReporter {
 		filesList = this.dir.listFiles();
 		count = 0;
 		suiteName = this.dir.getName();
+		String filepath = "";
 		
 		/**
 		 * set up file output
 		 */
 		try {
-			output = new FileOutputStream(this.dir.getAbsolutePath()+"/"+suiteName+".html");
+			filepath = this.dir.getAbsolutePath()+"/"+suiteName+".html";
+			output = new FileOutputStream(filepath);
 			repFile = new PrintStream(output);
 		} catch(Exception e) {
-			System.err.println("Error writing to file "+suiteName+".html");
+			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", filepath);
 			e.printStackTrace();
 		}
 	}
