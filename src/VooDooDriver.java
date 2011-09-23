@@ -424,6 +424,7 @@ public class VooDooDriver {
 				Date test_start_time = null;
 				
 				if ( (restartCount > 0) && (testRanCount >= restartCount)) {
+					System.out.printf("(*))Auto restarting browser.\n");
 					if (!browser.isClosed()) {
 						browser.close();
 					}
@@ -541,8 +542,20 @@ public class VooDooDriver {
 				}
 				
 				if (restartCount > 0) {
-					testRanCount += 1;
-					System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
+					File tmpF = new File(current_test);
+					File pF = tmpF.getParentFile();
+					
+					if (pF != null) {
+						String path = pF.getAbsolutePath();
+						path = path.toLowerCase();
+						if (!path.contains("lib")) {
+							testRanCount += 1;
+							System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
+						}
+					} else {
+						testRanCount += 1;
+						System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
+					}
 				}
 			}
 			
