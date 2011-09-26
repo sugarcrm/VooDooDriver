@@ -90,7 +90,6 @@ public class SummaryReporter {
 		
 		for (int i = 0; i < xmlFiles.size(); i ++){
 			HashMap<String, Object> suiteData = null;
-			System.out.printf("XML FILE: %s\n", xmlFiles.get(i));
 			suiteData = parseXMLFile(xmlFiles.get(i));
 			name = suiteData.get("suitename").toString();
 			list.put(name, suiteData);
@@ -101,7 +100,6 @@ public class SummaryReporter {
 		
 		for (int i = 0; i <= keys.length -1; i++) {
 			String key = keys[i];
-			System.out.printf("KEY: %s\n", key);
 			repFile.print(generateTableRow(key, list.get(key)));
 		}
 		
