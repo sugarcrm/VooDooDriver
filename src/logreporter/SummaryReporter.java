@@ -82,12 +82,27 @@ public class SummaryReporter {
 		}
 	}
 	
-	public void generateReport(){
+	public void generateReport() {
+		HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
 		repFile.print(generateHTMLHeader());
+		String name = "";
+		String[] keys = null;
 		
 		for (int i = 0; i < xmlFiles.size(); i ++){
-			parseXMLFile(xmlFiles.get(i));
-			repFile.print(generateTableRow(dom));
+			HashMap<String, Object> suiteData = null;
+			System.out.printf("XML FILE: %s\n", xmlFiles.get(i));
+			suiteData = parseXMLFile(xmlFiles.get(i));
+			name = suiteData.get("suitename").toString();
+			list.put(name, suiteData);
+		}
+		
+		keys = list.keySet().toArray(new String[0]);
+		java.util.Arrays.sort(keys);
+		
+		for (int i = 0; i <= keys.length -1; i++) {
+			String key = keys[i];
+			System.out.printf("KEY: %s\n", key);
+			repFile.print(generateTableRow(key, list.get(key)));
 		}
 		
 		repFile.print(generateHTMLFooter());
@@ -95,29 +110,64 @@ public class SummaryReporter {
 		repFile.close();
 	}
 	
+	private HashMap<String, Object> getSuiteData(Document doc) {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
+		String runtime = "";
+		String suiteName = getSuiteName(doc);
+		
+		passed = getAmtPassed(doc);
+		blocked = getAmtBlocked(doc);
+		failed = getAmtFailed(doc) - blocked;  //blocked tests count as failed too
+		wd = getAmtwatchdog(doc);
+		asserts = getAmtAsserts(doc);
+		assertsF = getAmtAssertsF(doc);
+		exceptions = getAmtExceptions(doc);
+		errors = getAmtErrors(doc);
+		total = assertsF + exceptions + errors;
+		runtime = getRunTime(doc);
+		
+		result.put("passed", passed);
+		result.put("blocked", blocked);
+		result.put("failed", failed);
+		result.put("wd", wd);
+		result.put("asserts", asserts);
+		result.put("assertsF", assertsF);
+		result.put("exceptions", exceptions);
+		result.put("errors", errors);
+		result.put("total", total);
+		result.put("runtime", runtime);
+		result.put("suitename", suiteName);
+		
+		return result;
+	}
+	
 	/**
 	 * generates a table row for summary.html from a DOM
 	 * @return - a nicely formatted html table row for summary.html
 	 */
-	private String generateTableRow(Document d){
+	
+	private String generateTableRow(String suiteName, HashMap<String, Object> data) {
 		int passed, failed, blocked, asserts, assertsF, errors, exceptions, wd, total;
-		String suiteName = getSuiteName(d);
-		String html = "<tr id=\""+count+"\" class=\"unhighlight\" onmouseover=\"this.className='highlight'\" onmouseout=\"this.className='unhighlight'\"> \n";
-		html += "<td class=\"td_file_data\">\n" +
-				"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
-				"</td>";
-		
-		passed = getAmtPassed(d);
-		blocked = getAmtBlocked(d);
-		failed = getAmtFailed(d) - blocked;  //blocked tests count as failed too
-		wd = getAmtwatchdog(d);
-		asserts = getAmtAsserts(d);
-		assertsF = getAmtAssertsF(d);
-		exceptions = getAmtExceptions(d);
-		errors = getAmtErrors(d);
+		suiteName = data.get("suitename").toString();
+		String runtime = "";
+		String html = "<tr id=\""+count+"\" class=\"unhighlight\" onmouseover=\"this.className='highlight'\" onmouseout=\"this.className='unhighlight'\"> \n" +
+			"<td class=\"td_file_data\">\n" +
+			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
+			"</td>";
+			
+		passed = (Integer)data.get("passed");
+		blocked = (Integer)data.get("blocked");
+		failed = (Integer)data.get("failed") - blocked;  //blocked tests count as failed too
+		wd = (Integer)data.get("wd");
+		asserts = (Integer)data.get("asserts");
+		assertsF = (Integer)data.get("assertsF");
+		exceptions = (Integer)data.get("exceptions");
+		errors = (Integer)data.get("errors");
 		total = assertsF + exceptions + errors;
+		runtime = data.get("runtime").toString();
 		
-		//"Tests" column
+		
 		if (blocked == 0) {
 			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
@@ -161,7 +211,7 @@ public class SummaryReporter {
 			html += "\t <td class=\"td_total_error_data\">"+total+"</td> \n";
 		}
 		
-		html += "\t <td class=\"td_time_data\">"+getRunTime(d)+"</td> \n";
+		html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
 		html += "</tr>";
 		
 		return html;
@@ -220,15 +270,20 @@ public class SummaryReporter {
 		return footer;
 	}
 
-	private void parseXMLFile(File xml){
+	private HashMap<String, Object> parseXMLFile(File xml){
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		HashMap<String, Object> result = new HashMap<String, Object>();
 		
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			dom = db.parse(xml);
+			result = getSuiteData(dom);
 		} catch(Exception e){
 			e.printStackTrace();
+			result = null;
 		}
+		
+		return result;
 	}
 	
 	/**
@@ -467,7 +522,7 @@ public class SummaryReporter {
 	 * @return
 	 */
 	private String getSuiteName(Document d) {
-		String name = "jfdjfajdlfea";
+		String name = "";
 		NodeList nl = d.getElementsByTagName("suitefile");
 		
 		if (nl != null && nl.getLength() > 0) {
