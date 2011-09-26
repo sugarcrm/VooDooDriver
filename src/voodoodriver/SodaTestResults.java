@@ -18,7 +18,7 @@ package voodoodriver;
 
 import java.util.HashMap;
 
-public class SodaTestResults extends HashMap<String, Integer> {
+public class SodaTestResults extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = 1L;
 

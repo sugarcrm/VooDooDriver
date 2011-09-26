@@ -17,6 +17,7 @@ limitations under the License.
 package logreporter;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,34 +116,53 @@ public class SuiteReporter {
 		repFile.close();
 	}
 	
-	/*
-	 * 
-	 */
-	private String GenMiniErrorTable(String line) {
-		String result = "";
+	private HashMap<String, String>findErrorInfo(String line) {
+		HashMap<String, String> result = new HashMap<String, String>();
+		String[] items = {
+			"failedasserts",
+			"exceptions",
+			"errors",
+			"watchdog"
+		};
 		Pattern p = null;
 		Matcher m = null;
+		
+		for (int i = 0; i <= items.length -1; i++) {
+			String value = "";
+			String reg = String.format("%s:(\\d+)", items[i]);
+			p = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
+			
+			m = p.matcher(line);
+			if (!m.find()) {
+				System.out.printf("(!)Error: Failed to find needed matches when parsing a failed tests results line!\n");
+				System.out.printf("--)Line: '%s'\n\n", line);
+				value = "";
+			} else {
+				value = m.group(1);
+			}
+			
+			result.put(items[i], value);
+		}
+		
+		return result;
+	}
+	
+	private String GenMiniErrorTable(String line) {
+		String result = "";
 		String exceptions = "";
 		String watchdog = "";
 		String fasserts = "";
 		String errors = "";
 		String color = "";
 		
+		findErrorInfo(line);
+
 		try {
-			p = Pattern.compile("failedasserts:(\\d+).*exceptions:(\\d+).*errors:(\\d+).*watchdog:(\\d+)", 
-					Pattern.CASE_INSENSITIVE);
-			m = p.matcher(line);
-			
-			if (!m.find()) {
-				System.out.printf("(!)Error: Failed to find needed matches when parsing a failed tests results line!\n");
-				System.out.printf("--)Line: '%s'\n\n", line);
-				return "";
-			}
-			
-			fasserts = m.group(1);
-			exceptions = m.group(2);
-			watchdog = m.group(3);
-			errors = m.group(4);
+			HashMap<String, String> data = this.findErrorInfo(line);
+			fasserts = data.get("failedasserts");
+			exceptions = data.get("exceptions");
+			watchdog = data.get("watchdog");
+			errors = data.get("errors");
 			
 			result = "\t<td class=\"td_issues_data\">\n\t<table class=\"table_sub\">\n"+
 			"\t<tr>\n";

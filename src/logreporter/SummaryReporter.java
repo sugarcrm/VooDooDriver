@@ -414,7 +414,6 @@ public class SummaryReporter {
 			}
 		}
 		
-		//global watchdog variable
 		watchdog += n;
 		return n;
 	}

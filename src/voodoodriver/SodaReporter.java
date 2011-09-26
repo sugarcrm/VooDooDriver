@@ -80,11 +80,16 @@ public class SodaReporter {
 		this.browser = browser;
 	}
 	
+	public String getLogFileName() {
+		return this.reportLog;
+	}
+	
 	public SodaTestResults getResults() {
 		SodaTestResults result = null;
 		Integer res = 0;
 		
 		result = new SodaTestResults();
+		result.put("testlog", this.reportLog);
 		result.put("blocked", this.Blocked);
 		result.put("exceptions", this.Exceptions);
 		result.put("failedasserts", this.FailedAsserts);
