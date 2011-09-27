@@ -2593,6 +2593,7 @@ public class SodaEventDriver implements Runnable {
 			String classname = data.get("classname").toString();
 			String msg = "";
 			Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
+			msg = String.format("");
 			
 			try {
 				int err = 0;
@@ -2600,11 +2601,16 @@ public class SodaEventDriver implements Runnable {
 				
 				String tmp_hwnd = this.getCurrentHWND();
 				if (this.windowExists(tmp_hwnd)) {
-					err = inst.execute(null, this.Browser, element);
+					msg = String.format("Starting plugin: '%s'.", classname);
+					this.report.Log(msg);
 					
+					err = inst.execute(null, this.Browser, element);
 					if (err != 0) {
 						msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!", classname, err);
 						this.report.ReportError(msg);
+					} else {
+						msg = String.format("Plugin: '%s' finished.", classname);
+						this.report.Log(msg);
 					}
 				} else {
 					msg = "Found the browser window has been closed, skipping executing plugin.";
