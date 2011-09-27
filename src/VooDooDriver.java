@@ -77,6 +77,7 @@ public class VooDooDriver {
 		"  --restartcount: This is how many tests in a suite that run before the browser is restarted.\n\n"+
 		"  --restarttest: This is the test that gets ran after the browser restarts, and before the next test"+
 		"     is run.\n\n"+
+		"  --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.\n\n"+
 		"  --version: Print the Soda Version string.\n\n\n"+
 		"Notes:\n"+
 		"--)All conflicting command line options with with the config files supersede the confile files.\n\n";
@@ -104,7 +105,8 @@ public class VooDooDriver {
 		String assertpage = null;
 		SodaHash gvars = null;
 		int restartCount = 0;
-		String restartTest = null; 
+		String restartTest = null;
+		int attachTimeout = 0;
 		
 		SodaEvents configFileOpts = null;
 		
@@ -146,6 +148,8 @@ public class VooDooDriver {
 						if (name.contains("browser")) {
 							cmdOpts.put("browser", value);
 							System.out.printf("(*)Added Confile-File cmdopts: '%s' => '%s'.\n", name, value);
+						} else if (name.contains("attachtimeout")) {
+							cmdOpts.put("attachtimeout", value);
 						}
 					}
 				}
@@ -162,8 +166,13 @@ public class VooDooDriver {
 				System.exit(0);
 			}
 			
+			attachTimeout = (Integer)cmdOpts.get("attachtimeout");
 			restartTest = (String)cmdOpts.get("restarttest");
 			restartCount = (Integer)cmdOpts.get("restartcount");
+			
+			if (attachTimeout > 0) {
+				System.out.printf("(*)Setting the default Attach Timeout to: '%s' seconds.\n", attachTimeout);
+			}
 			
 			if (restartCount > 0) {
 				System.out.printf("(*)Restart Count => '%d'\n", restartCount);
@@ -243,13 +252,13 @@ public class VooDooDriver {
 				
 				RunSuites(SodaSuitesList, resultdir, browserType, gvars, 
 						(SodaHash)cmdOpts.get("hijacks"), blockList, plugins, savehtml, downloadDir,
-						assertpage, restartTest, restartCount);
+						assertpage, restartTest, restartCount, attachTimeout);
 			}
 			
 			SodaTestsList = (ArrayList<String>)cmdOpts.get("tests");
 			if (!SodaTestsList.isEmpty()) {
 				RunTests(SodaTestsList, resultdir, browserType, gvars, (SodaHash)cmdOpts.get("hijacks"),
-						plugins, savehtml, downloadDir, assertpage);
+						plugins, savehtml, downloadDir, assertpage, attachTimeout);
 			}
 		} catch (Exception exp) {
 			exp.printStackTrace();
@@ -261,7 +270,7 @@ public class VooDooDriver {
 	
 	private static void RunTests(ArrayList<String> tests, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaEvents plugins, boolean savehtml, String downloaddir, 
-			String assertpage) {
+			String assertpage, int attachTimeout) {
 		File resultFD = null;
 		SodaBrowser browser = null;
 		int len = 0;
@@ -325,7 +334,7 @@ public class VooDooDriver {
 	
 	private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, boolean savehtml,
-			String downloaddir, String assertpage, String restartTest, int restartCount) {
+			String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout) {
 		int len = suites.size() -1;
 		File resultFD = null;
 		String report_file_name = resultdir;
