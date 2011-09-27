@@ -1811,7 +1811,7 @@ public class SodaEventDriver implements Runnable {
 			if (this.attachTimeout > 0) {
 				long tout = this.attachTimeout * 1000;
 				Thread.currentThread();
-				msg = String.format("Waiting '%s' seconds before executing next event.", tout);
+				msg = String.format("Waiting '%s' seconds before executing next event.", this.attachTimeout);
 				this.report.Log(msg);
 				Thread.sleep(tout);
 			}

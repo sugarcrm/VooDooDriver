@@ -347,6 +347,7 @@ public class VooDooDriver {
 		Date suiteStopTime = null;
 		
 		System.out.printf("(*)Running Suite files now...\n");
+		System.out.printf("(*)Timeout: %s\n", attachTimeout);
 		
 		resultFD = new File(resultdir);
 		if (!resultFD.exists()) {
@@ -458,6 +459,7 @@ public class VooDooDriver {
 							testobj.setPlugins(plugins);
 						}
 						
+						testobj.setAttachTimeout(attachTimeout);
 						testobj.runTest(false);
 						now = new Date();
 						date_str = df.format(now);
@@ -515,6 +517,7 @@ public class VooDooDriver {
 					testobj.setPlugins(plugins);
 				}
 				
+				testobj.setAttachTimeout(attachTimeout);
 				testobj.runTest(false);
 				
 				now = new Date();
