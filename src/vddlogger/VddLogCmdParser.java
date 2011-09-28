@@ -2,8 +2,8 @@ package vddlogger;
 
 public class VddLogCmdParser {
 
-	private String suiteDir = "";
-	private String suiteFile = "";
+	private String suiteDir = null;
+	private String suiteFile = null;
 	private String help = null;
 	private VddLogCmdOpts opts = null;
 	

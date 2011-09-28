@@ -18,6 +18,10 @@ package logreporter;
 
 import java.io.*;
 import java.util.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 public class LogReporter {
 	private static void printUsage() {
@@ -33,33 +37,27 @@ public class LogReporter {
 		System.out.printf("%s\n", msg);
 	}
 	
-	/**
-	 * from the directory path, return an ArrayList of either xml files or folders containing .log files
-	 * @param path - path of the directory to get folders
-	 * @param getFolder - returns ArrayList of folders if true, ArrayList of files if false
-	 * @return ArrayList of folders/files
-	 */
-	private static ArrayList<File> getFolderContent(String path, boolean getFolder) {
-		ArrayList<File> list = new ArrayList<File>();
-		File folder = new File(path);
-		File[] filesList = folder.listFiles();
+	private static ArrayList<String> getSuiteFiles(String path) {
+		ArrayList<String> result = new ArrayList<String>();
+		File dir = new File(path);
+		File[] files;
 		
-		/**
-		 * look through the given directory
-		 */
-		for (int i = 0; i < filesList.length; i++) {
-			if (getFolder) {
-				if (filesList[i].isDirectory() && !filesList[i].isHidden()) {
-					list.add(filesList[i]);
-				}
-			} else {
-				if (filesList[i].isFile() && !filesList[i].isHidden() && filesList[i].getName().endsWith("xml")) {
-					list.add(filesList[i]);
-				}
+		if (!dir.exists()) {
+			System.out.printf("(!)Error: Directory doesn't exist: '%s'!\n", path);
+			result = null;
+			return result;
+		}
+		
+		files = dir.listFiles();
+		for (int i = 0; i <= files.length -1; i++) {
+			String name = files[i].getName();
+			name = name.toLowerCase();
+			if (name.endsWith(".xml")) {
+				result.add(files[i].getAbsolutePath());
 			}
-		}	
+		}
 		
-		return list;
+		return result;
 	}
 	
 	/**
@@ -100,8 +98,42 @@ public class LogReporter {
 		return options;
 	}
 	
-	public static void main(String[] args){
-		int count = 0;
+	public static ArrayList<HashMap<String, String>> parseSuiteFile(String filename) {
+		ArrayList<HashMap<String, String>> result = null;
+		result = new ArrayList<HashMap<String,String>>();
+		File fd = new File(filename);
+		DocumentBuilderFactory dbf = null;
+		DocumentBuilder db = null;
+		Document doc = null;
+		
+		if (!fd.exists()) {
+			result = null;
+			return result;
+		}
+
+		try {
+			dbf = DocumentBuilderFactory.newInstance();
+			db = dbf.newDocumentBuilder();
+			doc = db.parse(fd);
+			NodeList nodes = doc.getDocumentElement().getChildNodes();
+			
+			for (int i = 0; i <= nodes.getLength() -1; i++) {
+				String name = nodes.item(i).getNodeName();
+				if (!name.contains("suite")) {
+					continue;
+				}
+				System.out.printf("(*)Node Name: %s\n", name);
+			}
+			
+		} catch (Exception exp) {
+			exp.printStackTrace();
+			result = null;
+		}
+		
+		return result;
+	}
+	
+	public static void main(String[] args) {
 		
 		try {
 			HashMap<String, Object> options = cmdLineOptions (args);
@@ -117,86 +149,39 @@ public class LogReporter {
 			
 			if (options.containsKey("suitedir")) {
 				String path = (String)options.get("suitedir");
-				ArrayList<File> foldersList = getFolderContent(path, true);
-				LogConverter htmlLogs = new LogConverter();
-				File[] filesList;
+				ArrayList<String> suiteFiles = null;
+				suiteFiles = getSuiteFiles(path);
 				
-				if (foldersList.size() == 0) {
+				LogConverter htmlLogs = new LogConverter();
+				
+				if (suiteFiles.size() < 1) {
 					System.out.printf("(*)There are no directories to generate log reports from.\n");
 				}
 				
-				for (int i = 0; i < foldersList.size(); i++) {
-					System.out.printf("(*)Checking directory: '%s'.\n", foldersList.get(i).getName());
-					filesList = foldersList.get(i).listFiles();
+				for (int i = 0; i <= suiteFiles.size() -1; i++) {
+					String sfile = suiteFiles.get(i);
+					System.out.printf("(*)Processing suite file: '%s'.\n", sfile);
+					VDDSuiteResult suiteResult = new VDDSuiteResult(sfile);
+					ArrayList<HashMap<String, String>> data = suiteResult.parse();
 					
-					for (int j = 0; j < filesList.length; j ++) {
-						//check is file, not hidden, and is a log file
-						if (!filesList[j].isHidden() && filesList[j].isFile() && filesList[j].getName().endsWith("log")) {
-							htmlLogs = new LogConverter(filesList[j].getAbsolutePath());
-							htmlLogs.generateReport();
-							count ++;
-						}
-					}
-					
-					if (count == 0) {
-						System.out.printf("(*)No log reports found.\n");
-					} else {
-						System.out.printf("(*)Generated '%d' reports.\n", count);
-					}
-					
-					if (count != 0) {
-						System.out.printf("(*)Creating test summary for suite: '%s'.\n", foldersList.get(i).getAbsolutePath());
-						SuiteReporter suiteSummary = new SuiteReporter(foldersList.get(i));
-						suiteSummary.generateReport();
-						System.out.printf("(*)Summary creation finished.\n");
-					}
-					count = 0;
-				}
-				
-				//generate summary of suites
-				if (getFolderContent(path, false).size() == 0) {
-					System.out.printf("(*)There are no files containing suite test information.\n");
-				} else {
-					SummaryReporter summaryReport = new SummaryReporter(getFolderContent(path, false), path);
-					summaryReport.generateReport();
-					System.out.printf("(*)Generated summary.html.\n");
-				}	
-			} else if (options.containsKey("suite")) {
-				String path = (String)options.get("suite");
-				File folder = new File(path);
-				File[] filesList = folder.listFiles();
-				//generate log reports
-				LogConverter htmlLogs = new LogConverter();
-				//look though folder
-				System.out.printf("(*)'%d' file found in directory '%s'.\n", filesList.length, path);
-				
-				for (int i = 0; i < filesList.length; i ++) {
-					if (!filesList[i].isHidden() && filesList[i].isFile() && filesList[i].getName().endsWith("log")) {
-						htmlLogs = new LogConverter(filesList[i].getAbsolutePath());
+					for (int suiteIndex = 0; suiteIndex <= data.size() -1; suiteIndex++) {
+						HashMap<String, String> testInfo = data.get(suiteIndex);
+ 						String testlog = testInfo.get("testlog");
+ 						System.out.printf("TEST LOG: %s\n", testlog);
+						htmlLogs = new LogConverter(testlog);
 						htmlLogs.generateReport();
-						count ++;
 					}
-				}
-				
-				if (count == 0) {
-					System.out.printf("(*)No log reports found.\n");
-				} else {
-					System.out.printf("(*)Generated '%d' report(s).\n", count);
+					
 				}
 
-				if (count != 0) {
-					System.out.printf("(*)Writing test summary for suite: '%s'.\n", path);
-					SuiteReporter suiteSummary = new SuiteReporter(folder);
-					suiteSummary.generateReport();
-					System.out.printf("(*)Finished writing summary.\n");	
-				}
-				count = 0;
+				SuiteReporter suiteSummary = new SuiteReporter(new File(path));
+				suiteSummary.generateReport();
+				System.out.printf("(*)Summary creation finished.\n");
 			}
 			
-		} catch(NullPointerException e) {
-			System.out.printf("(!)Error: Invalid path!\n");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}	
+			} catch (Exception exp) {
+				exp.printStackTrace();
+			}
 	}
 }
+	
