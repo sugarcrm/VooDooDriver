@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 public class VddLogToHTML {
 	
+	private final String HTML_HEADER_RESOURCE = "reportlogheader.txt";
 	private String fileName;
 	private FileReader input;
 	private BufferedReader br;
@@ -536,87 +537,34 @@ public class VddLogToHTML {
 	 * 
 	 */
 	private void generateHtmlHeader() {
-		final String title = "SODA Test report";
-		String temp = "<html> \n" +
-				"<script language=javascript type='text/javascript'> \n" +
-		 		"function hidediv(name, href_id) { \n" +
-		 		"\t document.getElementById(name).style.display = 'none'; \n" +
-		 		"\t document.getElementById(href_id).innerHTML=\"[ Expand Backtrace ]<b>+</b>\"; \n" +
-		 		"\t document.getElementById(href_id).href=\"javascript:showdiv('\" + name +\"', '\" + href_id + \"')\";\n" +
-		 		"} \n" +
-		 		"function showdiv(name, href_id) { \n" +
-		 		"\t document.getElementById(name).style.display = 'inline'; \n" +
-				"\t document.getElementById(href_id).innerHTML=\"[ Collapse Backtrace ]<b>-</b>\"; \n" +
-				"\t document.getElementById(href_id).href=\"javascript:hidediv('\" + name + \"', '\" + href_id + \"')\"; \n" +
-				"} \n" +
-				"</script> \n" +
-				"<style type=\"text/css\"> \n" +
-				"body{ \n" +
-				"\t margin: 0px; \n" +
-				"\t font-family: Arial, Verdana, Helvetica, sans-serif; \n" +
-				"} \n" +
-				"fieldset, table, pre{ \n" +
-				"\t margin-bottom:0; \n" +
-				"} \n" +
-				"p{ \n" +
-				"\t margin-top: 0px; \n" +
-				"\t margin-bottom: 0px; \n" +
-				"} \n" +
-				"textarea{ \n" +
-				"\t fontfamily: Arial, Verdana,Helvetica,sans-serif; \n" +
-				"} \n" +
-				"td{ \n" +
-				"\t text-align:left; \n" +
-				"\t vertical-align: top; \n" +
-				"} \n" +
-				".td_msgtype{ \n" +
-				"\t text-align: center; \n" +
-				"\t vertical-align: middle; \n" +
-				"} \n" +
-				".tr_normal{ \n" +
-				"\t background: #e5eef3; \n" +
-				"} \n" +
-				".tr_header{ \n" +
-				"\t background: #a4a4a4; \n"+
-				"} \n" +
-				".tr_module{ \n" +
-				"\t background: #3c78c8; \n" +
-				"} \n" +
-				".tr_error{ \n" +
-				"\t background: #ff0000; \n" +
-				"} \n" +
-				".tr_warning{ \n" +
-				"\t background: #eeff30; \n" +
-				"} \n" +
-				".tr_assert_passed{ \n" +
-				"\t background: #7ff98a; \n" +
-				"} \n" +
-				".highlight { \n" +
-				"\t background-color: #8888FF; \n" +
-				"} \n" +
-				".highlight_report { \n" +
-				"\t background-color: #5dec6d; \n" +
-				"} \n" +
-				"table { \n" +
-				"\t background: #ffff; \n" +
-				"\t border: 1px solid black; \n" +
-				"\t border-bottom: 1px solid #0000; \n" +
-				"\t border-right: 1px solid #0000; \n" +
-				"\t color: #0000; \n" +
-				"\t padding: 4px; \n" +
-				"\t font-size: 11px; \n" +
-				"} \n" +
-				"</style> \n" +
-				"<title>"+title+"</title> \n" +
-				"<body> \n" +
-				"<table> \n" +
-				"<tr class=\"tr_header\"> \n" +
-				"\t <td nowrap> <b>Date Time: </b></td> \n" +
-				"\t <td nowrap> <b>Message Type: </b></td> \n" +
-				"\t <td> <b>Message: </b></td> \n" +
-				"</tr > \n";
+		String header = "";
+		String line = "";
+		InputStream stream = null;
+
+		try {
+			String className = this.getClass().getName().replace('.', '/');
+			String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+			
+			if (classJar.startsWith("jar:")) {
+				stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			} else {
+				File header_fd = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
+				stream = new FileInputStream(header_fd);
+			}
+			
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
+			
+			while ((line = br.readLine()) != null) {
+				header += line;
+				header += "\n";
+			}
+			
+		} catch (Exception exp ) {
+			exp.printStackTrace();
+		}
 		
-		repFile.print(temp);
+		repFile.print(header);
 	}
 	
 	/**
