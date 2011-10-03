@@ -36,7 +36,29 @@ public class VddSuiteReporter {
 	private PrintStream repFile = null;
 	
 	public VddSuiteReporter(String suitename, String basedir, ArrayList<String> logfiles) {
+		this.suiteName = suitename;
+		String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
+		System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
+		String filepath = "";
+		ArrayList<File> tmpFiles = new ArrayList<File>();
 		
+		for (int i = 0; i <= logfiles.size() -1; i++) {
+			tmpFiles.add(new File(logfiles.get(i)));
+		}
+		
+		filesList = tmpFiles.toArray(new File[0]);
+		
+		/**
+		 * set up file output
+		 */
+		try {
+			filepath = String.format("%s%s%s.html", outputDir, File.separatorChar,suitename);
+			output = new FileOutputStream(filepath);
+			repFile = new PrintStream(output);
+		} catch(Exception e) {
+			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", filepath);
+			e.printStackTrace();
+		}
 	}
 	
 	/**

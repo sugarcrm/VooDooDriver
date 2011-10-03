@@ -43,6 +43,7 @@ public class VddSummaryReporter {
 	private FileOutputStream output;
 	private PrintStream repFile;
 	private Document dom;
+	private String basedir = "";
 	
 	public VddSummaryReporter(ArrayList<File> xmlFiles, String path) {
 		this.count = 0;
@@ -59,6 +60,7 @@ public class VddSummaryReporter {
 		minutes = 0;
 		seconds = 0;
 		String summaryFile = String.format("%s%s%s", path, File.separatorChar, "summary.html");
+		this.basedir = path;
 		
 		try {
 			output = new FileOutputStream(summaryFile);
@@ -200,6 +202,10 @@ public class VddSummaryReporter {
 		
 		html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
 		html += "</tr>";
+		
+		ArrayList<String> logs = (ArrayList<String>)data.get("testlogs");
+		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
+		reporter.generateReport();
 		
 		return html;
 	}
