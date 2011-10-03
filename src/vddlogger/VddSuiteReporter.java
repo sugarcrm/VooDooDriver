@@ -14,7 +14,7 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logreporter;
+package vddlogger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,15 +22,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Takes in a File type input (should be the directory of .log files), reads all the log files and 
- * generate a nice html summary table of the tests. The generated html will be in the same directory 
- * 
- * @param folder - path of the folder containing SODA report logs
- *
- */
-public class SuiteReporter {
-	
+public class VddSuiteReporter {
+
 	private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
 	private File dir = null;
 	private File[] filesList = null;
@@ -42,33 +35,8 @@ public class SuiteReporter {
 	private FileOutputStream output = null;
 	private PrintStream repFile = null;
 	
-	
-	public SuiteReporter(String suitename, String basedir, ArrayList<String> logfiles) {
+	public VddSuiteReporter(String suitename, String basedir, ArrayList<String> logfiles) {
 		
-	}
-	
-	/**
-	 * Constructor for class SuiteReporter
-	 * @param directory - the directory in which the suite log files reside.
-	 */
-	public SuiteReporter(File directory){
-		this.dir = directory;
-		filesList = this.dir.listFiles();
-		count = 0;
-		suiteName = this.dir.getName();
-		String filepath = "";
-		
-		/**
-		 * set up file output
-		 */
-		try {
-			filepath = this.dir.getAbsolutePath()+"/"+suiteName+".html";
-			output = new FileOutputStream(filepath);
-			repFile = new PrintStream(output);
-		} catch(Exception e) {
-			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", filepath);
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -261,7 +229,16 @@ public class SuiteReporter {
 		boolean found_suitename = false;
 		
 		try {
-			stream = getClass().getResourceAsStream(HTML_HEADER_RESOURCE);
+			String className = this.getClass().getName().replace('.', '/');
+			String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+			
+			if (classJar.startsWith("jar:")) {
+				stream = getClass().getResourceAsStream(HTML_HEADER_RESOURCE);
+			} else {
+				File header_fd = new File(getClass().getResource(HTML_HEADER_RESOURCE).getFile());
+				stream = new FileInputStream(header_fd);
+			}
+			
 			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
 			
@@ -303,4 +280,5 @@ public class SuiteReporter {
 			System.out.printf("(!)Error: Reading file: '%s'!\n", inputFile);
 		}
 	}
+	
 }

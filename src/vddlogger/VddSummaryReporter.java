@@ -24,8 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import org.w3c.dom.Document;
-
 public class VddSummaryReporter {
 
 	private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
@@ -78,6 +76,7 @@ public class VddSummaryReporter {
 		String name = "";
 		String[] keys = null;
 		
+		
 		for (int i = 0; i < xmlFiles.size(); i ++) {
 			HashMap<String, Object> suiteData = null;
 			suiteData = parseXMLFile(xmlFiles.get(i));
@@ -126,6 +125,7 @@ public class VddSummaryReporter {
 		result.put("total", total);
 		result.put("runtime", runtime);
 		result.put("suitename", suiteName);
+		result.put("testlogs", this.getTestLogs(doc));
 		
 		return result;
 	}
@@ -154,7 +154,6 @@ public class VddSummaryReporter {
 		errors = (Integer)data.get("errors");
 		total = assertsF + exceptions + errors;
 		runtime = data.get("runtime").toString();
-		
 		
 		if (blocked == 0) {
 			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
@@ -348,6 +347,20 @@ public class VddSummaryReporter {
 		//global blockedTests variable
 		blockedTests += n;
 		return n;
+	}
+	
+	
+	private ArrayList<String> getTestLogs(Document d) {
+		ArrayList<String> list = new ArrayList<String>();
+		NodeList nodes = d.getElementsByTagName("testlog");
+		
+		for (int i = 0; i <= nodes.getLength() -1; i++) {
+			String tmp = nodes.item(i).getTextContent();
+			System.out.printf("(*)TestLog: %s\n", tmp);
+			list.add(nodes.item(i).getTextContent());
+		}
+		
+		return list;
 	}
 	
 	/**
