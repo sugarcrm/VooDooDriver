@@ -75,6 +75,7 @@ public class VddLogConverter {
 	public static void handleSuiteDir(String dir) {
 		File dirFD = new File(dir);
 		ArrayList<VddSuiteFileList> data = new ArrayList<VddSuiteFileList>();
+		ArrayList<File> xmlsuitefiles = new ArrayList<File>();
 		ArrayList<String> suiteFiles = new ArrayList<String>();
 		String[] files = null;
 		String current_suite = "";
@@ -91,8 +92,14 @@ public class VddLogConverter {
 			System.out.printf("(*)Found Suite File: '%s'.\n", files[i]);
 			String filename = String.format("%s%s%s", dir, File.separatorChar, files[i]);
 			suiteFiles.add(filename);
+			xmlsuitefiles.add(new File(filename));
 		}
 		
+		System.out.printf("(*)Generating Summary file...\n");
+		VddSummaryReporter summary = new VddSummaryReporter(xmlsuitefiles, dir);
+		summary.generateReport();
+		
+		/*
 		for (int i = 0; i <= suiteFiles.size() -1; i++) {
 			current_suite = suiteFiles.get(i);
 			System.out.printf("(*)Parsing suite file: '%s' into data.\n", current_suite);
@@ -102,9 +109,21 @@ public class VddLogConverter {
 		
 		System.out.printf("(*)Processing all suite file data...\n");		
 		processSuiteData(data);
+		*/
 	}
 	
 	public static void processSuiteData(ArrayList<VddSuiteFileList> data) {
+		
+		for (int i = 0; i <= data.size() -1; i++) {
+			VddSuiteFileList list = data.get(i);
+			for (int suiteIndex = 0; suiteIndex <= list.size() -1; suiteIndex++) {
+				VddSuiteFile sfile = list.get(suiteIndex);
+				String[] keys = sfile.keySet().toArray(new String[0]);
+				for (int x = 0; x <= keys.length -1; x++) {
+					System.out.printf("(KEY)%s => %s\n", keys[x], sfile.get(keys[x]));
+				}
+			}
+		}
 		
 	}
 	

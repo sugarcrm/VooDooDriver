@@ -17,7 +17,6 @@ limitations under the License.
 package vddlogger;
 
 import java.io.File;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -47,7 +46,7 @@ public class VddSuiteFileParser {
 			}
 			
 			if (name.contains("suitefile")) {
-				result.put("suitefile", node.getTextContent());
+				result.put("suitefile", name);
 			}
 			
 			if (name.contains("test")) {
