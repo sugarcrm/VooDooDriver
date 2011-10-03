@@ -18,11 +18,12 @@ package vddlogger;
 
 import java.util.HashMap;
 
-public class VddLogCmdOpts extends HashMap<String, String> {
+public class VddSuiteFile extends HashMap<String, String> {
 	
 	private static final long serialVersionUID = 1L;
-
-	public VddLogCmdOpts () {
+	
+	public VddSuiteFile() {
 		super();
 	}
+	
 }

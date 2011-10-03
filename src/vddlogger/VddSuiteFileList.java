@@ -16,13 +16,14 @@ limitations under the License.
 
 package vddlogger;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
-public class VddLogCmdOpts extends HashMap<String, String> {
-	
+public class VddSuiteFileList extends ArrayList<VddSuiteFile> {
+
 	private static final long serialVersionUID = 1L;
-
-	public VddLogCmdOpts () {
+	
+	public VddSuiteFileList () {
 		super();
 	}
+	
 }
