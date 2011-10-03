@@ -43,7 +43,10 @@ public class VddSuiteReporter {
 		ArrayList<File> tmpFiles = new ArrayList<File>();
 		
 		for (int i = 0; i <= logfiles.size() -1; i++) {
-			tmpFiles.add(new File(logfiles.get(i)));
+			String log = logfiles.get(i);
+			File tfile = new File(log);
+			log = String.format("%s%s%s",outputDir, File.separatorChar, tfile.getName());
+			tmpFiles.add(new File(log));
 		}
 		
 		filesList = tmpFiles.toArray(new File[0]);
