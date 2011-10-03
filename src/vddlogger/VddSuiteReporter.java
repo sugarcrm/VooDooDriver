@@ -34,12 +34,13 @@ public class VddSuiteReporter {
 	private String strLine, tmp = null;
 	private FileOutputStream output = null;
 	private PrintStream repFile = null;
+	private String suiteDir = "";
 	
 	public VddSuiteReporter(String suitename, String basedir, ArrayList<String> logfiles) {
+		String filepath = "";
 		this.suiteName = suitename;
 		String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
 		System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
-		String filepath = "";
 		ArrayList<File> tmpFiles = new ArrayList<File>();
 		
 		for (int i = 0; i <= logfiles.size() -1; i++) {
@@ -52,6 +53,7 @@ public class VddSuiteReporter {
 		 * set up file output
 		 */
 		try {
+			this.suiteDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
 			filepath = String.format("%s%s%s.html", outputDir, File.separatorChar,suitename);
 			output = new FileOutputStream(filepath);
 			repFile = new PrintStream(output);
@@ -95,8 +97,13 @@ public class VddSuiteReporter {
 					} else {
 						generateTableRow(temp, 1, null);
 					}
+					
+					String logname = String.format("%s%s%s", this.suiteDir, File.separatorChar, filesList[i].getName());
+					System.out.printf("(*)Log File: %s\n", logname);
+					VddLogToHTML log2html = new VddLogToHTML(logname);
+					log2html.generateReport();
 				}
-			}		
+			}
 		}
 		
 		repFile.print("\n</table>\n</body>\n</html>\n");

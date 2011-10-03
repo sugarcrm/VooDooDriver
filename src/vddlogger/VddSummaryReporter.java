@@ -207,6 +207,7 @@ public class VddSummaryReporter {
 		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
 		reporter.generateReport();
 		
+		
 		return html;
 	}
 	
