@@ -76,6 +76,7 @@ public class VddLogConverter {
 		File dirFD = new File(dir);
 		ArrayList<String> suiteFiles = new ArrayList<String>();
 		String[] files = null;
+		String current_suite = "";
 
 		files = dirFD.list();
 		for (int i = 0; i <= files.length -1; i++) {
@@ -86,10 +87,16 @@ public class VddLogConverter {
 			}
 			
 			System.out.printf("(*)Found Suite File: '%s'.\n", files[i]);
-			suiteFiles.add(files[i]);
+			String filename = String.format("%s%s%s", dir, File.separatorChar, files[i]);
+			suiteFiles.add(filename);
 		}
 		
-		
+		for (int i = 0; i <= suiteFiles.size() -1; i++) {
+			current_suite = suiteFiles.get(i);
+			System.out.printf("(*)Parsing suite file: '%s'.\n", current_suite);
+			VddSuiteFileParser parser = new VddSuiteFileParser(current_suite);
+			parser.parse();
+		}
 		
 		
 	}
