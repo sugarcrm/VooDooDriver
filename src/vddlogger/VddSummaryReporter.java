@@ -137,6 +137,7 @@ public class VddSummaryReporter {
 	 * @return - a nicely formatted html table row for summary.html
 	 */
 	
+	@SuppressWarnings("unchecked")
 	private String generateTableRow(String suiteName, HashMap<String, Object> data) {
 		int passed, failed, blocked, asserts, assertsF, errors, exceptions, wd, total;
 		suiteName = data.get("suitename").toString();

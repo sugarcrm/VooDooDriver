@@ -35,8 +35,7 @@ public class VddSuiteFileParser {
 	private VddSuiteFile parseSuite(Node node) {
 		VddSuiteFile result = new VddSuiteFile();
 		NodeList nodes = node.getChildNodes();
-		String tmp = "";
-		
+
 		for (int i = 0; i <= nodes.getLength() -1; i++) {
 			Node kid = nodes.item(i);
 			String name = kid.getNodeName();

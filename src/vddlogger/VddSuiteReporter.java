@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 public class VddSuiteReporter {
 
 	private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
-	private File dir = null;
 	private File[] filesList = null;
 	private int count = 0;
 	private String suiteName = null;
