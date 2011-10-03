@@ -54,6 +54,8 @@ public class VddLogConverter {
 				System.exit(3);
 			}
 			
+			System.out.printf("(*)Processing suite file: '%s'...\n", suitefile);
+			handleSuiteFile(suitefile);
 		}
 		
 		if (suitedir != null) {
@@ -68,8 +70,6 @@ public class VddLogConverter {
 			handleSuiteDir(suitedir);
 			
 		}
-		
-		
 	}
 
 	public static void handleSuiteDir(String dir) {
@@ -114,7 +114,19 @@ public class VddLogConverter {
 	}
 	
 	public static void handleSuiteFile(String filename) {
+		ArrayList<File> xmlsuitefiles = new ArrayList<File>();
+		String dir = "";
 		
+		File tmp = new File(filename);
+		dir = tmp.getParent();
+		if (dir == null) {
+			dir = "";
+		}
+
+		xmlsuitefiles.add(new File(filename));
+		System.out.printf("(*)Generating Summary file...\n");
+		VddSummaryReporter summary = new VddSummaryReporter(xmlsuitefiles, dir);
+		summary.generateReport();
 	}
 	
 	public static void PrintHelp() {
