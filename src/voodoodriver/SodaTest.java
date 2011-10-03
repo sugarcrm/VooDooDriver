@@ -134,7 +134,7 @@ public class SodaTest {
 				eventDriver.setAttachTimeout(this.attachTimeout);
 			}
 			
-			while(eventDriver.isAlive() && this.WatchDog != true) {
+			while (eventDriver.isAlive() && this.WatchDog != true) {
 				Date current_time = new Date();
 				Date thread_time = eventDriver.getThreadTime();
 				current = current_time.getTime();

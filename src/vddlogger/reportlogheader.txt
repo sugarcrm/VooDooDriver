@@ -37,9 +37,16 @@ td {
 	vertical-align: top;
 }
 
+.td_date {
+	text-align:left;
+	vertical-align: top;
+	width: 120px;
+}
+
 .td_msgtype {
 	text-align: center;
 	vertical-align: middle;
+	width: 120px;
 }
 
 .tr_normal {

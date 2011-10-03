@@ -161,7 +161,7 @@ public class VddLogToHTML {
 		htmlRow = "<tr class=\""+ trStyle +"\" "+
 		         "onMouseOver=\"this.className='highlight'\" " +
 		         "onMouseOut=\"this.className='"+ trStyle +"'\">\n";
-		htmlRow += "\t<td>" + rowData[0] + "</td>\n";
+		htmlRow += "\t<td class=\"td_date\">" + rowData[0] + "</td>\n";
 		htmlRow += "\t<td class=\"td_msgtype\">" + rowData[1] + "</td>\n";
 		htmlRow += "\t<td>" + rowData[2] + "</td>\n</tr>\n";
 		
