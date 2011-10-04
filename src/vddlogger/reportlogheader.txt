@@ -83,13 +83,11 @@ td {
 
 table {
 	background: #ffff;
-	tborder: 1px solid black;
-	border-bottom: 1px solid #0000;
-	border-right: 1px solid #0000;
+	border: 2px solid black;
 	color: #0000;
 	padding: 4px;
 	font-size: 11px;
-	width: 100%;
+	width: 98%;
 } 
 </style> 
 <title>SODA Test report</title> 
