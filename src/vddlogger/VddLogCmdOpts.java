@@ -14,15 +14,15 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package voodoodriver;
+package vddlogger;
 
 import java.util.HashMap;
 
-public class SodaTestResults extends HashMap<String, Object> {
-
+public class VddLogCmdOpts extends HashMap<String, String> {
+	
 	private static final long serialVersionUID = 1L;
 
-	public SodaTestResults() {
+	public VddLogCmdOpts () {
 		super();
 	}
 }

@@ -14,19 +14,15 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logreporter;
+package vddlogger;
 
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * converts a single .log file into a readable HTML file. The output file will be in the same directory as the .log source
- * 
- * @param inputFile - absolute path and name of file. If no path is given, will assume is in same directory. 
- *
- */
-public class LogConverter{
+public class VddLogToHTML {
+	
+	private final String HTML_HEADER_RESOURCE = "reportlogheader.txt";
 	private String fileName;
 	private FileReader input;
 	private BufferedReader br;
@@ -36,18 +32,7 @@ public class LogConverter{
 	private int backTraceID;
 	private int eventDumpID;
 	
-	public LogConverter(){
-		fileName = "";
-		strLine = "";
-		backTraceID = 0;
-		eventDumpID = 0;
-	}
-
-	/**
-	 * Constructor for class LogConverter.
-	 * @param inputFile - name of the file to be converted. Should be in correct format, with .log extention
-	 */
-	public LogConverter(String inputFile) {
+	public VddLogToHTML(String inputFile) {
 		strLine = new String();
 		backTraceID = 0;
 		eventDumpID = 0 ;
@@ -61,9 +46,9 @@ public class LogConverter{
 			/*sets up buffered reader to read input one line at a time*/
 			br = new BufferedReader(input);
 		} catch (FileNotFoundException e) {
-			System.err.println("file not found: "+inputFile);
+			System.out.printf("(!)Error: Failed to find file: '%s'!\n", inputFile);
 		} catch (Exception e) {
-			System.err.println("error reading file" + inputFile);
+			e.printStackTrace();
 		}
 		
 		/**
@@ -72,7 +57,7 @@ public class LogConverter{
 		fileName = inputFile.substring(inputFile.lastIndexOf("/")+1, inputFile.length()-4);
 		String filePath = inputFile.substring(0, inputFile.lastIndexOf('/')+1);
 		fileName = "Report-"+fileName+".html";
-		System.out.println(fileName);
+		System.out.printf("(*)Generating report: '%s'.\n", fileName);
 		
 		/**
 		 * sets up output file
@@ -81,8 +66,10 @@ public class LogConverter{
 			output = new FileOutputStream(filePath+fileName);
 			repFile = new PrintStream(output);
 		} catch (Exception e) {
-			System.err.println("Error writing to file "+fileName);
+			System.out.printf("(!)Error: Failed trying to write to file: '%s'!\n", fileName);
 		}
+		
+		System.out.printf("(*)Finished report generation.\n");
 	}
 	
 	/**
@@ -174,7 +161,7 @@ public class LogConverter{
 		htmlRow = "<tr class=\""+ trStyle +"\" "+
 		         "onMouseOver=\"this.className='highlight'\" " +
 		         "onMouseOut=\"this.className='"+ trStyle +"'\">\n";
-		htmlRow += "\t<td>" + rowData[0] + "</td>\n";
+		htmlRow += "\t<td class=\"td_date\">" + rowData[0] + "</td>\n";
 		htmlRow += "\t<td class=\"td_msgtype\">" + rowData[1] + "</td>\n";
 		htmlRow += "\t<td>" + rowData[2] + "</td>\n</tr>\n";
 		
@@ -559,87 +546,34 @@ public class LogConverter{
 	 * 
 	 */
 	private void generateHtmlHeader() {
-		final String title = "SODA Test report";
-		String temp = "<html> \n" +
-				"<script language=javascript type='text/javascript'> \n" +
-		 		"function hidediv(name, href_id) { \n" +
-		 		"\t document.getElementById(name).style.display = 'none'; \n" +
-		 		"\t document.getElementById(href_id).innerHTML=\"[ Expand Backtrace ]<b>+</b>\"; \n" +
-		 		"\t document.getElementById(href_id).href=\"javascript:showdiv('\" + name +\"', '\" + href_id + \"')\";\n" +
-		 		"} \n" +
-		 		"function showdiv(name, href_id) { \n" +
-		 		"\t document.getElementById(name).style.display = 'inline'; \n" +
-				"\t document.getElementById(href_id).innerHTML=\"[ Collapse Backtrace ]<b>-</b>\"; \n" +
-				"\t document.getElementById(href_id).href=\"javascript:hidediv('\" + name + \"', '\" + href_id + \"')\"; \n" +
-				"} \n" +
-				"</script> \n" +
-				"<style type=\"text/css\"> \n" +
-				"body{ \n" +
-				"\t margin: 0px; \n" +
-				"\t font-family: Arial, Verdana, Helvetica, sans-serif; \n" +
-				"} \n" +
-				"fieldset, table, pre{ \n" +
-				"\t margin-bottom:0; \n" +
-				"} \n" +
-				"p{ \n" +
-				"\t margin-top: 0px; \n" +
-				"\t margin-bottom: 0px; \n" +
-				"} \n" +
-				"textarea{ \n" +
-				"\t fontfamily: Arial, Verdana,Helvetica,sans-serif; \n" +
-				"} \n" +
-				"td{ \n" +
-				"\t text-align:left; \n" +
-				"\t vertical-align: top; \n" +
-				"} \n" +
-				".td_msgtype{ \n" +
-				"\t text-align: center; \n" +
-				"\t vertical-align: middle; \n" +
-				"} \n" +
-				".tr_normal{ \n" +
-				"\t background: #e5eef3; \n" +
-				"} \n" +
-				".tr_header{ \n" +
-				"\t background: #a4a4a4; \n"+
-				"} \n" +
-				".tr_module{ \n" +
-				"\t background: #3c78c8; \n" +
-				"} \n" +
-				".tr_error{ \n" +
-				"\t background: #ff0000; \n" +
-				"} \n" +
-				".tr_warning{ \n" +
-				"\t background: #eeff30; \n" +
-				"} \n" +
-				".tr_assert_passed{ \n" +
-				"\t background: #7ff98a; \n" +
-				"} \n" +
-				".highlight { \n" +
-				"\t background-color: #8888FF; \n" +
-				"} \n" +
-				".highlight_report { \n" +
-				"\t background-color: #5dec6d; \n" +
-				"} \n" +
-				"table { \n" +
-				"\t background: #ffff; \n" +
-				"\t border: 1px solid black; \n" +
-				"\t border-bottom: 1px solid #0000; \n" +
-				"\t border-right: 1px solid #0000; \n" +
-				"\t color: #0000; \n" +
-				"\t padding: 4px; \n" +
-				"\t font-size: 11px; \n" +
-				"} \n" +
-				"</style> \n" +
-				"<title>"+title+"</title> \n" +
-				"<body> \n" +
-				"<table> \n" +
-				"<tr class=\"tr_header\"> \n" +
-				"\t <td nowrap> <b>Date Time: </b></td> \n" +
-				"\t <td nowrap> <b>Message Type: </b></td> \n" +
-				"\t <td> <b>Message: </b></td> \n" +
-				"</tr > \n";
+		String header = "";
+		String line = "";
+		InputStream stream = null;
+
+		try {
+			String className = this.getClass().getName().replace('.', '/');
+			String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+			
+			if (classJar.startsWith("jar:")) {
+				stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			} else {
+				File header_fd = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
+				stream = new FileInputStream(header_fd);
+			}
+			
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
+			
+			while ((line = br.readLine()) != null) {
+				header += line;
+				header += "\n";
+			}
+			
+		} catch (Exception exp ) {
+			exp.printStackTrace();
+		}
 		
-		repFile.print(temp);
+		repFile.print(header);
 	}
 	
 	/**
@@ -672,4 +606,7 @@ public class LogConverter{
 	public String getFileName(){
 		return fileName;
 	}
+	
 }
+
+

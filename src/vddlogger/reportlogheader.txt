@@ -1,0 +1,100 @@
+<html>
+<script language="javascript" type='text/javascript'>
+function hidediv(name, href_id) {
+	document.getElementById(name).style.display = 'none';
+	document.getElementById(href_id).innerHTML="[ Expand Backtrace ]<b>+</b>";
+	document.getElementById(href_id).href="javascript:showdiv('" + name +"', '" + href_id + "')";
+}
+
+function showdiv(name, href_id) {
+	document.getElementById(name).style.display = 'inline';
+	document.getElementById(href_id).innerHTML="[ Collapse Backtrace ]<b>-</b>";
+	document.getElementById(href_id).href="javascript:hidediv('" + name + "', '" + href_id + "')";
+}
+</script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+}
+
+fieldset, table, pre {
+	margin-bottom:0;
+}
+
+p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+textarea {
+	fontfamily: Arial, Verdana,Helvetica,sans-serif;
+}
+
+td {
+	text-align:left;
+	vertical-align: top;
+}
+
+.td_date {
+	text-align:left;
+	vertical-align: top;
+	width: 120px;
+}
+
+.td_msgtype {
+	text-align: center;
+	vertical-align: middle;
+	width: 120px;
+}
+
+.tr_normal {
+	background: #e5eef3;
+}
+
+.tr_header {
+	background: #a4a4a4;
+}
+				
+.tr_module {
+	background: #3c78c8;
+}
+
+.tr_error {
+	background: #ff0000;
+}
+
+.tr_warning {
+	background: #eeff30;
+}
+
+.tr_assert_passed {
+	background: #7ff98a;
+}
+
+.highlight {
+	background-color: #8888FF;
+}
+
+.highlight_report {
+	background-color: #5dec6d;
+}
+
+table {
+	background: #ffff;
+	border: 2px solid black;
+	color: #0000;
+	padding: 4px;
+	font-size: 11px;
+	width: 98%;
+} 
+</style> 
+<title>SODA Test report</title> 
+<body> 
+<table> 
+<tr class="tr_header"> 
+	<td nowrap> <b>Date Time: </b></td> 
+	<td nowrap> <b>Message Type: </b></td> 
+	<td> <b>Message: </b></td> 
+</tr >

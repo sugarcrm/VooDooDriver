@@ -47,6 +47,9 @@ public class SodaCmdLineOpts {
 	private String configfile = null;
 	private String downloaddir = null;
 	private String assertPageFile = null;
+	private int restartcount = 0;
+	private String restarttest = null;
+	private int attachtimeout = 0; 
 	
 	public SodaCmdLineOpts(String[] args) {
 		
@@ -119,6 +122,16 @@ public class SodaCmdLineOpts {
 						this.assertPageFile = this.assertPageFile.replace("--assertpagefile=", "");
 						this.assertPageFile = FilenameUtils.separatorsToSystem(this.assertPageFile);
 						System.out.printf("(*)Assertpagefile: %s\n", this.assertPageFile);
+				 } else if (args[i].contains("--restartcount")) {
+					 String tmp = args[i].replaceAll("--restartcount=", "");
+					 this.restartcount = Integer.valueOf(tmp);
+				 } else if (args[i].contains("--restarttest")) {
+					 this.restarttest = args[i];
+					 this.restarttest = this.restarttest.replaceAll("--restarttest=", "");
+				 } else if (args[i].contains("--attachtimeout")) {
+					 String tmp = args[i];
+					 tmp = tmp.replace("--attachtimeout=", "");
+					 this.attachtimeout = Integer.valueOf(tmp);
 				 }
 			}
 			
@@ -141,6 +154,9 @@ public class SodaCmdLineOpts {
 			this.options.put("config", this.configfile);
 			this.options.put("downloaddir", this.downloaddir);
 			this.options.put("assertpagefile", this.assertPageFile);
+			this.options.put("restartcount", this.restartcount);
+			this.options.put("restarttest", this.restarttest);
+			this.options.put("attachtimeout", this.attachtimeout);
 		} catch (Exception exp) {
 			exp.printStackTrace();
 			this.options = null;

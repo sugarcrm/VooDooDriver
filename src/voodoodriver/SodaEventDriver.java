@@ -51,6 +51,7 @@ public class SodaEventDriver implements Runnable {
 	private SodaHash ElementStore = null;
 	private VDDPluginsHash loadedPlugins = null;
 	private String currentHWnd = null;
+	private int attachTimeout = 0;
 	
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events, SodaReporter reporter, SodaHash gvars,
 			SodaHash hijacks, SodaHash oldvars, SodaEvents plugins) {
@@ -94,6 +95,10 @@ public class SodaEventDriver implements Runnable {
 		this.setCurrentHWND(hwnd);
 		this.runner = new Thread(this, "SodaEventDriver-Thread");
 		runner.start();
+	}
+	
+	public void setAttachTimeout(int timeout) {
+		this.attachTimeout = timeout;
 	}
 	
 	private boolean windowExists(String hwnd) {
@@ -1802,6 +1807,14 @@ public class SodaEventDriver implements Runnable {
 			this.setCurrentHWND(currentWindow);
 			msg = String.format("Switching back to window handle: '%s'.", currentWindow);
 			this.report.Log(msg);
+			
+			if (this.attachTimeout > 0) {
+				long tout = this.attachTimeout * 1000;
+				Thread.currentThread();
+				msg = String.format("Waiting '%s' seconds before executing next event.", this.attachTimeout);
+				this.report.Log(msg);
+				Thread.sleep(tout);
+			}
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
@@ -2593,6 +2606,7 @@ public class SodaEventDriver implements Runnable {
 			String classname = data.get("classname").toString();
 			String msg = "";
 			Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
+			msg = String.format("");
 			
 			try {
 				int err = 0;
@@ -2600,11 +2614,16 @@ public class SodaEventDriver implements Runnable {
 				
 				String tmp_hwnd = this.getCurrentHWND();
 				if (this.windowExists(tmp_hwnd)) {
-					err = inst.execute(null, this.Browser, element);
+					msg = String.format("Starting plugin: '%s'.", classname);
+					this.report.Log(msg);
 					
+					err = inst.execute(null, this.Browser, element);
 					if (err != 0) {
 						msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!", classname, err);
 						this.report.ReportError(msg);
+					} else {
+						msg = String.format("Plugin: '%s' finished.", classname);
+						this.report.Log(msg);
 					}
 				} else {
 					msg = "Found the browser window has been closed, skipping executing plugin.";

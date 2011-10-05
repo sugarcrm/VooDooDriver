@@ -44,7 +44,7 @@ import voodoodriver.SodaUtils;
 
 public class VooDooDriver {
 
-	public static String VERSION = "1.0.0-Beta1";
+	public static String VERSION = "1.0.0";
 	
 	public static void printUsage() {
 		String msg = "VooDooDriver\n"+
@@ -74,7 +74,11 @@ public class VooDooDriver {
 		"	--config: This is a config file for preloading command line options.\n\n"+
 		"   --downloaddir: The default place to save downloaded files to.\n\n"+
 		"	--assertpagefile: This is the XML file containing things to assert on each page load.\n\n"+
-		"   --version: Print the Soda Version string.\n\n\n"+
+		"  --restartcount: This is how many tests in a suite that run before the browser is restarted.\n\n"+
+		"  --restarttest: This is the test that gets ran after the browser restarts, and before the next test"+
+		"     is run.\n\n"+
+		"  --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.\n\n"+
+		"  --version: Print the Soda Version string.\n\n\n"+
 		"Notes:\n"+
 		"--)All conflicting command line options with with the config files supersede the confile files.\n\n";
 		
@@ -100,6 +104,9 @@ public class VooDooDriver {
 		String downloadDir = null;
 		String assertpage = null;
 		SodaHash gvars = null;
+		int restartCount = 0;
+		String restartTest = null;
+		int attachTimeout = 0;
 		
 		SodaEvents configFileOpts = null;
 		
@@ -141,6 +148,8 @@ public class VooDooDriver {
 						if (name.contains("browser")) {
 							cmdOpts.put("browser", value);
 							System.out.printf("(*)Added Confile-File cmdopts: '%s' => '%s'.\n", name, value);
+						} else if (name.contains("attachtimeout")) {
+							cmdOpts.put("attachtimeout", value);
 						}
 					}
 				}
@@ -155,6 +164,28 @@ public class VooDooDriver {
 			if ((Boolean)cmdOpts.get("version")) {
 				System.out.printf("(*)VooDooDriver Version: %s\n", VooDooDriver.VERSION);
 				System.exit(0);
+			}
+			
+			attachTimeout = (Integer)cmdOpts.get("attachtimeout");
+			restartTest = (String)cmdOpts.get("restarttest");
+			restartCount = (Integer)cmdOpts.get("restartcount");
+			
+			if (attachTimeout > 0) {
+				System.out.printf("(*)Setting the default Attach Timeout to: '%s' seconds.\n", attachTimeout);
+			}
+			
+			if (restartCount > 0) {
+				System.out.printf("(*)Restart Count => '%d'\n", restartCount);
+				
+				if (restartTest != null) {
+					System.out.printf("(*)Restart Test => '%s'.\n", restartTest);
+					File retmp = new File(restartTest);
+					
+					if (!retmp.exists()) {
+						System.out.printf("(!)Error: failed to find Restart Test: => '%s'!\n\n", restartTest);
+						System.exit(5);
+					}
+				}
 			}
 			
 			if (cmdOpts.get("browser") == null) {
@@ -221,13 +252,13 @@ public class VooDooDriver {
 				
 				RunSuites(SodaSuitesList, resultdir, browserType, gvars, 
 						(SodaHash)cmdOpts.get("hijacks"), blockList, plugins, savehtml, downloadDir,
-						assertpage);
+						assertpage, restartTest, restartCount, attachTimeout);
 			}
 			
 			SodaTestsList = (ArrayList<String>)cmdOpts.get("tests");
 			if (!SodaTestsList.isEmpty()) {
 				RunTests(SodaTestsList, resultdir, browserType, gvars, (SodaHash)cmdOpts.get("hijacks"),
-						plugins, savehtml, downloadDir, assertpage);
+						plugins, savehtml, downloadDir, assertpage, attachTimeout);
 			}
 		} catch (Exception exp) {
 			exp.printStackTrace();
@@ -239,7 +270,7 @@ public class VooDooDriver {
 	
 	private static void RunTests(ArrayList<String> tests, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaEvents plugins, boolean savehtml, String downloaddir, 
-			String assertpage) {
+			String assertpage, int attachTimeout) {
 		File resultFD = null;
 		SodaBrowser browser = null;
 		int len = 0;
@@ -303,7 +334,7 @@ public class VooDooDriver {
 	
 	private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, boolean savehtml,
-			String downloaddir, String assertpage) {
+			String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout) {
 		int len = suites.size() -1;
 		File resultFD = null;
 		String report_file_name = resultdir;
@@ -316,6 +347,7 @@ public class VooDooDriver {
 		Date suiteStopTime = null;
 		
 		System.out.printf("(*)Running Suite files now...\n");
+		System.out.printf("(*)Timeout: %s\n", attachTimeout);
 		
 		resultFD = new File(resultdir);
 		if (!resultFD.exists()) {
@@ -378,6 +410,7 @@ public class VooDooDriver {
 			String suite_base_name = "";
 			File suite_fd = new File(suite_name);
 			suite_base_name = suite_fd.getName();
+			int testRanCount = 0;
 		
 			writeSummary(suiteRptFD, "\t<suite>\n\n");
 			writeSummary(suiteRptFD, String.format("\t\t<suitefile>%s</suitefile>\n", suite_base_name));
@@ -399,6 +432,66 @@ public class VooDooDriver {
 			suiteStartTime = new Date();
 			for (int test_index = 0; test_index <= suite_test_list.size() -1; test_index++) {
 				Date test_start_time = null;
+				
+				if ( (restartCount > 0) && (testRanCount >= restartCount)) {
+					System.out.printf("(*))Auto restarting browser.\n");
+					if (!browser.isClosed()) {
+						browser.close();
+					}
+					browser.newBrowser();
+					
+					if (restartTest != null) {
+						System.out.printf("(*)Executing Restart Test: '%s'\n", restartTest);
+						writeSummary(suiteRptFD, "\t\t<test>\n");
+						writeSummary(suiteRptFD, String.format("\t\t\t<testfile>%s</testfile>\n", restartTest));
+						now = new Date();
+						test_start_time = now;
+						date_str = df.format(now);
+						writeSummary(suiteRptFD, String.format("\t\t\t<starttime>%s</starttime>\n", date_str));
+						
+						testobj = new SodaTest(restartTest, browser, gvars, hijacks, blockList, vars, 
+								suite_base_noext, resultdir, savehtml);
+						if (assertpage != null) {
+							testobj.setAssertPage(assertpage);
+						}
+								
+						if (plugins != null) {
+							testobj.setPlugins(plugins);
+						}
+						
+						testobj.setAttachTimeout(attachTimeout);
+						testobj.runTest(false);
+						now = new Date();
+						date_str = df.format(now);
+						writeSummary(suiteRptFD, String.format("\t\t\t<stoptime>%s</stoptime>\n", date_str));
+						String msg = SodaUtils.GetRunTime(test_start_time, now);
+						writeSummary(suiteRptFD, String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
+						
+						if (testobj.getSodaEventDriver() != null) {
+							vars = testobj.getSodaEventDriver().getSodaVars();
+						}
+						
+						test_results_hash = testobj.getReporter().getResults();
+						test_resultsStore.add(test_results_hash);
+						for (int res_index = 0; res_index <= test_results_hash.keySet().size() -1; res_index++) {
+							String key = test_results_hash.keySet().toArray()[res_index].toString();
+							String value = test_results_hash.get(key).toString();
+							
+							if (key.contains("result")) {
+								if (Integer.valueOf(value) != 0) {
+									value = "Failed";	
+								} else {
+									value = "Passed";	
+								}
+							}
+							writeSummary(suiteRptFD, String.format("\t\t\t<%s>%s</%s>\n", key, value, key));
+						}
+						writeSummary(suiteRptFD, "\t\t</test>\n\n");
+					}
+					
+					testRanCount = 0;
+				}
+				
 				writeSummary(suiteRptFD, "\t\t<test>\n");
 				String current_test = suite_test_list.get(test_index);
 				writeSummary(suiteRptFD, String.format("\t\t\t<testfile>%s</testfile>\n", current_test));
@@ -419,12 +512,12 @@ public class VooDooDriver {
 				if (assertpage != null) {
 					testobj.setAssertPage(assertpage);
 				}
-				
-				
+						
 				if (plugins != null) {
 					testobj.setPlugins(plugins);
 				}
 				
+				testobj.setAttachTimeout(attachTimeout);
 				testobj.runTest(false);
 				
 				now = new Date();
@@ -454,10 +547,27 @@ public class VooDooDriver {
 				}
 				writeSummary(suiteRptFD, "\t\t</test>\n\n");
 				
-				Integer watchdog = Integer.valueOf(test_results_hash.get("watchdog"));
+				Integer watchdog = Integer.valueOf(test_results_hash.get("watchdog").toString());
 				if (watchdog > 0) {
 					System.out.printf("Exiting from finishing the other tests due to watch dog!\n");
 					break;
+				}
+				
+				if (restartCount > 0) {
+					File tmpF = new File(current_test);
+					File pF = tmpF.getParentFile();
+					
+					if (pF != null) {
+						String path = pF.getAbsolutePath();
+						path = path.toLowerCase();
+						if (!path.contains("lib")) {
+							testRanCount += 1;
+							System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
+						}
+					} else {
+						testRanCount += 1;
+						System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
+					}
 				}
 			}
 			

@@ -35,6 +35,7 @@ public class SodaTest {
 	private boolean SaveHTML = false;
 	private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
 	private String assertPage = null;
+	private int attachTimeout = 0;
 	
 	public SodaTest(String testFile, SodaBrowser browser, SodaHash gvars, SodaHash hijacks, 
 			SodaBlockList blocklist, SodaHash oldvars, String suitename, String reportDir,
@@ -65,6 +66,10 @@ public class SodaTest {
 		}
 		
 		this.Browser.setReporter(this.reporter);
+	}
+	
+	public void setAttachTimeout(int timeout) {
+		this.attachTimeout = timeout;
 	}
 	
 	public void setAssertPage(String assertPage) {
@@ -125,7 +130,11 @@ public class SodaTest {
 			eventDriver = new SodaEventDriver(this.Browser, events, this.reporter, this.GVars, this.HiJacks, 
 					this.OldVars, this.PlugIns);
 			
-			while(eventDriver.isAlive() && this.WatchDog != true) {
+			if (this.attachTimeout > 0) {
+				eventDriver.setAttachTimeout(this.attachTimeout);
+			}
+			
+			while (eventDriver.isAlive() && this.WatchDog != true) {
 				Date current_time = new Date();
 				Date thread_time = eventDriver.getThreadTime();
 				current = current_time.getTime();

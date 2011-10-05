@@ -14,7 +14,8 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logreporter;
+package vddlogger;
+
 import java.io.*;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,15 +24,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+public class VddSummaryReporter {
 
-/**
- * takes in a formatted .xml file containing suite test results and generates a nicely formatted HTML report
- *
- *@param file - an ArrayList of xml files containing suite test data
- *
- */
-public class SummaryReporter {
-	
 	private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
 	private int count;
 	private ArrayList<File> xmlFiles;
@@ -43,24 +37,16 @@ public class SummaryReporter {
 	private int exceptions = 0;
 	private int errors = 0;
 	private int watchdog = 0;
-	private int failedTotal =0;
 	private int hours = 0;
 	private int minutes = 0;
 	private int seconds = 0;
 	private FileOutputStream output;
 	private PrintStream repFile;
 	private Document dom;
-
-	public SummaryReporter() {
-		
-	}
+	private String basedir = "";
 	
-	/**
-	 * Constructor for class SummaryReporter
-	 *@param file - an ArrayList of xml files containing suite test data
-	 */
-	public SummaryReporter(ArrayList<File> xmlFiles, String path){
-		count = 0;
+	public VddSummaryReporter(ArrayList<File> xmlFiles, String path) {
+		this.count = 0;
 		this.xmlFiles = xmlFiles;
 		passedTests = 0; 
 		failedTests = 0; 
@@ -69,27 +55,43 @@ public class SummaryReporter {
 		passedAsserts = 0; 
 		exceptions = 0; 
 		errors = 0; 
-		watchdog = 0; 
-		failedTotal = 0;
+		watchdog = 0;
 		hours = 0;
 		minutes = 0;
 		seconds = 0;
+		String summaryFile = String.format("%s%s%s", path, File.separatorChar, "summary.html");
+		this.basedir = path;
 		
 		try {
-			output = new FileOutputStream(path+	"summary.html");
+			output = new FileOutputStream(summaryFile);
+			System.out.printf("(*)SummaryFile: %s\n", summaryFile);
 			repFile = new PrintStream(output);
 		} catch (Exception e) {
-			System.err.println("Error writing to summary.html");
+			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", summaryFile);
 			e.printStackTrace();
 		}
 	}
 	
-	public void generateReport(){
+	public void generateReport() {
+		HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
 		repFile.print(generateHTMLHeader());
+		String name = "";
+		String[] keys = null;
 		
-		for (int i = 0; i < xmlFiles.size(); i ++){
-			parseXMLFile(xmlFiles.get(i));
-			repFile.print(generateTableRow(dom));
+		
+		for (int i = 0; i < xmlFiles.size(); i ++) {
+			HashMap<String, Object> suiteData = null;
+			suiteData = parseXMLFile(xmlFiles.get(i));
+			name = suiteData.get("suitename").toString();
+			list.put(name, suiteData);
+		}
+		
+		keys = list.keySet().toArray(new String[0]);
+		java.util.Arrays.sort(keys);
+		
+		for (int i = 0; i <= keys.length -1; i++) {
+			String key = keys[i];
+			repFile.print(generateTableRow(key, list.get(key)));
 		}
 		
 		repFile.print(generateHTMLFooter());
@@ -97,29 +99,65 @@ public class SummaryReporter {
 		repFile.close();
 	}
 	
+	private HashMap<String, Object> getSuiteData(Document doc) {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
+		String runtime = "";
+		String suiteName = getSuiteName(doc);
+		
+		passed = getAmtPassed(doc);
+		blocked = getAmtBlocked(doc);
+		failed = getAmtFailed(doc) - blocked;  //blocked tests count as failed too
+		wd = getAmtwatchdog(doc);
+		asserts = getAmtAsserts(doc);
+		assertsF = getAmtAssertsF(doc);
+		exceptions = getAmtExceptions(doc);
+		errors = getAmtErrors(doc);
+		total = assertsF + exceptions + errors;
+		runtime = getRunTime(doc);
+		
+		result.put("passed", passed);
+		result.put("blocked", blocked);
+		result.put("failed", failed);
+		result.put("wd", wd);
+		result.put("asserts", asserts);
+		result.put("assertsF", assertsF);
+		result.put("exceptions", exceptions);
+		result.put("errors", errors);
+		result.put("total", total);
+		result.put("runtime", runtime);
+		result.put("suitename", suiteName);
+		result.put("testlogs", this.getTestLogs(doc));
+		
+		return result;
+	}
+	
 	/**
 	 * generates a table row for summary.html from a DOM
 	 * @return - a nicely formatted html table row for summary.html
 	 */
-	private String generateTableRow(Document d){
+	
+	@SuppressWarnings("unchecked")
+	private String generateTableRow(String suiteName, HashMap<String, Object> data) {
 		int passed, failed, blocked, asserts, assertsF, errors, exceptions, wd, total;
-		String suiteName = getSuiteName(d);
-		String html = "<tr id=\""+count+"\" class=\"unhighlight\" onmouseover=\"this.className='highlight'\" onmouseout=\"this.className='unhighlight'\"> \n";
-		html += "<td class=\"td_file_data\">\n" +
-				"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
-				"</td>";
-		
-		passed = getAmtPassed(d);
-		blocked = getAmtBlocked(d);
-		failed = getAmtFailed(d) - blocked;  //blocked tests count as failed too
-		wd = getAmtwatchdog(d);
-		asserts = getAmtAsserts(d);
-		assertsF = getAmtAssertsF(d);
-		exceptions = getAmtExceptions(d);
-		errors = getAmtErrors(d);
+		suiteName = data.get("suitename").toString();
+		String runtime = "";
+		String html = "<tr id=\""+count+"\" class=\"unhighlight\" onmouseover=\"this.className='highlight'\" onmouseout=\"this.className='unhighlight'\"> \n" +
+			"<td class=\"td_file_data\">\n" +
+			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
+			"</td>";
+			
+		passed = (Integer)data.get("passed");
+		blocked = (Integer)data.get("blocked");
+		failed = (Integer)data.get("failed") - blocked;  //blocked tests count as failed too
+		wd = (Integer)data.get("wd");
+		asserts = (Integer)data.get("asserts");
+		assertsF = (Integer)data.get("assertsF");
+		exceptions = (Integer)data.get("exceptions");
+		errors = (Integer)data.get("errors");
 		total = assertsF + exceptions + errors;
+		runtime = data.get("runtime").toString();
 		
-		//"Tests" column
 		if (blocked == 0) {
 			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
@@ -163,8 +201,13 @@ public class SummaryReporter {
 			html += "\t <td class=\"td_total_error_data\">"+total+"</td> \n";
 		}
 		
-		html += "\t <td class=\"td_time_data\">"+getRunTime(d)+"</td> \n";
+		html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
 		html += "</tr>";
+		
+		ArrayList<String> logs = (ArrayList<String>)data.get("testlogs");
+		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
+		reporter.generateReport();
+		
 		
 		return html;
 	}
@@ -179,7 +222,15 @@ public class SummaryReporter {
 		InputStream stream = null;
 		
 		try {
-			stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			String className = this.getClass().getName().replace('.', '/');
+			String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+			
+			if (classJar.startsWith("jar:")) {
+				stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
+			} else {
+				File header_fd = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
+				stream = new FileInputStream(header_fd);
+			}
 			
 			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
@@ -222,15 +273,20 @@ public class SummaryReporter {
 		return footer;
 	}
 
-	private void parseXMLFile(File xml){
+	private HashMap<String, Object> parseXMLFile(File xml){
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		HashMap<String, Object> result = new HashMap<String, Object>();
 		
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			dom = db.parse(xml);
+			result = getSuiteData(dom);
 		} catch(Exception e){
 			e.printStackTrace();
+			result = null;
 		}
+		
+		return result;
 	}
 	
 	/**
@@ -301,6 +357,20 @@ public class SummaryReporter {
 		return n;
 	}
 	
+	
+	private ArrayList<String> getTestLogs(Document d) {
+		ArrayList<String> list = new ArrayList<String>();
+		NodeList nodes = d.getElementsByTagName("testlog");
+		
+		for (int i = 0; i <= nodes.getLength() -1; i++) {
+			String tmp = nodes.item(i).getTextContent();
+			System.out.printf("(*)TestLog: %s\n", tmp);
+			list.add(nodes.item(i).getTextContent());
+		}
+		
+		return list;
+	}
+	
 	/**
 	 * get the number of assertions that passed within this suite document
 	 * @ param d - the Document containing suite run data
@@ -363,7 +433,6 @@ public class SummaryReporter {
 			}
 		}
 		
-		//global watchdog variable
 		watchdog += n;
 		return n;
 	}
@@ -469,7 +538,7 @@ public class SummaryReporter {
 	 * @return
 	 */
 	private String getSuiteName(Document d) {
-		String name = "jfdjfajdlfea";
+		String name = "";
 		NodeList nl = d.getElementsByTagName("suitefile");
 		
 		if (nl != null && nl.getLength() > 0) {
@@ -480,5 +549,6 @@ public class SummaryReporter {
 		name = name.substring(0, name.indexOf("."));
 		return name;
 	}
+	
 	
 }
