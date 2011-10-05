@@ -40,6 +40,7 @@ public class SodaReporter {
 	private boolean saveHTML = false;
 	private int SavePageNum = 0;
 	private SodaBrowser browser = null;
+	private boolean isRestart = false;
 	//private String CurrentMD5 = "";
 	//private String LastSavedPage = "";
 	
@@ -74,6 +75,10 @@ public class SodaReporter {
 		}
 	}
 	
+	public void setIsRestTest(boolean restart) {
+		this.isRestart = restart;
+	}
+	
 	public void setSaveHTML(boolean setting, SodaBrowser browser) {
 		this.saveHTML = setting;
 		this.browser = browser;
@@ -95,6 +100,7 @@ public class SodaReporter {
 		result.put("passedasserts", this.PassedAsserts);
 		result.put("watchdog", this.WatchDog);
 		result.put("errors", this.OtherErrors);
+		result.put("isrestart", this.isRestart);
 		
 		if (this.Blocked > 0 || this.Exceptions > 0 || this.FailedAsserts > 0 || this.OtherErrors > 0) {
 			res = -1;
