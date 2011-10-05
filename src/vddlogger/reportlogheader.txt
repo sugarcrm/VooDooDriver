@@ -91,7 +91,8 @@ table {
 } 
 </style> 
 <title>SODA Test report</title> 
-<body> 
+<body>
+<center> 
 <table> 
 <tr class="tr_header"> 
 	<td nowrap> <b>Date Time: </b></td> 

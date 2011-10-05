@@ -189,7 +189,7 @@ public class VddLogToHTML {
 			e.printStackTrace();
 		}
 		
-		repFile.print("\n</table>\n</body>\n</html>\n");
+		repFile.print("\n</table>\n</center>\n</body>\n</html>\n");
 		repFile.close();
 	}
 	////////////////////////////////////////////
