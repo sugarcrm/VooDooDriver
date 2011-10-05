@@ -220,12 +220,15 @@ public class VddSuiteReporter {
 	 */
 	public void generateTableRow(String fileName, int status, String line){
 		String html = "\t<td class=\"td_issues_data\"></td>\n";
+		String tmp_filename = fileName;
+		
+		tmp_filename = tmp_filename.replaceAll("-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+", "");
 		
 		count ++;
 		repFile.println("<tr id=\""+count+"\" onMouseOver=\"this.className='highlight'\" "+
 				"onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
 		repFile.println("\t<td class=\"td_file_data\">"+count+"</td>");
-		repFile.println("\t<td class=\"td_file_data\">"+fileName+".xml</td>");
+		repFile.println("\t<td class=\"td_file_data\">"+tmp_filename+".xml</td>");
 		
 		switch (status) {
 			case 0:
