@@ -40,8 +40,8 @@ public class SodaReporter {
 	private boolean saveHTML = false;
 	private int SavePageNum = 0;
 	private SodaBrowser browser = null;
-	private String CurrentMD5 = "";
-	private String LastSavedPage = "";
+	//private String CurrentMD5 = "";
+	//private String LastSavedPage = "";
 	
 	public SodaReporter(String reportName, String resultDir) {
 		Date now = new Date();
@@ -327,19 +327,25 @@ public class SodaReporter {
 		String htmldir = this.resultDir;
 		String new_save_file = "";
 		String src = "";
-		String md5 = "";
+		//String md5 = "";
 		
 		if (!this.saveHTML) {
 			return;
 		}
 		
 		src = this.browser.getPageSource();
+		
+		/*
+		 * not using this now as it doesn't seem to work with ajax pages.
+		 * will look into this later.
+		 * 
 		md5 = SodaUtils.MD5(src);
 		
 		if (md5.compareTo(this.CurrentMD5) == 0) {
 			this.Log(String.format("HTML Saved: %s", this.LastSavedPage));
 			return;
 		}
+		*/
 		
 		htmldir = htmldir.concat("/saved-html");
 		dir = new File(htmldir);
@@ -358,8 +364,8 @@ public class SodaReporter {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(newfd));
 			bw.write(src);
 			bw.close();
-			this.LastSavedPage = new_save_file;
-			this.CurrentMD5 = SodaUtils.MD5(src);
+			//this.LastSavedPage = new_save_file;
+			//this.CurrentMD5 = SodaUtils.MD5(src);
 			this.Log(String.format("HTML Saved: %s", new_save_file));
 		} catch (Exception exp) {
 			this.ReportException(exp);
