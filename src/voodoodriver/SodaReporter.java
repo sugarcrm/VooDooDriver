@@ -20,12 +20,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.FilenameUtils;
 
 public class SodaReporter {
@@ -47,9 +44,11 @@ public class SodaReporter {
 	private String LastSavedPage = "";
 	
 	public SodaReporter(String reportName, String resultDir) {
-		DateFormat fd = new SimpleDateFormat("MM-d-yyyy-hh-m-s-S");
 		Date now = new Date();
-		String date_str = fd.format(now);
+		String frac = String.format("%1$tN", now);
+		String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+		frac = frac.subSequence(0, 3).toString();
+		date_str += String.format("-%s", frac);
 		
 		this.LineSeparator = System.getProperty("line.separator");
 		
@@ -113,8 +112,12 @@ public class SodaReporter {
 	
 	private void _log(String msg) {
 		Date now = new Date();
-		DateFormat df = new SimpleDateFormat("MM/d/yyyy-hh:m:s.S");
-		String date_str = df.format(now);
+		String frac = String.format("%1$tN", now);
+		String date_str = String.format("%1$tm/%1$td/%1$tY-%1$tI:%1$tM:%1$tS", now);
+		
+		frac = frac.subSequence(0, 3).toString();
+		date_str += String.format(".%s", frac);
+		
 		msg = replaceLineFeed(msg);
 		String logstr = "[" + date_str + "]" + msg + this.LineSeparator;
 		
