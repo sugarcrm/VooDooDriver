@@ -129,8 +129,9 @@ public class VooDooDriver {
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
-			gvars = (SodaHash)cmdOpts.get("gvars");
+			//gvars = (SodaHash)cmdOpts.get("gvars");
 			
+			gvars = new SodaHash();
 			if (cmdOpts.containsKey("configfile")) {
 				sodaConfigFile = cmdOpts.get("configfile").toString();
 				System.out.printf("(*)Overwriting default config file to: '%s'.\n", sodaConfigFile);
@@ -171,6 +172,8 @@ public class VooDooDriver {
 				}
 				
 			}
+
+			gvars.putAll((SodaHash)cmdOpts.get("gvars"));
 			
 			if ((Boolean)cmdOpts.get("help")) {
 				printUsage();
