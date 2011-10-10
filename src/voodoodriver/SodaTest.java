@@ -36,6 +36,7 @@ public class SodaTest {
 	private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
 	private String assertPage = null;
 	private int attachTimeout = 0;
+	private boolean isRestartTest = false;
 	
 	public SodaTest(String testFile, SodaBrowser browser, SodaHash gvars, SodaHash hijacks, 
 			SodaBlockList blocklist, SodaHash oldvars, String suitename, String reportDir,
@@ -49,7 +50,6 @@ public class SodaTest {
 		String resultsdir = reportDir;
 		String report_name = "";
 		File tmp_file = new File(testFile);
-		
 		this.SaveHTML = saveHtml;
 		
 		report_name = tmp_file.getName();
@@ -63,9 +63,14 @@ public class SodaTest {
 		
 		if (saveHtml) {
 			this.reporter.setSaveHTML(this.SaveHTML, browser);
+			this.reporter.setTestName(testFile);
 		}
 		
 		this.Browser.setReporter(this.reporter);
+	}
+	
+	public void setIsRestartTest(boolean isRestart) {
+		this.isRestartTest = isRestart;
 	}
 	
 	public void setAttachTimeout(int timeout) {
@@ -115,6 +120,10 @@ public class SodaTest {
 	public boolean runTest(boolean isSuitetest) {
 		boolean result = false;
 		this.WatchDog = false;
+		
+		if (this.isRestartTest) {
+			this.reporter.setIsRestTest(true);
+		}
 		
 		result = this.loadTestFile();
 		if (!result) {

@@ -20,12 +20,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.FilenameUtils;
 
 public class SodaReporter {
@@ -43,13 +40,17 @@ public class SodaReporter {
 	private boolean saveHTML = false;
 	private int SavePageNum = 0;
 	private SodaBrowser browser = null;
-	private String CurrentMD5 = "";
-	private String LastSavedPage = "";
+	private boolean isRestart = false;
+	private String testName = null;
+	//private String CurrentMD5 = "";
+	//private String LastSavedPage = "";
 	
 	public SodaReporter(String reportName, String resultDir) {
-		DateFormat fd = new SimpleDateFormat("MM-d-yyyy-hh-m-s-S");
 		Date now = new Date();
-		String date_str = fd.format(now);
+		String frac = String.format("%1$tN", now);
+		String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+		frac = frac.subSequence(0, 3).toString();
+		date_str += String.format("-%s", frac);
 		
 		this.LineSeparator = System.getProperty("line.separator");
 		
@@ -75,6 +76,14 @@ public class SodaReporter {
 		}
 	}
 	
+	public void setTestName(String name) {
+		this.testName = name;
+	}
+	
+	public void setIsRestTest(boolean restart) {
+		this.isRestart = restart;
+	}
+	
 	public void setSaveHTML(boolean setting, SodaBrowser browser) {
 		this.saveHTML = setting;
 		this.browser = browser;
@@ -96,6 +105,7 @@ public class SodaReporter {
 		result.put("passedasserts", this.PassedAsserts);
 		result.put("watchdog", this.WatchDog);
 		result.put("errors", this.OtherErrors);
+		result.put("isrestart", this.isRestart);
 		
 		if (this.Blocked > 0 || this.Exceptions > 0 || this.FailedAsserts > 0 || this.OtherErrors > 0) {
 			res = -1;
@@ -113,8 +123,12 @@ public class SodaReporter {
 	
 	private void _log(String msg) {
 		Date now = new Date();
-		DateFormat df = new SimpleDateFormat("MM/d/yyyy-hh:m:s.S");
-		String date_str = df.format(now);
+		String frac = String.format("%1$tN", now);
+		String date_str = String.format("%1$tm/%1$td/%1$tY-%1$tI:%1$tM:%1$tS", now);
+		
+		frac = frac.subSequence(0, 3).toString();
+		date_str += String.format(".%s", frac);
+		
 		msg = replaceLineFeed(msg);
 		String logstr = "[" + date_str + "]" + msg + this.LineSeparator;
 		
@@ -324,19 +338,26 @@ public class SodaReporter {
 		String htmldir = this.resultDir;
 		String new_save_file = "";
 		String src = "";
-		String md5 = "";
+		String testname = "";
+		//String md5 = "";
 		
 		if (!this.saveHTML) {
 			return;
 		}
 		
 		src = this.browser.getPageSource();
+		
+		/*
+		 * not using this now as it doesn't seem to work with ajax pages.
+		 * will look into this later.
+		 * 
 		md5 = SodaUtils.MD5(src);
 		
 		if (md5.compareTo(this.CurrentMD5) == 0) {
 			this.Log(String.format("HTML Saved: %s", this.LastSavedPage));
 			return;
 		}
+		*/
 		
 		htmldir = htmldir.concat("/saved-html");
 		dir = new File(htmldir);
@@ -344,8 +365,16 @@ public class SodaReporter {
 			dir.mkdir();
 		}
 		
+		if (this.testName != null) {
+			File tmp = new File(this.testName);
+			testname = tmp.getName();
+			testname = testname.substring(0, testname.length() -4);
+			testname = String.format("%s-", testname);
+			tmp = null;
+		}
+		
 		new_save_file = htmldir;
-		new_save_file = new_save_file.concat(String.format("/savedhtml-%d.html", this.SavePageNum));
+		new_save_file = new_save_file.concat(String.format("/%ssavedhtml-%d.html", testname, this.SavePageNum));
 		new_save_file = FilenameUtils.separatorsToSystem(new_save_file);
 		this.SavePageNum += 1;
 		
@@ -355,8 +384,8 @@ public class SodaReporter {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(newfd));
 			bw.write(src);
 			bw.close();
-			this.LastSavedPage = new_save_file;
-			this.CurrentMD5 = SodaUtils.MD5(src);
+			//this.LastSavedPage = new_save_file;
+			//this.CurrentMD5 = SodaUtils.MD5(src);
 			this.Log(String.format("HTML Saved: %s", new_save_file));
 		} catch (Exception exp) {
 			this.ReportException(exp);

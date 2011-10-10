@@ -17,15 +17,13 @@ limitations under the License.
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.InetAddress;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.FilenameUtils;
-
 import voodoodriver.SodaBlockList;
 import voodoodriver.SodaBlockListParser;
 import voodoodriver.SodaBrowser;
@@ -107,10 +105,27 @@ public class VooDooDriver {
 		int restartCount = 0;
 		String restartTest = null;
 		int attachTimeout = 0;
+		HashMap<String, String> javainfo = null;
 		
 		SodaEvents configFileOpts = null;
+		javainfo = SodaUtils.getJavaInfo();
 		
-		System.out.printf("Starting VooDooDriver...\n");
+		System.out.printf("(*)Starting VooDooDriver...\n");
+		System.out.printf("(*)Java RunTime Info:\n");
+		String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
+		Arrays.sort(jinfoKeys);
+		for (int i = 0; i <= jinfoKeys.length -1; i++) {
+			String value = javainfo.get(jinfoKeys[i]);
+			System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
+		}
+		
+		if (javainfo.containsKey("java.vendor")) {
+			String value = javainfo.get("java.vendor");
+			if (!value.contains("Sun Microsystems Inc")) {
+				System.out.printf("\n(!)Warning: You are using a none 'Sun Microsystems Inc.' JRE/JDK, this is not a supported JRE!\n");
+			}
+		}
+		
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
@@ -139,6 +154,7 @@ public class VooDooDriver {
 						value = tmp.get("value").toString();
 						
 						if (!gvars.containsKey(name)) {
+							name = String.format("global.%s", name);
 							gvars.put(name, value);
 							System.out.printf("(*)Added Config-File gvar: '%s' => '%s'.\n", name, value);
 						}	
@@ -232,10 +248,13 @@ public class VooDooDriver {
 			
 			String resultdir = (String)cmdOpts.get("resultdir");
 			if (resultdir == null) {
-				DateFormat df = null;
+				Date now = new Date();
 				String cwd = System.getProperty("user.dir");
-				df = new SimpleDateFormat("MM-d-yyyy-hh-m-s.S");
-				String date_str = df.format(new Date());
+				String frac = String.format("%1$tN", now);
+				String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+				frac = frac.subSequence(0, 3).toString();
+				date_str += String.format(".%s", frac);
+
 				cwd = cwd.concat("/");
 				cwd = cwd.concat(date_str);
 				cwd = FilenameUtils.separatorsToSystem(cwd);
@@ -320,7 +339,7 @@ public class VooDooDriver {
 				testobj.setAssertPage(assertpage);
 			}
 			testobj.setPlugins(plugins);
-			testobj.runTest(false);	
+			testobj.runTest(false);
 		}
 	}
 	
@@ -341,7 +360,6 @@ public class VooDooDriver {
 		String hostname = "";
 		FileOutputStream suiteRptFD = null;
 		SodaBrowser browser = null;
-		DateFormat df = null;
 		Date now = null;
 		Date suiteStartTime = null;
 		Date suiteStopTime = null;
@@ -375,8 +393,12 @@ public class VooDooDriver {
 			System.exit(4);
 		}
 		
-		df = new SimpleDateFormat("MM-d-yyyy-hh-m-s.S");
-		String date_str = df.format(new Date());
+		now = new Date();
+		String frac = String.format("%1$tN", now);
+		String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+		frac = frac.subSequence(0, 3).toString();
+		date_str += String.format(".%s", frac);
+
 		report_file_name += "/"+ hostname + "-" + date_str + ".xml";
 		report_file_name = FilenameUtils.separatorsToSystem(report_file_name);
 		
@@ -446,11 +468,17 @@ public class VooDooDriver {
 						writeSummary(suiteRptFD, String.format("\t\t\t<testfile>%s</testfile>\n", restartTest));
 						now = new Date();
 						test_start_time = now;
-						date_str = df.format(now);
+						frac = String.format("%1$tN", now);
+						date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+						frac = frac.subSequence(0, 3).toString();
+						date_str += String.format(".%s", frac);
+						
 						writeSummary(suiteRptFD, String.format("\t\t\t<starttime>%s</starttime>\n", date_str));
 						
 						testobj = new SodaTest(restartTest, browser, gvars, hijacks, blockList, vars, 
 								suite_base_noext, resultdir, savehtml);
+						testobj.setIsRestartTest(true);
+						
 						if (assertpage != null) {
 							testobj.setAssertPage(assertpage);
 						}
@@ -462,7 +490,11 @@ public class VooDooDriver {
 						testobj.setAttachTimeout(attachTimeout);
 						testobj.runTest(false);
 						now = new Date();
-						date_str = df.format(now);
+						frac = String.format("%1$tN", now);
+						date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+						frac = frac.subSequence(0, 3).toString();
+						date_str += String.format(".%s", frac);
+
 						writeSummary(suiteRptFD, String.format("\t\t\t<stoptime>%s</stoptime>\n", date_str));
 						String msg = SodaUtils.GetRunTime(test_start_time, now);
 						writeSummary(suiteRptFD, String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
@@ -498,7 +530,11 @@ public class VooDooDriver {
 				System.out.printf("(*)Executing Test: '%s'\n", current_test);
 				now = new Date();
 				test_start_time = now;
-				date_str = df.format(now);
+				frac = String.format("%1$tN", now);
+				date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+				frac = frac.subSequence(0, 3).toString();
+				date_str += String.format(".%s", frac);
+				
 				writeSummary(suiteRptFD, String.format("\t\t\t<starttime>%s</starttime>\n", date_str));
 				
 				if (browser.isClosed()) {
@@ -521,7 +557,10 @@ public class VooDooDriver {
 				testobj.runTest(false);
 				
 				now = new Date();
-				date_str = df.format(now);
+				frac = String.format("%1$tN", now);
+				date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+				frac = frac.subSequence(0, 3).toString();
+				date_str += String.format(".%s", frac);
 				writeSummary(suiteRptFD, String.format("\t\t\t<stoptime>%s</stoptime>\n", date_str));
 				String msg = SodaUtils.GetRunTime(test_start_time, now);
 				writeSummary(suiteRptFD, String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
@@ -572,9 +611,20 @@ public class VooDooDriver {
 			}
 			
 			suiteStopTime = new Date();
+			frac = String.format("%1$tN", suiteStopTime);
+			frac = frac.subSequence(0, 3).toString();
+			String stopTimeStr = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", suiteStopTime);
+			stopTimeStr += String.format(".%s", frac);
+			
+			frac = String.format("%1$tN", suiteStartTime);
+			frac = frac.subSequence(0, 3).toString();
+			String startTimeStr = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", suiteStartTime);
+			startTimeStr += String.format(".%s", frac);
+			
+			
 			String msg = String.format("\t\t<runtime>%s</runtime>\n", SodaUtils.GetRunTime(suiteStartTime, suiteStopTime));
-			writeSummary(suiteRptFD, String.format("\t\t<starttime>%s</starttime>\n", df.format(suiteStartTime)));
-			writeSummary(suiteRptFD, String.format("\t\t<stoptime>%s</stoptime>\n", df.format(suiteStopTime)));
+			writeSummary(suiteRptFD, String.format("\t\t<starttime>%s</starttime>\n", startTimeStr));
+			writeSummary(suiteRptFD, String.format("\t\t<stoptime>%s</stoptime>\n", stopTimeStr));
 			writeSummary(suiteRptFD, msg);
 			writeSummary(suiteRptFD, "\t</suite>\n");
 		}

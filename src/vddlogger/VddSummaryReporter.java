@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class VddSummaryReporter {
@@ -99,6 +100,22 @@ public class VddSummaryReporter {
 		repFile.close();
 	}
 	
+	private boolean isRestart(Node node) {
+		boolean result = false;
+		NodeList parent = node.getParentNode().getChildNodes();
+		
+		for (int i = 0; i <= parent.getLength() -1; i++) {
+			Node tmp = parent.item(i);
+			String name = tmp.getNodeName();
+			if (name.contains("isrestart")) {
+				result = Boolean.valueOf(tmp.getTextContent());
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	private HashMap<String, Object> getSuiteData(Document doc) {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
@@ -128,7 +145,7 @@ public class VddSummaryReporter {
 		result.put("runtime", runtime);
 		result.put("suitename", suiteName);
 		result.put("testlogs", this.getTestLogs(doc));
-		
+
 		return result;
 	}
 	
@@ -147,6 +164,7 @@ public class VddSummaryReporter {
 			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
 			"</td>";
 			
+		//restarts = (Integer)data.get("restarts");
 		passed = (Integer)data.get("passed");
 		blocked = (Integer)data.get("blocked");
 		failed = (Integer)data.get("failed") - blocked;  //blocked tests count as failed too
@@ -164,7 +182,7 @@ public class VddSummaryReporter {
 			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 			html += "\t <td class=\"td_blocked_data_zero\">0</td> \n";
 		} else {
-			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed + blocked)+"</td>\n";
+			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 			html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
@@ -207,7 +225,6 @@ public class VddSummaryReporter {
 		ArrayList<String> logs = (ArrayList<String>)data.get("testlogs");
 		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
 		reporter.generateReport();
-		
 		
 		return html;
 	}
@@ -299,10 +316,15 @@ public class VddSummaryReporter {
 		int n = 0;
 		Element el;
 		NodeList nl = d.getElementsByTagName("result");
+		boolean isrestart = false;
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n ++;
 			}
 		}
@@ -321,10 +343,15 @@ public class VddSummaryReporter {
 	private int getAmtFailed(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("result");
 		for (int i = 0; i < nl.getLength(); i ++){
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n ++;
 			}
 		}
@@ -343,11 +370,16 @@ public class VddSummaryReporter {
 	private int getAmtBlocked(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("blocked");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n ++;
 			}
 		}
@@ -356,7 +388,6 @@ public class VddSummaryReporter {
 		blockedTests += n;
 		return n;
 	}
-	
 	
 	private ArrayList<String> getTestLogs(Document d) {
 		ArrayList<String> list = new ArrayList<String>();
@@ -380,11 +411,16 @@ public class VddSummaryReporter {
 	private int getAmtAsserts(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("passedasserts");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -402,11 +438,16 @@ public class VddSummaryReporter {
 	private int getAmtAssertsF(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("failedasserts");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -424,11 +465,16 @@ public class VddSummaryReporter {
 	private int getAmtwatchdog(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("watchdog");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -446,11 +492,16 @@ public class VddSummaryReporter {
 	private int getAmtExceptions(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("exceptions");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -462,10 +513,15 @@ public class VddSummaryReporter {
 	private int getAmtErrors(Document d) {
 		int n = 0;
 		Element el;
+		boolean isrestart = false;
 		NodeList nl = d.getElementsByTagName("errors");
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
+				isrestart = isRestart(nl.item(i));
+				if (isrestart) {
+					continue;
+				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
 		}
@@ -549,6 +605,5 @@ public class VddSummaryReporter {
 		name = name.substring(0, name.indexOf("."));
 		return name;
 	}
-	
 	
 }

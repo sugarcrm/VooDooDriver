@@ -65,6 +65,10 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 		this.reporter = rep;
 	}
 	
+	public SodaReporter getReporter() {
+		return this.reporter;
+	}
+	
 	/**
 	 * Sets the name of the browser profile to use.
 	 * 

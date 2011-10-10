@@ -82,6 +82,7 @@ public class SodaEventDriver implements Runnable {
 				String key = gvars.keySet().toArray()[i].toString();
 				String value = gvars.get(key).toString();
 				System.out.printf("--)'%s' => '%s'\n", key, value);
+				
 				this.sodaVars.put(key, value);
 			}
 		}

@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -170,5 +171,27 @@ public class SodaUtils {
 		
 		return result;
 		
+	}
+	
+	public static HashMap<String, String> getJavaInfo() {
+		HashMap<String, String> data = new HashMap<String, String>();
+		
+		data.put("java.vendor", null);
+		data.put("java.version", null);
+		data.put("os.arch", null);
+		data.put("os.name", null);
+		data.put("os.version", null);
+		data.put("user.name", null);
+		data.put("user.home", null);
+		data.put("user.dir", null);
+		
+		String[] keys = data.keySet().toArray(new String[0]);
+		
+		for (int i = 0; i <= keys.length -1; i++) {
+			String value = System.getProperty(keys[i]);
+			data.put(keys[i], value);
+		}
+		
+		return data;
 	}
 }
