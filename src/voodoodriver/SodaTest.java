@@ -63,6 +63,7 @@ public class SodaTest {
 		
 		if (saveHtml) {
 			this.reporter.setSaveHTML(this.SaveHTML, browser);
+			this.reporter.setTestName(testFile);
 		}
 		
 		this.Browser.setReporter(this.reporter);

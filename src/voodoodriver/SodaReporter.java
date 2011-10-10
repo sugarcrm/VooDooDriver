@@ -41,6 +41,7 @@ public class SodaReporter {
 	private int SavePageNum = 0;
 	private SodaBrowser browser = null;
 	private boolean isRestart = false;
+	private String testName = null;
 	//private String CurrentMD5 = "";
 	//private String LastSavedPage = "";
 	
@@ -73,6 +74,10 @@ public class SodaReporter {
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
+	}
+	
+	public void setTestName(String name) {
+		this.testName = name;
 	}
 	
 	public void setIsRestTest(boolean restart) {
@@ -333,6 +338,7 @@ public class SodaReporter {
 		String htmldir = this.resultDir;
 		String new_save_file = "";
 		String src = "";
+		String testname = "";
 		//String md5 = "";
 		
 		if (!this.saveHTML) {
@@ -359,8 +365,16 @@ public class SodaReporter {
 			dir.mkdir();
 		}
 		
+		if (this.testName != null) {
+			File tmp = new File(this.testName);
+			testname = tmp.getName();
+			testname = testname.substring(0, testname.length() -4);
+			testname = String.format("%s-", testname);
+			tmp = null;
+		}
+		
 		new_save_file = htmldir;
-		new_save_file = new_save_file.concat(String.format("/savedhtml-%d.html", this.SavePageNum));
+		new_save_file = new_save_file.concat(String.format("/%ssavedhtml-%d.html", testname, this.SavePageNum));
 		new_save_file = FilenameUtils.separatorsToSystem(new_save_file);
 		this.SavePageNum += 1;
 		
