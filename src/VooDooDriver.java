@@ -135,6 +135,7 @@ public class VooDooDriver {
 						value = tmp.get("value").toString();
 						
 						if (!gvars.containsKey(name)) {
+							name = String.format("global.%s", name);
 							gvars.put(name, value);
 							System.out.printf("(*)Added Config-File gvar: '%s' => '%s'.\n", name, value);
 						}	
@@ -319,7 +320,7 @@ public class VooDooDriver {
 				testobj.setAssertPage(assertpage);
 			}
 			testobj.setPlugins(plugins);
-			testobj.runTest(false);	
+			testobj.runTest(false);
 		}
 	}
 	

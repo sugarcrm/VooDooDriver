@@ -50,7 +50,6 @@ public class SodaTest {
 		String resultsdir = reportDir;
 		String report_name = "";
 		File tmp_file = new File(testFile);
-		
 		this.SaveHTML = saveHtml;
 		
 		report_name = tmp_file.getName();
