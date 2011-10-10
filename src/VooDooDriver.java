@@ -18,7 +18,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -103,10 +105,20 @@ public class VooDooDriver {
 		int restartCount = 0;
 		String restartTest = null;
 		int attachTimeout = 0;
+		HashMap<String, String> javainfo = null;
 		
 		SodaEvents configFileOpts = null;
+		javainfo = SodaUtils.getJavaInfo();
 		
-		System.out.printf("Starting VooDooDriver...\n");
+		System.out.printf("(*)Starting VooDooDriver...\n");
+		System.out.printf("(*)Java RunTime Info:\n");
+		String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
+		Arrays.sort(jinfoKeys);
+		for (int i = 0; i <= jinfoKeys.length -1; i++) {
+			String value = javainfo.get(jinfoKeys[i]);
+			System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
+		}
+		
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
