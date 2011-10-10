@@ -119,6 +119,13 @@ public class VooDooDriver {
 			System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
 		}
 		
+		if (javainfo.containsKey("java.vendor")) {
+			String value = javainfo.get("java.vendor");
+			if (!value.contains("Sun Microsystems Inc")) {
+				System.out.printf("\n(!)Warning: You are using a none 'Sun Microsystems Inc.' JRE/JDK, this is not a supported JRE!\n");
+			}
+		}
+		
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
