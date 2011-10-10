@@ -77,4 +77,6 @@ public interface SodaBrowserInterface {
 	
 	public Mouse getMouse();
 	
+	public SodaReporter getReporter();
+	
 }
