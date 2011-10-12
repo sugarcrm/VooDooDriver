@@ -222,7 +222,7 @@ public class VddSummaryReporter {
 		html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
 		html += "</tr>";
 		
-		ArrayList<String> logs = (ArrayList<String>)data.get("testlogs");
+		ArrayList<HashMap<String, String>> logs = (ArrayList<HashMap<String, String>>)data.get("testlogs");
 		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
 		reporter.generateReport();
 		
@@ -389,17 +389,27 @@ public class VddSummaryReporter {
 		return n;
 	}
 	
-	private ArrayList<String> getTestLogs(Document d) {
-		ArrayList<String> list = new ArrayList<String>();
-		NodeList nodes = d.getElementsByTagName("testlog");
+	private ArrayList<HashMap<String, String>> getTestLogs(Document d) {
+		ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String,String>>();
+		NodeList nodes = d.getElementsByTagName("test");
 		
 		for (int i = 0; i <= nodes.getLength() -1; i++) {
-			String tmp = nodes.item(i).getTextContent();
-			System.out.printf("(*)TestLog: %s\n", tmp);
-			list.add(nodes.item(i).getTextContent());
+			Node currNode = nodes.item(i);
+			HashMap<String, String> newHash = new HashMap<String, String>();
+			NodeList kids = currNode.getChildNodes();
+			
+			for (int x = 0; x <= kids.getLength() -1; x++) {
+				Node kidNode = kids.item(x);
+				if (kidNode.getNodeName().contains("testlog")) {
+					newHash.put(kidNode.getNodeName(), kidNode.getTextContent());
+				} else if (kidNode.getNodeName().contains("isrestart")) {
+					newHash.put(kidNode.getNodeName(), kidNode.getTextContent().toLowerCase());
+				}
+			}
+			result.add(newHash);
 		}
 		
-		return list;
+		return result;
 	}
 	
 	/**

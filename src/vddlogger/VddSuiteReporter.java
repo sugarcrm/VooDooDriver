@@ -35,7 +35,7 @@ public class VddSuiteReporter {
 	private PrintStream repFile = null;
 	private String suiteDir = "";
 	
-	public VddSuiteReporter(String suitename, String basedir, ArrayList<String> logfiles) {
+	public VddSuiteReporter(String suitename, String basedir, ArrayList<HashMap<String, String>> logfiles) {
 		String filepath = "";
 		this.suiteName = suitename;
 		String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
@@ -43,10 +43,12 @@ public class VddSuiteReporter {
 		ArrayList<File> tmpFiles = new ArrayList<File>();
 		
 		for (int i = 0; i <= logfiles.size() -1; i++) {
-			String log = logfiles.get(i);
-			File tfile = new File(log);
-			log = String.format("%s%s%s",outputDir, File.separatorChar, tfile.getName());
-			tmpFiles.add(new File(log));
+			HashMap<String, String> log = logfiles.get(i);
+			if (!Boolean.valueOf(log.get("isrestart"))) { 
+				File tfile = new File(log.get("testlog"));
+				String logfilename = String.format("%s%s%s",outputDir, File.separatorChar, tfile.getName());
+				tmpFiles.add(new File(logfilename));
+			}
 		}
 		
 		filesList = tmpFiles.toArray(new File[0]);
