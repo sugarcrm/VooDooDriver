@@ -137,6 +137,9 @@ public class VooDooDriver {
 						} else if (name.contains("resultdir")) {
 							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
 							resultdir = value;
+						} else if (name.contains("savehtml")) {
+							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
+							savehtml = value;
 						}
 					} else if (type.contains("hijacks")) {
 						ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
@@ -211,7 +214,10 @@ public class VooDooDriver {
 				downloadDir = cmdOpts.get("downloaddir").toString();
 			}
 			
-			savehtml = (String)cmdOpts.get("savehtml");
+			String cmdSaveHtml = (String)cmdOpts.get("savehtml");
+			if (cmdSaveHtml != null && !cmdSaveHtml.isEmpty()) {
+				savehtml = cmdSaveHtml; 
+			}
 			System.out.printf("(*)SaveHTML: %s\n", savehtml);
 			
 			pluginFile = (String)cmdOpts.get("plugin");
