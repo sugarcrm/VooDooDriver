@@ -42,45 +42,11 @@ import voodoodriver.SodaUtils;
 
 public class VooDooDriver {
 
-	public static String VERSION = "1.0.0";
+	public static String VERSION = "1.5.1";
 	
 	public static void printUsage() {
-		String msg = "VooDooDriver\n"+
-		"Usage: SodaSuite --browser=\"firefox\" --test=\"sodatest1.xml\""+
-		" --test=\"sodatest2.xml\" ...\n\n"+
-		"Required Flags:\n"+
-		"   --browser: This is any of the following supported web browser name.\n"+
-		"      [ firefox, safari, ie ]\n\n"+
-		"   --test: This is a soda test file.  This argument can be used more then"+
-		"once when there are more then one soda tests to run.\n\n"+
-		"   --savehtml: This flag will cause html pages to be saved when there is an"+
-		" error testing the page.\n\n"+
-		"   --hijack: This is a key/value pair that is used to hi jack any csv file\n"+
-		"      values of the same name.  The key and value are split using \"::\"\n"+  
-		"      Example: --hijack=\"username::sugaruser\"\n\n"+
-		"   --resultdir: This allows you to override the default results directory.\n\n"+
-		"   --gvar: This is a global var key/value pair to be injected into Soda.\n"+
-		"      The key and value are split using \"::\"\n"+
-		"      Example: --gvar=\"slayerurl::http://www.slayer.net\"\n\n"+
-		"   --suite: This is a Soda suite xml test file.\n\n"+
-		"   --skipcsserrors: This tells soda to not report on css errors.\n\n"+
-		"   --testdelay: This forces a 10 second delay in between tests that run in a"+
-		" suite.\n\n"+
-		"   --blocklistfile: This is the XML file containing tests to block from running.\n\n"+
-		"	--profile: This is the browser profile name use start the browser with.\n\n"+
-		"	--plugin: This is a plugin XML file.\n\n"+
-		"	--config: This is a config file for preloading command line options.\n\n"+
-		"   --downloaddir: The default place to save downloaded files to.\n\n"+
-		"	--assertpagefile: This is the XML file containing things to assert on each page load.\n\n"+
-		"  --restartcount: This is how many tests in a suite that run before the browser is restarted.\n\n"+
-		"  --restarttest: This is the test that gets ran after the browser restarts, and before the next test"+
-		"     is run.\n\n"+
-		"  --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.\n\n"+
-		"  --version: Print the Soda Version string.\n\n\n"+
-		"Notes:\n"+
-		"--)All conflicting command line options with with the config files supersede the confile files.\n\n";
-		
-		System.out.printf("%s\n", msg);
+		VooDooHelp help = new VooDooHelp();
+		help.printHelp();
 	}
 	
 	@SuppressWarnings("unchecked")
