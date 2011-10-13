@@ -286,6 +286,10 @@ public class VooDooDriver {
 			
 			ArrayList<String> cmdTests = (ArrayList<String>)cmdOpts.get("tests");
 			if (cmdTests != null && !cmdTests.isEmpty()) {
+				if (SodaTestsList == null) {
+					SodaTestsList = new ArrayList<String>();
+				}
+				
 				SodaTestsList.addAll(cmdTests);
 			}
 			
