@@ -116,6 +116,27 @@ public class VddSummaryReporter {
 		return result;
 	}
 	
+	private boolean isBlocked(Node node) {
+		boolean result = false;
+		NodeList parent = node.getParentNode().getChildNodes();
+		
+		for (int i = 0; i <= parent.getLength() -1; i++) {
+			Node tmp = parent.item(i);
+			String name = tmp.getNodeName();
+			if (name.contains("blocked")) {
+				int blocked = Integer.valueOf(tmp.getTextContent());
+				if (blocked != 0) {
+					result = true;
+				} else {
+					result = false;
+				}
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	private HashMap<String, Object> getSuiteData(Document doc) {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
@@ -124,7 +145,7 @@ public class VddSummaryReporter {
 		
 		passed = getAmtPassed(doc);
 		blocked = getAmtBlocked(doc);
-		failed = getAmtFailed(doc) - blocked;  //blocked tests count as failed too
+		failed = getAmtFailed(doc);
 		wd = getAmtwatchdog(doc);
 		asserts = getAmtAsserts(doc);
 		assertsF = getAmtAssertsF(doc);
@@ -167,7 +188,7 @@ public class VddSummaryReporter {
 		//restarts = (Integer)data.get("restarts");
 		passed = (Integer)data.get("passed");
 		blocked = (Integer)data.get("blocked");
-		failed = (Integer)data.get("failed") - blocked;  //blocked tests count as failed too
+		failed = (Integer)data.get("failed");
 		wd = (Integer)data.get("wd");
 		asserts = (Integer)data.get("asserts");
 		assertsF = (Integer)data.get("assertsF");
@@ -176,6 +197,13 @@ public class VddSummaryReporter {
 		total = assertsF + exceptions + errors;
 		runtime = data.get("runtime").toString();
 		
+		html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
+		//html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
+		html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
+		html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
+		html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
+		
+		/*
 		if (blocked == 0) {
 			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
@@ -183,10 +211,13 @@ public class VddSummaryReporter {
 			html += "\t <td class=\"td_blocked_data_zero\">0</td> \n";
 		} else {
 			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
+			//html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 			html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
 		}
+		*/
+		
 		//"Results" column
 		if (wd == 0) {
 			html += "\t <td class=\"td_watchdog_data\">0</td> \n";
@@ -344,14 +375,22 @@ public class VddSummaryReporter {
 		int n = 0;
 		Element el;
 		boolean isrestart = false;
+		boolean isblocked = false;
 		NodeList nl = d.getElementsByTagName("result");
+		
 		for (int i = 0; i < nl.getLength(); i ++){
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
 				isrestart = isRestart(nl.item(i));
+				isblocked = isBlocked(nl.item(i));
 				if (isrestart) {
 					continue;
 				}
+				
+				if (isblocked) {
+					continue;
+				}
+				
 				n ++;
 			}
 		}
