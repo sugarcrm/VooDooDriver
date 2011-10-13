@@ -260,6 +260,10 @@ public class VooDooDriver {
 			
 			ArrayList<String> cmdSuites = (ArrayList<String>)cmdOpts.get("suites");
 			if ((cmdSuites != null) && (!cmdSuites.isEmpty())) {
+				
+				if (SodaSuitesList == null) {
+					SodaSuitesList = new ArrayList<String>();
+				}
 				SodaSuitesList.addAll(cmdSuites);
 			}
 
