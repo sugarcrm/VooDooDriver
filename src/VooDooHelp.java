@@ -52,6 +52,8 @@ public class VooDooHelp {
 			}
 			
 			System.out.printf("%s\n", msg);
+			br.close();
+			in.close();
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}

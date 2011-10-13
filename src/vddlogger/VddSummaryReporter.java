@@ -288,6 +288,8 @@ public class VddSummaryReporter {
 				header += "\n";
 			}
 			
+			br.close();
+			in.close();
 		} catch (Exception exp ) {
 			exp.printStackTrace();
 		}
