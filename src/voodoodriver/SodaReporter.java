@@ -37,13 +37,15 @@ public class SodaReporter {
 	private int OtherErrors = 0;
 	private int WatchDog = 0;
 	private String LineSeparator = null;
-	private boolean saveHTML = false;
 	private int SavePageNum = 0;
 	private SodaBrowser browser = null;
 	private boolean isRestart = false;
 	private String testName = null;
-	//private String CurrentMD5 = "";
-	//private String LastSavedPage = "";
+	private boolean saveOnWarning = false;
+	private boolean saveOnError = false;
+	private boolean saveOnAssertFailed = false;
+	private boolean saveOnException = false;
+	private boolean saveOnWatchDog = false;
 	
 	public SodaReporter(String reportName, String resultDir) {
 		Date now = new Date();
@@ -84,9 +86,30 @@ public class SodaReporter {
 		this.isRestart = restart;
 	}
 	
-	public void setSaveHTML(boolean setting, SodaBrowser browser) {
-		this.saveHTML = setting;
+	public void setSaveHTML(String setting, SodaBrowser browser) {
 		this.browser = browser;
+		String[] opts = setting.split(",");
+		
+		for (int i = 0; i <= opts.length -1; i++) {
+			opts[i] = opts[i].toLowerCase();
+			if (opts[i].contains("warning")) {
+				this.saveOnWarning = true;
+			} else if (opts[i].contains("error")) {
+				this.saveOnError = true;
+			} else if (opts[i].contains("assertfail")) {
+				this.saveOnAssertFailed = true;
+			} else if (opts[i].contains("exception")) {
+				this.saveOnException = true;
+			} else if (opts[i].contains("watchdog")) {
+				this.saveOnWatchDog = true;
+			} else if (opts[i].contains("all")) {
+				this.saveOnWatchDog = true;
+				this.saveOnException = true;
+				this.saveOnAssertFailed = true;
+				this.saveOnError = true;
+				this.saveOnWarning = true;
+			}
+		}	
 	}
 	
 	public String getLogFileName() {
@@ -159,15 +182,27 @@ public class SodaReporter {
 	
 	public void Warn(String msg) {
 		this._log("(W)" + msg);
+		
+		if (this.saveOnWarning) {
+			this.SavePage();
+		}
 	}
 	
 	public void ReportError(String msg) {
 		this._log(String.format("(!)%s", msg));
 		this.OtherErrors += 1;
+		
+		if (this.saveOnError) {
+			this.SavePage();
+		}
 	}
 	
 	public void ReportWatchDog() {
 		this.WatchDog = 1;
+		
+		if (this.saveOnWatchDog) {
+			this.SavePage();
+		}
 	}
 	
 	public void ReportBlocked() {
@@ -210,7 +245,9 @@ public class SodaReporter {
 		}
 		
 		this._log("(!)" + msg);
-		this.SavePage();
+		if (this.saveOnException) {
+			this.SavePage();
+		}
 	}
 	
 	public boolean isRegex(String str) {
@@ -242,6 +279,7 @@ public class SodaReporter {
 	
 	public boolean Assert(String msg, boolean state, boolean expected) {
 		boolean result = false;
+		boolean fail = false;
 		String status = "";
 		
 		if (state == expected) {
@@ -250,10 +288,15 @@ public class SodaReporter {
 		} else {
 			this.FailedAsserts += 1;
 			status = "(!)Assert Failed: ";
+			fail = true;
 		}
 		
 		status = status.concat(msg);
 		this._log(status);
+		
+		if (fail && this.saveOnAssertFailed) {
+			this.SavePage();
+		}
 		
 		return result;
 	}
@@ -275,7 +318,11 @@ public class SodaReporter {
 				this.FailedAsserts += 1;
 				msg = String.format("(!)Assert Failed for find: '%s'!", value);
 				this._log(msg);
-				this.SavePage();
+				
+				if (this.saveOnAssertFailed) {
+					this.SavePage();
+				}
+				
 				result = false;
 			}
 		} else {
@@ -288,7 +335,10 @@ public class SodaReporter {
 				this.FailedAsserts += 1;
 				msg = String.format("(!)Assert Failed for find: '%s'!", value);
 				this._log(msg);
-				this.SavePage();
+				
+				if (this.saveOnAssertFailed) {
+					this.SavePage();
+				}
 				result = false;
 			}
 		}
@@ -306,7 +356,9 @@ public class SodaReporter {
 				this.FailedAsserts += 1;
 				msg = String.format("(!)Assert Failed, Found Unexpected text: '%s'.", value);
 				this._log(msg);
-				this.SavePage();
+				if (this.saveOnAssertFailed) {
+					this.SavePage();
+				}
 				result = false;
 			} else {
 				this.PassedAsserts += 1;
@@ -319,7 +371,11 @@ public class SodaReporter {
 				this.FailedAsserts += 1;
 				msg = String.format("(!)Assert Passed, Found: '%s'.", value);
 				this._log(msg);
-				this.SavePage();
+				
+				if (this.saveOnAssertFailed) {
+					this.SavePage();
+				}
+				
 				result = false;
 			} else {
 				this.PassedAsserts += 1;
@@ -339,25 +395,8 @@ public class SodaReporter {
 		String new_save_file = "";
 		String src = "";
 		String testname = "";
-		//String md5 = "";
-		
-		if (!this.saveHTML) {
-			return;
-		}
 		
 		src = this.browser.getPageSource();
-		
-		/*
-		 * not using this now as it doesn't seem to work with ajax pages.
-		 * will look into this later.
-		 * 
-		md5 = SodaUtils.MD5(src);
-		
-		if (md5.compareTo(this.CurrentMD5) == 0) {
-			this.Log(String.format("HTML Saved: %s", this.LastSavedPage));
-			return;
-		}
-		*/
 		
 		htmldir = htmldir.concat("/saved-html");
 		dir = new File(htmldir);

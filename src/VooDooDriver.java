@@ -97,7 +97,7 @@ public class VooDooDriver {
 		String pluginFile = null;
 		SodaPluginParser plugParser = null;
 		SodaEvents plugins = null;
-		boolean savehtml = false;
+		String savehtml = "";
 		SodaConfigParser configParser = null;
 		String downloadDir = null;
 		String assertpage = null;
@@ -220,7 +220,7 @@ public class VooDooDriver {
 				downloadDir = cmdOpts.get("downloaddir").toString();
 			}
 			
-			savehtml = (Boolean)cmdOpts.get("savehtml");
+			savehtml = (String)cmdOpts.get("savehtml");
 			System.out.printf("(*)SaveHTML: %s\n", savehtml);
 			
 			pluginFile = (String)cmdOpts.get("plugin");
@@ -291,7 +291,7 @@ public class VooDooDriver {
 	}
 	
 	private static void RunTests(ArrayList<String> tests, String resultdir, SodaSupportedBrowser browserType,
-			SodaHash gvars, SodaHash hijacks, SodaEvents plugins, boolean savehtml, String downloaddir, 
+			SodaHash gvars, SodaHash hijacks, SodaEvents plugins, String savehtml, String downloaddir, 
 			String assertpage, int attachTimeout) {
 		File resultFD = null;
 		SodaBrowser browser = null;
@@ -355,7 +355,7 @@ public class VooDooDriver {
 	}
 	
 	private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
-			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, boolean savehtml,
+			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, String savehtml,
 			String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout) {
 		int len = suites.size() -1;
 		File resultFD = null;
