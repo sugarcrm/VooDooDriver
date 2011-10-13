@@ -184,8 +184,7 @@ public class VddSummaryReporter {
 			"<td class=\"td_file_data\">\n" +
 			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
 			"</td>";
-			
-		//restarts = (Integer)data.get("restarts");
+
 		passed = (Integer)data.get("passed");
 		blocked = (Integer)data.get("blocked");
 		failed = (Integer)data.get("failed");
@@ -198,25 +197,9 @@ public class VddSummaryReporter {
 		runtime = data.get("runtime").toString();
 		
 		html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
-		//html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
 		html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 		html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 		html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
-		
-		/*
-		if (blocked == 0) {
-			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
-			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
-			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
-			html += "\t <td class=\"td_blocked_data_zero\">0</td> \n";
-		} else {
-			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
-			//html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
-			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
-			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
-			html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
-		}
-		*/
 		
 		//"Results" column
 		if (wd == 0) {

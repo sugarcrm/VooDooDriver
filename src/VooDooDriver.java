@@ -72,6 +72,7 @@ public class VooDooDriver {
 		String restartTest = null;
 		int attachTimeout = 0;
 		HashMap<String, String> javainfo = null;
+		SodaHash hijacks = new SodaHash();
 		
 		SodaEvents configFileOpts = null;
 		javainfo = SodaUtils.getJavaInfo();
@@ -95,7 +96,6 @@ public class VooDooDriver {
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
-			//gvars = (SodaHash)cmdOpts.get("gvars");
 			
 			gvars = new SodaHash();
 			if (cmdOpts.containsKey("configfile")) {
@@ -123,23 +123,44 @@ public class VooDooDriver {
 						if (!gvars.containsKey(name)) {
 							name = String.format("global.%s", name);
 							gvars.put(name, value);
-							System.out.printf("(*)Added Config-File gvar: '%s' => '%s'.\n", name, value);
+							System.out.printf("(*)Adding Config-File gvar: '%s' => '%s'.\n", name, value);
 						}	
 					} else if (type.contains("cmdopt")) {
 						name = tmp.get("name").toString();
 						value = tmp.get("value").toString();
 						if (name.contains("browser")) {
 							cmdOpts.put("browser", value);
-							System.out.printf("(*)Added Confile-File cmdopts: '%s' => '%s'.\n", name, value);
+							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
 						} else if (name.contains("attachtimeout")) {
 							cmdOpts.put("attachtimeout", value);
 						}
+					} else if (type.contains("hijacks")) {
+						ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
+						
+						for (int x = 0; x <= jacks.size() -1; x++) {
+							String[] jdata = jacks.get(x).split("::");
+							hijacks.put(jdata[0], jdata[1]);
+							System.out.printf("(*)Adding Config-File hijack: '%s' => '%s'\n", jdata[0], jdata[1]);
+						}
+						
+					} else if (type.contains("suites")) {
+						SodaSuitesList = (ArrayList<String>)tmp.get("suites");
+						for (int x = 0; x <= SodaSuitesList.size() -1; x++) {
+							String sname = SodaSuitesList.get(x);
+							System.out.printf("(*)Adding Config-File suite file: '%s'\n", sname);
+						}
+					} else if (type.contains("tests")) {
+						SodaTestsList = (ArrayList<String>)tmp.get("tests");
+						for (int x = 0; x <= SodaTestsList.size() -1; x++) {
+							String tname = SodaTestsList.get(x);
+							System.out.printf("(*)Adding Config-File test file: '%s'\n", tname);
+						}
 					}
 				}
-				
 			}
 
 			gvars.putAll((SodaHash)cmdOpts.get("gvars"));
+			hijacks.putAll((SodaHash)cmdOpts.get("hijacks"));
 			
 			if ((Boolean)cmdOpts.get("help")) {
 				printUsage();
@@ -230,7 +251,11 @@ public class VooDooDriver {
 				resultdir = cwd;
 			}
 			
-			SodaSuitesList = (ArrayList<String>)cmdOpts.get("suites");
+			ArrayList<String> cmdSuites = (ArrayList<String>)cmdOpts.get("suites");
+			if ((cmdSuites != null) && (!cmdSuites.isEmpty())) {
+				SodaSuitesList.addAll(cmdSuites);
+			}
+
 			if ((SodaSuitesList != null) && (!SodaSuitesList.isEmpty())) {
 				if (resultdir == null) {
 					System.out.printf("(!)Error: Missing command line flag --resultdir!\n");
@@ -238,14 +263,17 @@ public class VooDooDriver {
 					System.exit(3);
 				}
 				
-				RunSuites(SodaSuitesList, resultdir, browserType, gvars, 
-						(SodaHash)cmdOpts.get("hijacks"), blockList, plugins, savehtml, downloadDir,
+				RunSuites(SodaSuitesList, resultdir, browserType, gvars, hijacks, blockList, plugins, savehtml, downloadDir,
 						assertpage, restartTest, restartCount, attachTimeout);
 			}
 			
-			SodaTestsList = (ArrayList<String>)cmdOpts.get("tests");
+			ArrayList<String> cmdTests = (ArrayList<String>)cmdOpts.get("tests");
+			if (cmdTests != null && !cmdTests.isEmpty()) {
+				SodaTestsList.addAll(cmdTests);
+			}
+			
 			if (!SodaTestsList.isEmpty()) {
-				RunTests(SodaTestsList, resultdir, browserType, gvars, (SodaHash)cmdOpts.get("hijacks"),
+				RunTests(SodaTestsList, resultdir, browserType, gvars, hijacks,
 						plugins, savehtml, downloadDir, assertpage, attachTimeout);
 			}
 		} catch (Exception exp) {
