@@ -73,6 +73,7 @@ public class VooDooDriver {
 		int attachTimeout = 0;
 		HashMap<String, String> javainfo = null;
 		SodaHash hijacks = new SodaHash();
+		String resultdir = null;
 		
 		SodaEvents configFileOpts = null;
 		javainfo = SodaUtils.getJavaInfo();
@@ -133,6 +134,9 @@ public class VooDooDriver {
 							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
 						} else if (name.contains("attachtimeout")) {
 							cmdOpts.put("attachtimeout", value);
+						} else if (name.contains("resultdir")) {
+							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
+							resultdir = value;
 						}
 					} else if (type.contains("hijacks")) {
 						ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
@@ -236,7 +240,10 @@ public class VooDooDriver {
 				blockList = new SodaBlockList();
 			}
 			
-			String resultdir = (String)cmdOpts.get("resultdir");
+			String cmdResultdir = (String)cmdOpts.get("resultdir");
+			if (cmdResultdir != null && !cmdResultdir.isEmpty()) {
+				resultdir = cmdResultdir; 
+			}
 			if (resultdir == null) {
 				Date now = new Date();
 				String cwd = System.getProperty("user.dir");
