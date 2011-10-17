@@ -15,8 +15,13 @@ echo "(*)Starting VooDooDriver Bash Launcher..."
 for arg in "$@"
 do
    newArg=`echo "$arg" | sed -rn 's/(--.*=)(.*)/\1\"\2\"/p'`
-   VDDCOMMAND="$VDDCOMMAND $newArg"
-   PrintDebug "[$index]Converting arg: '$arg' to '$newArg'"
+
+   if [ ! -z "$newArg" ]; then
+      VDDCOMMAND="$VDDCOMMAND $newArg"
+      PrintDebug "[$index]Converting arg: '$arg' to '$newArg'"
+   else
+      VDDCOMMAND="$VDDCOMMAND $arg"
+   fi
 done
 
 PrintDebug "Executing Bash command: '$VDDCOMMAND'"
