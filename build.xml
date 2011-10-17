@@ -48,6 +48,12 @@
 		</copy>
 	</target>
 	
+	<target name="copy-launchers" depends="init">
+		<copy todir="${dist}">
+			<fileset dir="launchers/" />
+		</copy>
+	</target>
+	
    <target name="init" depends="clean">
       <!-- Create the time stamp -->
       <tstamp/>
@@ -78,7 +84,7 @@
       <delete dir="${dist}" failonerror="false" />
    </target>
 
-   <target name="debug" depends="clean,init,api-docs" description="compile the source in debug mode" >
+   <target name="debug" depends="clean,init,api-docs,copy-launchers" description="compile the source in debug mode" >
       <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source">
             <classpath>
                <pathelement path="${classpath}"/>
@@ -132,7 +138,7 @@
       </javac>
    </target>
    
-   <target name="default-build" depends="compile,api-docs" description="generate the distribution" >
+   <target name="default-build" depends="compile,api-docs,copy-launchers" description="generate the distribution" >
       <copy todir="${dist}/lib">
          <fileset dir="lib/libs" />
       </copy>
