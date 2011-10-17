@@ -285,7 +285,7 @@ public class SodaEventDriver implements Runnable {
 		
 		switch ((SodaElements)event.get("type")) {
 		case BROWSER: 
-			result = browserEvent(event);
+			result = browserEvent(event, parent);
 			break;
 		case PUTS:
 			result = putsEvent(event);
@@ -2211,7 +2211,7 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-	private boolean browserEvent(SodaHash event) {
+	private boolean browserEvent(SodaHash event, WebElement parent) {
 		boolean result = false;
 		boolean assertPage = true;
 		SodaBrowserActions browser_action = null;
@@ -2265,7 +2265,12 @@ public class SodaEventDriver implements Runnable {
 					case BROWSER_assert:
 						value = event.get("assert").toString();
 						value = this.replaceString(value);
-						result = this.Browser.Assert(value);
+						
+						if (parent != null) {
+							result = this.Browser.Assert(value, parent);
+						} else {
+							result = this.Browser.Assert(value);
+						}
 						
 						if (!result) {
 							String msg = String.format("Browser Assert Failed to find this in page: '%s'", value);
@@ -2275,7 +2280,12 @@ public class SodaEventDriver implements Runnable {
 					case BROWSER_assertnot:
 						value = event.get("assertnot").toString();
 						value = this.replaceString(value);
-						result = this.Browser.AssertNot(value);
+						
+						if (parent != null) {
+							result = this.Browser.AssertNot(value, parent);
+						} else {
+							result = this.Browser.AssertNot(value);
+						}
 
 						if (!result) {
 							String msg = String.format("Browser AssertNot Found text in page: '%s'", value);
