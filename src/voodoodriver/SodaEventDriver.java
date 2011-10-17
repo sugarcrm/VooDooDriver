@@ -2080,7 +2080,7 @@ public class SodaEventDriver implements Runnable {
 			if (element == null) {
 				if (required && exists) {
 					String msg = String.format("Failed to find link: '%s' => '%s'!", how, value);
-					this.report.ReportError(msg);
+					this.report.Log(msg);
 				}
 				
 				if (exists != true) {
@@ -2274,7 +2274,7 @@ public class SodaEventDriver implements Runnable {
 						
 						if (!result) {
 							String msg = String.format("Browser Assert Failed to find this in page: '%s'", value);
-							this.report.ReportError(msg);
+							this.report.Log(msg);
 						}
 						break;
 					case BROWSER_assertnot:
@@ -2289,7 +2289,7 @@ public class SodaEventDriver implements Runnable {
 
 						if (!result) {
 							String msg = String.format("Browser AssertNot Found text in page: '%s'", value);
-							this.report.ReportError(msg);
+							this.report.Log(msg);
 						}
 						break;
 					
