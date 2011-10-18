@@ -2083,6 +2083,7 @@ public class SodaEventDriver implements Runnable {
 					this.report.Log(msg);
 				}
 				
+				
 				if (exists != true) {
 					this.report.Assert("Link does not exist.", false, false);
 				}
