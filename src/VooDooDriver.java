@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
+
 import voodoodriver.SodaBlockList;
 import voodoodriver.SodaBlockListParser;
 import voodoodriver.SodaBrowser;
@@ -39,16 +40,15 @@ import voodoodriver.SodaTest;
 import voodoodriver.SodaTestList;
 import voodoodriver.SodaTestResults;
 import voodoodriver.SodaUtils;
+import voodoodriver.VDDVersionInfo;
 
 public class VooDooDriver {
-
-	public static String VERSION = "1.5.1";
 	
 	public static void printUsage() {
 		VooDooHelp help = new VooDooHelp();
 		help.printHelp();
 	}
-	
+		
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		String sodaConfigFile = "soda-config.xml";
@@ -175,7 +175,8 @@ public class VooDooDriver {
 			}
 			
 			if ((Boolean)cmdOpts.get("version")) {
-				System.out.printf("(*)VooDooDriver Version: %s\n", VooDooDriver.VERSION);
+				VDDVersionInfo vinfo = new VDDVersionInfo();
+				System.out.printf("(*)VooDooDriver Version: %s\n", vinfo.getVDDVersion());
 				System.exit(0);
 			}
 			
