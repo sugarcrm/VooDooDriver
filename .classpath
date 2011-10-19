@@ -36,5 +36,6 @@
 	<classpathentry kind="lib" path="lib/libs/junit-dep-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/libs/operadriver-v0.7.3.jar"/>
 	<classpathentry kind="lib" path="lib/libs/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/libs/opencsv-2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

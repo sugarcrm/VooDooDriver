@@ -20,18 +20,22 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import au.com.bytecode.opencsv.CSVParser;
 
 public class SodaCSV {
 
 	private SodaReporter report = null;
 	private ArrayList<String> keys = null;
 	private SodaCSVData data = null;
+	private CSVParser parser = null;
 	
 	public SodaCSV(String csvfile, SodaReporter reporter) {
 		FileInputStream fs = null;
 		BufferedReader br = null;
 	
 		this.report = reporter;
+	
+		this.parser = new CSVParser(',','"');
 		
 		try {
 			this.keys = new ArrayList<String>();
@@ -84,7 +88,10 @@ public class SodaCSV {
 					continue;
 				}
 				
-				linedata = line.split(",");
+				//linedata = line.split(",");
+				//linedata = this.processLine(line);
+				linedata = this.parser.parseLine(line);
+				
 				int linelen = linedata.length -1;
 				SodaHash tmphash = new SodaHash();
 				for (int i = 0; i <= this.keys.size() -1; i++) {
@@ -128,7 +135,9 @@ public class SodaCSV {
 				}
 			}
 			
-			lines = line.split(",");
+			//lines = line.split(",");
+			//lines = this.processLine(line);
+			lines = this.parser.parseLine(line);
 			for (int i = 0; i <= lines.length -1; i++) {
 				this.keys.add(lines[i]);
 			}
