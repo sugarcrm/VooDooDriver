@@ -369,7 +369,7 @@ public class SodaReporter {
 		} else {
 			if (src.contains(value)) {
 				this.FailedAsserts += 1;
-				msg = String.format("(!)Assert Passed, Found: '%s'.", value);
+				msg = String.format("(!)Assertnot Failed: Found: '%s'.", value);
 				this._log(msg);
 				
 				if (this.saveOnAssertFailed) {
