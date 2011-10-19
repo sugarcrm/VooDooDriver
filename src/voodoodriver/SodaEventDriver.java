@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -2416,7 +2417,7 @@ public class SodaEventDriver implements Runnable {
 			if (href) {
 				element = this.findElementByHref(event.get("href").toString(), parent);
 			} else if (value) {
-				element = this.slowFindElement(event.get("do").toString(), what, parent);
+				element = this.slowFindElement(event.get("do").toString(), what, parent, index);
 			}else {
 				if (parent == null) {
 					if (index > -1) {
@@ -2474,8 +2475,9 @@ public class SodaEventDriver implements Runnable {
 		return element;
 	}
 	
-	private WebElement slowFindElement(String ele_type, String how, WebElement parent) {
+	private WebElement slowFindElement(String ele_type, String how, WebElement parent, int index) {
 		WebElement element = null;
+		ArrayList<WebElement> list = new ArrayList<WebElement>();
 		String msg = "";
 		String js = "";
 		
@@ -2489,20 +2491,27 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (ele_type.contains("button")) {
-			js = String.format("querySelector('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"+
+			js = String.format("querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"+
 					"input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);", how, how, how, how);
 		} else {
-			js = String.format("querySelector('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)", 
+			js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)", 
 					ele_type, how, ele_type, how);
 		}
 		
 		if (parent == null) {
 			js = "return document." + js;
-			element = (WebElement)this.Browser.executeJS(js, null);
+			list = (ArrayList<WebElement>)this.Browser.executeJS(js, null);
 		} else {
 			js = "return arguments[0]." + js;
-			element = (WebElement)this.Browser.executeJS(js, parent);
+			list = (ArrayList<WebElement>)this.Browser.executeJS(js, parent);
 		}
+		
+		if (index < 0) {
+			element = list.get(0);
+		} else {
+			element = list.get(index);
+		}
+		
 		
 		return element;
 	}
