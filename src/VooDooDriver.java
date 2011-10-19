@@ -292,6 +292,8 @@ public class VooDooDriver {
 				}
 				
 				SodaTestsList.addAll(cmdTests);
+			} else {
+				SodaTestsList = new ArrayList<String>();
 			}
 			
 			if (!SodaTestsList.isEmpty()) {
