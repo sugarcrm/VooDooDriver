@@ -1133,6 +1133,9 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 			
+			String value = element.getText();
+			handleVars(value, event);
+			
 			if (click) {
 				this.report.Log("Click element.");
 				this.firePlugin(element, SodaElements.LI, SodaPluginEventType.BEFORECLICK);
