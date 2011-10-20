@@ -158,9 +158,7 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
-			//this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
-			//this.report.Log("AssertPage finished.");
 		}
 	}
 	
@@ -548,6 +546,8 @@ public class SodaEventDriver implements Runnable {
 			if (user_exists_true) {
 				this.report.Assert("Alert dialog does eixts.", true, true);
 			}
+			
+			handleVars(alert_text, event);
 			
 			result = true;
 		} catch (NoAlertPresentException exp) { 
@@ -1054,6 +1054,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.IMAGE, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Image click finished.");
 			}
+			
+			handleVars(element.getAttribute("src"), event);
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -1093,6 +1095,10 @@ public class SodaEventDriver implements Runnable {
 				element.sendKeys(setvalue);
 				this.report.Log("Finished set.");
 			}
+			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -1165,6 +1171,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("TR event finished.");
 				return element;
 			}
+
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1208,6 +1217,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("TD event finished.");
 				return element;
 			}
+			
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1254,16 +1266,8 @@ public class SodaEventDriver implements Runnable {
 				return result;
 			}
 			
-			if (event.containsKey("var")) {
-				String name = event.get("var").toString();
-				//String value = element.getValue();
-				String value = element.getAttribute("value");
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
-			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 			result = true;
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
@@ -1309,14 +1313,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 			
-			if (event.containsKey("vartext")) {
-				String name = event.get("vartext").toString();
-				String value = element.getText();
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (click) {
 				this.firePlugin(element, SodaElements.SPAN, SodaPluginEventType.BEFORECLICK);
@@ -1387,14 +1385,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("set").toString());
 			}
 			
-			if (event.containsKey("vartext")) {
-				String name = event.get("vartext").toString();
-				String value = element.getText();
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 			
 			if (click) {
 				this.firePlugin(element, SodaElements.RADIO, SodaPluginEventType.BEFORECLICK);
@@ -1586,6 +1578,9 @@ public class SodaEventDriver implements Runnable {
 						}
 					}
 				}
+				
+				String value = element.getAttribute("value");
+				handleVars(value, event);
 			}
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
@@ -1908,6 +1903,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Javascript event finished.");
 			}
 			
+			String value = element.getText();
+			handleVars(value, event);
+			
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
@@ -1977,7 +1975,11 @@ public class SodaEventDriver implements Runnable {
 				var_value = event.get("set").toString();
 				var_value = this.replaceString(var_value);
 				this.sodaVars.put(var_name, var_value);
-				this.report.Log("Setting SODA variable: '"+ var_name + "' => '" + var_value + "'.");
+				
+				String tmp_value = var_value;
+				tmp_value = tmp_value.replaceAll("\n", "\\\n");
+				
+				this.report.Log("Setting SODA variable: '"+ var_name + "' => '" + tmp_value + "'.");
 			}
 			
 			if (event.containsKey("unset")) {
@@ -2042,6 +2044,9 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
@@ -2094,6 +2099,9 @@ public class SodaEventDriver implements Runnable {
 				return element;
 			}
 
+			value = element.getText();
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.LINK, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("alert")) {
@@ -2679,6 +2687,9 @@ public class SodaEventDriver implements Runnable {
 				return null;
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.BUTTON, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("click")) {
@@ -2738,6 +2749,9 @@ public class SodaEventDriver implements Runnable {
 				return null;
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.TEXTAREA, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("clear")) {
@@ -2748,7 +2762,7 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			if (event.containsKey("set")) {
-				String value = event.get("set").toString();
+				value = event.get("set").toString();
 				value = this.replaceString(value);
 				this.report.Log(String.format("Setting Value to: '%s'.", value));
 				element.sendKeys(value);
@@ -2843,6 +2857,9 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -2865,5 +2882,15 @@ public class SodaEventDriver implements Runnable {
 		result = true;
 		this.resetThreadTime();
 		return result;
+	}
+	
+	private void handleVars(String value, SodaHash event) {
+		if (event.containsKey("var")) {
+			String name = event.get("var").toString();
+			SodaHash tmp = new SodaHash();
+			tmp.put("set", value);
+			tmp.put("var", name);
+			this.varEvent(tmp);
+		}
 	}
 }
