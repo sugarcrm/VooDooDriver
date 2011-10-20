@@ -2877,8 +2877,13 @@ public class SodaEventDriver implements Runnable {
 		boolean result = false;
 		String msg = "";
 		
-		this.resetThreadTime();		
-		msg = this.replaceString(event.get("text").toString());
+		if (event.containsKey("txt")) {
+			msg = this.replaceString(event.get("txt").toString());
+		} else {
+			msg = this.replaceString(event.get("text").toString());	
+		}
+		
+		this.resetThreadTime();
 		this.report.Log(msg);
 		result = true;
 		this.resetThreadTime();

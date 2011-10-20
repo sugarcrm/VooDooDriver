@@ -69,6 +69,7 @@ limitations under the License.
    <puts>
       <accessor_attributes>
          <accessor type="string">text</accessor>
+         <accessor type="string">txt</accessor>
       </accessor_attributes>
    </puts>
 
