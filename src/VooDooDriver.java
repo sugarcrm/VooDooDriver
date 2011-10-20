@@ -608,10 +608,7 @@ public class VooDooDriver {
 				writeSummary(suiteRptFD, "\t\t</test>\n\n");
 				
 				Integer watchdog = Integer.valueOf(test_results_hash.get("watchdog").toString());
-				if (watchdog > 0) {
-					System.out.printf("Exiting from finishing the other tests due to watch dog!\n");
-					break;
-				}
+
 				
 				if (restartCount > 0) {
 					File tmpF = new File(current_test);
