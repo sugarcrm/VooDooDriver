@@ -97,7 +97,8 @@
 	</target>
 	
    <target name="debug" depends="clean,init,api-docs,copy-launchers" description="compile the source in debug mode" >
-      <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source">
+      <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" 
+   		includeantruntime="false">
             <classpath>
                <pathelement path="${classpath}"/>
                <fileset dir="lib">
@@ -141,7 +142,7 @@
    </target>
 	
    <target name="compile" depends="init" description="compile the source " >
-      <javac srcdir="${src}" destdir="${build}">
+      <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
          <classpath>
             <pathelement path="${classpath}"/>
             <fileset dir="lib">
