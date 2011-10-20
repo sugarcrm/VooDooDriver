@@ -2483,6 +2483,7 @@ public class SodaEventDriver implements Runnable {
 		return element;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private WebElement slowFindElement(String ele_type, String how, WebElement parent, int index) {
 		WebElement element = null;
 		ArrayList<WebElement> list = new ArrayList<WebElement>();
