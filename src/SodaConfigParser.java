@@ -16,6 +16,8 @@ limitations under the License.
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -56,6 +58,9 @@ public class SodaConfigParser {
 		Document doc = null;
 		NodeList nodes = null;
 		int node_count = 0;
+		ArrayList<String> hijacks = null;
+		ArrayList<String> suites = null;
+		ArrayList<String> tests = null;
 		
 		try {
 			dbf = DocumentBuilderFactory.newInstance();
@@ -74,11 +79,37 @@ public class SodaConfigParser {
 			Node tmp = nodes.item(i);
 			String name = tmp.getNodeName();
 			
-			
 			if (name.contains("#text")) {
 				continue;
 			}
 			
+			if (name.contains("test")) {
+				if (tests == null) {
+					tests = new ArrayList<String>();
+				}
+
+				tests.add(tmp.getTextContent());
+				continue;
+			}
+			
+			if (name.contains("suite")) {
+				if (suites == null) {
+					suites = new ArrayList<String>();
+				}
+				
+				suites.add(tmp.getTextContent());
+				continue;
+			}
+			
+			if (name.contains("hijack")) {
+				if (hijacks == null) {
+					hijacks = new ArrayList<String>();
+				}
+
+				hijacks.add(tmp.getTextContent());
+				continue;
+			}
+				
 			if (tmp.hasAttributes()) {
 				NamedNodeMap attrs = tmp.getAttributes();
 				int attrs_count = attrs.getLength() -1;
@@ -97,6 +128,27 @@ public class SodaConfigParser {
 			options.add(data);
 		}
 		
+		if (hijacks != null) {
+			SodaHash jackhash = new SodaHash();
+			jackhash.put("hijacks", hijacks);
+			jackhash.put("type", "hijacks");
+			options.add(jackhash);
+		}
+		
+		if (suites != null) {
+			SodaHash suitehash = new SodaHash();
+			suitehash.put("suites", suites);
+			suitehash.put("type", "suites");
+			options.add(suitehash);
+		}
+		
+		if (tests != null) {
+			SodaHash testhash = new SodaHash();
+			testhash.put("tests", tests);
+			testhash.put("type", "tests");
+			options.add(testhash);
+		}
+			
 		return options;
 	}
 }

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -157,9 +158,7 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (assertpage) {
-			//this.report.Log("AssertPage Starting.");
 			this.Browser.assertPage();
-			//this.report.Log("AssertPage finished.");
 		}
 	}
 	
@@ -285,7 +284,7 @@ public class SodaEventDriver implements Runnable {
 		
 		switch ((SodaElements)event.get("type")) {
 		case BROWSER: 
-			result = browserEvent(event);
+			result = browserEvent(event, parent);
 			break;
 		case PUTS:
 			result = putsEvent(event);
@@ -547,6 +546,8 @@ public class SodaEventDriver implements Runnable {
 			if (user_exists_true) {
 				this.report.Assert("Alert dialog does eixts.", true, true);
 			}
+			
+			handleVars(alert_text, event);
 			
 			result = true;
 		} catch (NoAlertPresentException exp) { 
@@ -1053,6 +1054,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.IMAGE, SodaPluginEventType.AFTERCLICK);
 				this.report.Log("Image click finished.");
 			}
+			
+			handleVars(element.getAttribute("src"), event);
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -1092,6 +1095,10 @@ public class SodaEventDriver implements Runnable {
 				element.sendKeys(setvalue);
 				this.report.Log("Finished set.");
 			}
+			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -1125,6 +1132,9 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
+			
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (click) {
 				this.report.Log("Click element.");
@@ -1164,6 +1174,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("TR event finished.");
 				return element;
 			}
+
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1207,6 +1220,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("TD event finished.");
 				return element;
 			}
+			
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1253,16 +1269,8 @@ public class SodaEventDriver implements Runnable {
 				return result;
 			}
 			
-			if (event.containsKey("var")) {
-				String name = event.get("var").toString();
-				//String value = element.getValue();
-				String value = element.getAttribute("value");
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
-			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 			result = true;
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
@@ -1308,14 +1316,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 			
-			if (event.containsKey("vartext")) {
-				String name = event.get("vartext").toString();
-				String value = element.getText();
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
+			String value = element.getText();
+			handleVars(value, event);
 			
 			if (click) {
 				this.firePlugin(element, SodaElements.SPAN, SodaPluginEventType.BEFORECLICK);
@@ -1386,14 +1388,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("set").toString());
 			}
 			
-			if (event.containsKey("vartext")) {
-				String name = event.get("vartext").toString();
-				String value = element.getText();
-				SodaHash tmp = new SodaHash();
-				tmp.put("set", value);
-				tmp.put("var", name);
-				this.varEvent(tmp);
-			}
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 			
 			if (click) {
 				this.firePlugin(element, SodaElements.RADIO, SodaPluginEventType.BEFORECLICK);
@@ -1585,6 +1581,9 @@ public class SodaEventDriver implements Runnable {
 						}
 					}
 				}
+				
+				String value = element.getAttribute("value");
+				handleVars(value, event);
 			}
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
@@ -1907,6 +1906,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Javascript event finished.");
 			}
 			
+			String value = element.getText();
+			handleVars(value, event);
+			
 			if (event.containsKey("children")) {
 				this.processEvents((SodaEvents)event.get("children"), element);
 			}
@@ -1976,7 +1978,11 @@ public class SodaEventDriver implements Runnable {
 				var_value = event.get("set").toString();
 				var_value = this.replaceString(var_value);
 				this.sodaVars.put(var_name, var_value);
-				this.report.Log("Setting SODA variable: '"+ var_name + "' => '" + var_value + "'.");
+				
+				String tmp_value = var_value;
+				tmp_value = tmp_value.replaceAll("\n", "\\\n");
+				
+				this.report.Log("Setting SODA variable: '"+ var_name + "' => '" + tmp_value + "'.");
 			}
 			
 			if (event.containsKey("unset")) {
@@ -2041,6 +2047,9 @@ public class SodaEventDriver implements Runnable {
 				}
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
@@ -2080,8 +2089,9 @@ public class SodaEventDriver implements Runnable {
 			if (element == null) {
 				if (required && exists) {
 					String msg = String.format("Failed to find link: '%s' => '%s'!", how, value);
-					this.report.ReportError(msg);
+					this.report.Log(msg);
 				}
+				
 				
 				if (exists != true) {
 					this.report.Assert("Link does not exist.", false, false);
@@ -2092,6 +2102,9 @@ public class SodaEventDriver implements Runnable {
 				return element;
 			}
 
+			value = element.getText();
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.LINK, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("alert")) {
@@ -2211,7 +2224,7 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-	private boolean browserEvent(SodaHash event) {
+	private boolean browserEvent(SodaHash event, WebElement parent) {
 		boolean result = false;
 		boolean assertPage = true;
 		SodaBrowserActions browser_action = null;
@@ -2265,21 +2278,31 @@ public class SodaEventDriver implements Runnable {
 					case BROWSER_assert:
 						value = event.get("assert").toString();
 						value = this.replaceString(value);
-						result = this.Browser.Assert(value);
+						
+						if (parent != null) {
+							result = this.Browser.Assert(value, parent);
+						} else {
+							result = this.Browser.Assert(value);
+						}
 						
 						if (!result) {
 							String msg = String.format("Browser Assert Failed to find this in page: '%s'", value);
-							this.report.ReportError(msg);
+							this.report.Log(msg);
 						}
 						break;
 					case BROWSER_assertnot:
 						value = event.get("assertnot").toString();
 						value = this.replaceString(value);
-						result = this.Browser.AssertNot(value);
+						
+						if (parent != null) {
+							result = this.Browser.AssertNot(value, parent);
+						} else {
+							result = this.Browser.AssertNot(value);
+						}
 
 						if (!result) {
 							String msg = String.format("Browser AssertNot Found text in page: '%s'", value);
-							this.report.ReportError(msg);
+							this.report.Log(msg);
 						}
 						break;
 					
@@ -2405,7 +2428,7 @@ public class SodaEventDriver implements Runnable {
 			if (href) {
 				element = this.findElementByHref(event.get("href").toString(), parent);
 			} else if (value) {
-				element = this.slowFindElement(event.get("do").toString(), what, parent);
+				element = this.slowFindElement(event.get("do").toString(), what, parent, index);
 			}else {
 				if (parent == null) {
 					if (index > -1) {
@@ -2463,8 +2486,10 @@ public class SodaEventDriver implements Runnable {
 		return element;
 	}
 	
-	private WebElement slowFindElement(String ele_type, String how, WebElement parent) {
+	@SuppressWarnings("unchecked")
+	private WebElement slowFindElement(String ele_type, String how, WebElement parent, int index) {
 		WebElement element = null;
+		ArrayList<WebElement> list = new ArrayList<WebElement>();
 		String msg = "";
 		String js = "";
 		
@@ -2478,20 +2503,27 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (ele_type.contains("button")) {
-			js = String.format("querySelector('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"+
+			js = String.format("querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"+
 					"input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);", how, how, how, how);
 		} else {
-			js = String.format("querySelector('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)", 
+			js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)", 
 					ele_type, how, ele_type, how);
 		}
 		
 		if (parent == null) {
 			js = "return document." + js;
-			element = (WebElement)this.Browser.executeJS(js, null);
+			list = (ArrayList<WebElement>)this.Browser.executeJS(js, null);
 		} else {
 			js = "return arguments[0]." + js;
-			element = (WebElement)this.Browser.executeJS(js, parent);
+			list = (ArrayList<WebElement>)this.Browser.executeJS(js, parent);
 		}
+		
+		if (index < 0) {
+			element = list.get(0);
+		} else {
+			element = list.get(index);
+		}
+		
 		
 		return element;
 	}
@@ -2659,6 +2691,9 @@ public class SodaEventDriver implements Runnable {
 				return null;
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.BUTTON, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("click")) {
@@ -2718,6 +2753,9 @@ public class SodaEventDriver implements Runnable {
 				return null;
 			}
 			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+			
 			this.firePlugin(element, SodaElements.TEXTAREA, SodaPluginEventType.AFTERFOUND);
 			
 			if (event.containsKey("clear")) {
@@ -2728,7 +2766,7 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			if (event.containsKey("set")) {
-				String value = event.get("set").toString();
+				value = event.get("set").toString();
 				value = this.replaceString(value);
 				this.report.Log(String.format("Setting Value to: '%s'.", value));
 				element.sendKeys(value);
@@ -2823,6 +2861,9 @@ public class SodaEventDriver implements Runnable {
 				assvalue = this.replaceString(assvalue);
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
+			
+			String value = element.getAttribute("value");
+			handleVars(value, event);
 		} catch (ElementNotVisibleException exp) { 
 			this.report.ReportError("Error: The element you are trying to access is not visible!"); 
 		} catch (Exception exp) {
@@ -2839,11 +2880,26 @@ public class SodaEventDriver implements Runnable {
 		boolean result = false;
 		String msg = "";
 		
-		this.resetThreadTime();		
-		msg = this.replaceString(event.get("text").toString());
+		if (event.containsKey("txt")) {
+			msg = this.replaceString(event.get("txt").toString());
+		} else {
+			msg = this.replaceString(event.get("text").toString());	
+		}
+		
+		this.resetThreadTime();
 		this.report.Log(msg);
 		result = true;
 		this.resetThreadTime();
 		return result;
+	}
+	
+	private void handleVars(String value, SodaHash event) {
+		if (event.containsKey("var")) {
+			String name = event.get("var").toString();
+			SodaHash tmp = new SodaHash();
+			tmp.put("set", value);
+			tmp.put("var", name);
+			this.varEvent(tmp);
+		}
 	}
 }

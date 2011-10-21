@@ -33,7 +33,7 @@ public class SodaCmdLineOpts {
 	private ArrayList<String> tests = null;
 	private ArrayList<String> suites = null;
 	private String flavor = null;
-	private Boolean saveHtml = false;
+	private String saveHtml = null;
 	private SodaHash hijacks = null;
 	private String resultDir = null;
 	private String blocklistFile = null;
@@ -77,7 +77,8 @@ public class SodaCmdLineOpts {
 					this.flavor = args[i];
 					System.out.printf("(*)Flavor: %s\n", this.flavor);
 				} else if (args[i].contains("--savehtml")) {
-					this.saveHtml = true;
+					args[i] = args[i].replaceAll("--savehtml=", "");
+					this.saveHtml = args[i];
 					System.out.printf("(*)SaveHTML: %s\n", this.saveHtml);
 				} else if (args[i].contains("--version")) {
 					this.version = true;

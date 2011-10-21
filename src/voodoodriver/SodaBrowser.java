@@ -319,6 +319,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 		return result;
 	}
 	
+	public boolean Assert(String value, WebElement parent) {
+		boolean result = false;
+		result = this.reporter.Assert(value, parent.getText());
+		return result;
+	}
+	
 	/**
 	 * Asserts if the given value does not exist in the browser text.
 	 * 
@@ -329,6 +335,12 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	public boolean AssertNot(String value) {
 		boolean result = false;
 		result = this.reporter.AssertNot(value, this.getPageSource());
+		return result;
+	}
+	
+	public boolean AssertNot(String value, WebElement parent) {
+		boolean result = false;
+		result = this.reporter.AssertNot(value, parent.getText());
 		return result;
 	}
 	

@@ -32,7 +32,7 @@ public class SodaTest {
 	private SodaBlockList blocked = null;
 	private boolean WatchDog = false;
 	private SodaEvents PlugIns = null;
-	private boolean SaveHTML = false;
+	private String SaveHTML = "";
 	private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
 	private String assertPage = null;
 	private int attachTimeout = 0;
@@ -40,7 +40,7 @@ public class SodaTest {
 	
 	public SodaTest(String testFile, SodaBrowser browser, SodaHash gvars, SodaHash hijacks, 
 			SodaBlockList blocklist, SodaHash oldvars, String suitename, String reportDir,
-			boolean saveHtml) {
+			String saveHtml) {
 		this.Browser = browser;
 		this.testFile = testFile;
 		this.HiJacks = hijacks;
@@ -61,7 +61,7 @@ public class SodaTest {
 		
 		this.reporter = new SodaReporter(report_name, resultsdir);
 		
-		if (saveHtml) {
+		if (saveHtml != null && saveHtml.length() > 0) {
 			this.reporter.setSaveHTML(this.SaveHTML, browser);
 			this.reporter.setTestName(testFile);
 		}

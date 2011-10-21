@@ -1,0 +1,50 @@
+VooDooDriver
+Usage: SodaSuite --browser="firefox" --test="sodatest1.xml" --test="sodatest2.xml" ...
+
+Required Flags:
+   --browser: This is any of the following supported web browser name.
+      [ firefox, safari, ie ]
+
+   --test: This is a soda test file.  This argument can be used more thenonce when there are more then one soda tests to run.
+
+   --savehtml: This flag will cause html pages to be saved for given events based 
+	this arguments you pass to it.  Supported savehtml options are: 
+	[“warning”, “error”, “assertfail”, “exception”, “watchdog”, “all”].
+	Example: --savehtml=”exception,error,warning”
+
+   --hijack: This is a key/value pair that is used to hi jack any csv file
+      values of the same name.  The key and value are split using "::"
+      Example: --hijack="username::sugaruser"
+
+   --resultdir: This allows you to override the default results directory.
+
+   --gvar: This is a global var key/value pair to be injected into Soda.
+      The key and value are split using "::"
+      Example: --gvar="slayerurl::http://www.slayer.net"
+
+   --suite: This is a Soda suite xml test file.
+
+   --testdelay: This forces a 10 second delay in between tests that run in a suite.
+
+   --blocklistfile: This is the XML file containing tests to block from running.
+
+   --profile: This is the browser profile name use start the browser with.
+
+   --plugin: This is a plugin XML file.
+
+   --config: This is a config file for preloading command line options.
+
+   --downloaddir: The default place to save downloaded files to.
+
+   --assertpagefile: This is the XML file containing things to assert on each page load.
+
+   --restartcount: This is how many tests in a suite that run before the browser is restarted.
+
+  --restarttest: This is the test that gets ran after the browser restarts, and before the next test     is run.
+
+  --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.
+
+  --version: Print the Soda Version string.
+
+Notes:
+--)All conflicting command line options with with the config files supersede the confile files.

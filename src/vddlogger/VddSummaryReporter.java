@@ -116,6 +116,50 @@ public class VddSummaryReporter {
 		return result;
 	}
 	
+	private boolean isLibTest(Node node) {
+		boolean result = false;
+		NodeList parent = node.getParentNode().getChildNodes();
+		
+		for (int i = 0; i <= parent.getLength() -1; i++) {
+			Node tmp = parent.item(i);
+			String name = tmp.getNodeName();
+			if (name.contains("testfile")) {
+				File fd = new File(tmp.getTextContent());
+				String path = fd.getParent();
+				path = path.toLowerCase();
+				
+				if (path.contains("lib")) {
+					//System.out.printf("LIBFILE: %s\n", tmp.getTextContent());
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	private boolean isBlocked(Node node) {
+		boolean result = false;
+		NodeList parent = node.getParentNode().getChildNodes();
+		
+		for (int i = 0; i <= parent.getLength() -1; i++) {
+			Node tmp = parent.item(i);
+			String name = tmp.getNodeName();
+			if (name.contains("blocked")) {
+				int blocked = Integer.valueOf(tmp.getTextContent());
+				if (blocked != 0) {
+					result = true;
+				} else {
+					result = false;
+				}
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	private HashMap<String, Object> getSuiteData(Document doc) {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
@@ -124,7 +168,7 @@ public class VddSummaryReporter {
 		
 		passed = getAmtPassed(doc);
 		blocked = getAmtBlocked(doc);
-		failed = getAmtFailed(doc) - blocked;  //blocked tests count as failed too
+		failed = getAmtFailed(doc);
 		wd = getAmtwatchdog(doc);
 		asserts = getAmtAsserts(doc);
 		assertsF = getAmtAssertsF(doc);
@@ -163,11 +207,10 @@ public class VddSummaryReporter {
 			"<td class=\"td_file_data\">\n" +
 			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
 			"</td>";
-			
-		//restarts = (Integer)data.get("restarts");
+
 		passed = (Integer)data.get("passed");
 		blocked = (Integer)data.get("blocked");
-		failed = (Integer)data.get("failed") - blocked;  //blocked tests count as failed too
+		failed = (Integer)data.get("failed");
 		wd = (Integer)data.get("wd");
 		asserts = (Integer)data.get("asserts");
 		assertsF = (Integer)data.get("assertsF");
@@ -176,17 +219,18 @@ public class VddSummaryReporter {
 		total = assertsF + exceptions + errors;
 		runtime = data.get("runtime").toString();
 		
-		if (blocked == 0) {
-			html += "\t <td class=\"td_run_data\">"+(passed+failed)+"/"+(passed+failed)+"</td>\n";
-			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
-			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
-			html += "\t <td class=\"td_blocked_data_zero\">0</td> \n";
-		} else {
-			html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
-			html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
-			html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
-			html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
+		int d1 = (passed+failed);
+		int d2 = (passed+failed+blocked);
+		String runclass = "td_run_data_error";
+		if (d1 == d2) {
+			runclass = "td_run_data";
 		}
+		
+		html += "\t <td class=\""+runclass+"\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
+		html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
+		html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
+		html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
+		
 		//"Results" column
 		if (wd == 0) {
 			html += "\t <td class=\"td_watchdog_data\">0</td> \n";
@@ -222,7 +266,7 @@ public class VddSummaryReporter {
 		html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
 		html += "</tr>";
 		
-		ArrayList<String> logs = (ArrayList<String>)data.get("testlogs");
+		ArrayList<HashMap<String, String>> logs = (ArrayList<HashMap<String, String>>)data.get("testlogs");
 		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
 		reporter.generateReport();
 		
@@ -257,6 +301,8 @@ public class VddSummaryReporter {
 				header += "\n";
 			}
 			
+			br.close();
+			in.close();
 		} catch (Exception exp ) {
 			exp.printStackTrace();
 		}
@@ -317,14 +363,22 @@ public class VddSummaryReporter {
 		Element el;
 		NodeList nl = d.getElementsByTagName("result");
 		boolean isrestart = false;
+		boolean islibfile = false;
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0) {
+				islibfile = isLibTest(nl.item(i));
 				isrestart = isRestart(nl.item(i));
+				
 				if (isrestart) {
+					//continue;
+				}
+				
+				if (islibfile) {
 					continue;
 				}
+				
 				n ++;
 			}
 		}
@@ -344,14 +398,28 @@ public class VddSummaryReporter {
 		int n = 0;
 		Element el;
 		boolean isrestart = false;
+		boolean isblocked = false;
 		NodeList nl = d.getElementsByTagName("result");
+		boolean islibfile = false;
+		
 		for (int i = 0; i < nl.getLength(); i ++){
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
 				isrestart = isRestart(nl.item(i));
-				if (isrestart) {
+				isblocked = isBlocked(nl.item(i));
+				islibfile = isLibTest(nl.item(i));
+				if (isrestart) { 
 					continue;
 				}
+				
+				if (isblocked) {
+					continue;
+				}
+				
+				if (islibfile) {
+					continue;
+				}
+				
 				n ++;
 			}
 		}
@@ -371,15 +439,22 @@ public class VddSummaryReporter {
 		int n = 0;
 		Element el;
 		boolean isrestart = false;
+		boolean islibfile = false;
 		NodeList nl = d.getElementsByTagName("blocked");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0) {
 				isrestart = isRestart(nl.item(i));
+				islibfile = isLibTest(nl.item(i));
 				if (isrestart) {
 					continue;
 				}
+				
+				if (islibfile) {
+					continue;
+				}
+				
 				n ++;
 			}
 		}
@@ -389,17 +464,27 @@ public class VddSummaryReporter {
 		return n;
 	}
 	
-	private ArrayList<String> getTestLogs(Document d) {
-		ArrayList<String> list = new ArrayList<String>();
-		NodeList nodes = d.getElementsByTagName("testlog");
+	private ArrayList<HashMap<String, String>> getTestLogs(Document d) {
+		ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String,String>>();
+		NodeList nodes = d.getElementsByTagName("test");
 		
 		for (int i = 0; i <= nodes.getLength() -1; i++) {
-			String tmp = nodes.item(i).getTextContent();
-			System.out.printf("(*)TestLog: %s\n", tmp);
-			list.add(nodes.item(i).getTextContent());
+			Node currNode = nodes.item(i);
+			HashMap<String, String> newHash = new HashMap<String, String>();
+			NodeList kids = currNode.getChildNodes();
+			
+			for (int x = 0; x <= kids.getLength() -1; x++) {
+				Node kidNode = kids.item(x);
+				if (kidNode.getNodeName().contains("testlog")) {
+					newHash.put(kidNode.getNodeName(), kidNode.getTextContent());
+				} else if (kidNode.getNodeName().contains("isrestart")) {
+					newHash.put(kidNode.getNodeName(), kidNode.getTextContent().toLowerCase());
+				}
+			}
+			result.add(newHash);
 		}
 		
-		return list;
+		return result;
 	}
 	
 	/**
@@ -419,7 +504,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+					//continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -446,7 +531,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -473,7 +558,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -500,7 +585,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -520,7 +605,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}

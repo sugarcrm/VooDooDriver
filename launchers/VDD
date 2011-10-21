@@ -1,0 +1,32 @@
+#!/bin/bash
+
+VDDCOMMAND="java -jar VooDooDriver.jar"
+
+function PrintDebug {
+   if [ ! -z "$1" ]; then
+      if [ ! -z "$VDD_DEBUG" ]; then
+         echo "[VDD DEBUG]: $1"
+      fi
+   fi
+}
+
+echo "(*)Starting VooDooDriver Bash Launcher..."
+
+for arg in "$@"
+do
+#   newArg=`echo "$arg" | sed -rn 's/(--.*=)(.*)/\1\"\2\"/p'`
+
+   if [ ! -z "$newArg" ]; then
+      VDDCOMMAND="$VDDCOMMAND $newArg"
+      PrintDebug "[$index]Converting arg: '$arg' to '$newArg'"
+   else
+      VDDCOMMAND="$VDDCOMMAND $arg"
+   fi
+done
+
+PrintDebug "Executing Bash command: '$VDDCOMMAND'"
+
+$VDDCOMMAND
+
+exit $?
+
