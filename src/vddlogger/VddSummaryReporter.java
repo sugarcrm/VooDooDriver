@@ -116,6 +116,29 @@ public class VddSummaryReporter {
 		return result;
 	}
 	
+	private boolean isLibTest(Node node) {
+		boolean result = false;
+		NodeList parent = node.getParentNode().getChildNodes();
+		
+		for (int i = 0; i <= parent.getLength() -1; i++) {
+			Node tmp = parent.item(i);
+			String name = tmp.getNodeName();
+			if (name.contains("testfile")) {
+				File fd = new File(tmp.getTextContent());
+				String path = fd.getParent();
+				path = path.toLowerCase();
+				
+				if (path.contains("lib")) {
+					//System.out.printf("LIBFILE: %s\n", tmp.getTextContent());
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	private boolean isBlocked(Node node) {
 		boolean result = false;
 		NodeList parent = node.getParentNode().getChildNodes();
@@ -333,14 +356,22 @@ public class VddSummaryReporter {
 		Element el;
 		NodeList nl = d.getElementsByTagName("result");
 		boolean isrestart = false;
+		boolean islibfile = false;
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0) {
+				islibfile = isLibTest(nl.item(i));
 				isrestart = isRestart(nl.item(i));
+				
 				if (isrestart) {
+					//continue;
+				}
+				
+				if (islibfile) {
 					continue;
 				}
+				
 				n ++;
 			}
 		}
@@ -362,17 +393,23 @@ public class VddSummaryReporter {
 		boolean isrestart = false;
 		boolean isblocked = false;
 		NodeList nl = d.getElementsByTagName("result");
+		boolean islibfile = false;
 		
 		for (int i = 0; i < nl.getLength(); i ++){
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
 				isrestart = isRestart(nl.item(i));
 				isblocked = isBlocked(nl.item(i));
-				if (isrestart) {
+				islibfile = isLibTest(nl.item(i));
+				if (isrestart) { 
 					continue;
 				}
 				
 				if (isblocked) {
+					continue;
+				}
+				
+				if (islibfile) {
 					continue;
 				}
 				
@@ -395,15 +432,22 @@ public class VddSummaryReporter {
 		int n = 0;
 		Element el;
 		boolean isrestart = false;
+		boolean islibfile = false;
 		NodeList nl = d.getElementsByTagName("blocked");
 		
 		for (int i = 0; i < nl.getLength(); i ++) {
 			el = (Element)nl.item(i);
 			if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0) {
 				isrestart = isRestart(nl.item(i));
+				islibfile = isLibTest(nl.item(i));
 				if (isrestart) {
 					continue;
 				}
+				
+				if (islibfile) {
+					continue;
+				}
+				
 				n ++;
 			}
 		}
@@ -453,7 +497,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+					//continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -480,7 +524,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -507,7 +551,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -534,7 +578,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
@@ -554,7 +598,7 @@ public class VddSummaryReporter {
 			if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
 				isrestart = isRestart(nl.item(i));
 				if (isrestart) {
-					continue;
+				//	continue;
 				}
 				n += Integer.parseInt(el.getFirstChild().getNodeValue());
 			}
