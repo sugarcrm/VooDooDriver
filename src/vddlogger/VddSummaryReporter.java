@@ -219,7 +219,14 @@ public class VddSummaryReporter {
 		total = assertsF + exceptions + errors;
 		runtime = data.get("runtime").toString();
 		
-		html += "\t <td class=\"td_run_data_error\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
+		int d1 = (passed+failed);
+		int d2 = (passed+failed+blocked);
+		String runclass = "td_run_data_error";
+		if (d1 == d2) {
+			runclass = "td_run_data";
+		}
+		
+		html += "\t <td class=\""+runclass+"\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
 		html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
 		html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
 		html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
