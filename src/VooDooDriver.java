@@ -30,6 +30,7 @@ import voodoodriver.SodaBlockListParser;
 import voodoodriver.SodaBrowser;
 import voodoodriver.SodaChrome;
 import voodoodriver.SodaCmdLineOpts;
+import voodoodriver.SodaConfigParser;
 import voodoodriver.SodaEvents;
 import voodoodriver.SodaFirefox;
 import voodoodriver.SodaHash;

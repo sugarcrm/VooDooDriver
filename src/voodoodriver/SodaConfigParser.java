@@ -1,3 +1,4 @@
+package voodoodriver;
 /*
 Copyright 2011 SugarCRM Inc.
 
@@ -24,8 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import voodoodriver.SodaEvents;
-import voodoodriver.SodaHash;
 
 /**
  * Class to parse a VooDooDriver config xml file.
