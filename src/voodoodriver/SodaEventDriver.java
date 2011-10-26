@@ -2347,7 +2347,9 @@ public class SodaEventDriver implements Runnable {
 		}
 		
 		if (event.containsKey("index")) {
-			index = Integer.valueOf(event.get("index").toString()).intValue();
+			String inx = event.get("index").toString();
+			inx = this.replaceString(inx);
+			index = Integer.valueOf(inx).intValue();
 		}
 		
 		this.resetThreadTime();
