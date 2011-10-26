@@ -43,6 +43,7 @@ public class SodaConfigParser {
 	 */
 	public SodaConfigParser(File configfile) {
 		this.configFile = configfile;
+		
 	}
 	
 	/**
