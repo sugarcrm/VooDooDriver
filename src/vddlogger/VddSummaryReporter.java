@@ -320,7 +320,7 @@ public class VddSummaryReporter {
 				"\t <td class=\"td_header_master\">Totals:</td>" +
 				"\t <td class=\"td_footer_run\">"+(passedTests + failedTests - blockedTests)+"/"+(passedTests + failedTests)+"</td>" +
 				"\t <td class=\"td_footer_passed\">"+passedTests+"</td>" +
-				"\t <td class=\"td_footer_failed\">"+(failedTests - blockedTests)+"</td>" +
+				"\t <td class=\"td_footer_failed\">"+failedTests+"</td>" +
 				"\t <td class=\"td_footer_skipped\">"+blockedTests+"</td>" +
 				"\t <td class=\"td_footer_watchdog\">"+watchdog+"</td>" +
 				"\t <td class=\"td_footer_passed\">"+passedAsserts+"</td>" +
