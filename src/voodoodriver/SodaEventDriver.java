@@ -2335,6 +2335,7 @@ public class SodaEventDriver implements Runnable {
 		String what = "";
 		int index = -1;
 		int timeout = 5;
+		String msg = "";
 		
 		if (event.containsKey("exist")) {
 			exists = this.clickToBool(event.get("exist").toString());
@@ -2342,28 +2343,35 @@ public class SodaEventDriver implements Runnable {
 		
 		if (event.containsKey("timeout")) {
 			timeout = Integer.valueOf(event.get("timeout").toString());
-			String msg = String.format("Resetting default element finding timeout to: '%d' seconds.", timeout);
+			msg = String.format("Resetting default element finding timeout to: '%d' seconds.", timeout);
 			this.report.Log(msg);
 		}
 		
 		if (event.containsKey("index")) {
 			String inx = event.get("index").toString();
 			inx = this.replaceString(inx);
+			
+			if (!SodaUtils.isInt(inx)) {
+				msg = String.format("Error: index value: '%s' is not an integer!", inx);
+				this.report.ReportError(msg);
+				return null;
+			}
+			
 			index = Integer.valueOf(inx).intValue();
 		}
 		
 		this.resetThreadTime();
 		
 		try {
-			String msg = "";
+			msg = "";
 			how = event.get("how").toString();
 			what = event.get(how).toString(); 
 			what = this.replaceString(what);
 			String dowhat = event.get("do").toString();
 			
 			if (index > -1) {
-			msg = String.format("Tring to find page element '%s' by: '%s' => '%s' index => '%s'.", dowhat, how, what,
-					index);
+				msg = String.format("Tring to find page element '%s' by: '%s' => '%s' index => '%s'.", dowhat, 
+						how, what, index);
 			} else {
 				msg = String.format("Tring to find page element '%s' by: '%s' => '%s'.", dowhat, how, what);	
 			}
@@ -2471,10 +2479,10 @@ public class SodaEventDriver implements Runnable {
 		
 		if (element == null && exists == true) {
 			if (required) {
-				String msg = String.format("Failed to find element: '%s' => '%s'", how, what);
+				msg = String.format("Failed to find element: '%s' => '%s'", how, what);
 				this.report.ReportError(msg);
 			} else {
-				String msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'", how, what);
+				msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'", how, what);
 				this.report.Log(msg);
 			}
 		} else if (element != null && exists != true) {

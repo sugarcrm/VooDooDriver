@@ -194,4 +194,17 @@ public class SodaUtils {
 		
 		return data;
 	}
+	
+	public static boolean isInt(String str) {
+		boolean result = false;
+		
+		try {
+			Integer.parseInt(str);
+			result = true;
+		} catch (NumberFormatException exp) {
+			result = false;
+		}
+		
+		return result;
+	}
 }
