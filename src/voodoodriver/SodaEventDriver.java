@@ -2153,11 +2153,16 @@ public class SodaEventDriver implements Runnable {
 		SodaCSVData csv_data = null;
 		String var_name = event.get("var").toString();
 		String csv_filename = "";
+		String msg = "";
 
 		this.resetThreadTime();
+		this.report.Log("CSV event starting...");
+		
 		
 		csv_filename = event.get("file").toString();
 		csv_filename = replaceString(csv_filename);
+		msg = String.format("Processing CSV file: '%s'...".concat(csv_filename));
+		this.report.Log(msg);
 		
 		csv = new SodaCSV(csv_filename, this.report);
 		csv_data = csv.getData();
@@ -2181,6 +2186,8 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents)event.get("children"), null);
 			}
 		}
+		
+		this.report.Log("CSV event finished.");
 		
 		this.resetThreadTime();
 		return result;

@@ -88,8 +88,6 @@ public class SodaCSV {
 					continue;
 				}
 				
-				//linedata = line.split(",");
-				//linedata = this.processLine(line);
 				linedata = this.parser.parseLine(line);
 				
 				int linelen = linedata.length -1;
