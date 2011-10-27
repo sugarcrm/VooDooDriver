@@ -27,13 +27,20 @@ import org.w3c.dom.NodeList;
 public class SodaSuiteParser {
 	
 	private SodaTestList tests = null;
+	private SodaHash gvars = null;
 	
-	public SodaSuiteParser(String suitefile) {
+	public SodaSuiteParser(String suitefile, SodaHash gvars) {
 		Document doc = null;
 		File suiteFD = null;
 		DocumentBuilderFactory dbf = null;
 		DocumentBuilder db = null;
+		
+		this.gvars = gvars;
 
+		if (this.gvars == null) {
+			this.gvars = new SodaHash();
+		}
+		
 		try {
 			this.tests = new SodaTestList();
 			suiteFD = new File(suitefile);
@@ -68,6 +75,8 @@ public class SodaSuiteParser {
 			for (int x = 0; x <= atts_len; x++) {
 				String attr_name = attrs.item(x).getNodeName();
 				String attr_value = attrs.item(x).getNodeValue();
+				attr_value = SodaUtils.replaceString(attr_value, this.gvars);
+				System.out.printf("'%s' => '%s'\n", attr_name, attr_value);
 				File fd_tmp = null;
 				
 				if (attr_name.contains("fileset")) {

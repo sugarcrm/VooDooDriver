@@ -469,7 +469,7 @@ public class VooDooDriver {
 			SodaTest testobj = null;
 			System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
 			System.out.printf("(*)Parsing Suite file...\n");
-			SodaSuiteParser suiteP = new SodaSuiteParser(suite_name);
+			SodaSuiteParser suiteP = new SodaSuiteParser(suite_name, gvars);
 			SodaTestList suite_test_list = suiteP.getTests();
 			SodaHash vars = null;
 			SodaTestResults test_results_hash = null;
