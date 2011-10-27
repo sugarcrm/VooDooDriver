@@ -549,6 +549,8 @@ public class SodaEventDriver implements Runnable {
 			
 			handleVars(alert_text, event);
 			
+			this.firePlugin(null, SodaElements.ALERT, SodaPluginEventType.AFTERDIALOGCLOSED);
+			
 			result = true;
 		} catch (NoAlertPresentException exp) { 
 			if (!exists) {
