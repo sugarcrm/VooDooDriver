@@ -34,7 +34,6 @@ public class SodaCSV {
 		BufferedReader br = null;
 	
 		this.report = reporter;
-	
 		this.parser = new CSVParser(',','"');
 		
 		try {
