@@ -318,7 +318,7 @@ public class VddSummaryReporter {
 		String footer = "";
 		footer += "<tr id=\"totals\"> \n" +
 				"\t <td class=\"td_header_master\">Totals:</td>" +
-				"\t <td class=\"td_footer_run\">"+(passedTests + failedTests - blockedTests)+"/"+(passedTests + failedTests)+"</td>" +
+				"\t <td class=\"td_footer_run\">"+(passedTests + failedTests)+"/"+(passedTests + failedTests + blockedTests)+"</td>" +
 				"\t <td class=\"td_footer_passed\">"+passedTests+"</td>" +
 				"\t <td class=\"td_footer_failed\">"+failedTests+"</td>" +
 				"\t <td class=\"td_footer_skipped\">"+blockedTests+"</td>" +
@@ -372,7 +372,7 @@ public class VddSummaryReporter {
 				isrestart = isRestart(nl.item(i));
 				
 				if (isrestart) {
-					//continue;
+					continue;
 				}
 				
 				if (islibfile) {
