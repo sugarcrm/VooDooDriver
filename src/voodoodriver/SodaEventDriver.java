@@ -2161,7 +2161,7 @@ public class SodaEventDriver implements Runnable {
 		
 		csv_filename = event.get("file").toString();
 		csv_filename = replaceString(csv_filename);
-		msg = String.format("Processing CSV file: '%s'...".concat(csv_filename));
+		msg = String.format("Processing CSV file: '%s'...", csv_filename);
 		this.report.Log(msg);
 		
 		csv = new SodaCSV(csv_filename, this.report);
