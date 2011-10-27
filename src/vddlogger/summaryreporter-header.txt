@@ -304,6 +304,20 @@ table {
  border-bottom: 2px solid black;
 }
 
+.td_footer_run_err {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: center;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ color: #FF0000;
+ border-top: 2px solid black;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
 .td_footer_passed {
  white-space: nowrap;
  background: #b6dde8;
@@ -332,6 +346,20 @@ table {
  border-bottom: 2px solid black;
 }
 
+.td_footer_failed_zero {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: center;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ color: #000000;
+ border-top: 2px solid black;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
 .td_footer_skipped {
  white-space: nowrap;
  background: #b6dde8;
@@ -340,6 +368,34 @@ table {
  font-weight: bold;
  font-size: 12px;
  color: #FF8200;
+ border-top: 2px solid black;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
+.td_footer_blocked {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: center;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ color: #FF8200;
+ border-top: 2px solid black;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
+.td_footer_blocked_zero {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: center;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ color: #000000;
  border-top: 2px solid black;
  border-left: 0px solid black;
  border-right: 2px solid black;
