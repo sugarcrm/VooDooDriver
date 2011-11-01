@@ -542,11 +542,13 @@ public class SodaEventDriver implements Runnable {
 
 			if (event.containsKey("assert")) {
 				String ass = event.get("assert").toString();
+				ass = this.replaceString(ass);
 				this.report.Assert(ass, alert_text);
 			}
 
 			if (event.containsKey("assertnot")) {
 				String ass = event.get("assertnot").toString();
+				ass = this.replaceString(ass);
 				this.report.AssertNot(ass, alert_text);
 			}
 
