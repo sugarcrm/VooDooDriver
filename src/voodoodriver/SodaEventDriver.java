@@ -140,8 +140,7 @@ public class SodaEventDriver implements Runnable {
 
 			String classname = tmp.get("classname").toString();
 			String classfile = tmp.get("classfile").toString();
-			VDDClassLoader loader = new VDDClassLoader(
-					ClassLoader.getSystemClassLoader());
+			VDDClassLoader loader = new VDDClassLoader(ClassLoader.getSystemClassLoader());
 
 			try {
 				Class<VDDPluginInterface> tmp_class = loader.loadClass(classname,
@@ -180,15 +179,12 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (element == null) {
-			String msg = String
-					.format(
-							"Element trying to be saved: '%s => 'NULL', not storing NULL element!",
-							name);
+			String msg = String.format(
+					"Element trying to be saved: '%s => 'NULL', not storing NULL element!", name);
 			this.report.ReportError(msg);
 		} else {
 			this.ElementStore.put(name, element);
-			String msg = String.format(
-					"Stored HTML element to be referenced by: '%s'.", name);
+			String msg = String.format("Stored HTML element to be referenced by: '%s'.", name);
 			this.report.Log(msg);
 		}
 	}
@@ -411,8 +407,7 @@ public class SodaEventDriver implements Runnable {
 			result = frameEvent(event);
 			break;
 		default:
-			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type")
-					.toString());
+			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
 		}
 
@@ -483,8 +478,7 @@ public class SodaEventDriver implements Runnable {
 
 		if (!event.containsKey("file")) {
 			result = false;
-			this.report
-					.ReportError("Error: screenshot command missing 'file' attribute!");
+			this.report.ReportError("Error: screenshot command missing 'file' attribute!");
 			this.report.Log("Screenshot event finished.");
 			return result;
 		} else {
@@ -509,8 +503,7 @@ public class SodaEventDriver implements Runnable {
 
 		if (!event.containsKey("alert") && !event.containsKey("exist")) {
 			result = false;
-			this.report
-					.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
+			this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
 			return result;
 		}
 
@@ -524,6 +517,7 @@ public class SodaEventDriver implements Runnable {
 			String tmp = event.get("exist").toString();
 			tmp = this.replaceString(tmp);
 			exists = this.clickToBool(tmp);
+			
 			if (exists) {
 				user_exists_true = true;
 			}
@@ -600,14 +594,12 @@ public class SodaEventDriver implements Runnable {
 				result = true;
 			} else {
 				result = false;
-				String msg = String.format(
-						"Error: failed to find variable to delete by name: '%s'!",
+				String msg = String.format("Error: failed to find variable to delete by name: '%s'!",
 						name);
 				this.report.ReportError(msg);
 			}
 		} else {
-			this.report
-					.ReportError("Error: delete command missing name attribute!");
+			this.report.ReportError("Error: delete command missing name attribute!");
 			result = false;
 		}
 
@@ -627,8 +619,7 @@ public class SodaEventDriver implements Runnable {
 		this.report.Log("Javaplugin event started.");
 
 		if (!event.containsKey("classname")) {
-			this.report
-					.ReportError("Javaplugin event missing attribute: 'classname'!");
+			this.report.ReportError("Javaplugin event missing attribute: 'classname'!");
 			this.report.Log("Javaplugin event finished.");
 			return false;
 		}
@@ -647,8 +638,7 @@ public class SodaEventDriver implements Runnable {
 		msg = String.format("Loading classname: '%s'.", classname);
 		this.report.Log(msg);
 		if (!this.JavaPlugings.containsKey(classname)) {
-			msg = String.format(
-					"Error failed to find a loaded plugin with classname: '%s'!",
+			msg = String.format("Error failed to find a loaded plugin with classname: '%s'!",
 					classname);
 			this.report.ReportError(msg);
 			this.report.Log("Javaplugin event finished.");
@@ -708,8 +698,7 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (!event.containsKey("classname")) {
-			this.report
-					.ReportError("Error: Missing 'classname' attribute for pluginloader command!");
+			this.report.ReportError("Error: Missing 'classname' attribute for pluginloader command!");
 			this.report.Log("PluginLoader event finished.");
 			return false;
 		}
@@ -721,8 +710,7 @@ public class SodaEventDriver implements Runnable {
 
 		tmp = new File(filename);
 		if (!tmp.exists()) {
-			String msg = String.format("Error: failed to find file: '%s'!",
-					filename);
+			String msg = String.format("Error: failed to find file: '%s'!", filename);
 			this.report.ReportError(msg);
 			return false;
 		}
@@ -838,8 +826,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Area click finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -888,8 +875,7 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents) event.get("children"), element);
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -935,8 +921,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("OL click finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -954,8 +939,7 @@ public class SodaEventDriver implements Runnable {
 		this.report.Log("Javascript event starting.");
 
 		if (event.containsKey("content")) {
-			this.report
-					.Warn("Using javascript contents is deprecated, please use the file attribute!");
+			this.report.Warn("Using javascript contents is deprecated, please use the file attribute!");
 			scriptdata = event.get("content").toString();
 		}
 
@@ -1010,10 +994,9 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Process finished executing.");
 				proc_ret = proc.exitValue();
 				if (proc_ret != 0) {
-					String msg = String
-							.format(
-									"Error the command being executed returned a non-zero value: '%s'!",
-									proc_ret);
+					String msg = String.format(
+							"Error the command being executed returned a non-zero value: '%s'!",
+							proc_ret);
 					this.report.ReportError(msg);
 				} else {
 					this.report.Log("Execute was successful.");
@@ -1047,7 +1030,6 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (src == null) {
-
 			this.report.ReportError("DVD command is missing 'src' attribute!");
 			result = false;
 		}
@@ -1104,8 +1086,7 @@ public class SodaEventDriver implements Runnable {
 
 			handleVars(element.getAttribute("src"), event);
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -1150,8 +1131,7 @@ public class SodaEventDriver implements Runnable {
 			handleVars(value, event);
 
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -1197,8 +1177,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Click finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1246,8 +1225,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Click finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1295,8 +1273,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.Log("Click finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			element = null;
 			this.report.ReportException(exp);
@@ -1403,8 +1380,7 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
@@ -1413,8 +1389,7 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents) event.get("children"), element);
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1482,8 +1457,7 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
@@ -1493,9 +1467,7 @@ public class SodaEventDriver implements Runnable {
 				boolean expected = this
 						.clickToBool(event.get("checked").toString());
 				String msg = "";
-				msg = String
-						.format(
-								"Radio control's current checked state: '%s', was expecting: '%s'!",
+				msg = String.format("Radio control's current checked state: '%s', was expecting: '%s'!",
 								ischecked, expected);
 				this.report.Assert(msg, ischecked, expected);
 
@@ -1621,8 +1593,7 @@ public class SodaEventDriver implements Runnable {
 				if (event.containsKey("jscriptevent")) {
 					this.report.Log("Firing Javascript Event: "
 							+ event.get("jscriptevent").toString());
-					this.Browser.fire_event(element, event.get("jscriptevent")
-							.toString());
+					this.Browser.fire_event(element, event.get("jscriptevent").toString());
 					Thread.sleep(1000);
 					this.report.Log("Javascript event finished.");
 				}
@@ -1686,8 +1657,7 @@ public class SodaEventDriver implements Runnable {
 				handleVars(value, event);
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1733,8 +1703,7 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents) event.get("children"), element);
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -1803,8 +1772,7 @@ public class SodaEventDriver implements Runnable {
 				this.processEvents((SodaEvents) event.get("children"), element);
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -1898,8 +1866,7 @@ public class SodaEventDriver implements Runnable {
 							Matcher m = p.matcher(tmp_title);
 							if (m.find()) {
 								found_handle = tmp_handle;
-								this.report.Log(String.format(
-										"Found Window Title '%s'", finder));
+								this.report.Log(String.format("Found Window Title '%s'", finder));
 								break;
 							}
 						} else {
@@ -1936,8 +1903,7 @@ public class SodaEventDriver implements Runnable {
 			}
 			
 			if (found_handle == null) {
-				msg = String
-						.format("Failed to find window matching: '%s!'", finder);
+				msg = String.format("Failed to find window matching: '%s!'", finder);
 				this.report.ReportError(msg);
 				result = false;
 				this.Browser.getDriver().switchTo().window(currentWindow);
@@ -2060,8 +2026,7 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
@@ -2074,8 +2039,7 @@ public class SodaEventDriver implements Runnable {
 			}
 
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2198,14 +2162,14 @@ public class SodaEventDriver implements Runnable {
 				String set = event.get("set").toString();
 				set = this.replaceString(set);
 				boolean check = this.clickToBool(set);
-
+				String js = String.format("arguments[0].checked=%s;", check);
 				if (!check) {
 					this.report.Log("Unchecking checkbox.");
-					element.clear();
+					this.Browser.executeJS(js, element);
 					this.report.Log("Unchecking finished.");
 				} else {
 					this.report.Log("Checking checkbox.");
-					element.click();
+					this.Browser.executeJS(js, element);
 					this.report.Log("Checking finished.");
 				}
 			}
@@ -2214,8 +2178,7 @@ public class SodaEventDriver implements Runnable {
 			handleVars(value, event);
 
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 		}
@@ -2274,11 +2237,9 @@ public class SodaEventDriver implements Runnable {
 
 			if (event.containsKey("alert")) {
 				boolean alert = this.clickToBool(event.get("alert").toString());
-				this.report
-						.Log(String.format("Setting Alert Hack to: '%s'", alert));
+				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
-				this.report
-						.Warn("You are using a deprecated alert hack, please use the <alert> command!");
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 
 			if (event.containsKey("click")) {
@@ -2304,14 +2265,12 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -2345,8 +2304,7 @@ public class SodaEventDriver implements Runnable {
 			int keys_len = csv_data.get(i).keySet().size() - 1;
 
 			for (int key_index = 0; key_index <= keys_len; key_index++) {
-				String key = csv_data.get(i).keySet().toArray()[key_index]
-						.toString();
+				String key = csv_data.get(i).keySet().toArray()[key_index].toString();
 				String sodavar_name = var_name + "." + key;
 				String sodavar_value = csv_data.get(i).get(key).toString();
 
@@ -2421,8 +2379,7 @@ public class SodaEventDriver implements Runnable {
 
 		try {
 			if (event.containsKey("action")) {
-				browser_action = SodaBrowserActions.valueOf(event.get("action")
-						.toString().toUpperCase());
+				browser_action = SodaBrowserActions.valueOf(event.get("action").toString().toUpperCase());
 				switch (browser_action) {
 				case REFRESH:
 					this.report.Log("Calling Browser event refresh.");
@@ -2490,21 +2447,18 @@ public class SodaEventDriver implements Runnable {
 						}
 
 						if (!result) {
-							String msg = String.format(
-									"Browser AssertNot Found text in page: '%s'", value);
+							String msg = String.format("Browser AssertNot Found text in page: '%s'", value);
 							this.report.Log(msg);
 						}
 						break;
 
 					case BROWSER_assertPage:
-						assertPage = this.clickToBool(event.get("assertPage")
-								.toString());
+						assertPage = this.clickToBool(event.get("assertPage").toString());
 						this.report.Log(String.format("Borwser assertPage => '%s'.",
 								assertPage));
 						break;
 					default:
-						System.out.printf(
-								"(!)ERROR: Unknown browser method: '%s'!\n", key_id);
+						System.out.printf("(!)ERROR: Unknown browser method: '%s'!\n", key_id);
 						System.exit(3);
 					}
 				}
@@ -2537,8 +2491,7 @@ public class SodaEventDriver implements Runnable {
 
 		if (event.containsKey("timeout")) {
 			timeout = Integer.valueOf(event.get("timeout").toString());
-			msg = String.format(
-					"Resetting default element finding timeout to: '%d' seconds.",
+			msg = String.format("Resetting default element finding timeout to: '%d' seconds.",
 					timeout);
 			this.report.Log(msg);
 		}
@@ -2567,9 +2520,7 @@ public class SodaEventDriver implements Runnable {
 			String dowhat = event.get("do").toString();
 
 			if (index > -1) {
-				msg = String
-						.format(
-								"Tring to find page element '%s' by: '%s' => '%s' index => '%s'.",
+				msg = String.format("Tring to find page element '%s' by: '%s' => '%s' index => '%s'.",
 								dowhat, how, what, index);
 			} else {
 				msg = String.format(
@@ -2632,8 +2583,7 @@ public class SodaEventDriver implements Runnable {
 				value = true;
 				break;
 			default:
-				this.report.ReportError(String.format(
-						"Error: findElement, unknown how: '%s'!\n", how));
+				this.report.ReportError(String.format("Error: findElement, unknown how: '%s'!\n", how));
 				System.exit(4);
 				break;
 			}
@@ -2658,9 +2608,7 @@ public class SodaEventDriver implements Runnable {
 						elements = parent.findElements(by);
 						if (elements.size() - 1 < index && required != false) {
 							if (required) {
-								msg = String
-										.format(
-												"Failed to find element by index '%d', index is out of bounds!",
+								msg = String.format("Failed to find element by index '%d', index is out of bounds!",
 												index);
 								this.report.ReportError(msg);
 							}
@@ -2676,7 +2624,6 @@ public class SodaEventDriver implements Runnable {
 		} catch (NoSuchElementException exp) {
 			if (required && exists) {
 				this.report.ReportError("Failed to find element!");
-				// this.report.ReportException(exp);
 				element = null;
 			}
 		} catch (Exception exp) {
@@ -2692,9 +2639,7 @@ public class SodaEventDriver implements Runnable {
 						what);
 				this.report.ReportError(msg);
 			} else {
-				msg = String
-						.format(
-								"Failed to find element, but required => 'false' : '%s' => '%s'",
+				msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'",
 								how, what);
 				this.report.Log(msg);
 			}
@@ -2717,8 +2662,7 @@ public class SodaEventDriver implements Runnable {
 		String msg = "";
 		String js = "";
 
-		msg = String
-				.format("Looking for elements by value is very very slow!  You should never do this!");
+		msg = String.format("Looking for elements by value is very very slow!  You should never do this!");
 		this.report.Log(msg);
 		msg = String.format("Looking for element: '%s' => '%s'.", ele_type, how);
 		this.report.Log(msg);
@@ -2728,16 +2672,13 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (ele_type.contains("button")) {
-			js = String
-					.format(
-							"querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"
-									+ "input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);",
-							how, how, how, how);
+			js = String.format(
+					"querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"
+					+ "input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);",
+					how, how, how, how);
 		} else {
-			js = String
-					.format(
-							"querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)",
-							ele_type, how, ele_type, how);
+			js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)",
+					ele_type, how, ele_type, how);
 		}
 
 		if (parent == null) {
@@ -2837,8 +2778,7 @@ public class SodaEventDriver implements Runnable {
 							result = true;
 							break;
 						} else {
-							String msg = String.format(
-									"Failed trying to read plugin source file: '%s'!",
+							String msg = String.format("Failed trying to read plugin source file: '%s'!",
 									(String) tmp.get("jsfile"));
 							this.report.ReportError(msg);
 							result = false;
@@ -2859,8 +2799,7 @@ public class SodaEventDriver implements Runnable {
 				result = true;
 			} else {
 				result = false;
-				String msg = String.format(
-						"Plugin Event Failed with return value: '%s'!", tmp);
+				String msg = String.format("Plugin Event Failed with return value: '%s'!", tmp);
 				this.report.ReportError(msg);
 			}
 
@@ -2871,8 +2810,7 @@ public class SodaEventDriver implements Runnable {
 			SodaHash data = this.plugIns.get(index);
 			String classname = data.get("classname").toString();
 			String msg = "";
-			Class<VDDPluginInterface> tmp_class = this.loadedPlugins
-					.get(classname);
+			Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
 			msg = String.format("");
 
 			try {
@@ -2886,9 +2824,7 @@ public class SodaEventDriver implements Runnable {
 
 					err = inst.execute(null, this.Browser, element);
 					if (err != 0) {
-						msg = String
-								.format(
-										"Plugin Classname: '%s' failed returning error code: '%d'!",
+						msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!",
 										classname, err);
 						this.report.ReportError(msg);
 					} else {
@@ -2940,11 +2876,9 @@ public class SodaEventDriver implements Runnable {
 
 			if (event.containsKey("alert")) {
 				boolean alert = this.clickToBool(event.get("alert").toString());
-				this.report
-						.Log(String.format("Setting Alert Hack to: '%s'", alert));
+				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
 				this.Browser.alertHack(alert);
-				this.report
-						.Warn("You are using a deprecated alert hack, please use the <alert> command!");
+				this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
 			}
 
 			if (click) {
@@ -2960,14 +2894,12 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -3021,8 +2953,7 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
@@ -3039,8 +2970,7 @@ public class SodaEventDriver implements Runnable {
 				this.report.AssertNot(assvalue, element.getAttribute("value"));
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;
@@ -3096,8 +3026,7 @@ public class SodaEventDriver implements Runnable {
 			if (event.containsKey("jscriptevent")) {
 				this.report.Log("Firing Javascript Event: "
 						+ event.get("jscriptevent").toString());
-				this.Browser.fire_event(element, event.get("jscriptevent")
-						.toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
 				Thread.sleep(1000);
 				this.report.Log("Javascript event finished.");
 			}
