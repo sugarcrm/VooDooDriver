@@ -10,8 +10,8 @@
    
    <plugin>
       <name>My Plugin -1</name>
-      <control>div</control>
-      <event>afterfound</event>
+      <control>alert</control>
+      <event>afterdialogclosed</event>
       <jsfile>plugins/button-highlight.js</jsfile>
    </plugin>
    

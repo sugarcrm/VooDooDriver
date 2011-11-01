@@ -1449,10 +1449,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 
-			// this is a hack to make older soda tests work //
 			if (event.containsKey("set")) {
-				this.report
-						.Warn("Using the 'set' command for a radio element is not supported anymore!  Use click!");
+				this.report.Warn("Using the 'set' command for a radio element is not supported anymore!  Use click!");
 				click = this.clickToBool(event.get("set").toString());
 			}
 
@@ -1826,6 +1824,7 @@ public class SodaEventDriver implements Runnable {
 		String found_handle = null;
 		String msg = "";
 		int timeout = 10;
+		int index = -1;
 
 		try {
 			this.report.Log("Attach event starting.");
@@ -1833,7 +1832,21 @@ public class SodaEventDriver implements Runnable {
 			this.report.Log(String.format("Current Window Handle: '%s'.",
 					currentWindow));
 
-			if (event.containsKey("url")) {
+			if (event.containsKey("index")) {
+				use_URL = false;
+				String tmp_index = event.get("index").toString();
+				tmp_index = this.replaceString(tmp_index);
+				if (!SodaUtils.isInt(tmp_index)) {
+					msg = String.format("Error: index is not an integer: '%s'!", tmp_index);
+					this.report.ReportError(msg);
+					this.report.Log("Attach event finished.");
+					return false;
+				}
+				
+				timeout = 0; // causes the for loop to do nothing this is a hack. should make this method better later ... //
+				index = Integer.valueOf(tmp_index);
+				finder = tmp_index;
+			}else if (event.containsKey("url")) {
 				use_URL = true;
 				finder = event.get("url").toString();
 			} else {
@@ -1901,13 +1914,27 @@ public class SodaEventDriver implements Runnable {
 						}
 					}
 				} // end for loop //
-
+				
 				if (found_handle != null) {
 					break;
 				}
 				Thread.sleep(1000);
 			} // end timer loop //
 
+			
+			if (index != -1) {
+				handles = this.Browser.getDriver().getWindowHandles();
+				len = handles.size() -1;
+				
+				if (index > len) {
+					msg = String.format("Error: index: '%d' is greater then the number of windows found: '%d'!",
+							index, len);
+					found_handle = null;
+				} else {
+					found_handle = handles.toArray()[index].toString();
+				}
+			}
+			
 			if (found_handle == null) {
 				msg = String
 						.format("Failed to find window matching: '%s!'", finder);
