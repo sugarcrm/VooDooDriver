@@ -315,13 +315,32 @@ public class VddSummaryReporter {
 	 * @return - String of html table footer
 	 */
 	private String generateHTMLFooter(){
-		String footer = "";
-		footer += "<tr id=\"totals\"> \n" +
+		int n1 = 0;
+		int n2 = 0;
+		String footerrun = "td_footer_run";
+		String failedtd = "td_footer_failed";
+		String blockedtd = "td_footer_blocked";
+		
+		n1 = passedTests + failedTests;
+		n2 = passedTests + failedTests + blockedTests;
+		if (n1 != n2) {
+			footerrun = "td_footer_run_err";
+		}
+		
+		if (failedTests == 0) {
+			failedtd = "td_footer_failed_zero";
+		}
+		
+		if (blockedTests == 0) {
+			blockedtd = "td_footer_blocked_zero";
+		}
+		
+		String footer = "<tr id=\"totals\"> \n" +
 				"\t <td class=\"td_header_master\">Totals:</td>" +
-				"\t <td class=\"td_footer_run\">"+(passedTests + failedTests - blockedTests)+"/"+(passedTests + failedTests)+"</td>" +
+				String.format("\t <td class=\"%s\">"+(passedTests + failedTests)+"/"+(passedTests + failedTests + blockedTests)+"</td>", footerrun) +
 				"\t <td class=\"td_footer_passed\">"+passedTests+"</td>" +
-				"\t <td class=\"td_footer_failed\">"+(failedTests - blockedTests)+"</td>" +
-				"\t <td class=\"td_footer_skipped\">"+blockedTests+"</td>" +
+				String.format("\t <td class=\"%s\">"+failedTests+"</td>", failedtd) +
+				String.format("\t <td class=\"%s\">"+blockedTests+"</td>", blockedtd) +
 				"\t <td class=\"td_footer_watchdog\">"+watchdog+"</td>" +
 				"\t <td class=\"td_footer_passed\">"+passedAsserts+"</td>" +
 				"\t <td class=\"td_footer_assert\">"+failedAsserts+"</td>" +
@@ -372,7 +391,7 @@ public class VddSummaryReporter {
 				isrestart = isRestart(nl.item(i));
 				
 				if (isrestart) {
-					//continue;
+					continue;
 				}
 				
 				if (islibfile) {

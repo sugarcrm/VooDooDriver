@@ -28,6 +28,8 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -194,4 +196,43 @@ public class SodaUtils {
 		
 		return data;
 	}
+	
+	public static boolean isInt(String str) {
+		boolean result = false;
+		
+		try {
+			Integer.parseInt(str);
+			result = true;
+		} catch (NumberFormatException exp) {
+			result = false;
+		}
+		
+		return result;
+	}
+	
+	public static String replaceString(String str, SodaHash hijacks) {
+		String result = str;
+		Pattern patt = null;
+		Matcher matcher = null;
+		
+		patt = Pattern.compile("\\{@[\\w\\.]+\\}", Pattern.CASE_INSENSITIVE);
+		matcher = patt.matcher(str);
+		
+		while (matcher.find()) {
+			String m = matcher.group();
+			String tmp = m;
+			tmp = tmp.replace("{@", "");
+			tmp = tmp.replace("}", "");
+			
+			if (hijacks.containsKey(tmp)) {
+				String value = hijacks.get(tmp).toString();
+				result = result.replace(m, value);
+			}
+		}
+		
+		result = result.replaceAll("\\\\n", "\n");
+		
+		return result;
+	}
+	
 }

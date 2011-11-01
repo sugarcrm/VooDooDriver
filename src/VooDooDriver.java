@@ -30,6 +30,7 @@ import voodoodriver.SodaBlockListParser;
 import voodoodriver.SodaBrowser;
 import voodoodriver.SodaChrome;
 import voodoodriver.SodaCmdLineOpts;
+import voodoodriver.SodaConfigParser;
 import voodoodriver.SodaEvents;
 import voodoodriver.SodaFirefox;
 import voodoodriver.SodaHash;
@@ -97,11 +98,13 @@ public class VooDooDriver {
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
-			
 			gvars = new SodaHash();
-			if (cmdOpts.containsKey("configfile")) {
-				sodaConfigFile = cmdOpts.get("configfile").toString();
-				System.out.printf("(*)Overwriting default config file to: '%s'.\n", sodaConfigFile);
+			
+			if (cmdOpts.containsKey("config")) {
+				if (cmdOpts.get("config") != null) {
+					sodaConfigFile = cmdOpts.get("config").toString();
+					System.out.printf("(*)Overwriting default config file to: '%s'.\n", sodaConfigFile);
+				}
 			}
 			
 			sodaConfigFD = new File(sodaConfigFile);
@@ -466,7 +469,7 @@ public class VooDooDriver {
 			SodaTest testobj = null;
 			System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
 			System.out.printf("(*)Parsing Suite file...\n");
-			SodaSuiteParser suiteP = new SodaSuiteParser(suite_name);
+			SodaSuiteParser suiteP = new SodaSuiteParser(suite_name, gvars);
 			SodaTestList suite_test_list = suiteP.getTests();
 			SodaHash vars = null;
 			SodaTestResults test_results_hash = null;

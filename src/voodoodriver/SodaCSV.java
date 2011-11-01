@@ -34,7 +34,6 @@ public class SodaCSV {
 		BufferedReader br = null;
 	
 		this.report = reporter;
-	
 		this.parser = new CSVParser(',','"');
 		
 		try {
@@ -88,8 +87,6 @@ public class SodaCSV {
 					continue;
 				}
 				
-				//linedata = line.split(",");
-				//linedata = this.processLine(line);
 				linedata = this.parser.parseLine(line);
 				
 				int linelen = linedata.length -1;

@@ -133,6 +133,8 @@ public class SodaCmdLineOpts {
 					 String tmp = args[i];
 					 tmp = tmp.replace("--attachtimeout=", "");
 					 this.attachtimeout = Integer.valueOf(tmp);
+				 } else {
+					 System.err.printf("(!)Error: Unknown command line flag passed to VooDooDriver: '%s'!\n", args[i]);
 				 }
 			}
 			
