@@ -53,6 +53,7 @@ public class SodaEventDriver implements Runnable {
 	private VDDPluginsHash loadedPlugins = null;
 	private String currentHWnd = null;
 	private int attachTimeout = 0;
+	private String csvOverrideFile = null;
 
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events,
 			SodaReporter reporter, SodaHash gvars, SodaHash hijacks,
@@ -2287,13 +2288,37 @@ public class SodaEventDriver implements Runnable {
 		boolean result = false;
 		SodaCSV csv = null;
 		SodaCSVData csv_data = null;
-		String var_name = event.get("var").toString();
+		String var_name = null;
 		String csv_filename = "";
 		String msg = "";
 
+		if (event.containsKey("var")) {
+			var_name = event.get("var").toString();
+		}
+		
 		this.resetThreadTime();
 		this.report.Log("CSV event starting...");
 
+		if (this.csvOverrideFile != null) {
+			csv_filename = event.get("file").toString();
+			csv_filename = this.replaceString(csv_filename);
+			msg = String.format("Found existing csv override file: '%s', replacing expected file: '%s'.", 
+					this.csvOverrideFile, csv_filename);
+			event.put("file", this.csvOverrideFile);
+			event.remove("csv"); // just in cause someone wanted to override and override. //
+			this.csvOverrideFile = null;
+		}
+		
+		if (event.containsKey("override")) {
+			String csv_txt = event.get("override").toString();
+			csv_txt = this.replaceString(csv_txt);
+			this.csvOverrideFile = csv_txt;
+			msg = String.format("Setting CSV file override to file: '%s'.", this.csvOverrideFile);
+			this.report.Log(msg);
+			this.report.Log("CSV event finished.");
+			return true;
+		}
+		
 		csv_filename = event.get("file").toString();
 		csv_filename = replaceString(csv_filename);
 		msg = String.format("Processing CSV file: '%s'...", csv_filename);
