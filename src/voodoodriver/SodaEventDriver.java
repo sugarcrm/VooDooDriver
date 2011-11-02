@@ -172,9 +172,7 @@ public class SodaEventDriver implements Runnable {
 
 		String name = event.get("save").toString();
 		if (this.ElementStore.containsKey(name)) {
-			String msg = String
-					.format(
-							"Found existing saved element var: '%s', Overwriting now.",
+			String msg = String.format("Found existing saved element var: '%s', Overwriting now.",
 							name);
 			this.report.Warn(msg);
 		}
@@ -502,7 +500,7 @@ public class SodaEventDriver implements Runnable {
 
 		this.report.Log("Alert event starting.");
 
-		if (!event.containsKey("alert") && !event.containsKey("exist")) {
+		if (!event.containsKey("alert") && !event.containsKey("exists")) {
 			result = false;
 			this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
 			return result;
@@ -514,8 +512,8 @@ public class SodaEventDriver implements Runnable {
 			alert_var = this.clickToBool(tmp);
 		}
 
-		if (event.containsKey("exist")) {
-			String tmp = event.get("exist").toString();
+		if (event.containsKey("exists")) {
+			String tmp = event.get("exists").toString();
 			tmp = this.replaceString(tmp);
 			exists = this.clickToBool(tmp);
 			
@@ -2202,8 +2200,8 @@ public class SodaEventDriver implements Runnable {
 			required = this.clickToBool(event.get("required").toString());
 		}
 
-		if (event.containsKey("exist")) {
-			String tmp = event.get("exist").toString();
+		if (event.containsKey("exists")) {
+			String tmp = event.get("exists").toString();
 			tmp = this.replaceString(tmp);
 			exists = this.clickToBool(tmp);
 		}
@@ -2512,8 +2510,8 @@ public class SodaEventDriver implements Runnable {
 		int timeout = 5;
 		String msg = "";
 
-		if (event.containsKey("exist")) {
-			exists = this.clickToBool(event.get("exist").toString());
+		if (event.containsKey("exists")) {
+			exists = this.clickToBool(event.get("exists").toString());
 		}
 
 		if (event.containsKey("timeout")) {
