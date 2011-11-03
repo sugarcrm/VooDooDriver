@@ -105,7 +105,6 @@ public class VddSummaryReporter {
 				stream = new FileInputStream(header_fd);
 			}
 			
-			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
 			File fd = new File(this.issuesHtmlFile);
 			BufferedWriter out = new BufferedWriter(new FileWriter(fd));
