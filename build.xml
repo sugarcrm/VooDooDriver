@@ -14,7 +14,7 @@
 	<property name="product-zip" location="${bin}/VooDooDriver.zip"/>
 	<property name="sodaelements" location="${src}/voodoodriver/SodaElements.xml"/>
 	<property name="suitereport-header" location="${src}/vddlogger/suitereporter-header.txt" />
-	<property name="issuesreport-header" location="${src/vddlogger/issues-header.txt}" />
+	<property name="issuesreport-header" location="${src}/vddlogger/issues-header.txt}" />
 	<property name="summaryreport-header" location="${src}/vddlogger/summaryreporter-header.txt" />
 	<property name="reportlog-header" location="${src}/vddlogger/reportlogheader.txt" />
 	<property name="helpmessage" location="${src}/helpmessage.txt" />
