@@ -32,14 +32,21 @@ public class SodaPageAsserter {
 	private ArrayList<String> checkes = null;
 	private File fd = null;
 	private SodaReporter reporter = null;
+	private SodaHash whiteList = null;
 	
-	public SodaPageAsserter(String assertFile, SodaReporter reporter) {
+	public SodaPageAsserter(String assertFile, SodaReporter reporter, SodaHash whitelist) {
 		this.reporter = reporter;
 		this.ignores = new ArrayList<String>();
 		this.checkes = new ArrayList<String>();
 		Document doc = null;
 		DocumentBuilderFactory dbf = null;
 		DocumentBuilder db = null;
+		
+		if (whitelist != null) {
+			this.whiteList = whitelist;
+		} else {
+			this.whiteList = new SodaHash();
+		}
 		
 		fd = new File(assertFile);
 		if (!fd.exists()) {
@@ -57,10 +64,23 @@ public class SodaPageAsserter {
 		}
 	}
 	
+	public void assertPage(String pagesrc, SodaHash whitelist) {
+		this.whiteList.putAll(whitelist);
+		assertPage(pagesrc);
+	}
+	
 	public void assertPage(String pagesrc) {
-		//this.reporter.Log("Page Assert Starting.");
 		int ignore_len = this.ignores.size() -1;
 		int check_len = this.checkes.size() -1;
+		String[] keys = this.whiteList.keySet().toArray(new String[0]);
+		
+		for (int windex = 0; windex <= keys.length -1; windex++) {
+			String whiteValue = this.whiteList.get(keys[windex]).toString();
+			whiteValue = reporter.strToRegex(whiteValue);
+			Pattern p = Pattern.compile(whiteValue, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+			Matcher m = p.matcher(pagesrc);
+			pagesrc = m.replaceAll("");
+		}
 		
 		for (int i = 0; i <= ignore_len; i++) {
 			if (reporter.isRegex(this.ignores.get(i))) {
@@ -89,8 +109,6 @@ public class SodaPageAsserter {
 				}
 			}
 		}
-		
-		//this.reporter.Log("Page Assert Finished.");
 	}
 	
 	private void parse(NodeList nodes) {

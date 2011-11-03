@@ -53,7 +53,7 @@ public interface SodaBrowserInterface {
 	
 	public String getPageSource();
 	
-	public boolean assertPage();
+	public boolean assertPage(SodaHash whitelist);
 	
 	public boolean Assert(String value);
 	
