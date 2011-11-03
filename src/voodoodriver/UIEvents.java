@@ -29,5 +29,6 @@ public enum UIEvents {
 	MOUSEOUT,
 	MOUSEOVER,
 	FOCUS,
-	BLUR;
+	BLUR,
+	DBLCLICK;
 }

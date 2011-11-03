@@ -293,7 +293,6 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 			if (failed) {
 				try {
 					Thread.currentThread();
-					//Thread.currentThread().sleep(1000);
 					Thread.sleep(1000);
 				} catch (Exception exp) {
 					exp.printStackTrace();
