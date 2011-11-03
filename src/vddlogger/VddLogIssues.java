@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public class VddLogIssues {
 
-	private static final long serialVersionUID = 1L;
 	private HashMap<String, Integer> errors = null;
 	private HashMap<String, Integer> wanrings = null;
 	private HashMap<String, Integer> exceptions = null;

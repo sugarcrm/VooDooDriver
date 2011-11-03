@@ -80,15 +80,14 @@ public class VddSummaryReporter {
 	}
 	
 	private void writeIssues() {
-		System.out.printf("(*)Writting issues file...");
-		ArrayList<String> list = new ArrayList<String>();
 		String[] errors_keys = null;
 		String[] warnings_keys = null;
 		String[] except_keys = null;
-		String header = "";
 		String line = "";
 		InputStream stream = null;
 		HashMap<String, Integer> tmpMap = null;
+		
+		System.out.printf("(*)Writting issues file...\n");
 		
 		errors_keys = sortIssue(this.issues.getData().get("errors"));
 		warnings_keys = sortIssue(this.issues.getData().get("warnings"));
@@ -105,13 +104,12 @@ public class VddSummaryReporter {
 				stream = new FileInputStream(header_fd);
 			}
 			
+			InputStreamReader in = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(in);
 			File fd = new File(this.issuesHtmlFile);
 			BufferedWriter out = new BufferedWriter(new FileWriter(fd));
 			
 			while ((line = br.readLine()) != null) {
-				header += line;
-				header += "\n";
 				out.write(line + "\n");
 			}
 			br.close();
@@ -119,7 +117,7 @@ public class VddSummaryReporter {
 			
 			tmpMap = this.issues.getData().get("errors");
 			out.write("<table>\n");
-			out.write("<tr>\n\t<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
+			out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
 			out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
 			for (int i = errors_keys.length -1; i >= 0 ; i--) {
 				int count = tmpMap.get(errors_keys[i]);
@@ -164,6 +162,8 @@ public class VddSummaryReporter {
 			exp.printStackTrace();
 		}
 
+		System.out.printf("(*)Finished writting issues file.\n");
+		
 	}
 	
 	private String[] sortIssue(HashMap<String, Integer> map) {
