@@ -121,6 +121,8 @@ public class VddSummaryReporter {
 			out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
 			for (int i = errors_keys.length -1; i >= 0 ; i--) {
 				int count = tmpMap.get(errors_keys[i]);
+				errors_keys[i] = errors_keys[i].replaceAll("<", "&lt");
+				errors_keys[i] = errors_keys[i].replaceAll(">", "&gt");
 				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
 				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, errors_keys[i]);
 				out.write(n);
@@ -136,6 +138,8 @@ public class VddSummaryReporter {
 			for (int i = except_keys.length -1; i >= 0 ; i--) {
 				int count = tmpMap.get(except_keys[i]);
 				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+				except_keys[i] = except_keys[i].replaceAll("<", "&lt");
+				except_keys[i] = except_keys[i].replaceAll(">", "&gt");
 				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, except_keys[i]);
 				out.write(n);
 				out.write("</tr>\n");
@@ -150,6 +154,8 @@ public class VddSummaryReporter {
 			for (int i = warnings_keys.length -1; i >= 0 ; i--) {
 				int count = tmpMap.get(warnings_keys[i]);
 				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+				warnings_keys[i] = warnings_keys[i].replaceAll("<", "&lt");
+				warnings_keys[i] = warnings_keys[i].replaceAll(">", "&gt");
 				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, warnings_keys[i]);
 				out.write(n);
 				out.write("</tr>\n");
