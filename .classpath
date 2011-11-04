@@ -32,10 +32,11 @@
 	<classpathentry kind="lib" path="lib/libs/httpmime-4.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/libs/nekohtml-1.9.15.jar"/>
 	<classpathentry kind="lib" path="lib/libs/operadriver-v0.7.2.jar"/>
-	<classpathentry kind="lib" path="lib/libs/selenium-java-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/libs/junit-dep-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/libs/operadriver-v0.7.3.jar"/>
 	<classpathentry kind="lib" path="lib/libs/protobuf-java-2.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/libs/opencsv-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/libs/guava-10.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/libs/selenium-java-2.11.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
