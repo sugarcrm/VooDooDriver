@@ -188,7 +188,6 @@ public class VddLogToHTML {
 				return;
 			} else if (line.startsWith("Exception")) {
 				this.issues.addException(line);
-				
 			} else {
 				this.issues.addError(line);
 			}

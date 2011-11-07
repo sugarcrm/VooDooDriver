@@ -2694,8 +2694,7 @@ public class SodaEventDriver implements Runnable {
 						elements = parent.findElements(by);
 						if (elements.size() - 1 < index && required != false) {
 							if (required) {
-								msg = String.format("Failed to find element by index '%d', index is out of bounds!",
-												index);
+								msg = String.format("Failed to find element by index '%d', index is out of bounds!",index);
 								this.report.ReportError(msg);
 							}
 							element = null;
