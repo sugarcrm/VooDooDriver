@@ -2582,8 +2582,7 @@ public class SodaEventDriver implements Runnable {
 			inx = this.replaceString(inx);
 
 			if (!SodaUtils.isInt(inx)) {
-				msg = String.format("Error: index value: '%s' is not an integer!",
-						inx);
+				msg = String.format("Error: index value: '%s' is not an integer!",inx);
 				this.report.ReportError(msg);
 				return null;
 			}
