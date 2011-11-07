@@ -31,11 +31,14 @@ public class VddLogToHTML {
 	private PrintStream repFile;
 	private int backTraceID;
 	private int eventDumpID;
+	private VddLogIssues issues = null;
 	
 	public VddLogToHTML(String inputFile) {
 		strLine = new String();
 		backTraceID = 0;
 		eventDumpID = 0 ;
+		
+		this.issues = new VddLogIssues();
 		
 		/**
 		 * set up file reading 
@@ -70,6 +73,10 @@ public class VddLogToHTML {
 		}
 		
 		System.out.printf("(*)Finished report generation.\n");
+	}
+	
+	public VddLogIssues getIssues() {
+		return this.issues;
 	}
 	
 	/**
@@ -168,6 +175,29 @@ public class VddLogToHTML {
 		return htmlRow;
 	}
 
+	private void processIssues(String line) {
+		if (line.contains("(*")) {
+			return;
+		}
+
+		line = line.replaceFirst("\\[.*\\]", "");
+		
+		if (line.startsWith("(!")) {
+			line = line.replaceFirst("\\(\\!\\)", "");
+			if (line.startsWith("--Exception")) {
+				return;
+			} else if (line.startsWith("Exception")) {
+				this.issues.addException(line);
+				
+			} else {
+				this.issues.addError(line);
+			}
+		} else if (line.startsWith("(W")) {
+			line = line.replaceFirst("\\(W\\)", "");
+			this.issues.addWarning(line);
+		}
+	}
+	
 	/**
 	 * generates a html report file 
 	 */
@@ -180,6 +210,7 @@ public class VddLogToHTML {
 			 */
 			strLine = br.readLine();		
 			while (strLine != null){
+				processIssues(strLine);
 				repFile.println(generateTableRow(strLine));
 				strLine = br.readLine();
 			}

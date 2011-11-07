@@ -40,11 +40,11 @@ Required Flags:
 
    --restartcount: This is how many tests in a suite that run before the browser is restarted.
 
-  --restarttest: This is the test that gets ran after the browser restarts, and before the next test     is run.
+   --restarttest: This is the test that gets ran after the browser restarts, and before the next test     is run.
 
-  --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.
+   --attachtimeout: This sets the timeout after an attach event finishes.  The debug is to not wait.
 
-  --version: Print the Soda Version string.
+   --version: Print the Soda Version string.
 
 Notes:
 --)All conflicting command line options with with the config files supersede the confile files.

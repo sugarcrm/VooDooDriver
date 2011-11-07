@@ -49,7 +49,7 @@ public class SodaCmdLineOpts {
 	private String assertPageFile = null;
 	private int restartcount = 0;
 	private String restarttest = null;
-	private int attachtimeout = 0; 
+	private int attachtimeout = 0;
 	
 	public SodaCmdLineOpts(String[] args) {
 		

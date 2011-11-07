@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 public class VddSummaryReporter {
 
 	private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
+	private String HTML_HEADER_ISSUES_RESOURCE = "issues-header.txt";
 	private int count;
 	private ArrayList<File> xmlFiles;
 	private int passedTests = 0;
@@ -45,6 +46,8 @@ public class VddSummaryReporter {
 	private PrintStream repFile;
 	private Document dom;
 	private String basedir = "";
+	private VddLogIssues issues = null;
+	private String issuesHtmlFile = null;
 	
 	public VddSummaryReporter(ArrayList<File> xmlFiles, String path) {
 		this.count = 0;
@@ -61,7 +64,10 @@ public class VddSummaryReporter {
 		minutes = 0;
 		seconds = 0;
 		String summaryFile = String.format("%s%s%s", path, File.separatorChar, "summary.html");
+		this.issuesHtmlFile = String.format("%s%s%s", path, File.separatorChar, "issues.html");
 		this.basedir = path;
+		
+		this.issues = new VddLogIssues();
 		
 		try {
 			output = new FileOutputStream(summaryFile);
@@ -71,6 +77,117 @@ public class VddSummaryReporter {
 			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", summaryFile);
 			e.printStackTrace();
 		}
+	}
+	
+	private void writeIssues() {
+		String[] errors_keys = null;
+		String[] warnings_keys = null;
+		String[] except_keys = null;
+		String line = "";
+		InputStream stream = null;
+		HashMap<String, Integer> tmpMap = null;
+		
+		System.out.printf("(*)Writting issues file...\n");
+		
+		errors_keys = sortIssue(this.issues.getData().get("errors"));
+		warnings_keys = sortIssue(this.issues.getData().get("warnings"));
+		except_keys = sortIssue(this.issues.getData().get("exceptions"));
+		
+		try {
+			String className = this.getClass().getName().replace('.', '/');
+			String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+			
+			if (classJar.startsWith("jar:")) {
+				stream = getClass().getResourceAsStream(this.HTML_HEADER_ISSUES_RESOURCE);
+			} else {
+				File header_fd = new File(getClass().getResource(this.HTML_HEADER_ISSUES_RESOURCE).getFile());
+				stream = new FileInputStream(header_fd);
+			}
+			
+			InputStreamReader in = new InputStreamReader(stream);
+			BufferedReader br = new BufferedReader(in);
+			File fd = new File(this.issuesHtmlFile);
+			BufferedWriter out = new BufferedWriter(new FileWriter(fd));
+			
+			while ((line = br.readLine()) != null) {
+				out.write(line + "\n");
+			}
+			br.close();
+			in.close();
+			
+			tmpMap = this.issues.getData().get("errors");
+			out.write("<table>\n");
+			out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
+			out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+			for (int i = errors_keys.length -1; i >= 0 ; i--) {
+				int count = tmpMap.get(errors_keys[i]);
+				errors_keys[i] = errors_keys[i].replaceAll("<", "&lt");
+				errors_keys[i] = errors_keys[i].replaceAll(">", "&gt");
+				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, errors_keys[i]);
+				out.write(n);
+				out.write("</tr>\n");
+			}
+			out.write("</table>\n");
+			out.write("\n<hr></hr>\n");
+
+			tmpMap = this.issues.getData().get("exceptions");
+			out.write("<table>\n");
+			out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Exceptions:</td>\n</tr>\n");
+			out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+			for (int i = except_keys.length -1; i >= 0 ; i--) {
+				int count = tmpMap.get(except_keys[i]);
+				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+				except_keys[i] = except_keys[i].replaceAll("<", "&lt");
+				except_keys[i] = except_keys[i].replaceAll(">", "&gt");
+				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, except_keys[i]);
+				out.write(n);
+				out.write("</tr>\n");
+			}
+			out.write("</table>\n");
+			out.write("\n<hr></hr>\n");
+			
+			tmpMap = this.issues.getData().get("warnings");
+			out.write("<table>\n");
+			out.write("<tr>\n\t<td class=\"td_header_master\" colspan=\"2\">Warnings:</td>\n</tr>\n");
+			out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+			for (int i = warnings_keys.length -1; i >= 0 ; i--) {
+				int count = tmpMap.get(warnings_keys[i]);
+				out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+				warnings_keys[i] = warnings_keys[i].replaceAll("<", "&lt");
+				warnings_keys[i] = warnings_keys[i].replaceAll(">", "&gt");
+				String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, warnings_keys[i]);
+				out.write(n);
+				out.write("</tr>\n");
+			}
+			out.write("</table>\n");
+			
+			out.write("</body></html>\n");
+			out.close();
+		} catch (Exception exp ) {
+			exp.printStackTrace();
+		}
+
+		System.out.printf("(*)Finished writting issues file.\n");
+		
+	}
+	
+	private String[] sortIssue(HashMap<String, Integer> map) {
+		String[] keys = null;
+
+		keys = map.keySet().toArray(new String[0]);
+		
+		for (int i = 0; i <= keys.length -1; i++) {
+			int count = map.get(keys[i]);
+			keys[i] = String.format("%d:%s", count, keys[i]);
+		}
+		
+		Arrays.sort(keys);
+		for (int i = 0; i <= keys.length -1; i++) {
+			keys[i] = keys[i].replaceFirst("\\d+:", "");
+		}
+		
+		return keys;
 	}
 	
 	public void generateReport() {
@@ -98,6 +215,8 @@ public class VddSummaryReporter {
 		repFile.print(generateHTMLFooter());
 		repFile.print("\n</body>\n</html>\n");
 		repFile.close();
+		
+		this.writeIssues();
 	}
 	
 	private boolean isRestart(Node node) {
@@ -269,6 +388,7 @@ public class VddSummaryReporter {
 		ArrayList<HashMap<String, String>> logs = (ArrayList<HashMap<String, String>>)data.get("testlogs");
 		VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
 		reporter.generateReport();
+		this.issues.appendIssues(reporter.getIssues());
 		
 		return html;
 	}

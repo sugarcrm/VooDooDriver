@@ -1,0 +1,85 @@
+<html>
+<style stype="text/css">
+body {
+ background: #e5eef3;
+}
+
+.highlight {
+ background-color: #8888FF;
+}
+
+.unhighlight {
+ background: #e5eef3;
+}
+
+.td_header_master {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: left;
+ padding-left: 10px;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
+.td_header_count {
+ width: 50px;
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: left;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ padding-left: 2px;
+ border-left: 1px solid black;
+ border-right: 0px solid black;
+ border-bottom: 2px solid black;
+}
+
+.td_header_sub {
+ white-space: nowrap;
+ background: #b6dde8;
+ text-align: left;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ padding-left: 10px;
+ border-left: 1px solid black;
+ border-right: 0px solid black;
+ border-bottom: 2px solid black;
+}
+
+table {
+ width: 100%;
+ border: 2px solid black;
+ border-collapse: collapse;
+ padding: 0px;
+ background: #FFFFFF;
+}
+
+.td_count_data {
+ white-space: nowrap;
+ text-align: left;
+ padding-left: 2px;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+
+.td_file_data {
+ text-align: left;
+ font-family: Arial;
+ font-weight: bold;
+ font-size: 12px;
+ border-left: 0px solid black;
+ border-right: 2px solid black;
+ border-bottom: 2px solid black;
+}
+</style>
+<body>

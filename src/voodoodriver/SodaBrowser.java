@@ -346,19 +346,19 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	/**
 	 * 
 	 */
-	public boolean assertPage() {
+	public boolean assertPage(SodaHash whitelist) {
 		boolean result = false;
 		
 		if (this.asserter == null && this.assertPageFile != null) {
 			try {
-				this.asserter = new SodaPageAsserter(this.assertPageFile, this.reporter);
+				this.asserter = new SodaPageAsserter(this.assertPageFile, this.reporter, whitelist);
 			} catch (Exception exp) {
 				this.reporter.ReportException(exp);
 			}
 		}
 		
 		if (this.asserter != null) {
-			this.asserter.assertPage(this.getPageSource());	
+			this.asserter.assertPage(this.getPageSource(), whitelist);	
 		}
 		
 		return result;
@@ -462,7 +462,7 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
 	 */
 	public void setAssertPageFile(String filename, SodaReporter reporter) {
 		this.assertPageFile = filename;
-		this.asserter = new SodaPageAsserter(filename, reporter);
+		this.asserter = new SodaPageAsserter(filename, reporter, null);
 	}
 	
 	/**

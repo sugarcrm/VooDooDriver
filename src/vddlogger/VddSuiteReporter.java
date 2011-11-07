@@ -34,6 +34,7 @@ public class VddSuiteReporter {
 	private FileOutputStream output = null;
 	private PrintStream repFile = null;
 	private String suiteDir = "";
+	private VddLogIssues issues = null;
 	
 	public VddSuiteReporter(String suitename, String basedir, ArrayList<HashMap<String, String>> logfiles) {
 		String filepath = "";
@@ -41,6 +42,7 @@ public class VddSuiteReporter {
 		String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
 		System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
 		ArrayList<File> tmpFiles = new ArrayList<File>();
+		this.issues = new VddLogIssues();
 		
 		for (int i = 0; i <= logfiles.size() -1; i++) {
 			HashMap<String, String> log = logfiles.get(i);
@@ -106,6 +108,9 @@ public class VddSuiteReporter {
 					System.out.printf("(*)Log File: %s\n", logname);
 					VddLogToHTML log2html = new VddLogToHTML(logname);
 					log2html.generateReport();
+					VddLogIssues tmpissues = log2html.getIssues();
+					this.issues.appendIssues(tmpissues);
+					tmpissues = null;
 				}
 			}
 		}
@@ -299,6 +304,10 @@ public class VddSuiteReporter {
 		
 		repFile.print(header);
 		
+	}
+	
+	public VddLogIssues getIssues() {
+		return this.issues;
 	}
 	
 	/**

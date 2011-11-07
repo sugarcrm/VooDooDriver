@@ -46,6 +46,7 @@ public class SodaReporter {
 	private boolean saveOnAssertFailed = false;
 	private boolean saveOnException = false;
 	private boolean saveOnWatchDog = false;
+	private boolean saveHTML = false;
 	
 	public SodaReporter(String reportName, String resultDir) {
 		Date now = new Date();
@@ -88,6 +89,7 @@ public class SodaReporter {
 	
 	public void setSaveHTML(String setting, SodaBrowser browser) {
 		this.browser = browser;
+		this.saveHTML = true;
 		String[] opts = setting.split(",");
 		
 		for (int i = 0; i <= opts.length -1; i++) {
@@ -395,6 +397,10 @@ public class SodaReporter {
 		String new_save_file = "";
 		String src = "";
 		String testname = "";
+		
+		if (!this.saveHTML) {
+			return;
+		}
 		
 		src = this.browser.getPageSource();
 		

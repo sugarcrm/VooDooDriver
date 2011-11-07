@@ -54,6 +54,7 @@ public class SodaEventDriver implements Runnable {
 	private String currentHWnd = null;
 	private int attachTimeout = 0;
 	private String csvOverrideFile = null;
+	private SodaHash whitelist = null;
 
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events,
 			SodaReporter reporter, SodaHash gvars, SodaHash hijacks,
@@ -63,6 +64,7 @@ public class SodaEventDriver implements Runnable {
 		this.report = reporter;
 		this.hijacks = hijacks;
 
+		this.whitelist = new SodaHash();
 		this.JavaPlugings = new SodaHash();
 		this.loadedPlugins = new VDDPluginsHash();
 
@@ -161,7 +163,7 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (assertpage) {
-			this.Browser.assertPage();
+			this.Browser.assertPage(this.whitelist);
 		}
 	}
 
@@ -405,6 +407,9 @@ public class SodaEventDriver implements Runnable {
 		case FRAME:
 			result = frameEvent(event);
 			break;
+		case WHITELIST:
+			result = whitelistEvent(event);
+			break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
 			System.exit(1);
@@ -421,6 +426,55 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
+	private boolean whitelistEvent(SodaHash event) {
+		boolean result = false;
+		String action = null;
+		String name = null;
+		String msg = "";
+		
+		this.report.Log("Whitelist event starting...");
+		
+		if (event.containsKey("name")) {
+			name = event.get("name").toString();
+			name = this.replaceString(name);
+		}
+		
+		if (name == null) {
+			this.report.ReportError("Error: Missing 'name' attribute!");
+			this.report.Log("Whitelist event finished.");
+			return false;
+		}
+		
+		if (event.containsKey("action")) {
+			action = event.get("action").toString();
+			action = this.replaceString(action);
+			action = action.toLowerCase();
+		}
+		
+		if ((action == null) || (!action.contains("add") && !action.contains("delete"))) {
+			msg = String.format("Error: action is an unknow type: '%s'!", action);
+			this.report.ReportError(msg);
+			this.report.Log("Whitelist event finished.");
+			return false;
+		}
+		
+		if (action.contains("add")) {
+			String tmp = event.get("content").toString();
+			tmp = this.replaceString(tmp);
+			this.whitelist.put(name, tmp);
+			msg = String.format("Added whitelist item: '%s' => '%s'.", name, tmp);
+			this.report.Log(msg);
+		} else {
+			this.whitelist.remove(name);
+			msg = String.format("Deleted whitelist item: '%s'.", name);
+			this.report.Log(msg);
+		}
+		
+		this.report.Log("Whitelist event finished.");
+
+		return result;
+	}
+	
 	private boolean frameEvent(SodaHash event) {
 		boolean result = false;
 		int index = -1;
@@ -1590,10 +1644,9 @@ public class SodaEventDriver implements Runnable {
 						}
 					}
 				}
-
+		
 				if (event.containsKey("jscriptevent")) {
-					this.report.Log("Firing Javascript Event: "
-							+ event.get("jscriptevent").toString());
+					this.report.Log("Firing Javascript Event: "+ event.get("jscriptevent").toString());
 					this.Browser.fire_event(element, event.get("jscriptevent").toString());
 					Thread.sleep(1000);
 					this.report.Log("Javascript event finished.");
@@ -1653,10 +1706,13 @@ public class SodaEventDriver implements Runnable {
 						this.processEvents((SodaEvents)event.get("children"), element);
 					}
 				}
+				
 
 				String value = element.getAttribute("value");
 				handleVars(value, event);
+				
 			}
+			
 		} catch (ElementNotVisibleException exp) {
 			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
@@ -2526,8 +2582,7 @@ public class SodaEventDriver implements Runnable {
 			inx = this.replaceString(inx);
 
 			if (!SodaUtils.isInt(inx)) {
-				msg = String.format("Error: index value: '%s' is not an integer!",
-						inx);
+				msg = String.format("Error: index value: '%s' is not an integer!",inx);
 				this.report.ReportError(msg);
 				return null;
 			}

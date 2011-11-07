@@ -215,6 +215,13 @@ public class SodaXML {
 				}
 			}
 			
+			if (name.contains("whitelist")) {
+				String tmp = child.getTextContent();
+				if (!tmp.isEmpty()) {
+					data.put("content", tmp);
+				}
+			}
+			
 			if (child.hasChildNodes()) {
 				if (name.contains("execute") || name.contains("javaplugin")) {
 					String[] list = processArgs(child.getChildNodes());
