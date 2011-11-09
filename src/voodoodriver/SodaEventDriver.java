@@ -37,6 +37,8 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 public class SodaEventDriver implements Runnable {
 
 	private SodaEvents testEvents = null;
@@ -816,6 +818,8 @@ public class SodaEventDriver implements Runnable {
 				return result;
 			}
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -867,6 +871,8 @@ public class SodaEventDriver implements Runnable {
 				return result;
 			}
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -916,6 +922,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 
+			this.checkDisabled(event, element);
+			
 			if (click) {
 				this.report.Log("Map click started.");
 				this.firePlugin(element, SodaElements.MAP,
@@ -966,6 +974,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 
+			this.checkDisabled(event, element);
+			
 			if (click) {
 				this.report.Log("OL click started.");
 				this.firePlugin(element, SodaElements.OL,
@@ -1129,6 +1139,8 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 
+			this.checkDisabled(event, element);
+			
 			if (click) {
 				this.report.Log("Image click started.");
 				this.firePlugin(element, SodaElements.IMAGE,
@@ -1172,6 +1184,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.FILEFIELD,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("set")) {
 				String setvalue = event.get("set").toString();
 				setvalue = this.replaceString(setvalue);
@@ -1219,6 +1233,7 @@ public class SodaEventDriver implements Runnable {
 				click = this.clickToBool(event.get("click").toString());
 			}
 
+			this.checkDisabled(event, element);
 			String value = element.getText();
 			handleVars(value, event);
 
@@ -1265,7 +1280,8 @@ public class SodaEventDriver implements Runnable {
 
 			String value = element.getText();
 			handleVars(value, event);
-
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -1314,6 +1330,8 @@ public class SodaEventDriver implements Runnable {
 			String value = element.getText();
 			handleVars(value, event);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -1404,6 +1422,8 @@ public class SodaEventDriver implements Runnable {
 
 			this.firePlugin(element, SodaElements.SPAN,
 					SodaPluginEventType.AFTERFOUND);
+			
+			this.checkDisabled(event, element);
 
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1474,6 +1494,8 @@ public class SodaEventDriver implements Runnable {
 
 			this.firePlugin(element, SodaElements.RADIO,
 					SodaPluginEventType.AFTERFOUND);
+			
+			this.checkDisabled(event, element);
 
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -1565,6 +1587,8 @@ public class SodaEventDriver implements Runnable {
 				this.firePlugin(element, SodaElements.SELECT,
 						SodaPluginEventType.AFTERFOUND);
 
+				this.checkDisabled(event, element);
+				
 				if (event.containsKey("set")) {
 					setvalue = event.get("set").toString();
 					setvalue = this.replaceString(setvalue);
@@ -1744,6 +1768,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.FORM,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -1790,6 +1816,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.TABLE,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -2053,6 +2081,8 @@ public class SodaEventDriver implements Runnable {
 
 			this.firePlugin(element, SodaElements.DIV,
 					SodaPluginEventType.AFTERFOUND);
+			
+			this.checkDisabled(event, element);
 
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
@@ -2204,6 +2234,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.CHECKBOX,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 				if (click) {
@@ -2292,6 +2324,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.LINK,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("alert")) {
 				boolean alert = this.clickToBool(event.get("alert").toString());
 				this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
@@ -2955,6 +2989,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.BUTTON,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 			}
@@ -3021,6 +3057,8 @@ public class SodaEventDriver implements Runnable {
 			this.firePlugin(element, SodaElements.TEXTAREA,
 					SodaPluginEventType.AFTERFOUND);
 
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("clear")) {
 				if (this.clickToBool(event.get("clear").toString())) {
 					this.report.Log("Clearing textarea.");
@@ -3086,7 +3124,9 @@ public class SodaEventDriver implements Runnable {
 
 			this.firePlugin(element, SodaElements.TEXTFIELD,
 					SodaPluginEventType.AFTERFOUND);
-
+			
+			this.checkDisabled(event, element);
+			
 			if (event.containsKey("clear")) {
 				if (this.clickToBool(event.get("clear").toString())) {
 					this.report.Log("Clearing textfield.");
@@ -3158,6 +3198,23 @@ public class SodaEventDriver implements Runnable {
 		result = true;
 		this.resetThreadTime();
 		return result;
+	}
+	
+	private void checkDisabled(SodaHash event, WebElement element) {
+		String value = null;
+		
+		if (!event.containsKey("disabled")) {
+			return;
+		}
+		
+		value = event.get("disabled").toString();
+		value = this.replaceString(value);
+		
+		try {
+			SodaUtils.isEnabled(element, this.report, Boolean.valueOf(value));
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+		}
 	}
 
 	private void handleVars(String value, SodaHash event) {
