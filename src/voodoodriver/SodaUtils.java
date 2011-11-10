@@ -244,7 +244,12 @@ public class SodaUtils {
 			return;
 		}
 		
-		eleState = element.isEnabled();
+		if (state) {
+			state = false;
+		} else {
+			state = true;
+		}
+		
 		msg = String.format("Element Enabled => '%s' was expecting Enabled => '%s'!", eleState, state);
 		reporter.Assert(msg, eleState, state);
 	}
