@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.openqa.selenium.WebElement;
 
 /**
  * A simple class for housing one off needed util functions, that can
@@ -233,6 +234,24 @@ public class SodaUtils {
 		result = result.replaceAll("\\\\n", "\n");
 		
 		return result;
+	}
+	
+	public static void isEnabled(WebElement element, SodaReporter reporter, boolean state) {
+		boolean eleState = false;
+		String msg = "";
+		
+		if (element == null) {
+			return;
+		}
+		
+		if (state) {
+			state = false;
+		} else {
+			state = true;
+		}
+		
+		msg = String.format("Element Enabled => '%s' was expecting Enabled => '%s'!", eleState, state);
+		reporter.Assert(msg, eleState, state);
 	}
 	
 }

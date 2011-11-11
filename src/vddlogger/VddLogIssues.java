@@ -28,7 +28,7 @@ public class VddLogIssues {
 	
 	public void addException(String str) {
 		if (this.exceptions.containsKey(str)) {
-			Integer tmp = this.errors.get(str);
+			Integer tmp = this.exceptions.get(str);
 			tmp += 1;
 			this.exceptions.put(str, tmp);
 		} else {
