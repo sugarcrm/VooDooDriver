@@ -143,19 +143,27 @@ public class SodaXML {
 	 */
 	private SodaHash processAttributes(SodaHash map, Node node) {
 		int len = node.getAttributes().getLength();
+		String found_index = null;
+		String accessor = null;
 		
 		if (node.hasAttributes()) {
 			for (int i = 0; i <= len -1; i++) {
 				Node tmp = node.getAttributes().item(i);
 				String name = tmp.getNodeName();
 				String value = tmp.getNodeValue();
-				String accessor = findElementAccessor((SodaElements)map.get("type"), name); 
-				map.put(name, value);
-				
-				if (accessor != null) {
-					map.put("how", accessor);
+				if (name == "index") {
+					found_index = name;
+				} else {
+					accessor = findElementAccessor((SodaElements)map.get("type"), name);
 				}
 				
+				map.put(name, value);
+			}
+			
+			if (accessor != null) {
+				map.put("how", accessor);
+			} else if (accessor == null && found_index != null) {
+				map.put("how", found_index);
 			}
 		}
 		

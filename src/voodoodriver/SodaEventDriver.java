@@ -2659,8 +2659,6 @@ public class SodaEventDriver implements Runnable {
 				if (what.contains("link")) {
 					what = "a";
 				}
-
-				System.out.printf("What: %s\n", what);
 				
 				if (what.contains("image")) {
 					what = "img";
