@@ -151,12 +151,13 @@ public class SodaXML {
 				Node tmp = node.getAttributes().item(i);
 				String name = tmp.getNodeName();
 				String value = tmp.getNodeValue();
+				
 				if (name == "index") {
 					found_index = name;
 				} else {
 					accessor = findElementAccessor((SodaElements)map.get("type"), name);
 				}
-				
+
 				map.put(name, value);
 			}
 			
