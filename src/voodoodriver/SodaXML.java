@@ -156,7 +156,7 @@ public class SodaXML {
 					found_index = "index";
 				}
 				
-				if (accessor == null) {
+				if (accessor == null || accessor == "index") {
 					accessor = findElementAccessor((SodaElements)map.get("type"), name);
 				}
 				
