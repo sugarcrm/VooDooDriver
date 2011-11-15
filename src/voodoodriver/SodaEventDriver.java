@@ -424,6 +424,8 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		this.assertPage(event);
+		
+		this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
 
 		return result;
 	}
@@ -2861,8 +2863,7 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-	private boolean firePlugin(WebElement element, SodaElements type,
-			SodaPluginEventType eventType) {
+	private boolean firePlugin(WebElement element, SodaElements type, SodaPluginEventType eventType) {
 		boolean result = false;
 		int len = 0;
 		String js = "var CONTROL = arguments[0];\n\n";

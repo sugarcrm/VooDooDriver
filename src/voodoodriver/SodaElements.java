@@ -77,7 +77,8 @@ public enum SodaElements {
    DELETE,
    SCREENSHOT,
    ALERT,
-   PLUGINCONTROL;
+   PLUGINCONTROL,
+   GLOBAL;
 	
 	static public boolean isMember(String aName) {
 		boolean result = false;
