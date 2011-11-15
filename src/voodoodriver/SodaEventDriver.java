@@ -37,8 +37,6 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 public class SodaEventDriver implements Runnable {
 
 	private SodaEvents testEvents = null;
