@@ -2231,19 +2231,16 @@ public class SodaEventDriver implements Runnable {
 				return element;
 			}
 
-			this.firePlugin(element, SodaElements.CHECKBOX,
-					SodaPluginEventType.AFTERFOUND);
+			this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERFOUND);
 
 			this.checkDisabled(event, element);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 				if (click) {
-					this.firePlugin(element, SodaElements.CHECKBOX,
-							SodaPluginEventType.BEFORECLICK);
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.BEFORECLICK);
 					element.click();
-					this.firePlugin(element, SodaElements.CHECKBOX,
-							SodaPluginEventType.AFTERCLICK);
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
 				}
 			}
 
