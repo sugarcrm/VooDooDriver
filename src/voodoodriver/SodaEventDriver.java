@@ -2248,19 +2248,18 @@ public class SodaEventDriver implements Runnable {
 			}
 
 			if (event.containsKey("set")) {
+				String msg = "";
 				String set = event.get("set").toString();
 				set = this.replaceString(set);
-				boolean check = this.clickToBool(set);
-				String js = String.format("arguments[0].checked=%s;", check);
-				if (!check) {
-					this.report.Log("Unchecking checkbox.");
-					this.Browser.executeJS(js, element);
-					this.report.Log("Unchecking finished.");
+				
+				if (Boolean.valueOf(set) == element.isSelected()) {
+					msg = String.format("Checkbox current checked state is already: '%s', skipping click.", set);
 				} else {
-					this.report.Log("Checking checkbox.");
-					this.Browser.executeJS(js, element);
-					this.report.Log("Checking finished.");
+					msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
+					element.click();
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
 				}
+				this.report.Log(msg);
 			}
 
 			String value = element.getAttribute("value");
