@@ -305,18 +305,17 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case BUTTON:
 			element = buttonEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
+			this.firePlugin(null, SodaElements.BUTTON, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CSV:
 			result = csvEvent(event);
 			break;
 		case LINK:
 			element = linkEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
+			this.firePlugin(null, SodaElements.LINK, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CHECKBOX:
 			element = checkboxEvent(event, parent);
-			
 			break;
 		case VAR:
 			result = varEvent(event);
@@ -326,22 +325,18 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case DIV:
 			element = divEvent(event, parent);
-			
 			break;
 		case ATTACH:
 			result = attachEvent(event);
 			break;
 		case TABLE:
 			element = tableEvent(event, parent);
-			
 			break;
 		case FORM:
 			element = formEvent(event, parent);
-			
 			break;
 		case SELECT:
 			element = selectEvent(event, parent);
-			
 			break;
 		case STAMP:
 			result = stampEvent();
@@ -351,33 +346,28 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case SPAN:
 			element = spanEvent(event, parent);
-			
 			break;
 		case HIDDEN:
 			result = hiddenEvent(event, parent);
 			break;
 		case TR:
 			element = trEvent(event, parent);
-			
 			break;
 		case TD:
 			element = tdEvent(event, parent);
-			
 			break;
 		case FILEFIELD:
 			element = filefieldEvent(event, parent);
-			
 			break;
 		case IMAGE:
 			element = imageEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
+			this.firePlugin(null, SodaElements.IMAGE, SodaPluginEventType.AFTEREVENT);
 			break;
 		case DND:
 			result = dndEvent(event);
 			break;
 		case TEXTAREA:
 			element = textareaEvent(event, parent);
-			
 			break;
 		case LI:
 			element = liEvent(event, parent);
