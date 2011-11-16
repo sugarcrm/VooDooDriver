@@ -301,22 +301,22 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case TEXTFIELD:
 			element = textfieldEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case BUTTON:
 			element = buttonEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CSV:
 			result = csvEvent(event);
 			break;
 		case LINK:
 			element = linkEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CHECKBOX:
 			element = checkboxEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case VAR:
 			result = varEvent(event);
@@ -326,22 +326,22 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case DIV:
 			element = divEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case ATTACH:
 			result = attachEvent(event);
 			break;
 		case TABLE:
 			element = tableEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case FORM:
 			element = formEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case SELECT:
 			element = selectEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case STAMP:
 			result = stampEvent();
@@ -351,41 +351,41 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case SPAN:
 			element = spanEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case HIDDEN:
 			result = hiddenEvent(event, parent);
 			break;
 		case TR:
 			element = trEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case TD:
 			element = tdEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case FILEFIELD:
 			element = filefieldEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case IMAGE:
 			element = imageEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.AFTEREVENT);
 			break;
 		case DND:
 			result = dndEvent(event);
 			break;
 		case TEXTAREA:
 			element = textareaEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case LI:
 			element = liEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case RADIO:
 			element = radioEvent(event, parent);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case EXECUTE:
 			result = executeEvent(event);
@@ -395,19 +395,19 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case UL:
 			result = ulEvent(event);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case OL:
 			result = olEvent(event);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case MAP:
 			result = mapEvent(event);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case AREA:
 			result = areaEvent(event);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
+			
 			break;
 		case PLUGINLOADER:
 			result = pluginloaderEvent(event);
@@ -426,7 +426,6 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case FRAME:
 			result = frameEvent(event);
-			this.firePlugin(null, SodaElements.GLOBAL, SodaPluginEventType.ALWAYSFIRE);
 			break;
 		case WHITELIST:
 			result = whitelistEvent(event);
