@@ -104,9 +104,9 @@ limitations under the License.
          <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="string">index</accessor>
       </accessor_attributes>
 
       <soda_attributes>
@@ -624,9 +624,9 @@ limitations under the License.
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+          <accessor type="string">index</accessor>
       </accessor_attributes>
 
       <soda_attributes>

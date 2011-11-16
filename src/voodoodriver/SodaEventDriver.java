@@ -37,8 +37,6 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 public class SodaEventDriver implements Runnable {
 
 	private SodaEvents testEvents = null;
@@ -303,15 +301,18 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case TEXTFIELD:
 			element = textfieldEvent(event, parent);
+			
 			break;
 		case BUTTON:
 			element = buttonEvent(event, parent);
+			this.firePlugin(null, SodaElements.BUTTON, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CSV:
 			result = csvEvent(event);
 			break;
 		case LINK:
 			element = linkEvent(event, parent);
+			this.firePlugin(null, SodaElements.LINK, SodaPluginEventType.AFTEREVENT);
 			break;
 		case CHECKBOX:
 			element = checkboxEvent(event, parent);
@@ -360,6 +361,7 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case IMAGE:
 			element = imageEvent(event, parent);
+			this.firePlugin(null, SodaElements.IMAGE, SodaPluginEventType.AFTEREVENT);
 			break;
 		case DND:
 			result = dndEvent(event);
@@ -369,9 +371,11 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case LI:
 			element = liEvent(event, parent);
+			
 			break;
 		case RADIO:
 			element = radioEvent(event, parent);
+			
 			break;
 		case EXECUTE:
 			result = executeEvent(event);
@@ -381,15 +385,19 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case UL:
 			result = ulEvent(event);
+			
 			break;
 		case OL:
 			result = olEvent(event);
+			
 			break;
 		case MAP:
 			result = mapEvent(event);
+			
 			break;
 		case AREA:
 			result = areaEvent(event);
+			
 			break;
 		case PLUGINLOADER:
 			result = pluginloaderEvent(event);
@@ -2231,36 +2239,32 @@ public class SodaEventDriver implements Runnable {
 				return element;
 			}
 
-			this.firePlugin(element, SodaElements.CHECKBOX,
-					SodaPluginEventType.AFTERFOUND);
+			this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERFOUND);
 
 			this.checkDisabled(event, element);
 			
 			if (event.containsKey("click")) {
 				click = this.clickToBool(event.get("click").toString());
 				if (click) {
-					this.firePlugin(element, SodaElements.CHECKBOX,
-							SodaPluginEventType.BEFORECLICK);
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.BEFORECLICK);
 					element.click();
-					this.firePlugin(element, SodaElements.CHECKBOX,
-							SodaPluginEventType.AFTERCLICK);
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
 				}
 			}
 
 			if (event.containsKey("set")) {
+				String msg = "";
 				String set = event.get("set").toString();
 				set = this.replaceString(set);
-				boolean check = this.clickToBool(set);
-				String js = String.format("arguments[0].checked=%s;", check);
-				if (!check) {
-					this.report.Log("Unchecking checkbox.");
-					this.Browser.executeJS(js, element);
-					this.report.Log("Unchecking finished.");
+				
+				if (Boolean.valueOf(set) == element.isSelected()) {
+					msg = String.format("Checkbox current checked state is already: '%s', skipping click.", set);
 				} else {
-					this.report.Log("Checking checkbox.");
-					this.Browser.executeJS(js, element);
-					this.report.Log("Checking finished.");
+					msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
+					element.click();
+					this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
 				}
+				this.report.Log(msg);
 			}
 
 			String value = element.getAttribute("value");
@@ -2659,8 +2663,6 @@ public class SodaEventDriver implements Runnable {
 				if (what.contains("link")) {
 					what = "a";
 				}
-
-				System.out.printf("What: %s\n", what);
 				
 				if (what.contains("image")) {
 					what = "img";
@@ -2867,8 +2869,7 @@ public class SodaEventDriver implements Runnable {
 		return result;
 	}
 
-	private boolean firePlugin(WebElement element, SodaElements type,
-			SodaPluginEventType eventType) {
+	private boolean firePlugin(WebElement element, SodaElements type, SodaPluginEventType eventType) {
 		boolean result = false;
 		int len = 0;
 		String js = "var CONTROL = arguments[0];\n\n";
