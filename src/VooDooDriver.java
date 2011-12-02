@@ -323,7 +323,7 @@ public class VooDooDriver {
 		
 		resultFD = new File(resultdir);
 		if (!resultFD.exists()) {
-			System.out.printf("(*)Result directory doesn't exists, trying to create dir: '%s'\n", resultdir);
+			System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n", resultdir);
 			try {
 				resultFD.mkdirs();
 			} catch (Exception exp) {
@@ -393,7 +393,7 @@ public class VooDooDriver {
 		
 		resultFD = new File(resultdir);
 		if (!resultFD.exists()) {
-			System.out.printf("(*)Result directory doesn't exists, trying to create dir: '%s'\n", resultdir);
+			System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n", resultdir);
 			
 			try {
 				resultFD.mkdirs();
