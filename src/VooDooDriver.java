@@ -44,6 +44,7 @@ import voodoodriver.SodaUtils;
 import voodoodriver.VDDVersionInfo;
 
 public class VooDooDriver {
+	final static String defaultSodaConfigFile = "soda-config.xml";
 	
 	public static void printUsage() {
 		VooDooHelp help = new VooDooHelp();
@@ -72,9 +73,117 @@ public class VooDooDriver {
 		}
 	}
 
+	/**
+	 * Read the VoodDooDriver configuration file.
+	 *
+	 * The default configuration file is soda-config.xml, but that can be changed with the --config command line option.
+	 *
+	 * @param cmdOpts  parsed command line options
+	 * @return         SodaHash with four entries:
+	 *                    <dl>
+	 *                    <dt>gvars</dt>    <dd>SodaHash of global variables from the configuration file</dd>
+	 *                    <dt>hijacks</dt>  <dd>SodaHash of SodaVar substitutions from the configuration file</dd>
+	 *                    <dt>suits</dt>    <dd>ArrayList of suites listed in the configuration file</dd>
+	 *                    <dt>tests</dt>    <dd>ArrayList of tests listed in the configuration file</dd>
+	 *                    </dl>
+	 */
+	@SuppressWarnings("unchecked")
+	private static SodaHash readConfigFile(SodaHash cmdOpts) {
+		String configFile = defaultSodaConfigFile;
+		File sodaConfigFD = null;
+		SodaHash gvars = new SodaHash();
+		SodaHash hijacks = new SodaHash();
+		ArrayList<String> SodaSuitesList = null;
+		ArrayList<String> SodaTestsList = null;
+		SodaHash returnVal = new SodaHash();
+		SodaConfigParser configParser = null;
+		SodaEvents configFileOpts = null;
+
+		returnVal.put("gvars", gvars);
+		returnVal.put("hijacks", hijacks);
+		returnVal.put("suites", null);
+		returnVal.put("tests", null);
+
+		if (cmdOpts.containsKey("config") && cmdOpts.get("config") != null) {
+			configFile = cmdOpts.get("config").toString();
+		}
+		sodaConfigFD = new File(configFile);
+
+		if (!sodaConfigFD.exists()) {
+			if (configFile != defaultSodaConfigFile) {
+				System.out.printf("(!)Error: Specified config file '%s' does not exist!\n", configFile);
+				System.exit(5);
+			}
+			return returnVal;
+		}
+
+		System.out.printf("(*)Reading VooDooDriver config file '%s'.\n", configFile);
+
+		configParser = new SodaConfigParser(sodaConfigFD);
+		configFileOpts = configParser.parse();
+		int argsLen = configFileOpts.size() - 1;
+
+		for (int i = 0; i <= argsLen; i++) {
+			SodaHash tmp = configFileOpts.get(i);
+			String type = tmp.get("type").toString();
+			String name = null;
+			String value = null;
+
+			if (type.contains("gvar")) {
+				name = tmp.get("name").toString();
+				value = tmp.get("value").toString();
+
+				if (!gvars.containsKey(name)) {
+					name = String.format("global.%s", name);
+					gvars.put(name, value);
+					System.out.printf("(*)Adding Config-File gvar: '%s' => '%s'.\n", name, value);
+				}	
+			} else if (type.contains("cmdopt")) {
+				name = tmp.get("name").toString();
+				value = tmp.get("value").toString();
+				if (name.contains("browser")) {
+					cmdOpts.put("browser", value);
+					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
+				} else if (name.contains("attachtimeout")) {
+					cmdOpts.put("attachtimeout", value);
+				} else if (name.contains("resultdir")) {
+					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
+					cmdOpts.put("resultdir", value);
+				} else if (name.contains("savehtml")) {
+					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
+					cmdOpts.put("savehtml", value);
+				}
+			} else if (type.contains("hijacks")) {
+				ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
+						
+				for (int x = 0; x <= jacks.size() -1; x++) {
+					String[] jdata = jacks.get(x).split("::");
+					hijacks.put(jdata[0], jdata[1]);
+					System.out.printf("(*)Adding Config-File hijack: '%s' => '%s'\n", jdata[0], jdata[1]);
+				}
+						
+			} else if (type.contains("suites")) {
+				SodaSuitesList = (ArrayList<String>)tmp.get("suites");
+				for (int x = 0; x <= SodaSuitesList.size() -1; x++) {
+					String sname = SodaSuitesList.get(x);
+					System.out.printf("(*)Adding Config-File suite file: '%s'\n", sname);
+				}
+				returnVal.put("suites", SodaSuitesList);
+			} else if (type.contains("tests")) {
+				SodaTestsList = (ArrayList<String>)tmp.get("tests");
+				for (int x = 0; x <= SodaTestsList.size() -1; x++) {
+					String tname = SodaTestsList.get(x);
+					System.out.printf("(*)Adding Config-File test file: '%s'\n", tname);
+				}
+				returnVal.put("suites", SodaTestsList);
+			}
+		}
+
+		return returnVal;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		String sodaConfigFile = "soda-config.xml";
 		File sodaConfigFD = null;
 		String blockListFile = null;
 		SodaBlockList blockList = null;
@@ -87,93 +196,26 @@ public class VooDooDriver {
 		SodaPluginParser plugParser = null;
 		SodaEvents plugins = null;
 		String savehtml = "";
-		SodaConfigParser configParser = null;
 		String downloadDir = null;
 		String assertpage = null;
 		SodaHash gvars = null;
 		int restartCount = 0;
 		String restartTest = null;
 		int attachTimeout = 0;
-		SodaHash hijacks = new SodaHash();
+		SodaHash hijacks = null;
 		String resultdir = null;
-		SodaEvents configFileOpts = null;
 		
 		System.out.printf("(*)Starting VooDooDriver...\n");
-                dumpJavaInfo();
+		dumpJavaInfo();
 		
 		try {
 			opts = new SodaCmdLineOpts(args);
 			cmdOpts = opts.getOptions();
-			gvars = new SodaHash();
-			
-			if (cmdOpts.containsKey("config")) {
-				if (cmdOpts.get("config") != null) {
-					sodaConfigFile = cmdOpts.get("config").toString();
-					System.out.printf("(*)Overwriting default config file to: '%s'.\n", sodaConfigFile);
-				}
-			}
-			
-			sodaConfigFD = new File(sodaConfigFile);
-			if (sodaConfigFD.exists()) {
-				System.out.printf("(*)Found VooDooDriver config file: %s\n", sodaConfigFile);
-				configParser = new SodaConfigParser(sodaConfigFD);
-				configFileOpts = configParser.parse();
-				int argsLen = configFileOpts.size() -1;
-				
-				for (int i = 0; i <= argsLen; i++) {
-					SodaHash tmp = configFileOpts.get(i);
-					String type = tmp.get("type").toString();
-					String name = null;
-					String value = null;
-
-					if (type.contains("gvar")) {
-						name = tmp.get("name").toString();
-						value = tmp.get("value").toString();
-						
-						if (!gvars.containsKey(name)) {
-							name = String.format("global.%s", name);
-							gvars.put(name, value);
-							System.out.printf("(*)Adding Config-File gvar: '%s' => '%s'.\n", name, value);
-						}	
-					} else if (type.contains("cmdopt")) {
-						name = tmp.get("name").toString();
-						value = tmp.get("value").toString();
-						if (name.contains("browser")) {
-							cmdOpts.put("browser", value);
-							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
-						} else if (name.contains("attachtimeout")) {
-							cmdOpts.put("attachtimeout", value);
-						} else if (name.contains("resultdir")) {
-							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
-							resultdir = value;
-						} else if (name.contains("savehtml")) {
-							System.out.printf("(*)Adding Confile-File cmdopts: '%s' => '%s'.\n", name, value);
-							savehtml = value;
-						}
-					} else if (type.contains("hijacks")) {
-						ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
-						
-						for (int x = 0; x <= jacks.size() -1; x++) {
-							String[] jdata = jacks.get(x).split("::");
-							hijacks.put(jdata[0], jdata[1]);
-							System.out.printf("(*)Adding Config-File hijack: '%s' => '%s'\n", jdata[0], jdata[1]);
-						}
-						
-					} else if (type.contains("suites")) {
-						SodaSuitesList = (ArrayList<String>)tmp.get("suites");
-						for (int x = 0; x <= SodaSuitesList.size() -1; x++) {
-							String sname = SodaSuitesList.get(x);
-							System.out.printf("(*)Adding Config-File suite file: '%s'\n", sname);
-						}
-					} else if (type.contains("tests")) {
-						SodaTestsList = (ArrayList<String>)tmp.get("tests");
-						for (int x = 0; x <= SodaTestsList.size() -1; x++) {
-							String tname = SodaTestsList.get(x);
-							System.out.printf("(*)Adding Config-File test file: '%s'\n", tname);
-						}
-					}
-				}
-			}
+			SodaHash config = readConfigFile(cmdOpts);
+			gvars = (SodaHash)config.get("gvars");
+			hijacks = (SodaHash)config.get("hijacks");
+			SodaSuitesList = (ArrayList<String>)config.get("suites");
+			SodaTestsList = (ArrayList<String>)config.get("tests");
 
 			gvars.putAll((SodaHash)cmdOpts.get("gvars"));
 			hijacks.putAll((SodaHash)cmdOpts.get("hijacks"));
