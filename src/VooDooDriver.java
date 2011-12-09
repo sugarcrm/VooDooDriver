@@ -137,7 +137,7 @@ public class VooDooDriver {
 					name = String.format("global.%s", name);
 					gvars.put(name, value);
 					System.out.printf("(*)Adding Config-File gvar: '%s' => '%s'.\n", name, value);
-				}	
+				}
 			} else if (type.contains("cmdopt")) {
 				name = tmp.get("name").toString();
 				value = tmp.get("value").toString();
@@ -204,6 +204,7 @@ public class VooDooDriver {
 		int attachTimeout = 0;
 		SodaHash hijacks = null;
 		String resultdir = null;
+		Boolean haltOnFailure = false;
 		
 		System.out.printf("(*)Starting VooDooDriver...\n");
 		dumpJavaInfo();
@@ -219,7 +220,7 @@ public class VooDooDriver {
 
 			gvars.putAll((SodaHash)cmdOpts.get("gvars"));
 			hijacks.putAll((SodaHash)cmdOpts.get("hijacks"));
-			
+
 			if ((Boolean)cmdOpts.get("help")) {
 				printUsage();
 				System.exit(0);
@@ -264,6 +265,9 @@ public class VooDooDriver {
 			
 			if (cmdOpts.get("downloaddir") != null) {
 				downloadDir = cmdOpts.get("downloaddir").toString();
+			}
+			if (cmdOpts.get("haltonfailure") != null) {
+				haltOnFailure = (Boolean)cmdOpts.get("haltonfailure");
 			}
 			
 			String cmdSaveHtml = (String)cmdOpts.get("savehtml");
@@ -333,7 +337,7 @@ public class VooDooDriver {
 				}
 				
 				RunSuites(SodaSuitesList, resultdir, browserType, gvars, hijacks, blockList, plugins, savehtml, downloadDir,
-						assertpage, restartTest, restartCount, attachTimeout);
+					  assertpage, restartTest, restartCount, attachTimeout, haltOnFailure);
 			}
 			
 			ArrayList<String> cmdTests = (ArrayList<String>)cmdOpts.get("tests");
@@ -349,7 +353,7 @@ public class VooDooDriver {
 			
 			if (!SodaTestsList.isEmpty()) {
 				RunTests(SodaTestsList, resultdir, browserType, gvars, hijacks,
-						plugins, savehtml, downloadDir, assertpage, attachTimeout);
+					 plugins, savehtml, downloadDir, assertpage, attachTimeout, haltOnFailure);
 			}
 		} catch (Exception exp) {
 			exp.printStackTrace();
@@ -361,7 +365,7 @@ public class VooDooDriver {
 	
 	private static void RunTests(ArrayList<String> tests, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaEvents plugins, String savehtml, String downloaddir, 
-			String assertpage, int attachTimeout) {
+			String assertpage, int attachTimeout, Boolean haltOnFailure) {
 		File resultFD = null;
 		SodaBrowser browser = null;
 		int len = 0;
@@ -412,6 +416,11 @@ public class VooDooDriver {
 			}
 			testobj.setPlugins(plugins);
 			testobj.runTest(false);
+
+			if (haltOnFailure && (Integer)testobj.getReporter().getResults().get("result") != 0) {
+				System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
+				break;
+			}
 		}
 	}
 	
@@ -425,7 +434,8 @@ public class VooDooDriver {
 	
 	private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
 			SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, String savehtml,
-			String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout) {
+			String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout,
+			Boolean haltOnFailure) {
 		int len = suites.size() -1;
 		File resultFD = null;
 		String report_file_name = resultdir;
@@ -435,6 +445,7 @@ public class VooDooDriver {
 		Date now = null;
 		Date suiteStartTime = null;
 		Date suiteStopTime = null;
+		Boolean terminateRun = false;
 		
 		System.out.printf("(*)Running Suite files now...\n");
 		System.out.printf("(*)Timeout: %s\n", attachTimeout);
@@ -498,6 +509,7 @@ public class VooDooDriver {
 		
 		writeSummary(suiteRptFD, "<data>\n");
 		
+		/* Loop over suites */
 		for (int i = 0; i <= len; i++) {
 			String suite_base_noext = "";
 			String suite_name = suites.get(i);
@@ -523,10 +535,12 @@ public class VooDooDriver {
 			SodaTestResults test_results_hash = null;
 			ArrayList<SodaTestResults> test_resultsStore = new ArrayList<SodaTestResults>();
 			
+			/* Loop over tests within each suite. */
 			suiteStartTime = new Date();
 			for (int test_index = 0; test_index <= suite_test_list.size() -1; test_index++) {
 				Date test_start_time = null;
-				
+				Boolean testPassed = false;
+
 				if ( (restartCount > 0) && (testRanCount >= restartCount)) {
 					System.out.printf("(*))Auto restarting browser.\n");
 					if (!browser.isClosed()) {
@@ -649,9 +663,10 @@ public class VooDooDriver {
 					
 					if (key.contains("result")) {
 						if (Integer.valueOf(value) != 0) {
-							value = "Failed";	
+							value = "Failed";
 						} else {
-							value = "Passed";	
+							value = "Passed";
+							testPassed = true;
 						}
 					}
 					writeSummary(suiteRptFD, String.format("\t\t\t<%s>%s</%s>\n", key, value, key));
@@ -677,6 +692,12 @@ public class VooDooDriver {
 						System.out.printf("(*)Tests ran since last restart: '%d'\n", testRanCount);
 					}
 				}
+
+				if (haltOnFailure && testPassed == false) {
+					System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
+					terminateRun = true;
+					break;
+				}
 			}
 			
 			suiteStopTime = new Date();
@@ -696,6 +717,10 @@ public class VooDooDriver {
 			writeSummary(suiteRptFD, String.format("\t\t<stoptime>%s</stoptime>\n", stopTimeStr));
 			writeSummary(suiteRptFD, msg);
 			writeSummary(suiteRptFD, "\t</suite>\n");
+
+			if (terminateRun) {
+				break;
+			}
 		}
 		writeSummary(suiteRptFD, "</data>\n\n");
 	}

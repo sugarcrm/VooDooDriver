@@ -50,6 +50,7 @@ public class SodaCmdLineOpts {
 	private int restartcount = 0;
 	private String restarttest = null;
 	private int attachtimeout = 0;
+	private Boolean haltOnFailure = false;
 	
 	public SodaCmdLineOpts(String[] args) {
 		
@@ -118,7 +119,7 @@ public class SodaCmdLineOpts {
 						this.downloaddir = this.downloaddir.replace("--downloaddir=", "");
 						this.downloaddir = FilenameUtils.separatorsToSystem(this.downloaddir);
 						System.out.printf("(*)Download Directory: %s\n", this.downloaddir);
-				 } else if (args[i].contains("--assertpagefile")) {
+				} else if (args[i].contains("--assertpagefile")) {
 						this.assertPageFile = args[i];
 						this.assertPageFile = this.assertPageFile.replace("--assertpagefile=", "");
 						this.assertPageFile = FilenameUtils.separatorsToSystem(this.assertPageFile);
@@ -133,6 +134,8 @@ public class SodaCmdLineOpts {
 					 String tmp = args[i];
 					 tmp = tmp.replace("--attachtimeout=", "");
 					 this.attachtimeout = Integer.valueOf(tmp);
+				} else if (args[i].equals("--haltOnFailure")) {
+					this.haltOnFailure = true;
 				 } else {
 					 System.err.printf("(!)Error: Unknown command line flag passed to VooDooDriver: '%s'!\n", args[i]);
 				 }
@@ -160,6 +163,7 @@ public class SodaCmdLineOpts {
 			this.options.put("restartcount", this.restartcount);
 			this.options.put("restarttest", this.restarttest);
 			this.options.put("attachtimeout", this.attachtimeout);
+			this.options.put("haltonfailure", this.haltOnFailure);
 		} catch (Exception exp) {
 			exp.printStackTrace();
 			this.options = null;
