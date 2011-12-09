@@ -50,6 +50,28 @@ public class VooDooDriver {
 		help.printHelp();
 	}
 		
+	/**
+	 * Dump JVM information to the console and warn if a non-Sun jvm is being used.
+	 */
+	private static void dumpJavaInfo() {
+		HashMap<String, String> javainfo = null;
+		javainfo = SodaUtils.getJavaInfo();
+
+		String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
+		Arrays.sort(jinfoKeys);
+
+		System.out.printf("(*)Java RunTime Info:\n");
+
+		for (int i = 0; i <= jinfoKeys.length -1; i++) {
+			String value = javainfo.get(jinfoKeys[i]);
+			System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
+		}
+
+		if (javainfo.containsKey("java.vendor") && !javainfo.get("java.vendor").contains("Sun Microsystems Inc")) {
+			System.out.printf("\n(!)Warning: This is not a 'Sun Microsystems Inc.' JRE/JDK and is not supported!\n");
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		String sodaConfigFile = "soda-config.xml";
@@ -72,28 +94,12 @@ public class VooDooDriver {
 		int restartCount = 0;
 		String restartTest = null;
 		int attachTimeout = 0;
-		HashMap<String, String> javainfo = null;
 		SodaHash hijacks = new SodaHash();
 		String resultdir = null;
-		
 		SodaEvents configFileOpts = null;
-		javainfo = SodaUtils.getJavaInfo();
 		
 		System.out.printf("(*)Starting VooDooDriver...\n");
-		System.out.printf("(*)Java RunTime Info:\n");
-		String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
-		Arrays.sort(jinfoKeys);
-		for (int i = 0; i <= jinfoKeys.length -1; i++) {
-			String value = javainfo.get(jinfoKeys[i]);
-			System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
-		}
-		
-		if (javainfo.containsKey("java.vendor")) {
-			String value = javainfo.get("java.vendor");
-			if (!value.contains("Sun Microsystems Inc")) {
-				System.out.printf("\n(!)Warning: You are using a none 'Sun Microsystems Inc.' JRE/JDK, this is not a supported JRE!\n");
-			}
-		}
+                dumpJavaInfo();
 		
 		try {
 			opts = new SodaCmdLineOpts(args);
