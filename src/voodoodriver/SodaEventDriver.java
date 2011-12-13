@@ -1602,8 +1602,8 @@ public class SodaEventDriver implements Runnable {
 					setvalue = this.replaceString(setvalue);
 				}
 
-				if (event.containsKey("realvalue")) {
-					setvalue = event.get("realvalue").toString();
+				if (event.containsKey("setreal")) {
+					setvalue = event.get("setreal").toString();
 					setvalue = this.replaceString(setvalue);
 					real = true;
 				}
