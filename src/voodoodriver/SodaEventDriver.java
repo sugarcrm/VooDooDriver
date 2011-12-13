@@ -1611,8 +1611,11 @@ public class SodaEventDriver implements Runnable {
 				if (setvalue != null) {
 					if (real) {
 						sel.selectByValue(setvalue);
+						this.report.Log("Setting option by value: '" + setvalue + "'.");
+
 					} else {
 						sel.selectByVisibleText(setvalue);
+						this.report.Log("Setting option by visible text: '" + setvalue + "'.");
 					}
 					this.firePlugin(element, SodaElements.SELECT,
 							SodaPluginEventType.AFTERSET);
