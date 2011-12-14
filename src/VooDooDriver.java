@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-
 import voodoodriver.SodaBlockList;
 import voodoodriver.SodaBlockListParser;
 import voodoodriver.SodaBrowser;
@@ -43,6 +42,11 @@ import voodoodriver.SodaTestResults;
 import voodoodriver.SodaUtils;
 import voodoodriver.VDDVersionInfo;
 
+/**
+ * 
+ * @author trampus
+ *
+ */
 public class VooDooDriver {
 	final static String defaultSodaConfigFile = "soda-config.xml";
 	
@@ -184,7 +188,6 @@ public class VooDooDriver {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		File sodaConfigFD = null;
 		String blockListFile = null;
 		SodaBlockList blockList = null;
 		SodaCmdLineOpts opts = null;
