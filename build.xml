@@ -41,7 +41,7 @@
    </pathconvert>
 
 	<target name="docs">
-	   <javadoc sourcepath="${src}" destdir="${dist}/doc" />
+	   <javadoc sourcepath="${src}" destdir="${dist}/javadocs" />
 	</target>
 	
 	<target name="api-docs" depends="init">
@@ -97,7 +97,7 @@
 		</propertyfile>
 	</target>
 	
-   <target name="debug" depends="clean,init,api-docs,copy-launchers" description="compile the source in debug mode" >
+   <target name="debug" depends="clean,init,api-docs,copy-launchers,docs" description="compile the source in debug mode" >
       <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" 
    		includeantruntime="false">
             <classpath>
@@ -155,7 +155,7 @@
       </javac>
    </target>
    
-   <target name="default-build" depends="compile,api-docs,copy-launchers" description="generate the distribution" >
+   <target name="default-build" depends="compile,api-docs,copy-launchers,docs" description="generate the distribution" >
       <copy todir="${dist}/lib">
          <fileset dir="lib/libs" />
       </copy>
