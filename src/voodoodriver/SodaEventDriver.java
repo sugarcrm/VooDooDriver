@@ -1103,12 +1103,12 @@ public class SodaEventDriver implements Runnable {
 		}
 
 		if (src == null) {
-			this.report.ReportError("DVD command is missing 'src' attribute!");
+			this.report.ReportError("DnD command is missing 'src' attribute!");
 			result = false;
 		}
 
 		if (dst == null) {
-			this.report.ReportError("DVD command is missing 'dst' attribute!");
+			this.report.ReportError("DnD command is missing 'dst' attribute!");
 			result = false;
 		}
 
