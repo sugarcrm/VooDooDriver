@@ -37,6 +37,13 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+/**
+ * This is the heart of all of VooDooDriver.  This class handles executing all of the SODA
+ * language commands in the web browser.
+ * 
+ * @author trampus
+ *
+ */
 public class SodaEventDriver implements Runnable {
 
 	private SodaEvents testEvents = null;
@@ -56,6 +63,17 @@ public class SodaEventDriver implements Runnable {
 	private String csvOverrideFile = null;
 	private SodaHash whitelist = null;
 
+	/**
+	 * The class Constructor.
+	 * 
+	 * @param browser  {@link SodaBrowser}
+	 * @param events   {@link SodaEvents}
+	 * @param reporter {@link SodaReporter}
+	 * @param gvars    {@link SodaHash}
+	 * @param hijacks  {@link SodaHash}
+	 * @param oldvars  {@link SodaHash}
+	 * @param plugins  {@link SodaEvents}
+	 */
 	public SodaEventDriver(SodaBrowser browser, SodaEvents events,
 			SodaReporter reporter, SodaHash gvars, SodaHash hijacks,
 			SodaHash oldvars, SodaEvents plugins) {
@@ -103,10 +121,22 @@ public class SodaEventDriver implements Runnable {
 		runner.start();
 	}
 
+	/**
+	 * Sets the timeout in seconds for the Attach command to give up on retrying
+	 * to find the wanted window to attach to.
+	 * 
+	 * @param timeout int
+	 */
 	public void setAttachTimeout(int timeout) {
 		this.attachTimeout = timeout;
 	}
 
+	/**
+	 * Checks to see if a browser window exists.
+	 * 
+	 * @param hwnd {@link String}
+	 * @return
+	 */
 	private boolean windowExists(String hwnd) {
 		boolean exists = false;
 		int i = 0;
@@ -124,14 +154,28 @@ public class SodaEventDriver implements Runnable {
 		return exists;
 	}
 
+	/**
+	 * Sets the active browser window for VDD to use. 
+	 * 
+	 * @param hwnd {@link String}
+	 */
 	private void setCurrentHWND(String hwnd) {
 		this.currentHWnd = hwnd;
 	}
 
+	/**
+	 * Gets the current browser window handle.
+	 * 
+	 * @return {@link String}
+	 */
 	private String getCurrentHWND() {
 		return this.currentHWnd;
 	}
 
+	/**
+	 * Loads and stores all of the java Event Plugin classes.
+	 * 
+	 */
 	private void loadJavaEventPlugins() {
 		int len = this.plugIns.size() - 1;
 
@@ -155,6 +199,10 @@ public class SodaEventDriver implements Runnable {
 		}
 	}
 
+	/**
+	 * 
+	 * @param event
+	 */
 	private void assertPage(SodaHash event) {
 		boolean assertpage = true;
 
