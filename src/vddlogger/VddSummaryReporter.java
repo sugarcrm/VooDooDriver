@@ -18,8 +18,12 @@ package vddlogger;
 
 import java.io.*;
 import java.util.*;
+import java.nio.CharBuffer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.InputSource;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -87,7 +91,7 @@ public class VddSummaryReporter {
 		InputStream stream = null;
 		HashMap<String, Integer> tmpMap = null;
 		
-		System.out.printf("(*)Writting issues file...\n");
+		System.out.printf("(*)Writing issues file...\n");
 		
 		errors_keys = sortIssue(this.issues.getData().get("errors"));
 		warnings_keys = sortIssue(this.issues.getData().get("warnings"));
@@ -168,7 +172,7 @@ public class VddSummaryReporter {
 			exp.printStackTrace();
 		}
 
-		System.out.printf("(*)Finished writting issues file.\n");
+		System.out.printf("(*)Finished writing issues file.\n");
 		
 	}
 	
@@ -199,7 +203,12 @@ public class VddSummaryReporter {
 		
 		for (int i = 0; i < xmlFiles.size(); i ++) {
 			HashMap<String, Object> suiteData = null;
-			suiteData = parseXMLFile(xmlFiles.get(i));
+			try {
+				suiteData = parseXMLFile(xmlFiles.get(i));
+			} catch (Exception e) {
+				System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
+				continue;
+			}
 			name = suiteData.get("suitename").toString();
 			list.put(name, suiteData);
 		}
@@ -282,6 +291,7 @@ public class VddSummaryReporter {
 	private HashMap<String, Object> getSuiteData(Document doc) {
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
+		boolean truncated;
 		String runtime = "";
 		String suiteName = getSuiteName(doc);
 		
@@ -295,6 +305,7 @@ public class VddSummaryReporter {
 		errors = getAmtErrors(doc);
 		total = assertsF + exceptions + errors;
 		runtime = getRunTime(doc);
+		truncated = getTruncated(doc);
 		
 		result.put("passed", passed);
 		result.put("blocked", blocked);
@@ -308,6 +319,7 @@ public class VddSummaryReporter {
 		result.put("runtime", runtime);
 		result.put("suitename", suiteName);
 		result.put("testlogs", this.getTestLogs(doc));
+		result.put("truncated", truncated);
 
 		return result;
 	}
@@ -320,9 +332,16 @@ public class VddSummaryReporter {
 	@SuppressWarnings("unchecked")
 	private String generateTableRow(String suiteName, HashMap<String, Object> data) {
 		int passed, failed, blocked, asserts, assertsF, errors, exceptions, wd, total;
+		boolean truncated;
+		String hl = "highlight", uhl = "unhighlight";
 		suiteName = data.get("suitename").toString();
+		truncated = (Boolean)data.get("truncated");
 		String runtime = "";
-		String html = "<tr id=\""+count+"\" class=\"unhighlight\" onmouseover=\"this.className='highlight'\" onmouseout=\"this.className='unhighlight'\"> \n" +
+		if (truncated) {
+			hl += "_truncated";
+			uhl += "_truncated";
+		}
+		String html = "<tr id=\""+count+"\" class=\""+uhl+"\" onmouseover=\"this.className='"+hl+"'\" onmouseout=\"this.className='"+uhl+"'\"> \n" +
 			"<td class=\"td_file_data\">\n" +
 			"<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
 			"</td>";
@@ -475,19 +494,106 @@ public class VddSummaryReporter {
 		return footer;
 	}
 
-	private HashMap<String, Object> parseXMLFile(File xml){
+	/**
+	 * Deal with log files that are missing end tags.
+	 *
+	 * <p>This is called when xml processing has failed, and that
+	 * only happens when the datafile ends prematurely.  From this
+	 * point of view, there are three scenarios:</p>
+	 *
+	 * <ol>
+	 *   <li>File is empty</li>
+	 *   <li>File is correctly formed xml, but missing end tags</li>
+	 *   <li>File ends mid-tag</li>
+	 * </ol>
+	 *
+	 * <p>For the first case, we create an almost empty file with
+	 * the bare minimum of tags and use the file name for the
+	 * suite file name.  This should be noticable by the user as a
+	 * problem.</p>
+	 *
+	 * <p>For the second and third, we find the last valid entry
+	 * and cut the file off there, then add terminating tags.</p>
+	 *
+	 * <p>For all cases, a &lt;truncated/&gt; tag is added.  This
+	 * tells the report generation engine to highlight this file's
+	 * entry so the user will be incited to look into the problem
+	 * (e.g. did the test machine crash midway through the
+	 * test?)</p>
+	 *
+	 * @param xml a log file that has already failed parsing
+	 * @return an InputSource with added end tags suitable for re-parsing
+	 */
+
+	private InputSource endTagHack(File xml) throws Exception {
+		if (xml.length() >= (2L << 31)) {
+			/*
+			 * The CharBuffer below uses an int for its
+			 * buffer size.  This limits us to files less
+			 * than 2GB.  That's probably the least of the
+			 * problems if this code is getting called,
+			 * but make sure here it's flagged.  Should
+			 * the user notice and file a bug, this code
+			 * can be revisited.
+			 */
+			System.out.println("(!)Warning: File > 2GB (" + xml.length() + "). Further truncation will occur.");
+		}
+		CharBuffer cbuf = CharBuffer.allocate((int)xml.length());
+		FileReader f = new FileReader(xml);
+		f.read(cbuf);
+		cbuf.rewind();
+
+		/* First case */
+		if (cbuf.length() == 0) {
+			String contents = "<data><truncated/><suite><suitefile>" + xml.getName() + "</suitefile></suite></data>\n";
+			return new InputSource(new StringReader(contents));
+		}
+
+		/* Second and third cases. */
+		String mungedXml = cbuf.toString();
+
+		/* Scan backward through the file, looking for an appropriate end tag. */
+		String endTags[] = {"</test>", "</suite>", "</data>"}; // Yes, the order is significant.
+		for (int k = cbuf.length() - 1; k >= 0; k--) {
+			if (cbuf.charAt(k) == '<') {
+				Boolean foundEndTag = false;
+				for (int t = 0; t < endTags.length; t++) {
+					if (mungedXml.regionMatches(k, endTags[t], 0, endTags[t].length())) {
+						foundEndTag = true;
+						mungedXml = mungedXml.substring(0, k);
+					}
+					if (foundEndTag) {
+						if (t == 2) {
+							mungedXml += "<truncated/>";
+						}
+						mungedXml += endTags[t];
+					}
+				}
+				if (foundEndTag) {
+					break;
+				}
+			}
+		}
+
+		return new InputSource(new StringReader(mungedXml));
+	}
+
+	private HashMap<String, Object> parseXMLFile(File xml) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		HashMap<String, Object> result = new HashMap<String, Object>();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		db.setErrorHandler(new VddErrorHandler());
 		
 		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
 			dom = db.parse(xml);
-			result = getSuiteData(dom);
-		} catch(Exception e){
-			e.printStackTrace();
-			result = null;
+		} catch(SAXParseException e) {
+			System.out.println("(!)Error parsing log file (" + e.getMessage() + ").  Retrying with end tag hack...");
+			InputSource is = endTagHack(xml);
+			dom = db.parse(is);
+			System.out.println("(*)Success!");
 		}
 		
+		result = getSuiteData(dom);
 		return result;
 	}
 	
@@ -830,4 +936,11 @@ public class VddSummaryReporter {
 		return name;
 	}
 	
+	/**
+	 * Get whether the log file was truncated
+	 */
+	private boolean getTruncated(Document d) {
+		NodeList nl = d.getElementsByTagName("truncated");
+		return nl.getLength() > 0;
+	}
 }

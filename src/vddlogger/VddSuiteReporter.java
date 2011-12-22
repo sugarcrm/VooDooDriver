@@ -58,12 +58,22 @@ public class VddSuiteReporter {
 		/**
 		 * set up file output
 		 */
+		File od = new File(outputDir);
+		if (!od.exists()) {
+			/*
+			 * This should only ever happen if the log
+			 * file being processed is completely empty.
+			 */
+			System.out.println("(!)Warning: Creating missing output directory '" + outputDir + "'.");
+			od.mkdir();
+		}
+
 		try {
 			this.suiteDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
-			filepath = String.format("%s%s%s.html", outputDir, File.separatorChar,suitename);
+			filepath = String.format("%s%s%s.html", outputDir, File.separatorChar, suitename);
 			output = new FileOutputStream(filepath);
 			repFile = new PrintStream(output);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", filepath);
 			e.printStackTrace();
 		}

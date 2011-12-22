@@ -6,10 +6,22 @@ body {
 
 .highlight {
  background-color: #8888FF;
+ color: black;
+}
+
+.highlight_truncated {
+ background-color: #ff6309;
+ color: black;
 }
 
 .unhighlight {
- background: #e5eef3;
+ background-color: #e5eef3;
+ color: black;
+}
+
+.unhighlight_truncated {
+ background-color: #ffcc99;
+ color: black;
 }
 
 .td_header_master {

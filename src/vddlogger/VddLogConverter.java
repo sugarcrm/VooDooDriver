@@ -62,7 +62,7 @@ public class VddLogConverter {
 			File suiteDir = new File(suitedir);
 			
 			if (!suiteDir.exists()) {
-				System.out.printf("(!)Error: Failed to find suite directory: '%s'!\n\n");
+				System.out.printf("(!)Error: Failed to find suite directory: '%s'!\n\n", suitedir);
 				System.exit(4);
 			}
 			
@@ -80,9 +80,7 @@ public class VddLogConverter {
 
 		files = dirFD.list();
 		for (int i = 0; i <= files.length -1; i++) {
-			String tmp = files[i];
-			tmp = tmp.toLowerCase();
-			if (!tmp.endsWith("xml")) {
+			if (!files[i].toLowerCase().endsWith("xml")) {
 				continue;
 			}
 			
