@@ -143,19 +143,15 @@ public class VooDooDriver {
 					System.out.printf("(*)Adding Config-File gvar: '%s' => '%s'.\n", name, value);
 				}
 			} else if (type.contains("cmdopt")) {
+				String validCmdopts[] = {"browser", "attachtimeout", "resultdir", "savehtml", "plugin"};
 				name = tmp.get("name").toString();
 				value = tmp.get("value").toString();
-				if (name.contains("browser")) {
-					cmdOpts.put("browser", value);
-					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
-				} else if (name.contains("attachtimeout")) {
-					cmdOpts.put("attachtimeout", value);
-				} else if (name.contains("resultdir")) {
-					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
-					cmdOpts.put("resultdir", value);
-				} else if (name.contains("savehtml")) {
-					System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
-					cmdOpts.put("savehtml", value);
+
+				for (String s: validCmdopts) {
+					if (name.contains(s)) {
+						cmdOpts.put(s, value);
+						System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n", name, value);
+					}
 				}
 			} else if (type.contains("hijacks")) {
 				ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
