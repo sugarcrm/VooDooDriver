@@ -206,6 +206,7 @@ public class VddSummaryReporter {
 			try {
 				suiteData = parseXMLFile(xmlFiles.get(i));
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
 				continue;
 			}
@@ -245,7 +246,6 @@ public class VddSummaryReporter {
 	}
 	
 	private boolean isLibTest(Node node) {
-		boolean result = false;
 		NodeList parent = node.getParentNode().getChildNodes();
 		
 		for (int i = 0; i <= parent.getLength() -1; i++) {
@@ -254,17 +254,22 @@ public class VddSummaryReporter {
 			if (name.contains("testfile")) {
 				File fd = new File(tmp.getTextContent());
 				String path = fd.getParent();
+				if (path == null) {
+					/*
+					 * Filename contains no path information, so it's
+					 * impossible to know whether this is in the lib.
+					 */
+					return false;
+				}
 				path = path.toLowerCase();
 				
 				if (path.contains("lib")) {
-					//System.out.printf("LIBFILE: %s\n", tmp.getTextContent());
-					result = true;
-					break;
+					return true;
 				}
 			}
 		}
 		
-		return result;
+		return false;
 	}
 	
 	private boolean isBlocked(Node node) {
