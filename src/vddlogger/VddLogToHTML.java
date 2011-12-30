@@ -130,7 +130,7 @@ public class VddLogToHTML {
 			rowData = formatJSError(line, message);
 		} else if (message.contains("(?i)replacing string")){
 			rowData = formatReplaceString(line, message);
-		} else if (message.startsWith("Tring to find")){
+		} else if (message.startsWith("Trying to find")){
 			rowData = formatFindingElement(line, message);
 		} else if (message.startsWith("(?i)element")){
 			rowData = formatClickingElement(line, message);

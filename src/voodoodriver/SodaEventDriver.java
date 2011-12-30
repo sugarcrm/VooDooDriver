@@ -2703,11 +2703,11 @@ public class SodaEventDriver implements Runnable {
 			String dowhat = event.get("do").toString();
 
 			if (index > -1) {
-				msg = String.format("Tring to find page element '%s' by: '%s' => '%s' index => '%s'.",
+				msg = String.format("Trying to find page element '%s' by: '%s' => '%s' index => '%s'.",
 								dowhat, how, what, index);
 			} else {
 				msg = String.format(
-						"Tring to find page element '%s' by: '%s' => '%s'.", dowhat,
+						"Trying to find page element '%s' by: '%s' => '%s'.", dowhat,
 						how, what);
 			}
 			this.report.Log(msg);
