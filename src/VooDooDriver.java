@@ -231,9 +231,9 @@ public class VooDooDriver {
 				System.exit(0);
 			}
 			
-			attachTimeout = (Integer)cmdOpts.get("attachtimeout");
+			attachTimeout = new Integer((String)cmdOpts.get("attachtimeout"));
 			restartTest = (String)cmdOpts.get("restarttest");
-			restartCount = (Integer)cmdOpts.get("restartcount");
+			restartCount = new Integer((String)cmdOpts.get("restartcount"));
 			
 			if (attachTimeout > 0) {
 				System.out.printf("(*)Setting the default Attach Timeout to: '%s' seconds.\n", attachTimeout);
