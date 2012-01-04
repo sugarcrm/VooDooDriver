@@ -97,6 +97,27 @@ limitations under the License.
       </soda_attributes>
    </browser>
 
+   <input>
+      <accessor_attributes>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">method</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">var</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+      </soda_attributes>
+   </input>
+
    <textfield>
       <accessor_attributes>
          <accessor type="string">name</accessor>

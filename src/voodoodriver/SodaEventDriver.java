@@ -349,7 +349,6 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case TEXTFIELD:
 			element = textfieldEvent(event, parent);
-			
 			break;
 		case BUTTON:
 			element = buttonEvent(event, parent);
@@ -467,6 +466,9 @@ public class SodaEventDriver implements Runnable {
 			break;
 		case WHITELIST:
 			result = whitelistEvent(event);
+			break;
+		case INPUT:
+			element = inputEvent(event, parent);
 			break;
 		default:
 			System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
@@ -1530,6 +1532,57 @@ public class SodaEventDriver implements Runnable {
 		return element;
 	}
 
+	private WebElement inputEvent(SodaHash event, WebElement parent) {
+		boolean required = true;
+		WebElement element = null;
+
+		this.report.Log("Input event starting.");
+
+		if (event.containsKey("required")) {
+			required = this.clickToBool(event.get("required").toString());
+		}
+
+		try {
+			element = this.findElement(event, parent, required);
+			if (element == null) {
+				this.report.Log("Input event finished.");
+				return element;
+			}
+
+			this.firePlugin(element, SodaElements.INPUT, SodaPluginEventType.AFTERFOUND);
+
+			this.checkDisabled(event, element);
+
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+
+			if (event.containsKey("assert")) {
+				String src = element.getText();
+				String val = this.replaceString(event.get("assert").toString());
+				this.report.Assert(val, src);
+			}
+
+			if (event.containsKey("assertnot")) {
+				String src = element.getText();
+				String val = this.replaceString(event.get("assertnot").toString());
+				this.report.AssertNot(val, src);
+			}
+
+			if (event.containsKey("jscriptevent")) {
+				this.report.Log("Firing Javascript Event: " + event.get("jscriptevent").toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
+				Thread.sleep(1000);
+				this.report.Log("Javascript event finished.");
+			}
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+			element = null;
+		}
+
+		this.report.Log("Input event finished.");
+		return element;
+	}
+
 	private WebElement radioEvent(SodaHash event, WebElement parent) {
 		boolean required = true;
 		boolean click = false;
@@ -1606,8 +1659,7 @@ public class SodaEventDriver implements Runnable {
 
 			}
 		} catch (ElementNotVisibleException exp) {
-			this.report
-					.ReportError("Error: The element you are trying to access is not visible!");
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
 		} catch (Exception exp) {
 			this.report.ReportException(exp);
 			element = null;

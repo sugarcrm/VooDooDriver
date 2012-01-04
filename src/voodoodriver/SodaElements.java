@@ -18,6 +18,7 @@ package voodoodriver;
 
 public enum SodaElements {
 	WHITELIST,
+	INPUT,
 	BUTTON,
 	LABEL,
 	H3,
@@ -74,12 +75,12 @@ public enum SodaElements {
 	PLUGIN,
 	PLUGINLOADER,
 	JAVAPLUGIN,
-   DELETE,
-   SCREENSHOT,
-   ALERT,
-   PLUGINCONTROL,
-   GLOBAL;
-	
+	DELETE,
+	SCREENSHOT,
+	ALERT,
+	PLUGINCONTROL,
+	GLOBAL;
+
 	static public boolean isMember(String aName) {
 		boolean result = false;
 		SodaElements[] values = SodaElements.values();
