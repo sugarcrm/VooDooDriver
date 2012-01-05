@@ -350,6 +350,9 @@ public class SodaEventDriver implements Runnable {
 		case TEXTFIELD:
 			element = textfieldEvent(event, parent);
 			break;
+		case PASSWORD:
+			element = passwordEvent(event, parent);
+			break;
 		case BUTTON:
 			element = buttonEvent(event, parent);
 			this.firePlugin(null, SodaElements.BUTTON, SodaPluginEventType.AFTEREVENT);
@@ -3298,6 +3301,90 @@ public class SodaEventDriver implements Runnable {
 
 		this.resetThreadTime();
 		this.report.Log("Finished textfield event.");
+		return element;
+	}
+
+	/**
+	 * Handle a &lt;password&gt; event
+	 *
+	 * @param event  the &lt;password&gt; event
+	 * @param parent this element's parent
+	 * @return the &lt;input type=&quot;password&quot; {@link WebElement} or null
+	 */
+
+	private WebElement passwordEvent(SodaHash event, WebElement parent) {
+		boolean required = true;
+		WebElement element = null;
+
+		this.resetThreadTime();
+		this.report.Log("Starting password event.");
+
+		if (event.containsKey("required")) {
+			required = this.clickToBool(event.get("required").toString());
+		}
+
+		try {
+			element = this.findElement(event, parent, required);
+			if (element == null) {
+				this.report.Log("Finished password event.");
+				return null;
+			}
+
+			this.firePlugin(element, SodaElements.PASSWORD, SodaPluginEventType.AFTERFOUND);
+			
+			this.checkDisabled(event, element);
+			
+			if (event.containsKey("clear")) {
+				if (this.clickToBool(event.get("clear").toString())) {
+					this.report.Log("Clearing password field.");
+					element.clear();
+				}
+			}
+
+			if (event.containsKey("set")) {
+				String value = event.get("set").toString();
+				value = this.replaceString(value);
+				this.report.Log(String.format("Setting Value to: '%s'.", value));
+				element.clear();
+				element.sendKeys(value);
+			}
+
+			if (event.containsKey("append")) {
+				String value = event.get("append").toString();
+				value = this.replaceString(value);
+				element.sendKeys(value);
+			}
+
+			if (event.containsKey("jscriptevent")) {
+				this.report.Log("Firing Javascript Event: " + event.get("jscriptevent").toString());
+				this.Browser.fire_event(element, event.get("jscriptevent").toString());
+				Thread.sleep(1000);
+				this.report.Log("Javascript event finished.");
+			}
+
+			if (event.containsKey("assert")) {
+				String assvalue = event.get("assert").toString();
+				assvalue = this.replaceString(assvalue);
+				this.report.Assert(assvalue, element.getAttribute("value"));
+			}
+
+			if (event.containsKey("assertnot")) {
+				String assvalue = event.get("assertnot").toString();
+				assvalue = this.replaceString(assvalue);
+				this.report.AssertNot(assvalue, element.getAttribute("value"));
+			}
+
+			String value = element.getAttribute("value");
+			handleVars(value, event);
+		} catch (ElementNotVisibleException exp) {
+			this.report.ReportError("Error: The element you are trying to access is not visible!");
+		} catch (Exception exp) {
+			this.report.ReportException(exp);
+			element = null;
+		}
+
+		this.resetThreadTime();
+		this.report.Log("Finished password event.");
 		return element;
 	}
 

@@ -49,6 +49,7 @@ public enum SodaElements {
 	FRAME,
 	MAP,
 	TEXTAREA,
+	PASSWORD,
 	TEXTFIELD,
 	PUTS,
 	CSV,
