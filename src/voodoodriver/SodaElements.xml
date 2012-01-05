@@ -217,7 +217,7 @@ limitations under the License.
       </soda_attributes>
    </label>
 
-   <button html_tag="button">
+   <button html_tag="input|button" html_type="button|submit|reset">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
