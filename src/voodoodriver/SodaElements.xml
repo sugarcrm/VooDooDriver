@@ -97,7 +97,7 @@ limitations under the License.
       </soda_attributes>
    </browser>
 
-   <input>
+   <input html_tag="input">
       <accessor_attributes>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
@@ -118,7 +118,7 @@ limitations under the License.
       </soda_attributes>
    </input>
 
-   <textfield>
+   <textfield html_tag="input" html_type="text">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -152,7 +152,7 @@ limitations under the License.
       </soda_attributes>
    </textfield>
 
-   <textarea>
+   <textarea html_tag="textarea">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -179,7 +179,7 @@ limitations under the License.
       </soda_attributes>
    </textarea>
 
-   <h3>
+   <h3 html_tag="h3">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -197,7 +197,7 @@ limitations under the License.
       </soda_attributes>
    </h3>
 
-   <label>
+   <label html_tag="label">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -217,7 +217,7 @@ limitations under the License.
       </soda_attributes>
    </label>
 
-   <button>
+   <button html_tag="button">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -248,7 +248,7 @@ limitations under the License.
       </soda_attributes>
    </button>
 
-   <h4>
+   <h4 html_tag="h4">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -266,7 +266,7 @@ limitations under the License.
       </soda_attributes>
    </h4>
 
-   <ul>
+   <ul html_tag="ul">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -284,7 +284,7 @@ limitations under the License.
       </soda_attributes>
    </ul>
 
-   <ol>
+   <ol html_tag="ol">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -303,7 +303,7 @@ limitations under the License.
       </soda_attributes>
    </ol>
 
-   <filefield>
+   <filefield html_tag="input" html_type="file">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">title</accessor>
@@ -326,7 +326,7 @@ limitations under the License.
       </soda_attributes>
    </filefield>
 
-   <h5>
+   <h5 html_tag="h5">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -346,7 +346,7 @@ limitations under the License.
       </soda_attributes>
    </h5>
 
-   <td>
+   <td html_tag="td">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -369,7 +369,7 @@ limitations under the License.
       </soda_attributes>
    </td>
 
-   <h6>
+   <h6 html_tag="h6">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -387,7 +387,7 @@ limitations under the License.
       </soda_attributes>
    </h6>
 
-   <select>
+   <select html_tag="select">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -417,7 +417,7 @@ limitations under the License.
       </soda_attributes>
    </select>
 
-   <select_list>
+   <select_list html_tag="optgroup">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -441,7 +441,7 @@ limitations under the License.
       </soda_attributes>
    </select_list>
 
-   <pre>
+   <pre html_tag="pre">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -459,7 +459,7 @@ limitations under the License.
       </soda_attributes>
    </pre>
 
-   <tr>
+   <tr html_tag="tr">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -480,7 +480,7 @@ limitations under the License.
       </soda_attributes>
    </tr>
 
-   <table>
+   <table html_tag="table">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -503,7 +503,7 @@ limitations under the License.
       </soda_attributes>
    </table>
 
-   <radio>
+   <radio html_tag="input" html_typ="radio">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -529,7 +529,7 @@ limitations under the License.
       </soda_attributes>
    </radio>
 
-   <p>
+   <p html_tag="p">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -547,7 +547,7 @@ limitations under the License.
       </soda_attributes>
    </p>
 
-   <checkbox>
+   <checkbox html_tag="input" html_type="checkbox">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -577,7 +577,7 @@ limitations under the License.
       </soda_attributes>
    </checkbox>
 
-   <map>
+   <map html_tag="map">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -598,7 +598,7 @@ limitations under the License.
       </soda_attributes>
    </map>
 
-   <frame>
+   <frame html_tag="iframe">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">src</accessor>
@@ -618,7 +618,7 @@ limitations under the License.
       </soda_attributes>
    </frame>
 
-   <form>
+   <form html_tag="form">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -639,7 +639,7 @@ limitations under the License.
       </soda_attributes>
    </form>
 
-   <div>
+   <div html_tag="div">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -664,7 +664,7 @@ limitations under the License.
       </soda_attributes>
    </div>
 
-   <area>
+   <area html_tag="area">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -684,7 +684,7 @@ limitations under the License.
       </soda_attributes>
    </area>
 
-   <li>
+   <li html_tag="li">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -706,7 +706,7 @@ limitations under the License.
       </soda_attributes>
    </li>
 
-   <link>
+   <link html_tag="a">
       <accessor_attributes>
          <accessor type="string">href</accessor>
          <accessor type="string">name</accessor>
@@ -736,7 +736,7 @@ limitations under the License.
       </soda_attributes>
    </link>
 
-   <h1>
+   <h1 html_tag="h1">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -754,7 +754,7 @@ limitations under the License.
       </soda_attributes>
    </h1>
 
-   <image>
+   <image html_tag="img">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -780,7 +780,7 @@ limitations under the License.
       </soda_attributes>
    </image>
 
-   <h2>
+   <h2 html_tag="h2">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -799,7 +799,7 @@ limitations under the License.
       </soda_attributes>
    </h2>
 
-   <span>
+   <span html_tag="span">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -825,7 +825,7 @@ limitations under the License.
       </soda_attributes>
    </span>
 
-   <hidden>
+   <hidden html_tag="input" html_type="hidden">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>

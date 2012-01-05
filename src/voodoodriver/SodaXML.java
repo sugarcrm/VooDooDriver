@@ -81,7 +81,30 @@ public class SodaXML {
 	}
 	
 	/**
+	 * Get type information for the specified {@link SodaElements}
+	 *
+	 * @param elementType {@link SodaElements} type 
+	 * @return a {@link SodaHash} containing the type information requested
+	 */
+
+	private SodaHash getSodaElement(SodaElements elementType) {
+		for (int k = 0; k < types.size(); k++) {
+			SodaHash type = types.get(k);
+			if (type.get("type") == elementType) {
+				return type;
+			}
+		}
+
+		assert false: "Not reached";
+		return null;
+	}
+
+	/**
 	 * Find an accessor for a {@link SodaElements} object.
+	 * 
+	 * Verify that the accessor used in the Soda test script is
+	 * valid for that Soda element.  If it is valid, the accessor
+	 * is returned.  If it is not, null is returned.
 	 * 
 	 * @param sodaElement element to search
 	 * @param accessor    the accessor to search for
@@ -90,22 +113,11 @@ public class SodaXML {
 
 	private String findElementAccessor(SodaElements sodaElement, String accessor) {
 		String result = null;
-		int len = types.size() -1;
 		SodaHash foundType = null;
 		SodaHash accessors = null;
 		
-		for (int i = 0; i <= len; i++) {
-			if (types.get(i).get("type") == sodaElement) {
-				foundType = types.get(i);
-				break;
-			}
-		}
-		
-		if (foundType == null) {
-			System.out.printf("foundType == null!\n");
-			return null;
-		}
-		
+		foundType = getSodaElement(sodaElement);
+
 		if (!foundType.containsKey("accessor_attributes")) {
 			return null;
 		}
@@ -127,16 +139,15 @@ public class SodaXML {
 	 */
 
 	private SodaHash processAttributes(SodaHash map, Node node) {
-		int len = node.getAttributes().getLength();
 		String found_index = null;
 		String accessor = null;
 		
 		if (node.hasAttributes()) {
-			for (int i = 0; i <= len -1; i++) {
-				Node tmp = node.getAttributes().item(i);
-				String name = tmp.getNodeName();
-				String value = tmp.getNodeValue();
-				
+			for (int i = 0; i < node.getAttributes().getLength(); i++) {
+				Node attr = node.getAttributes().item(i);
+				String name = attr.getNodeName();
+				String value = attr.getNodeValue();
+
 				if (name == "index") {
 					found_index = "index";
 				}
@@ -154,6 +165,17 @@ public class SodaXML {
 				map.put("how", found_index);
 			}
 		}
+
+		/*
+		 * Fill out HTML tag/type information, if applicable.
+		 */
+		SodaHash type = getSodaElement((SodaElements)map.get("type"));
+		String htmlAttrs[] = {"html_tag", "html_type"};
+		for (String attr: htmlAttrs) {
+			if (type.get(attr) != null) {
+				map.put(attr, type.get(attr));
+			}
+		}
 		
 		return map;
 	}
@@ -168,7 +190,7 @@ public class SodaXML {
 	private SodaEvents parse(NodeList nodes) {
 		SodaHash data = null;
 		SodaEvents dataList = null;
-		
+
 		dataList = new SodaEvents();
 
 		for (int i = 0; i < nodes.getLength(); i++) {

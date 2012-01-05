@@ -20,6 +20,7 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -73,14 +74,24 @@ public class SodaTypes {
 			
 			data.put(name, 0);
 			if (SodaElements.isMember(name.toUpperCase())) {
+				if (child.hasAttributes()) {
+					NamedNodeMap attrs = child.getAttributes();
+					String validAttrs[] = {"html_tag", "html_type"};
+					for (String key: validAttrs) {
+						Node value = attrs.getNamedItem(key);
+						if (value != null) {
+							data.put(key, value.getNodeValue());
+						}
+					}
+				}
 				data.put("type", SodaElements.valueOf(name.toUpperCase()));
 				if (child.hasChildNodes()) {
 					NodeList kids = child.getChildNodes();
 					for (int x = 0; x <= kids.getLength() -1; x++) {
-						Node tmp = kids.item(x);
-						String kid_name = tmp.getNodeName();
+						Node kid = kids.item(x);
+						String kid_name = kid.getNodeName();
 						if (kid_name.contains("soda_attributes") || kid_name.contains("accessor_attributes")) {
-							data.put(kid_name, parseAccessors(tmp.getChildNodes()));
+							data.put(kid_name, parseAccessors(kid.getChildNodes()));
 						}
 					}
 				}
