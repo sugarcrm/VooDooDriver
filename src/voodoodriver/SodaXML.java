@@ -24,9 +24,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is a simple class for reading a soda xml test file into a SodaEvents class.
- * @author trampus
+ * The <code>SodaXML</code> class reads a soda test script and converts
+ * it into a {@link SodaEvents} class.
  *
+ * @author trampus
  */
 
 public class SodaXML {
@@ -37,15 +38,13 @@ public class SodaXML {
 	private SodaEvents events = null;
 	private SodaReporter reporter = null;
 	
-	/*
-	 * SodaXML: Constructor
+	/**
+	 * Initialize a SodaXML object using the provided soda test script.
 	 * 
-	 * Input:
-	 * 	sodaTest: A full path to a soda test file.
-	 * 
-	 * Output:
-	 * 	None.
+	 * @param sodaTest full path to a soda test file
+	 * @param reporter {@link SodaReporter} object for logging messages and errors
 	 */
+
 	public SodaXML(String sodaTest, SodaReporter reporter) {
 		File testFD = null;
 		DocumentBuilderFactory dbf = null;
@@ -71,41 +70,32 @@ public class SodaXML {
 		}
 	}
 	
-	/*
-	 * getEvents:
-	 * 	This method returns the events that were created from the soda test file.
+	/**
+	 * Accessor for the {@link SodaEvents} object created from the soda test script.
 	 * 
-	 * Input:
-	 * 	None.
-	 * 
-	 * Output:
-	 * 	returns a SodaEvents object.
-	 * 
+	 * @return SodaEvents object
 	 */
+
 	public SodaEvents getEvents() {
 		return this.events;
 	}
 	
-	/*
-	 * findElementAccessor:
-	 * 	This method finds an accessor for a given soda element.
+	/**
+	 * Find an accessor for a {@link SodaElements} object.
 	 * 
-	 * Intput:
-	 * 	sodaelement: This is the element to find an accessor for.
-	 * accessor: This is the accessor to find for the given element.
-	 * 
-	 * Output:
-	 * 	returns a string with the given accessor if one exists, else null.
-	 * 
+	 * @param sodaElement element to search
+	 * @param accessor    the accessor to search for
+	 * @return The accessor if the element contains it, otherwise null.
 	 */
-	private String findElementAccessor(SodaElements sodaelement, String accessor) {
+
+	private String findElementAccessor(SodaElements sodaElement, String accessor) {
 		String result = null;
 		int len = types.size() -1;
 		SodaHash foundType = null;
 		SodaHash accessors = null;
 		
 		for (int i = 0; i <= len; i++) {
-			if (types.get(i).get("type") == sodaelement) {
+			if (types.get(i).get("type") == sodaElement) {
 				foundType = types.get(i);
 				break;
 			}
@@ -128,19 +118,14 @@ public class SodaXML {
 		return result;
 	}
 	
-	/*
-	 * processAttributes:
-	 * 	This method gets all of the attributes for a given soda element.
+	/**
+	 * Populate a {@link SodaHash} for a {@link SodaElements} with its attributes
 	 * 
-	 * Intput:
-	 * 	map: This is the soda element's map.
-	 *  node: This is the xml node for the given element.
-	 * 
-	 * Output:
-	 * 	returns a SodaHash object filled with the node's attributes if it has any.  If there are
-	 * 	no attributes then an empty SodaHash is returned.
-	 * 
+	 * @param map soda element
+	 * @param node {@link Node} from <code>SodaElements.xml</code>
+	 * @return {@link SodaHash} object populated with that Node's attributes
 	 */
+
 	private SodaHash processAttributes(SodaHash map, Node node) {
 		int len = node.getAttributes().getLength();
 		String found_index = null;
@@ -173,27 +158,21 @@ public class SodaXML {
 		return map;
 	}
 	
-	/*
-	 * parse:
-	 * 	This method parses all the xml nodes into a SodaEvents object.
+	/**
+	 * Parse XML Nodes from Soda test script.
 	 * 
-	 * Input:
-	 * 	node:  This is a node list from the soda xml test.
-	 * 
-	 * Output:
-	 * 	returns a SodaEvents object.
+	 * @param nodes  NodeList from the soda xml test.
+	 * @return SodaEvents object with Soda test script events
 	 */
-	private SodaEvents parse(NodeList node) throws Exception{
+
+	private SodaEvents parse(NodeList nodes) {
 		SodaHash data = null;
 		SodaEvents dataList = null;
-		boolean err = false;
-		int len = 0;
 		
 		dataList = new SodaEvents();
 
-		len = node.getLength();
-		for (int i = 0; i <= len -1; i++) {
-			Node child = node.item(i);
+		for (int i = 0; i < nodes.getLength(); i++) {
+			Node child = nodes.item(i);
 			String name = child.getNodeName();
 			
 			if (name.startsWith("#")) {
@@ -206,15 +185,13 @@ public class SodaXML {
 				} else {
 					this.reporter.ReportError(String.format("Error: Invalid Soda Element: '%s'!", name));
 				}
-				
-				err = true;
-				break;
+				return null;
 			}
 			
 			data = new SodaHash();
 			data.put("do", name);
 			data.put("type", SodaElements.valueOf(name.toUpperCase()));
-		
+
 			if (child.hasAttributes()) {
 				data = processAttributes(data, child);
 			}
@@ -239,12 +216,10 @@ public class SodaXML {
 					data.put("args", list);
 				} else {
 					SodaEvents tmp = parse(child.getChildNodes());
-					if (tmp != null) {
-						data.put("children", tmp);
-					} else {
-						err = true;
-						break;
+					if (tmp == null) {
+						return null;
 					}
+					data.put("children", tmp);
 				}
 			}
 			
@@ -255,13 +230,16 @@ public class SodaXML {
 			}
 		}
 		
-		if (err) {
-			dataList = null;
-		}
-		
 		return dataList;
 	}
 	
+	/**
+	 * Process the argument list for &lt;execute&gt; and &lt;javaplugin&gt; event Nodes.
+	 *
+	 * @param nodes  the argument list as an XML NodeList
+	 * @return String array of those arguments
+	 */
+
 	private String[] processArgs(NodeList nodes) {
 		int len = nodes.getLength() -1;
 		String[] list;
