@@ -34,6 +34,7 @@ import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -1720,6 +1721,19 @@ public class SodaEventDriver implements Runnable {
 						sel.selectByVisibleText(setvalue);
 						this.report.Log("Setting option by visible text: '" + setvalue + "'.");
 					}
+
+					try {
+						/*
+						 * Selecting a value has the potential to refresh the page.  Check
+						 * for a stale element and refresh it if needed (Bug 49533).
+						 */
+						element.isDisplayed();
+					} catch (StaleElementReferenceException e) {
+						this.report.Log("Page updated. Refreshing stale select element.");
+						element = this.findElement(event, null, required);
+						sel = new Select(element);
+					}
+
 					this.firePlugin(element, SodaElements.SELECT,
 							SodaPluginEventType.AFTERSET);
 				}
