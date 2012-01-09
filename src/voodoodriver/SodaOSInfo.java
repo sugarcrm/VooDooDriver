@@ -25,9 +25,8 @@ import java.util.regex.Pattern;
 public class SodaOSInfo {
 
 	public SodaOSInfo() {
-		
 	}
-	
+
 	public static SodaSupportedOS getOS() {
 		SodaSupportedOS type = null;
 		String value = "";
@@ -42,29 +41,29 @@ public class SodaOSInfo {
 		} else {
 			type = null;
 		}
-		
+
 		return type;
 	}
-	
+
 	private static ArrayList<Integer> getUnixPids(String process) {
 		ArrayList<Integer> pids = new ArrayList<Integer>();
 		Process proc = null;
 		BufferedReader reader;
 		String[] cmd = {"ps", "x", "-o", "pid,comm"};
-		
+
 		try {
 			proc = Runtime.getRuntime().exec(cmd);
 			reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			String line = null;
 			Pattern p = Pattern.compile(String.format("(^\\d+)\\s+(.*%s.*)", process));
 			Matcher m = null;
-			
+
 			while ((line = reader.readLine()) != null) {
 				line = line.replaceAll("^\\s+", "");
 				if (line.contains("PID COMMAND") || line.contains("PID COMM")) {
 					continue;
 				}
-				
+
 				m = p.matcher(line);
 				if (m.find()) {
 					String pid = m.group(1);
@@ -75,16 +74,16 @@ public class SodaOSInfo {
 			exp.printStackTrace();
 			pids = null;
 		}
-		
+
 		return pids;
 	}
-	
+
 	private static ArrayList<Integer> getWindowsPids(String process) {
 		ArrayList<Integer> pids = new ArrayList<Integer>();
 		String[] cmd = {"tasklist.exe", "/FO", "CSV", "/NH"};
 		Process proc = null;
 		BufferedReader reader = null;
-		
+
 		try {
 			proc = Runtime.getRuntime().exec(cmd);
 			reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -121,7 +120,7 @@ public class SodaOSInfo {
 			break;
 		case WINDOWS:
 			pids = getWindowsPids(process);
-				break;
+			break;
 		case LINUX:
 			pids = getUnixPids(process);
 			break;
@@ -130,15 +129,25 @@ public class SodaOSInfo {
 		return pids;
 	}
 	
-	private static boolean killWindowsProcess(Integer pid) {
+	/**
+	 * Kill a process
+	 *
+	 * Kill a process using the provided kill command.  This
+	 * method has functionality common to Unix and Windows.
+	 *
+	 * @param pid      process ID
+	 * @param killCmd  OS-specific kill command
+	 * @return whether the process was successfully terminated
+	 */
+
+	private static boolean killProcess(Integer pid, String[] killCmd) {
 		boolean result = false;
-		String[] cmd = {"taskkill.exe", "/T", "/F", "/PID", pid.toString()};
 		Process proc = null;
 		int ret = 0;
 		
 		try {
-			proc = Runtime.getRuntime().exec(cmd);
-			Thread.sleep(5000); // this is to bypass a windows wait issue... //
+			proc = Runtime.getRuntime().exec(killCmd);
+			Thread.sleep(5000); /* this is to bypass a windows wait issue... */
 			ret = proc.exitValue();
 			if (ret != 0) {
 				System.out.printf("(!)Error: Failed trying to kill process by pid: '%d'\n", pid);
@@ -150,32 +159,32 @@ public class SodaOSInfo {
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
-		
+
 		return result;
 	}
+
+	/**
+	 * Kill a process on Windows
+	 *
+	 * @param pid      process ID
+	 * @return whether the process was successfully terminated
+	 */
+
+	private static boolean killWindowsProcess(Integer pid) {
+		String[] cmd = {"taskkill.exe", "/T", "/F", "/PID", pid.toString()};
+		return killProcess(pid, cmd);
+	}
 	
+	/**
+	 * Kill a process on Unix
+	 *
+	 * @param pid      process ID
+	 * @return whether the process was successfully terminated
+	 */
+
 	private static boolean killUnixProcess(Integer pid) {
-		boolean result = false;
 		String[] cmd = {"kill", "-9", pid.toString()};
-		Process proc = null;
-		int ret = 0;
-		
-		try {
-			proc = Runtime.getRuntime().exec(cmd);
-			Thread.sleep(5000);
-			ret = proc.exitValue();
-			if (ret != 0) {
-				System.out.printf("(!)Error: Failed trying to kill process by pid: '%d'\n", pid);
-				result = false;
-			} else {
-				System.out.printf("(*)Killed process by pid: '%d'.\n", pid);
-				result = true;
-			}
-		} catch (Exception exp) {
-			exp.printStackTrace();
-		}
-		
-		return result;
+		return killProcess(pid, cmd);
 	}
 	
 	public static boolean killProcesses(ArrayList<Integer> list) {
@@ -183,7 +192,7 @@ public class SodaOSInfo {
 		boolean err = false;
 		SodaSupportedOS os = getOS();
 		int len = list.size() -1;
-		
+
 		for (int i = 0; i <= len; i++) {
 			int pid = list.get(i);
 			switch(os) {
@@ -197,13 +206,13 @@ public class SodaOSInfo {
 				err = killUnixProcess(pid);
 				break;
 			}
-			
+
 			if (err != true) {
 				System.out.printf("(!)Failed to kill pid: '%s'!\n", pid);
 				result = false;
 			}
 		}
-		
+
 		return result;
 	}	
 }
