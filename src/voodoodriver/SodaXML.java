@@ -181,6 +181,35 @@ public class SodaXML {
    }
 
    /**
+    * Check whether the actions specified are valid for this event
+    *
+    * @param node  the event {@link Node} to check
+    * @return true if the actions are valid, false otherwise
+    */
+
+   private boolean checkActions(Node node) {
+      SodaHash type = getSodaElement(SodaElements.valueOf(node.getNodeName().toUpperCase()));
+      SodaHash sodaAttributes = (SodaHash)type.get("soda_attributes");
+      SodaHash accessorAttributes = (SodaHash)type.get("accessor_attributes");
+
+      if (node.hasAttributes()) {
+         for (int i = 0; i < node.getAttributes().getLength(); i++) {
+            String attr = node.getAttributes().item(i).getNodeName();
+            
+            if (!(sodaAttributes != null && sodaAttributes.containsKey(attr)) &&
+                !(accessorAttributes != null && accessorAttributes.containsKey(attr))) {
+               this.reporter.ReportError(String.format("Error: Invalid attribute for %s event: '%s'",
+                                                       node.getNodeName().toUpperCase(), attr));
+               return false;
+            }
+
+         }
+      }
+
+      return true;
+   }
+
+   /**
     * Parse XML Nodes from Soda test script.
     *
     * @param nodes  NodeList from the soda xml test.
@@ -216,6 +245,10 @@ public class SodaXML {
 
          if (child.hasAttributes()) {
             data = processAttributes(data, child);
+         }
+
+         if (!checkActions(child)) {
+            return null;
          }
 
          if (name.contains("javascript")) {
