@@ -26,9 +26,9 @@ public class SodaTest {
    private SodaEventDriver eventDriver = null;
    private SodaEvents events = null;
    private SodaReporter reporter = null;
-   private SodaHash GVars = null;
-   private SodaHash OldVars = null;
-   private SodaHash HiJacks = null;
+   private VDDHash GVars = null;
+   private VDDHash OldVars = null;
+   private VDDHash HiJacks = null;
    private SodaBlockList blocked = null;
    private boolean WatchDog = false;
    private SodaEvents PlugIns = null;
@@ -38,8 +38,8 @@ public class SodaTest {
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
 
-   public SodaTest(String testFile, SodaBrowser browser, SodaHash gvars, SodaHash hijacks,
-         SodaBlockList blocklist, SodaHash oldvars, String suitename, String reportDir,
+   public SodaTest(String testFile, SodaBrowser browser, VDDHash gvars, VDDHash hijacks,
+         SodaBlockList blocklist, VDDHash oldvars, String suitename, String reportDir,
          String saveHtml) {
       this.Browser = browser;
       this.testFile = testFile;

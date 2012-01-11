@@ -90,7 +90,7 @@ public class SodaCSV {
             linedata = this.parser.parseLine(line);
 
             int linelen = linedata.length -1;
-            SodaHash tmphash = new SodaHash();
+            VDDHash tmphash = new VDDHash();
             for (int i = 0; i <= this.keys.size() -1; i++) {
                if (i <= linelen) {
                   tmphash.put(this.keys.get(i), linedata[i]);

@@ -18,11 +18,11 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.HashMap;
 
-public class SodaHash extends HashMap<String, Object>{
+public class VDDHash extends HashMap<String, Object>{
 
    private static final long serialVersionUID = 1L;
 
-   public SodaHash() {
+   public VDDHash() {
       super();
    }
 

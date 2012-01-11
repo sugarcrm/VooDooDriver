@@ -346,7 +346,7 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
    /**
     *
     */
-   public boolean assertPage(SodaHash whitelist) {
+   public boolean assertPage(VDDHash whitelist) {
       boolean result = false;
 
       if (this.asserter == null && this.assertPageFile != null) {

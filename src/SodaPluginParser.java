@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.sugarcrm.voodoodriver.SodaEvents;
-import org.sugarcrm.voodoodriver.SodaHash;
+import org.sugarcrm.voodoodriver.VDDHash;
 
 public class SodaPluginParser {
 
@@ -65,7 +65,7 @@ public class SodaPluginParser {
             continue;
          }
 
-         SodaHash tmp = new SodaHash();
+         VDDHash tmp = new VDDHash();
 
          int clen = child.getChildNodes().getLength() -1;
          String controls = "";
@@ -92,7 +92,7 @@ public class SodaPluginParser {
             int cdata_len = control_data.length -1;
 
             for (int p = 0; p <= cdata_len; p++) {
-               SodaHash newdata = new SodaHash();
+               VDDHash newdata = new VDDHash();
                newdata.putAll(tmp);
                newdata.put("control", control_data[p]);
                data.add(newdata);

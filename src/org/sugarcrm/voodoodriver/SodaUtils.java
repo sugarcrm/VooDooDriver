@@ -211,7 +211,7 @@ public class SodaUtils {
       return result;
    }
 
-   public static String replaceString(String str, SodaHash hijacks) {
+   public static String replaceString(String str, VDDHash hijacks) {
       String result = str;
       Pattern patt = null;
       Matcher matcher = null;

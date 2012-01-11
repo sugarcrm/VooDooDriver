@@ -75,7 +75,7 @@ public class SodaConfigParser {
       node_count = nodes.getLength() -1;
 
       for (int i = 0; i <= node_count; i++) {
-         SodaHash data = new SodaHash();
+         VDDHash data = new VDDHash();
          Node tmp = nodes.item(i);
          String name = tmp.getNodeName();
 
@@ -129,21 +129,21 @@ public class SodaConfigParser {
       }
 
       if (hijacks != null) {
-         SodaHash jackhash = new SodaHash();
+         VDDHash jackhash = new VDDHash();
          jackhash.put("hijacks", hijacks);
          jackhash.put("type", "hijacks");
          options.add(jackhash);
       }
 
       if (suites != null) {
-         SodaHash suitehash = new SodaHash();
+         VDDHash suitehash = new VDDHash();
          suitehash.put("suites", suites);
          suitehash.put("type", "suites");
          options.add(suitehash);
       }
 
       if (tests != null) {
-         SodaHash testhash = new SodaHash();
+         VDDHash testhash = new VDDHash();
          testhash.put("tests", tests);
          testhash.put("type", "tests");
          options.add(testhash);

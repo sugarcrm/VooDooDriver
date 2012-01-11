@@ -19,12 +19,12 @@ package org.sugarcrm.voodoodriver;
 import java.util.ArrayList;
 
 /**
- * A class that typedef's a Java ArrayList contaning SodaHash's.
+ * A class that typedef's a Java ArrayList contaning VDDHash's.
  *
  * @author trampus
  *
  */
-public class SodaBlockList extends ArrayList<SodaHash> {
+public class SodaBlockList extends ArrayList<VDDHash> {
 
    private static final long serialVersionUID = 1L;
 

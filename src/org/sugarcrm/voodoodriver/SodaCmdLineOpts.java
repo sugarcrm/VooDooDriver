@@ -28,13 +28,13 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class SodaCmdLineOpts {
 
-   private SodaHash options = null;
-   private SodaHash gvars = null;
+   private VDDHash options = null;
+   private VDDHash gvars = null;
    private ArrayList<String> tests = null;
    private ArrayList<String> suites = null;
    private String flavor = null;
    private String saveHtml = null;
-   private SodaHash hijacks = null;
+   private VDDHash hijacks = null;
    private String resultDir = null;
    private String blocklistFile = null;
    private Boolean version = false;
@@ -55,8 +55,8 @@ public class SodaCmdLineOpts {
    public SodaCmdLineOpts(String[] args) {
 
       try {
-         this.gvars = new SodaHash();
-         this.hijacks = new SodaHash();
+         this.gvars = new VDDHash();
+         this.hijacks = new VDDHash();
          this.tests = new ArrayList<String>();
          this.suites = new ArrayList<String>();
 
@@ -138,7 +138,7 @@ public class SodaCmdLineOpts {
              }
          }
 
-         this.options = new SodaHash();
+         this.options = new VDDHash();
          this.options.put("skipcsserrors", this.skipcssErrors);
          this.options.put("testdelay", this.testdelay);
          this.options.put("blocklistfile", this.blocklistFile);
@@ -218,9 +218,9 @@ public class SodaCmdLineOpts {
    /**
     * Returns the parsed options.
     *
-    * @return {@link SodaHash}
+    * @return {@link VDDHash}
     */
-   public SodaHash getOptions() {
+   public VDDHash getOptions() {
       return this.options;
    }
 }

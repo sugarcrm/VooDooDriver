@@ -18,7 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.ArrayList;
 
-public class SodaEvents extends ArrayList<SodaHash> {
+public class SodaEvents extends ArrayList<VDDHash> {
 
    private static final long serialVersionUID = 1L;
 

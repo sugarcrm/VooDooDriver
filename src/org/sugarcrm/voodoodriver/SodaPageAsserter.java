@@ -32,9 +32,9 @@ public class SodaPageAsserter {
    private ArrayList<String> checkes = null;
    private File fd = null;
    private SodaReporter reporter = null;
-   private SodaHash whiteList = null;
+   private VDDHash whiteList = null;
 
-   public SodaPageAsserter(String assertFile, SodaReporter reporter, SodaHash whitelist) {
+   public SodaPageAsserter(String assertFile, SodaReporter reporter, VDDHash whitelist) {
       this.reporter = reporter;
       this.ignores = new ArrayList<String>();
       this.checkes = new ArrayList<String>();
@@ -45,7 +45,7 @@ public class SodaPageAsserter {
       if (whitelist != null) {
          this.whiteList = whitelist;
       } else {
-         this.whiteList = new SodaHash();
+         this.whiteList = new VDDHash();
       }
 
       fd = new File(assertFile);
@@ -64,7 +64,7 @@ public class SodaPageAsserter {
       }
    }
 
-   public void assertPage(String pagesrc, SodaHash whitelist) {
+   public void assertPage(String pagesrc, VDDHash whitelist) {
       this.whiteList.putAll(whitelist);
       assertPage(pagesrc);
    }

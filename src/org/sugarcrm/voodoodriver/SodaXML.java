@@ -84,12 +84,12 @@ public class SodaXML {
     * Get type information for the specified {@link SodaElements}
     *
     * @param elementType {@link SodaElements} type
-    * @return a {@link SodaHash} containing the type information requested
+    * @return a {@link VDDHash} containing the type information requested
     */
 
-   private SodaHash getSodaElement(SodaElements elementType) {
+   private VDDHash getSodaElement(SodaElements elementType) {
       for (int k = 0; k < types.size(); k++) {
-         SodaHash type = types.get(k);
+         VDDHash type = types.get(k);
          if (type.get("type") == elementType) {
             return type;
          }
@@ -113,8 +113,8 @@ public class SodaXML {
 
    private String findElementAccessor(SodaElements sodaElement, String accessor) {
       String result = null;
-      SodaHash foundType = null;
-      SodaHash accessors = null;
+      VDDHash foundType = null;
+      VDDHash accessors = null;
 
       foundType = getSodaElement(sodaElement);
 
@@ -122,7 +122,7 @@ public class SodaXML {
          return null;
       }
 
-      accessors = (SodaHash)foundType.get("accessor_attributes");
+      accessors = (VDDHash)foundType.get("accessor_attributes");
       if (accessors.containsKey(accessor)) {
          result = accessor;
       }
@@ -131,14 +131,14 @@ public class SodaXML {
    }
 
    /**
-    * Populate a {@link SodaHash} for a {@link SodaElements} with its attributes
+    * Populate a {@link VDDHash} for a {@link SodaElements} with its attributes
     *
     * @param map soda element
     * @param node {@link Node} from <code>SodaElements.xml</code>
-    * @return {@link SodaHash} object populated with that Node's attributes
+    * @return {@link VDDHash} object populated with that Node's attributes
     */
 
-   private SodaHash processAttributes(SodaHash map, Node node) {
+   private VDDHash processAttributes(VDDHash map, Node node) {
       String found_index = null;
       String accessor = null;
 
@@ -169,7 +169,7 @@ public class SodaXML {
       /*
        * Fill out HTML tag/type information, if applicable.
        */
-      SodaHash type = getSodaElement((SodaElements)map.get("type"));
+      VDDHash type = getSodaElement((SodaElements)map.get("type"));
       String htmlAttrs[] = {"html_tag", "html_type"};
       for (String attr: htmlAttrs) {
          if (type.get(attr) != null) {
@@ -188,9 +188,9 @@ public class SodaXML {
     */
 
    private boolean checkActions(Node node) {
-      SodaHash type = getSodaElement(SodaElements.valueOf(node.getNodeName().toUpperCase()));
-      SodaHash sodaAttributes = (SodaHash)type.get("soda_attributes");
-      SodaHash accessorAttributes = (SodaHash)type.get("accessor_attributes");
+      VDDHash type = getSodaElement(SodaElements.valueOf(node.getNodeName().toUpperCase()));
+      VDDHash sodaAttributes = (VDDHash)type.get("soda_attributes");
+      VDDHash accessorAttributes = (VDDHash)type.get("accessor_attributes");
 
       if (node.hasAttributes()) {
          for (int i = 0; i < node.getAttributes().getLength(); i++) {
@@ -222,7 +222,7 @@ public class SodaXML {
     */
 
    private SodaEvents parse(NodeList nodes) {
-      SodaHash data = null;
+      VDDHash data = null;
       SodaEvents dataList = null;
 
       dataList = new SodaEvents();
@@ -244,7 +244,7 @@ public class SodaXML {
             return null;
          }
 
-         data = new SodaHash();
+         data = new VDDHash();
          data.put("do", name);
          data.put("type", SodaElements.valueOf(name.toUpperCase()));
 

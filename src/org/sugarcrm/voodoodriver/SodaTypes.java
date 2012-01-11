@@ -64,7 +64,7 @@ public class SodaTypes {
 
       len = node.getLength();
       for (int i = 0; i <= len -1; i++) {
-         SodaHash data = new SodaHash();
+         VDDHash data = new VDDHash();
          Node child = node.item(i);
          String name = child.getNodeName();
 
@@ -107,8 +107,8 @@ public class SodaTypes {
       return dataList;
    }
 
-   private SodaHash parseAccessors(NodeList nodes) {
-      SodaHash hash = new SodaHash();
+   private VDDHash parseAccessors(NodeList nodes) {
+      VDDHash hash = new VDDHash();
       int len = nodes.getLength() -1;
 
       for (int i = 0; i <= len; i++) {
@@ -124,7 +124,7 @@ public class SodaTypes {
             }
             hash.put(value, 0);
          } else {
-            SodaHash act_hash = new SodaHash();
+            VDDHash act_hash = new VDDHash();
             NodeList actions = nodes.item(i).getChildNodes();
             int actlen = actions.getLength() -1;
 

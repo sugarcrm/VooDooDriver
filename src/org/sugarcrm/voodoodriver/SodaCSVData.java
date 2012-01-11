@@ -18,7 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.ArrayList;
 
-public class SodaCSVData extends ArrayList<SodaHash> {
+public class SodaCSVData extends ArrayList<VDDHash> {
 
    /**
     *

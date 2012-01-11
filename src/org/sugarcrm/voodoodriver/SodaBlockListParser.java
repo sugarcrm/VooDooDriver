@@ -77,7 +77,7 @@ public class SodaBlockListParser {
          }
 
          NodeList kids = n.getChildNodes();
-         SodaHash tmp = new SodaHash();
+         VDDHash tmp = new VDDHash();
          for (int x = 0; x <= kids.getLength() -1; x++) {
             Node kid = kids.item(x);
 

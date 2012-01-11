@@ -32,7 +32,7 @@ import org.sugarcrm.voodoodriver.SodaCmdLineOpts;
 import org.sugarcrm.voodoodriver.SodaConfigParser;
 import org.sugarcrm.voodoodriver.SodaEvents;
 import org.sugarcrm.voodoodriver.SodaFirefox;
-import org.sugarcrm.voodoodriver.SodaHash;
+import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.SodaIE;
 import org.sugarcrm.voodoodriver.SodaSuiteParser;
 import org.sugarcrm.voodoodriver.SodaSupportedBrowser;
@@ -83,23 +83,23 @@ public class VooDooDriver {
     * The default configuration file is soda-config.xml, but that can be changed with the --config command line option.
     *
     * @param cmdOpts  parsed command line options
-    * @return         SodaHash with four entries:
+    * @return         VDDHash with four entries:
     *                    <dl>
-    *                    <dt>gvars</dt>    <dd>SodaHash of global variables from the configuration file</dd>
-    *                    <dt>hijacks</dt>  <dd>SodaHash of SodaVar substitutions from the configuration file</dd>
+    *                    <dt>gvars</dt>    <dd>VDDHash of global variables from the configuration file</dd>
+    *                    <dt>hijacks</dt>  <dd>VDDHash of SodaVar substitutions from the configuration file</dd>
     *                    <dt>suits</dt>    <dd>ArrayList of suites listed in the configuration file</dd>
     *                    <dt>tests</dt>    <dd>ArrayList of tests listed in the configuration file</dd>
     *                    </dl>
     */
    @SuppressWarnings("unchecked")
-   private static SodaHash readConfigFile(SodaHash cmdOpts) {
+   private static VDDHash readConfigFile(VDDHash cmdOpts) {
       String configFile = defaultSodaConfigFile;
       File sodaConfigFD = null;
-      SodaHash gvars = new SodaHash();
-      SodaHash hijacks = new SodaHash();
+      VDDHash gvars = new VDDHash();
+      VDDHash hijacks = new VDDHash();
       ArrayList<String> SodaSuitesList = null;
       ArrayList<String> SodaTestsList = null;
-      SodaHash returnVal = new SodaHash();
+      VDDHash returnVal = new VDDHash();
       SodaConfigParser configParser = null;
       SodaEvents configFileOpts = null;
 
@@ -128,7 +128,7 @@ public class VooDooDriver {
       int argsLen = configFileOpts.size() - 1;
 
       for (int i = 0; i <= argsLen; i++) {
-         SodaHash tmp = configFileOpts.get(i);
+         VDDHash tmp = configFileOpts.get(i);
          String type = tmp.get("type").toString();
          String name = null;
          String value = null;
@@ -187,7 +187,7 @@ public class VooDooDriver {
       String blockListFile = null;
       SodaBlockList blockList = null;
       SodaCmdLineOpts opts = null;
-      SodaHash cmdOpts = null;
+      VDDHash cmdOpts = null;
       SodaSupportedBrowser browserType = null;
       ArrayList<String> SodaSuitesList = null;
       ArrayList<String> SodaTestsList = null;
@@ -197,11 +197,11 @@ public class VooDooDriver {
       String savehtml = "";
       String downloadDir = null;
       String assertpage = null;
-      SodaHash gvars = null;
+      VDDHash gvars = null;
       int restartCount = 0;
       String restartTest = null;
       int attachTimeout = 0;
-      SodaHash hijacks = null;
+      VDDHash hijacks = null;
       String resultdir = null;
       Boolean haltOnFailure = false;
 
@@ -211,14 +211,14 @@ public class VooDooDriver {
       try {
          opts = new SodaCmdLineOpts(args);
          cmdOpts = opts.getOptions();
-         SodaHash config = readConfigFile(cmdOpts);
-         gvars = (SodaHash)config.get("gvars");
-         hijacks = (SodaHash)config.get("hijacks");
+         VDDHash config = readConfigFile(cmdOpts);
+         gvars = (VDDHash)config.get("gvars");
+         hijacks = (VDDHash)config.get("hijacks");
          SodaSuitesList = (ArrayList<String>)config.get("suites");
          SodaTestsList = (ArrayList<String>)config.get("tests");
 
-         gvars.putAll((SodaHash)cmdOpts.get("gvars"));
-         hijacks.putAll((SodaHash)cmdOpts.get("hijacks"));
+         gvars.putAll((VDDHash)cmdOpts.get("gvars"));
+         hijacks.putAll((VDDHash)cmdOpts.get("hijacks"));
 
          if ((Boolean)cmdOpts.get("help")) {
             printUsage();
@@ -363,7 +363,7 @@ public class VooDooDriver {
    }
 
    private static void RunTests(ArrayList<String> tests, String resultdir, SodaSupportedBrowser browserType,
-         SodaHash gvars, SodaHash hijacks, SodaEvents plugins, String savehtml, String downloaddir,
+         VDDHash gvars, VDDHash hijacks, SodaEvents plugins, String savehtml, String downloaddir,
          String assertpage, int attachTimeout, Boolean haltOnFailure) {
       File resultFD = null;
       SodaBrowser browser = null;
@@ -432,7 +432,7 @@ public class VooDooDriver {
    }
 
    private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
-         SodaHash gvars, SodaHash hijacks, SodaBlockList blockList, SodaEvents plugins, String savehtml,
+         VDDHash gvars, VDDHash hijacks, SodaBlockList blockList, SodaEvents plugins, String savehtml,
          String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout,
          Boolean haltOnFailure) {
       int len = suites.size() -1;
@@ -530,7 +530,7 @@ public class VooDooDriver {
          System.out.printf("(*)Parsing Suite file...\n");
          SodaSuiteParser suiteP = new SodaSuiteParser(suite_name, gvars);
          SodaTestList suite_test_list = suiteP.getTests();
-         SodaHash vars = null;
+         VDDHash vars = null;
          SodaTestResults test_results_hash = null;
          ArrayList<SodaTestResults> test_resultsStore = new ArrayList<SodaTestResults>();
 

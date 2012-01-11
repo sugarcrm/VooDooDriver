@@ -27,9 +27,9 @@ import org.w3c.dom.NodeList;
 public class SodaSuiteParser {
 
    private SodaTestList tests = null;
-   private SodaHash gvars = null;
+   private VDDHash gvars = null;
 
-   public SodaSuiteParser(String suitefile, SodaHash gvars) {
+   public SodaSuiteParser(String suitefile, VDDHash gvars) {
       Document doc = null;
       File suiteFD = null;
       DocumentBuilderFactory dbf = null;
@@ -38,7 +38,7 @@ public class SodaSuiteParser {
       this.gvars = gvars;
 
       if (this.gvars == null) {
-         this.gvars = new SodaHash();
+         this.gvars = new VDDHash();
       }
 
       try {

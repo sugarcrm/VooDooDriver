@@ -49,20 +49,20 @@ public class SodaEventDriver implements Runnable {
 
    private SodaEvents testEvents = null;
    private SodaBrowser Browser = null;
-   private SodaHash sodaVars = null;
+   private VDDHash sodaVars = null;
    private SodaReporter report = null;
-   private SodaHash hijacks = null;
+   private VDDHash hijacks = null;
    private Date threadTime = null;
    private volatile Thread runner;
    private volatile Boolean threadStop = false;
    private SodaEvents plugIns = null;
-   private SodaHash JavaPlugings = null;
-   private SodaHash ElementStore = null;
+   private VDDHash JavaPlugings = null;
+   private VDDHash ElementStore = null;
    private VDDPluginsHash loadedPlugins = null;
    private String currentHWnd = null;
    private int attachTimeout = 0;
    private String csvOverrideFile = null;
-   private SodaHash whitelist = null;
+   private VDDHash whitelist = null;
 
    /**
     * The class Constructor.
@@ -70,30 +70,30 @@ public class SodaEventDriver implements Runnable {
     * @param browser  {@link SodaBrowser}
     * @param events   {@link SodaEvents}
     * @param reporter {@link SodaReporter}
-    * @param gvars    {@link SodaHash}
-    * @param hijacks  {@link SodaHash}
-    * @param oldvars  {@link SodaHash}
+    * @param gvars    {@link VDDHash}
+    * @param hijacks  {@link VDDHash}
+    * @param oldvars  {@link VDDHash}
     * @param plugins  {@link SodaEvents}
     */
    public SodaEventDriver(SodaBrowser browser, SodaEvents events,
-         SodaReporter reporter, SodaHash gvars, SodaHash hijacks,
-         SodaHash oldvars, SodaEvents plugins) {
+         SodaReporter reporter, VDDHash gvars, VDDHash hijacks,
+         VDDHash oldvars, SodaEvents plugins) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
 
-      this.whitelist = new SodaHash();
-      this.JavaPlugings = new SodaHash();
+      this.whitelist = new VDDHash();
+      this.JavaPlugings = new VDDHash();
       this.loadedPlugins = new VDDPluginsHash();
 
       if (oldvars != null) {
          sodaVars = oldvars;
       } else {
-         sodaVars = new SodaHash();
+         sodaVars = new VDDHash();
       }
 
-      this.ElementStore = new SodaHash();
+      this.ElementStore = new VDDHash();
       this.plugIns = plugins;
       if (this.plugIns == null) {
          this.plugIns = new SodaEvents();
@@ -181,7 +181,7 @@ public class SodaEventDriver implements Runnable {
       int len = this.plugIns.size() - 1;
 
       for (int i = 0; i <= len; i++) {
-         SodaHash tmp = this.plugIns.get(i);
+         VDDHash tmp = this.plugIns.get(i);
          if (!tmp.containsKey("classname")) {
             continue;
          }
@@ -204,7 +204,7 @@ public class SodaEventDriver implements Runnable {
     *
     * @param event
     */
-   private void assertPage(SodaHash event) {
+   private void assertPage(VDDHash event) {
       boolean assertpage = true;
 
       if (event.containsKey("assertPage")) {
@@ -216,7 +216,7 @@ public class SodaEventDriver implements Runnable {
       }
    }
 
-   private void saveElement(SodaHash event, WebElement element) {
+   private void saveElement(VDDHash event, WebElement element) {
       if (!event.containsKey("save")) {
          return;
       }
@@ -239,11 +239,11 @@ public class SodaEventDriver implements Runnable {
       }
    }
 
-   public SodaHash getSodaVars() {
+   public VDDHash getSodaVars() {
       return this.sodaVars;
    }
 
-   public void appedSodaVars(SodaHash vars) {
+   public void appedSodaVars(VDDHash vars) {
       int len = 0;
 
       if (vars == null) {
@@ -328,7 +328,7 @@ public class SodaEventDriver implements Runnable {
       return testEvents;
    }
 
-   private boolean handleSingleEvent(SodaHash event, WebElement parent) {
+   private boolean handleSingleEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       WebElement element = null;
 
@@ -509,7 +509,7 @@ public class SodaEventDriver implements Runnable {
       }
    }
 
-   private boolean whitelistEvent(SodaHash event) {
+   private boolean whitelistEvent(VDDHash event) {
       boolean result = false;
       String action = null;
       String name = null;
@@ -558,7 +558,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean frameEvent(SodaHash event) {
+   private boolean frameEvent(VDDHash event) {
       boolean result = false;
       int index = -1;
       String frameid = null;
@@ -606,7 +606,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean screenshotEvent(SodaHash event) {
+   private boolean screenshotEvent(VDDHash event) {
       boolean result = false;
       String filename = "";
 
@@ -627,7 +627,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean alertEvent(SodaHash event) {
+   private boolean alertEvent(VDDHash event) {
       boolean result = false;
       boolean alert_var = false;
       boolean exists = true;
@@ -718,7 +718,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean deleteEvent(SodaHash event) {
+   private boolean deleteEvent(VDDHash event) {
       boolean result = false;
 
       this.report.Log("Delete event starting.");
@@ -745,12 +745,12 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean javapluginEvent(SodaHash event, WebElement parent) {
+   private boolean javapluginEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       String[] args = null;
       String classname = "";
       String classfile = "";
-      SodaHash classdata;
+      VDDHash classdata;
       String msg = "";
       int err = 0;
 
@@ -770,7 +770,7 @@ public class SodaEventDriver implements Runnable {
          return false;
       }
 
-      classdata = (SodaHash) this.JavaPlugings.get(classname);
+      classdata = (VDDHash) this.JavaPlugings.get(classname);
       classfile = classdata.get("file").toString();
 
       msg = String.format("Loading classname: '%s'.", classname);
@@ -819,12 +819,12 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean pluginloaderEvent(SodaHash event) {
+   private boolean pluginloaderEvent(VDDHash event) {
       boolean result = false;
       String filename = "";
       String classname = "";
       File tmp = null;
-      SodaHash data = null;
+      VDDHash data = null;
 
       this.report.Log("PluginLoader event started.");
 
@@ -868,7 +868,7 @@ public class SodaEventDriver implements Runnable {
          }
       }
 
-      data = new SodaHash();
+      data = new VDDHash();
       data.put("file", filename);
       data.put("classname", classname);
       data.put("enabled", true);
@@ -878,7 +878,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean ulEvent(SodaHash event) {
+   private boolean ulEvent(VDDHash event) {
       boolean required = true;
       boolean click = false;
       boolean result = false;
@@ -930,7 +930,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean areaEvent(SodaHash event) {
+   private boolean areaEvent(VDDHash event) {
       boolean required = true;
       boolean click = false;
       boolean result = false;
@@ -977,7 +977,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean mapEvent(SodaHash event) {
+   private boolean mapEvent(VDDHash event) {
       boolean required = true;
       boolean click = false;
       boolean result = false;
@@ -1029,7 +1029,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean olEvent(SodaHash event) {
+   private boolean olEvent(VDDHash event) {
       boolean required = true;
       boolean click = false;
       boolean result = false;
@@ -1077,7 +1077,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean javascriptEvent(SodaHash event) {
+   private boolean javascriptEvent(VDDHash event) {
       boolean result = false;
       String scriptdata = "";
 
@@ -1114,7 +1114,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean executeEvent(SodaHash event) {
+   private boolean executeEvent(VDDHash event) {
       boolean result = false;
       Process proc = null;
       int proc_ret = 0;
@@ -1161,7 +1161,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean dndEvent(SodaHash event) {
+   private boolean dndEvent(VDDHash event) {
       boolean result = true;
       String src = null;
       String dst = null;
@@ -1196,7 +1196,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement imageEvent(SodaHash event, WebElement parent) {
+   private WebElement imageEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1243,7 +1243,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement filefieldEvent(SodaHash event, WebElement parent) {
+   private WebElement filefieldEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
 
@@ -1291,7 +1291,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement liEvent(SodaHash event, WebElement parent) {
+   private WebElement liEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1340,7 +1340,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement trEvent(SodaHash event, WebElement parent) {
+   private WebElement trEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1389,7 +1389,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement tdEvent(SodaHash event, WebElement parent) {
+   private WebElement tdEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1440,7 +1440,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private boolean hiddenEvent(SodaHash event, WebElement parent) {
+   private boolean hiddenEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean required = true;
       WebElement element = null;
@@ -1482,7 +1482,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement spanEvent(SodaHash event, WebElement parent) {
+   private WebElement spanEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1554,7 +1554,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement inputEvent(SodaHash event, WebElement parent) {
+   private WebElement inputEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
 
@@ -1605,7 +1605,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement radioEvent(SodaHash event, WebElement parent) {
+   private WebElement radioEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1691,7 +1691,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement selectEvent(SodaHash event, WebElement parent) {
+   private WebElement selectEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
       String setvalue = null;
@@ -1893,7 +1893,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement formEvent(SodaHash event, WebElement parent) {
+   private WebElement formEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -1941,7 +1941,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement tableEvent(SodaHash event, WebElement parent) {
+   private WebElement tableEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -2013,7 +2013,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private boolean attachEvent(SodaHash event) {
+   private boolean attachEvent(VDDHash event) {
       boolean result = false;
       Set<String> handles = null;
       int len = 0;
@@ -2207,7 +2207,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement divEvent(SodaHash event, WebElement parent) {
+   private WebElement divEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -2282,7 +2282,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private boolean scriptEvent(SodaHash event) {
+   private boolean scriptEvent(VDDHash event) {
       boolean result = false;
       SodaXML xml = null;
       String testfile = "";
@@ -2321,7 +2321,7 @@ public class SodaEventDriver implements Runnable {
     *
     * Output: returns true on success or false on fail.
     */
-   private boolean varEvent(SodaHash event) {
+   private boolean varEvent(VDDHash event) {
       boolean result = false;
       String var_name = "";
       String var_value = "";
@@ -2360,7 +2360,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement checkboxEvent(SodaHash event, WebElement parent) {
+   private WebElement checkboxEvent(VDDHash event, WebElement parent) {
       boolean click = false;
       boolean required = true;
       WebElement element = null;
@@ -2442,7 +2442,7 @@ public class SodaEventDriver implements Runnable {
     * @return the a {@link WebElement} or null
     */
 
-   private WebElement linkEvent(SodaHash event, WebElement parent) {
+   private WebElement linkEvent(VDDHash event, WebElement parent) {
       boolean click = true;
       boolean required = true;
       boolean exists = true;
@@ -2538,7 +2538,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private boolean csvEvent(SodaHash event) {
+   private boolean csvEvent(VDDHash event) {
       boolean result = false;
       SodaCSV csv = null;
       SodaCSVData csv_data = null;
@@ -2608,7 +2608,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean waitEvent(SodaHash event) {
+   private boolean waitEvent(VDDHash event) {
       boolean result = false;
       int default_timeout = 5;
 
@@ -2649,7 +2649,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean browserEvent(SodaHash event, WebElement parent) {
+   private boolean browserEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean assertPage = true;
       SodaBrowserActions browser_action = null;
@@ -2753,7 +2753,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement findElement(SodaHash event, WebElement parent,
+   private WebElement findElement(VDDHash event, WebElement parent,
          boolean required) {
       WebElement element = null;
       By by = null;
@@ -3044,7 +3044,7 @@ public class SodaEventDriver implements Runnable {
       len = this.plugIns.size() - 1;
 
       for (int i = 0; i <= len; i++) {
-         SodaHash tmp = this.plugIns.get(i);
+         VDDHash tmp = this.plugIns.get(i);
 
          if (tmp.get("control").toString()
                .contains((type.toString().toLowerCase()))) {
@@ -3089,7 +3089,7 @@ public class SodaEventDriver implements Runnable {
       }
 
       if (index > -1) {
-         SodaHash data = this.plugIns.get(index);
+         VDDHash data = this.plugIns.get(index);
          String classname = data.get("classname").toString();
          String msg = "";
          Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
@@ -3127,7 +3127,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private WebElement buttonEvent(SodaHash event, WebElement parent) {
+   private WebElement buttonEvent(VDDHash event, WebElement parent) {
       boolean click = true;
       boolean required = true;
       WebElement element = null;
@@ -3195,7 +3195,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement textareaEvent(SodaHash event, WebElement parent) {
+   private WebElement textareaEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
 
@@ -3267,7 +3267,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement textfieldEvent(SodaHash event, WebElement parent) {
+   private WebElement textfieldEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
 
@@ -3353,7 +3353,7 @@ public class SodaEventDriver implements Runnable {
     * @return the &lt;input type=&quot;password&quot; {@link WebElement} or null
     */
 
-   private WebElement passwordEvent(SodaHash event, WebElement parent) {
+   private WebElement passwordEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
 
@@ -3429,7 +3429,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private boolean putsEvent(SodaHash event) {
+   private boolean putsEvent(VDDHash event) {
       boolean result = false;
       String msg = "";
 
@@ -3446,7 +3446,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private void checkDisabled(SodaHash event, WebElement element) {
+   private void checkDisabled(VDDHash event, WebElement element) {
       String value = null;
 
       if (!event.containsKey("disabled")) {
@@ -3463,10 +3463,10 @@ public class SodaEventDriver implements Runnable {
       }
    }
 
-   private void handleVars(String value, SodaHash event) {
+   private void handleVars(String value, VDDHash event) {
       if (event.containsKey("var")) {
          String name = event.get("var").toString();
-         SodaHash tmp = new SodaHash();
+         VDDHash tmp = new VDDHash();
          tmp.put("set", value);
          tmp.put("var", name);
          this.varEvent(tmp);
