@@ -1,4 +1,4 @@
-package voodoodriver;
+package org.sugarcrm.voodoodriver;
 /*
 Copyright 2011 SugarCRM Inc.
 

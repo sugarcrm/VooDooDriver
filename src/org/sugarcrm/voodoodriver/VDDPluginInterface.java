@@ -14,7 +14,7 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package voodoodriver;
+package org.sugarcrm.voodoodriver;
 
 import org.openqa.selenium.WebElement;
 

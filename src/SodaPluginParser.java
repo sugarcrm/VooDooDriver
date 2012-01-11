@@ -22,8 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import voodoodriver.SodaEvents;
-import voodoodriver.SodaHash;
+import org.sugarcrm.voodoodriver.SodaEvents;
+import org.sugarcrm.voodoodriver.SodaHash;
 
 public class SodaPluginParser {
 

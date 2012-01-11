@@ -1,4 +1,4 @@
-package vddlogger;
+package org.sugarcrm.vddlogger;
 
 public class VddLogCmdParser {
 

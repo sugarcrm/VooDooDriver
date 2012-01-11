@@ -14,7 +14,7 @@ Please see the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package voodoodriver;
+package org.sugarcrm.voodoodriver;
 
 /**
  * An enum class for all of the valid browser actions.

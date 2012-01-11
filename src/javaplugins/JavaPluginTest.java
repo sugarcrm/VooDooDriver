@@ -18,8 +18,8 @@ package javaplugins;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import voodoodriver.SodaBrowser;
-import voodoodriver.VDDPluginInterface;
+import org.sugarcrm.voodoodriver.SodaBrowser;
+import org.sugarcrm.voodoodriver.VDDPluginInterface;
 
 /**
  * a simple example Java plugin for use with VDD. This plugin demonstrates VDD's functionality of interacting with WebElement, and performing

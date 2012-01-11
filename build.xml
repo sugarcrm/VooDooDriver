@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="VooDooDriver" default="default-build" basedir=".">
-    <description>
-        simple example build file for building soda-java into a jar file.
-    </description>
+   <description>Build script for VooDooDriver</description>
    
    <!-- set global properties for this build -->
-	<property name="buildnum" value="666" />
-	<property name="bin" location="bin"/>
+   <property name="buildnum" value="666" />
+   <property name="bin" location="bin"/>
    <property name="src" location="src"/>
    <property name="build" location="build"/>
    <property name="dist"  location="VooDooDriver"/>
    <property name="lib" location="./lib"/>
-	<property name="product-zip" location="${bin}/VooDooDriver.zip"/>
-	<property name="sodaelements" location="${src}/voodoodriver/SodaElements.xml"/>
-	<property name="suitereport-header" location="${src}/vddlogger/suitereporter-header.txt" />
-	<property name="issuesreport-header" location="${src}/vddlogger/issues-header.txt" />
-	<property name="summaryreport-header" location="${src}/vddlogger/summaryreporter-header.txt" />
-	<property name="reportlog-header" location="${src}/vddlogger/reportlogheader.txt" />
-	<property name="helpmessage" location="${src}/helpmessage.txt" />
-	<property name="officialName" value="VooDooDriver" />
-	<property name="version" value="0.0.1" />
-	<property name="year" value="2011" />
+   <property name="product-zip" location="${bin}/VooDooDriver.zip"/>
+   <property name="sodaelements" location="${src}/org/sugarcrm/voodoodriver/SodaElements.xml"/>
+   <property name="suitereport-header" location="${src}/org/sugarcrm/vddlogger/suitereporter-header.txt" />
+   <property name="issuesreport-header" location="${src}/org/sugarcrm/vddlogger/issues-header.txt" />
+   <property name="summaryreport-header" location="${src}/org/sugarcrm/vddlogger/summaryreporter-header.txt" />
+   <property name="reportlog-header" location="${src}/org/sugarcrm/vddlogger/reportlogheader.txt" />
+   <property name="helpmessage" location="${src}/helpmessage.txt" />
+   <property name="officialName" value="VooDooDriver" />
+   <property name="version" value="0.0.1" />
+   <property name="year" value="2011" />
 	
    <pathconvert property="jars.classes" pathsep=" ">
       <mapper>
@@ -31,30 +29,29 @@
             <globmapper from="*" to="lib/*" />
          </chainedmapper>
       </mapper>
-      
-   	<path>
-   	   <!-- lib.home contains all jar files, in several subdirectories -->
-   	   <fileset dir="${lib}/libs">
-   	      <include name="**/*.jar" />
-   	   </fileset>
-   	</path>
+      <path>
+         <!-- lib.home contains all jar files, in several subdirectories -->
+         <fileset dir="${lib}/libs">
+            <include name="**/*.jar" />
+         </fileset>
+      </path>
    </pathconvert>
 
-	<target name="docs">
-	   <javadoc sourcepath="${src}" destdir="${dist}/javadocs" />
-	</target>
+   <target name="docs">
+      <javadoc sourcepath="${src}" destdir="${dist}/javadocs" />
+   </target>
 	
-	<target name="api-docs" depends="init">
-		<copy todir="${dist}/docs">
-			<fileset dir="docs/" />
-		</copy>
-	</target>
+   <target name="api-docs" depends="init">
+      <copy todir="${dist}/docs">
+         <fileset dir="docs/" />
+      </copy>
+   </target>
 	
-	<target name="copy-launchers" depends="init">
-		<copy todir="${dist}">
-			<fileset dir="launchers/" />
-		</copy>
-	</target>
+   <target name="copy-launchers" depends="init">
+      <copy todir="${dist}">
+         <fileset dir="launchers/" />
+      </copy>
+   </target>
 	
    <target name="init" depends="clean">
       <!-- Create the time stamp -->
@@ -64,7 +61,7 @@
    	<mkdir dir="${bin}" />
    	<mkdir dir="${dist}" />
    	<mkdir dir="${dist}/lib"/>
-  </target>
+   </target>
 
    <target name="clean">
       <delete failonerror="false">
@@ -86,63 +83,63 @@
       <delete dir="${dist}" failonerror="false" />
    </target>
 
-	<target name="create-propfile">
-		<tstamp>
-			<format property="timestamp" pattern="MM/dd/yyyy hh:mm aa" 
-				timezone="America/Los_Angeles" />
-		</tstamp>
+   <target name="create-propfile">
+      <tstamp>
+         <format property="timestamp" pattern="MM/dd/yyyy hh:mm aa" 
+                 timezone="America/Los_Angeles" />
+      </tstamp>
 		
-		<propertyfile file="${build}/voodoodriver/vdd.properties" comment="VooDooDriver Properties">
-			<entry key="version" value="${timestamp} 1.5.1 (build: ${buildnum})" />
-		</propertyfile>
-	</target>
+      <propertyfile file="${build}/org/sugarcrm/voodoodriver/vdd.properties" comment="VooDooDriver Properties">
+         <entry key="version" value="${timestamp} 1.5.1 (build: ${buildnum})" />
+      </propertyfile>
+   </target>
 	
    <target name="debug" depends="clean,init,api-docs,copy-launchers,docs" description="compile the source in debug mode" >
       <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" 
-   		includeantruntime="false">
-            <classpath>
-               <pathelement path="${classpath}"/>
-               <fileset dir="lib">
-                  <include name="**/*.jar"/>
-               </fileset>
-            </classpath>
-            <compilerarg value="-Xlint:unchecked"/>
-         </javac>
+             includeantruntime="false">
+         <classpath>
+            <pathelement path="${classpath}"/>
+            <fileset dir="lib">
+               <include name="**/*.jar"/>
+            </fileset>
+         </classpath>
+         <compilerarg value="-Xlint:unchecked"/>
+      </javac>
 
-      <copy todir="${build}/voodoodriver" file="${sodaelements}" />
-   	<copy todir="${build}/vddlogger" file="${suitereport-header}" />
-   	<copy todir="${build}/vddlogger" file="${issuesreport-header}" />
-   	<copy todir="${build}/vddlogger" file="${summaryreport-header}" />
-   	<copy todir="${build}/vddlogger" file="${reportlog-header}" />
-   	<copy todir="${build}" file="${helpmessage}" />
-   	
-   	<antcall target="create-propfile" />
-   	
-   	<jar jarfile="${dist}/VooDooDriver.jar" basedir="${build}">
+      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${sodaelements}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${suitereport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${reportlog-header}" />
+      <copy todir="${build}" file="${helpmessage}" />
+	
+      <antcall target="create-propfile" />
+
+      <jar jarfile="${dist}/VooDooDriver.jar" basedir="${build}">
          <fileset dir="${lib}">
             <include name="**/*.jar" />
          </fileset>
-         
+
          <manifest>
             <attribute name="Main-Class" value="VooDooDriver"/>
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
-   	
-   	<!-- LogReporter build -->
-   	<jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
-   	   	 <manifest>
-   	   	    <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
-   	   	 </manifest>
-   	</jar>
-   	
-   	<copy todir="${dist}/lib">
-   		  <fileset dir="lib/libs" />
-   	</copy>
-   		
-   	<zip destfile="${bin}/VooDooDriver-debug.zip" basedir="${dist}"/>
+
+      <!-- LogReporter build -->
+      <jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
+         <manifest>
+            <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
+         </manifest>
+      </jar>
+
+      <copy todir="${dist}/lib">
+         <fileset dir="lib/libs" />
+      </copy>
+
+      <zip destfile="${bin}/VooDooDriver-debug.zip" basedir="${dist}"/>
    </target>
-	
+
    <target name="compile" depends="init" description="compile the source " >
       <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
          <classpath>
@@ -151,42 +148,42 @@
                <include name="**/*.jar"/>
             </fileset>
          </classpath>
-      	<compilerarg value="-Xlint:unchecked"/>
+         <compilerarg value="-Xlint:unchecked"/>
       </javac>
    </target>
-   
+
    <target name="default-build" depends="compile,api-docs,copy-launchers,docs" description="generate the distribution" >
       <copy todir="${dist}/lib">
          <fileset dir="lib/libs" />
       </copy>
-      
-   	<copy todir="${build}/voodoodriver" file="${sodaelements}"/>
-   	<copy todir="${build}/vddlogger" file="${suitereport-header}" />
-   	<copy todir="${build}/vddlogger" file="${issuesreport-header}" />
-   	<copy todir="${build}/vddlogger" file="${summaryreport-header}" />
-   	<copy todir="${build}/vddlogger" file="${reportlog-header}" />
-   	<copy todir="${build}" file="${helpmessage}" />
-   	
-   	<antcall target="create-propfile" />
+
+      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${sodaelements}"/>
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${suitereport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />
+      <copy todir="${build}/org/sugarcrm/vddlogger" file="${reportlog-header}" />
+      <copy todir="${build}" file="${helpmessage}" />
+
+      <antcall target="create-propfile" />
    	
       <jar jarfile="${dist}/VooDooDriver.jar" basedir="${build}">
          <fileset dir="${lib}">
             <include name="**/*.jar" />
          </fileset>
-         
+
          <manifest>
             <attribute name="Main-Class" value="VooDooDriver"/>
             <attribute name="Class-Path" value="${jars.classes}"/>
          </manifest>
       </jar>
-   	
-   		<!-- LogReporter build -->
-   		<jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
-   	    	<manifest>
-   	    		<attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
-   	    	</manifest>
-   	 	</jar>
-   	
-   	<zip destfile="${bin}/VooDooDriver.zip" basedir="${dist}"/>
-  </target>
+
+      <!-- LogReporter build -->
+      <jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
+         <manifest>
+            <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
+         </manifest>
+      </jar>
+
+      <zip destfile="${bin}/VooDooDriver.zip" basedir="${dist}"/>
+   </target>
 </project>
