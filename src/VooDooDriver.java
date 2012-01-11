@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.sugarcrm.voodoodriver.VDDBlockList;
-import org.sugarcrm.voodoodriver.SodaBlockListParser;
+import org.sugarcrm.voodoodriver.VDDBlockListParser;
 import org.sugarcrm.voodoodriver.SodaBrowser;
 import org.sugarcrm.voodoodriver.SodaChrome;
 import org.sugarcrm.voodoodriver.SodaCmdLineOpts;
@@ -294,7 +294,7 @@ public class VooDooDriver {
          blockListFile = (String)cmdOpts.get("blocklistfile");
          if (blockListFile != null) {
             blockListFile = FilenameUtils.separatorsToSystem(blockListFile);
-            SodaBlockListParser sbp = new SodaBlockListParser(blockListFile);
+            VDDBlockListParser sbp = new VDDBlockListParser(blockListFile);
             blockList = sbp.parse();
          } else {
             System.out.printf("(*)No Block list file to parse.\n");
