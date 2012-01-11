@@ -45,12 +45,12 @@ public class SodaBlockListParser {
    /**
     * Parses the block list file.
     *
-    * @return   Returns a SodaBlockList.
+    * @return   Returns a VDDBlockList.
     *
-    * @see SodaBlockList
+    * @see VDDBlockList
     */
-   public SodaBlockList parse() {
-      SodaBlockList list = null;
+   public VDDBlockList parse() {
+      VDDBlockList list = null;
       File FD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
@@ -62,7 +62,7 @@ public class SodaBlockListParser {
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
          doc = db.parse(FD);
-         list = new SodaBlockList();
+         list = new VDDBlockList();
       } catch (Exception exp) {
          System.err.printf("(!)Error: %s\n", exp.getMessage());
          list = null;

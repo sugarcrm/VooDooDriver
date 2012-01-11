@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.sugarcrm.voodoodriver.SodaBlockList;
+import org.sugarcrm.voodoodriver.VDDBlockList;
 import org.sugarcrm.voodoodriver.SodaBlockListParser;
 import org.sugarcrm.voodoodriver.SodaBrowser;
 import org.sugarcrm.voodoodriver.SodaChrome;
@@ -185,7 +185,7 @@ public class VooDooDriver {
    @SuppressWarnings("unchecked")
    public static void main(String[] args) {
       String blockListFile = null;
-      SodaBlockList blockList = null;
+      VDDBlockList blockList = null;
       SodaCmdLineOpts opts = null;
       VDDHash cmdOpts = null;
       SodaSupportedBrowser browserType = null;
@@ -298,7 +298,7 @@ public class VooDooDriver {
             blockList = sbp.parse();
          } else {
             System.out.printf("(*)No Block list file to parse.\n");
-            blockList = new SodaBlockList();
+            blockList = new VDDBlockList();
          }
 
          String cmdResultdir = (String)cmdOpts.get("resultdir");
@@ -432,7 +432,7 @@ public class VooDooDriver {
    }
 
    private static void RunSuites(ArrayList<String> suites, String resultdir, SodaSupportedBrowser browserType,
-         VDDHash gvars, VDDHash hijacks, SodaBlockList blockList, SodaEvents plugins, String savehtml,
+         VDDHash gvars, VDDHash hijacks, VDDBlockList blockList, SodaEvents plugins, String savehtml,
          String downloaddir, String assertpage, String restartTest, int restartCount, int attachTimeout,
          Boolean haltOnFailure) {
       int len = suites.size() -1;

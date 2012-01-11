@@ -29,7 +29,7 @@ public class SodaTest {
    private VDDHash GVars = null;
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
-   private SodaBlockList blocked = null;
+   private VDDBlockList blocked = null;
    private boolean WatchDog = false;
    private SodaEvents PlugIns = null;
    private String SaveHTML = "";
@@ -39,7 +39,7 @@ public class SodaTest {
    private boolean isRestartTest = false;
 
    public SodaTest(String testFile, SodaBrowser browser, VDDHash gvars, VDDHash hijacks,
-         SodaBlockList blocklist, VDDHash oldvars, String suitename, String reportDir,
+         VDDBlockList blocklist, VDDHash oldvars, String suitename, String reportDir,
          String saveHtml) {
       this.Browser = browser;
       this.testFile = testFile;
