@@ -198,8 +198,13 @@ public class SodaXML {
             
             if (!(sodaAttributes != null && sodaAttributes.containsKey(attr)) &&
                 !(accessorAttributes != null && accessorAttributes.containsKey(attr))) {
-               this.reporter.ReportError(String.format("Error: Invalid attribute for %s event: '%s'",
-                                                       node.getNodeName().toUpperCase(), attr));
+               String err = String.format("Error: Invalid attribute for %s event: '%s'",
+                                          node.getNodeName().toUpperCase(), attr);
+               if (this.reporter == null) {
+                  System.out.println("(!)" + err);
+               } else {
+                  this.reporter.ReportError(err);
+               }
                return false;
             }
 
