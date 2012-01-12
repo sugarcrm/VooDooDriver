@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soda>
-<!--
-Copyright 2011 SugarCRM Inc.
+   <!--
+      Copyright 2011 SugarCRM Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License. 
-You may may obtain a copy of the License at
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0 
+         http://www.apache.org/licenses/LICENSE-2.0 
    
-Unless required by applicable law or agreed to in writing, software 
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-Please see the License for the specific language governing permissions and 
-limitations under the License.
--->
+      Unless required by applicable law or agreed to in writing,
+      software distributed under the License is distributed on an "AS
+      IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+      express or implied.  Please see the License for the specific
+      language governing permissions and limitations under the
+      License.
+   -->
 
    <timestamp>
    </timestamp>
@@ -24,7 +25,7 @@ limitations under the License.
          <accessor type="string">name</accessor>
       </soda_attributes>
    </execute>
-   
+
    <arg>
    </arg>
 
@@ -902,41 +903,53 @@ limitations under the License.
          <accessor type="string">file</accessor>
       </soda_attributes>
    </javascript>
-   
+
    <dnd>
-      <soda_attributes type="string">src</soda_attributes>
-      <soda_attributes type="string">dst</soda_attributes>
+      <soda_attributes>
+         <accessor type="string">src</accessor>
+         <accessor type="string">dst</accessor>
+      </soda_attributes>
    </dnd>
-   
+
    <pluginloader>
-      <soda_attributes type="string">classname</soda_attributes>
-      <soda_attributes type="string">file</soda_attributes>
+      <soda_attributes>
+         <accessor type="string">classname</accessor>
+         <accessor type="string">file</accessor>
+      </soda_attributes>
    </pluginloader>
-   
+
    <javaplugin>
-      <soda_attributes type="string">classname</soda_attributes>
+      <soda_attributes>
+         <accessor type="string">classname</accessor>
+      </soda_attributes>
    </javaplugin>
 
    <delete>
-      <soda_attributes type="string">name</soda_attributes>
+      <soda_attributes>
+         <accessor type="string">name</accessor>
+      </soda_attributes>
    </delete>
-   
-   <alert>
-   	<soda_attributes type="boolean">alert</soda_attributes>
-   	<soda_attributes type="boolean">exist</soda_attributes>
-   	<soda_attributes type="string">assert</soda_attributes>
-   	<soda_attributes type="string">assertnot</soda_attributes>
-   </alert>
-   
-   <screenshot>
-   	<soda_attributes type="string">file</soda_attributes>
-   </screenshot>
-   
-   <frame>
-		<accessor type="string">name</accessor>
-		<accessor type="string">id</accessor>
-		<accessor type="string">index</accessor>
-   </frame>
-   
-</soda>
 
+   <alert>
+      <soda_attributes>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+      </soda_attributes>
+   </alert>
+
+   <screenshot>
+      <soda_attributes>
+         <accessor type="string">file</accessor>
+      </soda_attributes>
+   </screenshot>
+
+   <frame>
+      <soda_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+      </soda_attributes>
+   </frame>
+</soda>
