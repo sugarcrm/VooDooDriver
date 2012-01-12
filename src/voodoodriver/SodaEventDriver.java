@@ -412,7 +412,8 @@ public class SodaEventDriver implements Runnable {
          break;
       case IMAGE:
          element = imageEvent(event, parent);
-         this.firePlugin(null, SodaElements.IMAGE, SodaPluginEventType.AFTEREVENT);
+         this.firePlugin(null, SodaElements.IMAGE,
+                         SodaPluginEventType.AFTEREVENT);
          break;
       case DND:
          result = dndEvent(event);
@@ -1702,6 +1703,7 @@ public class SodaEventDriver implements Runnable {
       boolean included = false;
       boolean included_direction = true;
       boolean real = false;
+      boolean click = false;
       String assert_value = "";
       String included_value = "";
 
@@ -1734,17 +1736,20 @@ public class SodaEventDriver implements Runnable {
             if (setvalue != null) {
                if (real) {
                   sel.selectByValue(setvalue);
-                  this.report.Log("Setting option by value: '" + setvalue + "'.");
+                  this.report.Log("Setting option by value: '" +
+                                  setvalue + "'.");
 
                } else {
                   sel.selectByVisibleText(setvalue);
-                  this.report.Log("Setting option by visible text: '" + setvalue + "'.");
+                  this.report.Log("Setting option by visible text: '" +
+                                  setvalue + "'.");
                }
 
                try {
                   /*
-                   * Selecting a value has the potential to refresh the page.  Check
-                   * for a stale element and refresh it if needed (Bug 49533).
+                   * Selecting a value has the potential to refresh
+                   * the page.  Check for a stale element and refresh
+                   * it if needed (Bug 49533).
                    */
                   element.isDisplayed();
                } catch (StaleElementReferenceException e) {
@@ -1816,9 +1821,23 @@ public class SodaEventDriver implements Runnable {
                }
             }
 
+            if (event.containsKey("click")) {
+               click = this.clickToBool(event.get("click").toString());
+            }
+
+            if (click) {
+               this.firePlugin(element, SodaElements.FORM,
+                               SodaPluginEventType.BEFORECLICK);
+               element.click();
+               this.firePlugin(element, SodaElements.FORM,
+                               SodaPluginEventType.AFTERCLICK);
+            }
+
             if (event.containsKey("jscriptevent")) {
-               this.report.Log("Firing Javascript Event: "+ event.get("jscriptevent").toString());
-               this.Browser.fire_event(element, event.get("jscriptevent").toString());
+               this.report.Log("Firing Javascript Event: " +
+                               event.get("jscriptevent").toString());
+               this.Browser.fire_event(element,
+                                       event.get("jscriptevent").toString());
                Thread.sleep(1000);
                this.report.Log("Javascript event finished.");
             }
