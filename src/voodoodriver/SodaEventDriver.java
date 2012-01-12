@@ -501,12 +501,15 @@ public class SodaEventDriver implements Runnable {
     * @param required  whether the element was required
     */
 
-   private void logElementNotVisible(boolean required) {
-      String msg = "The element you are trying to access is not visible!";
+   private void logElementNotVisible(boolean required, SodaHash event) {
+      String how = event.get("how").toString();
+      String what = this.replaceString(event.get(how).toString());
+      String msg = ("The element you are trying to access (" +
+                    how + " = " + what + ") is not visible");
       if (required) {
-         this.report.ReportError("Error: " + msg);
+         this.report.ReportError("Error: " + msg + "!");
       } else {
-         this.report.Log(msg);
+         this.report.Log(msg + ", but required = false.");
       }
    }
 
@@ -920,7 +923,7 @@ public class SodaEventDriver implements Runnable {
             this.processEvents((SodaEvents) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -968,7 +971,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Area click finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1019,7 +1022,7 @@ public class SodaEventDriver implements Runnable {
             this.processEvents((SodaEvents) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1067,7 +1070,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("OL click finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1234,7 +1237,7 @@ public class SodaEventDriver implements Runnable {
 
          handleVars(element.getAttribute("src"), event);
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1282,7 +1285,7 @@ public class SodaEventDriver implements Runnable {
          handleVars(value, event);
 
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1329,7 +1332,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }
@@ -1378,7 +1381,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }
@@ -1428,7 +1431,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
          this.report.ReportException(exp);
@@ -1546,7 +1549,7 @@ public class SodaEventDriver implements Runnable {
             this.processEvents((SodaEvents) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -1683,7 +1686,7 @@ public class SodaEventDriver implements Runnable {
 
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -1904,7 +1907,7 @@ public class SodaEventDriver implements Runnable {
          }
 
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }
@@ -1952,7 +1955,7 @@ public class SodaEventDriver implements Runnable {
             this.processEvents((SodaEvents) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }
@@ -2023,7 +2026,7 @@ public class SodaEventDriver implements Runnable {
             this.processEvents((SodaEvents) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -2292,7 +2295,7 @@ public class SodaEventDriver implements Runnable {
          }
 
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -2443,7 +2446,7 @@ public class SodaEventDriver implements Runnable {
          handleVars(value, event);
 
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }
@@ -2547,7 +2550,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Javascript event finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -3203,7 +3206,7 @@ public class SodaEventDriver implements Runnable {
             this.report.Log("Javascript event finished.");
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -3276,7 +3279,7 @@ public class SodaEventDriver implements Runnable {
             this.report.AssertNot(assvalue, element.getAttribute("value"));
          }
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -3354,7 +3357,7 @@ public class SodaEventDriver implements Runnable {
          String value = element.getAttribute("value");
          handleVars(value, event);
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -3438,7 +3441,7 @@ public class SodaEventDriver implements Runnable {
          String value = element.getAttribute("value");
          handleVars(value, event);
       } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required);
+         logElementNotVisible(required, event);
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
