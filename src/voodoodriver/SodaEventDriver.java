@@ -1270,8 +1270,9 @@ public class SodaEventDriver implements Runnable {
             String setvalue = event.get("set").toString();
             setvalue = this.replaceString(setvalue);
             setvalue = FilenameUtils.separatorsToSystem(setvalue);
+            setvalue = (new File(setvalue)).getAbsolutePath();
             this.report.Log(String.format("Setting filefield to: '%s'.",
-                  setvalue));
+                                          setvalue));
             element.sendKeys(setvalue);
             this.report.Log("Finished set.");
          }
