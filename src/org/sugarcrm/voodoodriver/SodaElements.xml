@@ -396,6 +396,7 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">click</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
@@ -439,6 +440,7 @@
          <accessor type="string">setreal</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="string">click</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="string">include</accessor>
          <accessor type="string">noninclude</accessor>
@@ -691,6 +693,7 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
