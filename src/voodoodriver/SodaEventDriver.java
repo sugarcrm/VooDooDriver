@@ -1225,6 +1225,8 @@ public class SodaEventDriver implements Runnable {
 
          this.checkDisabled(event, element);
 
+         handleVars(element.getAttribute("src"), event);
+
          if (click) {
             this.report.Log("Image click started.");
             this.firePlugin(element, SodaElements.IMAGE,
@@ -1234,8 +1236,6 @@ public class SodaEventDriver implements Runnable {
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Image click finished.");
          }
-
-         handleVars(element.getAttribute("src"), event);
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
