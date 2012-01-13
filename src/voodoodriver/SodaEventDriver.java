@@ -1322,6 +1322,14 @@ public class SodaEventDriver implements Runnable {
          String value = element.getText();
          handleVars(value, event);
 
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: "
+                            + event.get("jscriptevent").toString());
+            this.Browser.fire_event(element, event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, SodaElements.LI,
@@ -2529,9 +2537,9 @@ public class SodaEventDriver implements Runnable {
          if (click) {
             value = this.replaceString(value);
             this.report.Log(String.format("Clicking Link: '%s' => '%s'", how,
-                  value));
+                                          value));
             this.firePlugin(element, SodaElements.LINK,
-                  SodaPluginEventType.BEFORECLICK);
+                            SodaPluginEventType.BEFORECLICK);
             element.click();
             this.firePlugin(element, SodaElements.LINK,
                   SodaPluginEventType.AFTERCLICK);
