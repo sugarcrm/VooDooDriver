@@ -2902,34 +2902,26 @@ public class SodaEventDriver implements Runnable {
             element = this.slowFindElement(event.get("do").toString(), what,
                   parent, index);
          } else {
+            List<WebElement> elements;
+
             if (parent == null) {
-               if (index > -1) {
-                  element = this.Browser.findElements(by, timeout, index,
-                        required, exists);
-               } else {
-                  element = this.Browser.findElement(by, timeout);
-               }
+               elements = this.Browser.findElements(by, timeout);
             } else {
-               List<WebElement> elements;
-               if (index > 0) {
-                  elements = parent.findElements(by);
-                  if (elements.size() - 1 < index && required != false) {
-                     if (required) {
-                        msg = String.format("Failed to find element by index '%d', index is out of bounds!",index);
-                        this.report.ReportError(msg);
-                     }
-                     element = null;
-                  } else {
-                     element = elements.get(index);
-                  }
-               } else {
-                  element = parent.findElement(by);
-               }
+               elements = parent.findElements(by);
             }
+            elements = filterElements(elements, event);
+            index = (index < 0) ? 0 : index;
+            if (index >= elements.size()) {
+               String m = ((index > 0) ?
+                           "No elements found." :
+                           String.format("Index (%d) out of bounds.", index));
+               throw new NoSuchElementException(m);
+            }
+            element = elements.get(index);
          }
       } catch (NoSuchElementException exp) {
          if (required && exists) {
-            this.report.ReportError("Failed to find element!");
+            this.report.ReportError("Failed to find element! " + exp);
             element = null;
          }
       } catch (Exception exp) {
@@ -2958,6 +2950,58 @@ public class SodaEventDriver implements Runnable {
       }
 
       return element;
+   }
+
+   /**
+    * Determine whether tag is found in filter
+    *
+    * @param tag    HTML tag to search for
+    * @param filter list of acceptable HTML tags
+    * @return true if tag is in filter, false otherwise
+    */
+
+   private boolean checkMatch(String tag, String filter) {
+      if (filter == null) {
+         return true;
+      } else if (tag == null) {
+         return false;
+      }
+      String filters[] = filter.split("\\|");
+      for (int k = 0; k < filters.length; k++) {
+         if (tag.equals(filters[k])) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   /**
+    * Filter elements by HTML element type
+    *
+    * Take a list of {@link WebElement}s found using the event selection
+    * criteria and filter through by HTML tag type.
+    *
+    * @param elements  element list returned based on event
+    * @param event     current event
+    * @return list of elements filtered by HTML tag
+    */
+
+   private List<WebElement> filterElements(List<WebElement> elements,
+                                           SodaHash event) {
+      ArrayList<WebElement> filtered =
+         new ArrayList<WebElement>(elements.size());
+      String html_tag = (String)event.get("html_tag");
+      String html_type = (String)event.get("html_type");
+
+      for (int k = 0; k < elements.size(); k++) {
+         WebElement e = elements.get(k);
+         if (checkMatch(e.getTagName(), html_tag) &&
+             checkMatch(e.getAttribute("type"), html_type)) {
+            filtered.add(e);
+         }
+      }
+
+      return filtered;
    }
 
    @SuppressWarnings("unchecked")

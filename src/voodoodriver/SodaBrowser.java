@@ -19,6 +19,7 @@ package voodoodriver;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -382,6 +383,27 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
       } while (System.currentTimeMillis() < end);
 
       return null;
+   }
+
+   /**
+    * Find more then one element in the browser's current DOM.
+    *
+    * @param by         element selection criteria
+    * @param retryTime  how long to continue retrying
+    * @return a {@link List} of all {@link WebElement}s found
+    */
+
+   public List<WebElement> findElements(By by, int retryTime)
+      throws NoSuchElementException {
+      long end = System.currentTimeMillis() + retryTime * 1000;
+      
+      do {
+         try {
+            return this.Driver.findElements(by);
+         } catch (Exception exp) {}
+      } while (System.currentTimeMillis() < end);
+
+      throw new NoSuchElementException("Failed to find element by " + by);
    }
 
    /**
