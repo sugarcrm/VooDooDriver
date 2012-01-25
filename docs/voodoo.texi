@@ -1,0 +1,215 @@
+\input texinfo
+@setfilename voodoo.info
+@settitle VooDooDriver Manual
+
+@titlepage
+@title VooDooDriver Manual
+@author Jonathan duSaint @email{jdusaint@@sugarcrm.com}
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top VooDooDriver Manual
+@end ifnottex
+
+@menu
+* Invocation::
+* Test Script Format::
+@end menu
+
+@node Invocation
+@chapter Invocation
+
+@node Test Script Format
+@chapter Test Script Format
+
+@menu
+* Suite Files::
+* Test Files::
+* Accessor Attributes::
+* Action Attributes::
+* VooDooDriver Events::
+* HTML Events::
+@end menu
+
+Each VooDooDriver test script is an XML file.  The root element is
+<voodoo>.  Depending on the type of the script, suite or test, the
+type attribute of <voodoo> is ``suite'' or ``test'', respectively.
+
+@node Suite Files
+@section Suite Files
+
+@node Test Files
+@section Test Files
+
+@node Accessor Attributes
+@section Accessor Attributes
+
+Accessor attributes provide a means for VooDooDriver events to specify
+the HTML element to which they refer.  There are several different
+ways to search for elements, all of which are directly related both to
+the Selenium API, and to the DOM itself.
+
+@subsection class
+
+Search for an HTML element by its CSS class name.
+
+@subsection css
+
+Search for an HTML element by its CSS selector.
+
+@subsection id
+
+Search for an HTML element by its ID.
+
+@subsection index
+
+Assuming more than one element of an event type is on the page, match
+the specified element in the list, using the specified zero-based
+index.
+
+@subsection method
+
+Eh?
+
+@subsection name
+
+Search for an HTML element by name.
+
+@subsection text
+
+Search for an HTML element by its link text.  Eh?
+
+@subsection title
+
+The title of a browser window.  This attribute is used only by <browser>.
+
+@subsection value
+
+Search for an HTML element by its value.  Eh?
+
+@subsection xpath
+
+Search for an HTML element using its XPATH.  This method is not very
+portable across browser implementations.
+
+@node Action Attributes
+@section Action Attributes
+
+Action attributes describe what to do during an event with the matched
+HTML element.
+
+@subsection append
+@subsection assert
+@subsection assertnot
+@subsection clear
+@subsection click
+@subsection cssprop
+@subsection cssvalue
+@subsection default
+@subsection disabled
+@subsection exists
+@subsection exist
+@subsection jscriptevent
+@subsection jswait
+@subsection required
+@subsection save
+@subsection set
+@subsection timeout
+@subsection var
+
+@node VooDooDriver Events
+@section VooDooDriver Events
+
+@subsection Timestamp
+
+Timestamp updates VooDooDriver's internal timestamp variable.  This
+variable 
+
+Valid Accessor Attributes:
+
+None.
+
+Valid Action Attributes:
+
+None.
+
+@subsection Attach
+
+When a new browser window pops up, such as after clicking a control,
+this event directs all events nested within the <attach> event to
+execute in the context of the new browser window.
+
+Valid Accessor Attributes:
+
+@itemize @bullet
+@item title
+@item url
+@end itemize
+
+Valid Action Attributes:
+
+None.
+
+Example:
+
+@example
+<button id="new-window"/>     <!-- Button that opens a new window -->
+<attach title="New Window">   <!-- Attach to that new window -->
+   <button id="save"/>        <!-- Some action within that window -->
+   <browser action="close"/>  <!-- Close the new window -->
+</attach>                     <!-- Resume in old window -->
+@end example
+
+@subsection Variable
+@subsection Script
+@subsection CSV
+@subsection Wait
+@subsection Puts
+@subsection Browser
+@subsection Whitelist
+@subsection Assert
+@subsection Javascript
+@subsection DnD
+@subsection Select_List
+@subsection Execute
+@subsection AssertPageFile
+
+@node HTML Events
+@section HTML Events
+
+@subsection Textfield
+@subsection Textarea
+@subsection Label
+@subsection Button
+@subsection UL
+@subsection Filefield
+@subsection TD
+@subsection Select
+@subsection H1
+@subsection H
+@subsection H3
+@subsection H4
+@subsection H5
+@subsection H6
+@subsection Pre
+@subsection Table
+@subsection TR
+@subsection Radio
+@subsection P
+@subsection Map
+@subsection Frame
+@subsection Form
+@subsection Div
+@subsection Area
+@subsection LI
+@subsection Link
+@subsection Image
+@subsection Text_Field
+@subsection Span
+@subsection Hidden
+
+
+@bye
