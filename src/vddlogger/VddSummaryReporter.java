@@ -357,7 +357,7 @@ public class VddSummaryReporter {
       String html;
       String cls;
 
-      if (truncated) {
+      if (truncated || passed + failed + blocked == 0) {
          hl += "_truncated";
          uhl += "_truncated";
       }
