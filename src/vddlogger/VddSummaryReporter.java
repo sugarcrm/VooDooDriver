@@ -330,87 +330,94 @@ public class VddSummaryReporter {
    }
 
    /**
-    * generates a table row for summary.html from a DOM
-    * @return - a nicely formatted html table row for summary.html
+    * Generate a row in the suite summary report
+    *
+    * @param suiteName  name of the test suite being processed
+    * @param data       data for this test suite
+    * @return a single row for output to summary.html
     */
 
    @SuppressWarnings("unchecked")
-   private String generateTableRow(String suiteName, HashMap<String, Object> data) {
-      int passed, failed, blocked, asserts, assertsF, errors, exceptions, wd, total;
-      boolean truncated;
-      String hl = "highlight", uhl = "unhighlight";
-      suiteName = data.get("suitename").toString();
-      truncated = (Boolean)data.get("truncated");
-      String runtime = "";
+   private String generateTableRow(String suiteName,
+                                   HashMap<String, Object> data) {
+      int passed        = (Integer)data.get("passed");
+      int failed        = (Integer)data.get("failed");
+      int blocked       = (Integer)data.get("blocked");
+      int wd            = (Integer)data.get("wd");
+      int asserts       = (Integer)data.get("asserts");
+      int assertsF      = (Integer)data.get("assertsF");
+      int exceptions    = (Integer)data.get("exceptions");
+      int errors        = (Integer)data.get("errors");
+      int total         = assertsF + exceptions + errors;
+      String runtime    = data.get("runtime").toString();
+      boolean truncated = (Boolean)data.get("truncated");
+      String hl         = "highlight";
+      String uhl        = "unhighlight";
+      String runclass   = (blocked == 0) ? "td_run_data_error" : "td_run_data";
+      String html;
+      String cls;
+
       if (truncated) {
          hl += "_truncated";
          uhl += "_truncated";
       }
-      String html = "<tr id=\""+count+"\" class=\""+uhl+"\" onmouseover=\"this.className='"+hl+"'\" onmouseout=\"this.className='"+uhl+"'\"> \n" +
-         "<td class=\"td_file_data\">\n" +
-         "<a href=\""+suiteName+"/"+suiteName+".html\">"+suiteName+".xml</a> \n" +
-         "</td>";
 
-      passed = (Integer)data.get("passed");
-      blocked = (Integer)data.get("blocked");
-      failed = (Integer)data.get("failed");
-      wd = (Integer)data.get("wd");
-      asserts = (Integer)data.get("asserts");
-      assertsF = (Integer)data.get("assertsF");
-      exceptions = (Integer)data.get("exceptions");
-      errors = (Integer)data.get("errors");
-      total = assertsF + exceptions + errors;
-      runtime = data.get("runtime").toString();
+      /* Row prologue. */
+      html = ("<tr id=\"" + count + "\" class=\"" + uhl + "\"" +
+                     "    onmouseover=\"this.className='" + hl + "'\"" +
+              "    onmouseout=\"this.className='" + uhl + "'\">\n" +
+              "   <td class=\"td_file_data\">\n" +
+              "      <a href=\"" + suiteName + "/" + suiteName + ".html\">" +
+              suiteName + ".xml</a>\n" +
+              "   </td>");
 
-      int d1 = (passed+failed);
-      int d2 = (passed+failed+blocked);
-      String runclass = "td_run_data_error";
-      if (d1 == d2) {
-         runclass = "td_run_data";
-      }
+      /* Tests column (passed/failed/blocked). */
+      html += ("   <td class=\"" + runclass + "\">" +
+               (passed + failed) + "/" + (passed + failed + blocked) +
+               "</td>\n" +
+               "   <td class=\"td_passed_data\">" + passed + "</td>\n" + 
+               "   <td class=\"td_failed_data\">" + failed + "</td>\n" +
+               "   <td class=\"td_blocked_data\">" + blocked + "</td> \n");
 
-      html += "\t <td class=\""+runclass+"\">"+(passed+failed)+"/"+(passed+failed+blocked)+"</td>\n";
-      html += "\t <td class=\"td_passed_data\">"+passed+"</td> \n";
-      html += "\t <td class=\"td_failed_data\">"+failed+"</td> \n";
-      html += "\t <td class=\"td_blocked_data\">"+blocked+"</td> \n";
+      /* Results column */
 
-      //"Results" column
-      if (wd == 0) {
-         html += "\t <td class=\"td_watchdog_data\">0</td> \n";
-      } else {
-         html += "\t <td class=\"td_watchdog_error_data\">"+wd+"</td> \n";
-      }
+      /* Watchdog timer expiries */
+      cls = (wd != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
+      html += "   <td class=\"" + cls + "\">" + wd + "</td>\n";
 
-      html += "\t <td class=\"td_assert_data\">"+asserts+"</td> \n";
-      if (assertsF == 0) {
-         html += "\t <td class=\"td_assert_data\">0</td> \n";
-      } else {
-         html += "\t <td class=\"td_assert_error_data\">"+assertsF+"</td> \n";
-      }
+      /* Passed asserts */
+      html += "   <td class=\"td_assert_data\">"+asserts+"</td>\n";
 
-      if (exceptions == 0) {
-         html += "\t <td class=\"td_exceptions_data\">0</td> \n";
-      } else {
-         html += "\t <td class=\"td_exceptions_error_data\">"+exceptions+"</td> \n";
-      }
+      /* Failed asserts */
+      cls = (assertsF != 0) ? "td_assert_error_data" : "td_assert_data";
+      html += "   <td class=\"" + cls + "\">" + assertsF + "</td>\n";
 
-      if (errors == 0) {
-         html += "\t <td class=\"td_exceptions_data\">0</td> \n";
-      } else {
-         html += "\t <td class=\"td_exceptions_error_data\">"+errors+"</td> \n";
-      }
+      /* Exceptions */
+      cls = (exceptions != 0) ? "td_exceptions_error_data" :
+                                "td_exceptions_data";
+      html += "   <td class=\"" + cls + "\">" + exceptions + "</td>\n";
 
-      if (total == 0) {
-         html += "\t <td class=\"td_total_data\">0</td> \n";
-      } else {
-         html += "\t <td class=\"td_total_error_data\">"+total+"</td> \n";
-      }
+      /* Errors */
+      cls = (errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
+      html += "   <td class=\"" + cls + "\">" + errors + "</td>\n";
 
-      html += "\t <td class=\"td_time_data\">"+runtime+"</td> \n";
+      /* Total Failures */
+      cls = (total != 0) ? "td_total_error_data" : "td_total_data";
+      html += "   <td class=\"" + cls + "\">" + total + "</td>\n";
+
+      /* Runtime */
+      html += "   <td class=\"td_time_data\">" + runtime + "</td>\n";
+
+      /* Row epilogue */
       html += "</tr>";
 
-      ArrayList<HashMap<String, String>> logs = (ArrayList<HashMap<String, String>>)data.get("testlogs");
-      VddSuiteReporter reporter = new VddSuiteReporter(suiteName, this.basedir, logs);
+      /*
+       * Generate the suite report.
+       */
+      ArrayList<HashMap<String, String>> logs =
+         (ArrayList<HashMap<String, String>>)data.get("testlogs");
+      VddSuiteReporter reporter = new VddSuiteReporter(suiteName,
+                                                       this.basedir, logs);
       reporter.generateReport();
       this.issues.appendIssues(reporter.getIssues());
 
