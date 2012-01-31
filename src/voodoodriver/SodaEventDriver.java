@@ -342,6 +342,12 @@ public class SodaEventDriver implements Runnable {
       case BROWSER:
          result = browserEvent(event, parent);
          break;
+      case THEAD:
+         element = theadEvent(event, parent);
+         break;
+      case TBODY:
+         element = tbodyEvent(event, parent);
+         break;
       case PUTS:
          result = putsEvent(event);
          break;
@@ -2782,6 +2788,162 @@ public class SodaEventDriver implements Runnable {
       this.resetThreadTime();
       this.report.Log("Browser Event finished.");
       return result;
+   }
+
+   /**
+    * &lt;thead&gt; event
+    *
+    * @param event  the &lt;thead&gt; event
+    * @param parent this element's parent
+    * @return the &lt;thead&gt; {@link WebElement} or null
+    */
+
+   private WebElement theadEvent(SodaHash event, WebElement parent) {
+      boolean required = true;
+      boolean click = false;
+      WebElement element = null;
+
+      this.report.Log("thead event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log("thead event finished.");
+            return element;
+         }
+
+         this.firePlugin(element, SodaElements.THEAD,
+                         SodaPluginEventType.AFTERFOUND);
+
+         this.checkDisabled(event, element); //??
+
+         handleVars(element.getText(), event);
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, SodaElements.THEAD,
+                            SodaPluginEventType.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, SodaElements.THEAD,
+                            SodaPluginEventType.AFTERCLICK);
+         }
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: "
+                  + event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("children") && element != null) {
+            this.processEvents((SodaEvents) event.get("children"), element);
+         }
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.ReportException(exp);
+         element = null;
+      }
+
+      this.report.Log("thead event finished.");
+      return element;
+   }
+
+   /**
+    * &lt;tbody&gt; event
+    *
+    * @param event  the &lt;tbody&gt; event
+    * @param parent this element's parent
+    * @return the &lt;tbody&gt; {@link WebElement} or null
+    */
+
+   private WebElement tbodyEvent(SodaHash event, WebElement parent) {
+      boolean required = true;
+      boolean click = false;
+      WebElement element = null;
+
+      this.report.Log("tbody event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log("thead event finished.");
+            return element;
+         }
+
+         this.firePlugin(element, SodaElements.TBODY,
+                         SodaPluginEventType.AFTERFOUND);
+
+         this.checkDisabled(event, element); //??
+
+         handleVars(element.getText(), event);
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, SodaElements.TBODY,
+                            SodaPluginEventType.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, SodaElements.TBODY,
+                            SodaPluginEventType.AFTERCLICK);
+         }
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: "
+                  + event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("children") && element != null) {
+            this.processEvents((SodaEvents) event.get("children"), element);
+         }
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.ReportException(exp);
+         element = null;
+      }
+
+      this.report.Log("tbody event finished.");
+      return element;
    }
 
    private WebElement findElement(SodaHash event, WebElement parent,

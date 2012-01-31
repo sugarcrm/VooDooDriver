@@ -98,6 +98,56 @@
       </soda_attributes>
    </browser>
 
+   <thead html_tag="thead">
+      <accessor_attributes>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">method</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </thead>
+
+   <tbody html_tag="tbody">
+      <accessor_attributes>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">method</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </tbody>
+
    <input html_tag="input">
       <accessor_attributes>
          <accessor type="string">class</accessor>
@@ -132,7 +182,7 @@
       </accessor_attributes>
 
       <soda_attributes>
-      	<accessor type="string">var</accessor>
+         <accessor type="string">var</accessor>
          <accessor type="string">set</accessor>
          <accessor type="string">append</accessor>
          <accessor type="boolean">click</accessor>
