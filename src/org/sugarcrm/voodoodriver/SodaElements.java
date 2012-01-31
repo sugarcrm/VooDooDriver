@@ -60,6 +60,8 @@ public enum SodaElements {
    TR,
    SELECT,
    BROWSER,
+   THEAD,
+   TBODY,
    IMAGE,
    H1,
    DIALOG,

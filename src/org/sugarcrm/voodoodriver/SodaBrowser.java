@@ -148,13 +148,17 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
     }
 
     /**
-     * Executed javascript in the browser, but also creates an auto var called "CONTROL", which
-     * can be used by the script being executed.
+     * Execute javascript in the browser
      *
-     * @param script   The javascript to run in the browser.
-     * @param element   The Element to use on the page as the CONTROL var.
+     * This method executes a javascript string in the context of the
+     * browser.  During execution, a variable, "CONTROL", is created
+     * for use by the script.
+     *
+     * @param script  The javascript to run in the browser.
+     * @param element The Element to use on the page as the CONTROL var.
      * @return {@link Object}
      */
+
    public Object executeJS(String script, WebElement element) {
       Object result = null;
       JavascriptExecutor js = (JavascriptExecutor)this.Driver;
@@ -165,59 +169,46 @@ public abstract class SodaBrowser implements SodaBrowserInterface {
          result = js.executeScript(script);
       }
 
-      if (result == null) {
-         result = null;
-      }
-
       return result;
    }
 
    /**
-    * Fires a javascript event in the browser for a given html element.
+    * Fire a javascript event in the browser for an HTML element
     *
-    * @param element
-    * @param eventType
-    * @return {@link String}
+    * @param element    the HTML element
+    * @param eventType  which javascript event to fire
+    * @return {@link String} results of executing the event
     */
+
    public String fire_event(WebElement element, String eventType) {
-      String result = "";
+      Object result;
       String eventjs_src = "";
       JavascriptEventTypes type = null;
-      eventType = eventType.toLowerCase();
-      String tmp_type = eventType.replaceAll("on", "");
+      String tmp_type = eventType.toUpperCase().replaceAll("ON", "");
 
       try {
-         UIEvents.valueOf(tmp_type.toUpperCase());
+         UIEvents.valueOf(tmp_type);
          type = JavascriptEventTypes.UIEvent;
-      } catch (Exception exp) {
-         type = null;
-      }
-
-      if (type == null) {
+      } catch (Exception eo) {
          try {
-            HTMLEvents.valueOf(tmp_type.toUpperCase());
+            HTMLEvents.valueOf(tmp_type);
             type = JavascriptEventTypes.HTMLEvent;
-         } catch (Exception exp) {
-            type = null;
+         } catch (Exception ei) {
+            return "";
          }
-      }
-
-      if (type == null) {
-         return null;
       }
 
       switch (type) {
       case HTMLEvent:
-
          break;
       case UIEvent:
-         eventjs_src = this.generateUIEvent(UIEvents.valueOf(tmp_type.toUpperCase()));
+         eventjs_src = this.generateUIEvent(UIEvents.valueOf(tmp_type));
          break;
       }
 
-      result = this.executeJS(eventjs_src, element).toString();
+      result = this.executeJS(eventjs_src, element);
 
-      return result;
+      return (result == null) ? "" : result.toString();
    }
 
    /**

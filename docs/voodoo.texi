@@ -1,0 +1,492 @@
+\input texinfo
+@setfilename voodoo.info
+@settitle VooDooDriver Manual
+
+@titlepage
+@title VooDooDriver Manual
+@author Jonathan duSaint @email{jdusaint@@sugarcrm.com}
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top VooDooDriver Manual
+@end ifnottex
+
+@menu
+* Invocation::
+* Test Script Format::
+@end menu
+
+@node Invocation
+@chapter Invocation
+
+@node Test Script Format
+@chapter Test Script Format
+
+@menu
+* Suite Files::
+* Test Files::
+* Accessor Attributes::
+* Action Attributes::
+* VooDooDriver Events::
+* HTML Events::
+@end menu
+
+Each VooDooDriver test script is an XML file.  The root element is
+<voodoo>.  Depending on the type of the script, suite or test, the
+type attribute of <voodoo> is ``suite'' or ``test'', respectively.
+
+@node Suite Files
+@section Suite Files
+
+@node Test Files
+@section Test Files
+
+@node Accessor Attributes
+@section Accessor Attributes
+
+Accessor attributes provide a means for VooDooDriver events to specify
+the HTML element to which they refer.  There are several different
+ways to search for elements, all of which are directly related both to
+the Selenium API, and to the DOM itself.
+
+@menu
+* class::
+* css::
+* id::
+* index::
+* method::
+* name::
+* text::
+* title::
+* url::
+* value::
+* xpath::
+@end menu
+
+@node class,,,Accessor Attributes
+@subsection class
+
+Search for an HTML element by its CSS class name.
+
+@node css,,,Accessor Attributes
+@subsection css
+
+Search for an HTML element by its CSS selector.
+
+@node id,,,Accessor Attributes
+@subsection id
+
+Search for an HTML element by its ID.
+
+@node index,,,Accessor Attributes
+@subsection index
+
+Assuming more than one element of an event type is on the page, match
+the specified element in the list, using the specified zero-based
+index.
+
+@node method,,,Accessor Attributes
+@subsection method
+
+Eh?
+
+@node name,,,Accessor Attributes
+@subsection name
+
+Search for an HTML element by name.
+
+@node text,,,Accessor Attributes
+@subsection text
+
+Search for an HTML element by its link text.  Eh?
+
+@node title,,,Accessor Attributes
+@subsection title
+
+The title of a browser window.  This attribute is used only by <browser>.
+
+@node url,,,Accessor Attributes
+@subsection url
+
+The URL of a web page.
+
+@node value,,,Accessor Attributes
+@subsection value
+
+Search for an HTML element by its value.  Eh?
+
+@node xpath,,,Accessor Attributes
+@subsection xpath
+
+Search for an HTML element using its XPATH.  This method is not very
+portable across browser implementations.
+
+@node Action Attributes
+@section Action Attributes
+
+Action attributes describe what to do during an event with the matched
+HTML element.
+
+@menu
+* append::
+* assert::
+* assertnot::
+* clear::
+* click::
+* cssprop::
+* cssvalue::
+* default::
+* disabled::
+* exists::
+* exist::
+* jscriptevent::
+* jswait::
+* required::
+* save::
+* set::
+* timeout::
+* var::
+@end menu
+
+@node append,,,Action Attributes
+@subsection append
+
+@node assert,,,Action Attributes
+@subsection assert
+
+@node assertnot,,,Action Attributes
+@subsection assertnot
+
+@node clear,,,Action Attributes
+@subsection clear
+
+@node click,,,Action Attributes
+@subsection click
+
+@node cssprop,,,Action Attributes
+@subsection cssprop
+
+@node cssvalue,,,Action Attributes
+@subsection cssvalue
+
+@node default,,,Action Attributes
+@subsection default
+
+@node disabled,,,Action Attributes
+@subsection disabled
+
+@node exists,,,Action Attributes
+@subsection exists
+
+@node exist,,,Action Attributes
+@subsection exist
+
+@node jscriptevent,,,Action Attributes
+@subsection jscriptevent
+
+@node jswait,,,Action Attributes
+@subsection jswait
+
+@node required,,,Action Attributes
+@subsection required
+
+@node save,,,Action Attributes
+@subsection save
+
+@node set,,,Action Attributes
+@subsection set
+
+@node timeout,,,Action Attributes
+@subsection timeout
+
+@node var,,,Action Attributes
+@subsection var
+
+
+@node VooDooDriver Events
+@section VooDooDriver Events
+
+Several events do not correspond to HTML elements, but rather to
+events within VooDooDriver itself.  These events are described in this
+section.
+
+@menu
+* assert: assert-event:
+* assertpagefile::
+* attach::
+* browser::
+* csv::
+* dnd::
+* execute::
+* javascript::
+* puts::
+* script::
+* timestamp::
+* variable::
+* wait::
+* whitelist::
+@end menu
+
+@node assert-event,,,VooDooDriver Events
+@subsection assert
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node assertpagefile,,,VooDooDriver Events
+@subsection assertpagefile
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node attach,,,VooDooDriver Events
+@subsection attach
+
+When a new browser window pops up, such as after clicking a control,
+this event directs all events nested within the <attach> event to
+execute in the context of the new browser window.
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@item @ref{title}
+@item @ref{url}
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+None.
+
+@subsubsection Example
+
+@example
+<button id="new-window"/>     <!-- Button that opens a new window -->
+<attach title="New Window">   <!-- Attach to that new window -->
+   <button id="save"/>        <!-- Some action within that window -->
+   <browser action="close"/>  <!-- Close the new window -->
+</attach>                     <!-- Resume in old window -->
+@end example
+
+@node browser,,,VooDooDriver Events
+@subsection browser
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node csv,,,VooDooDriver Events
+@subsection csv
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node dnd,,,VooDooDriver Events
+@subsection dnd
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node execute,,,VooDooDriver Events
+@subsection execute
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node javascript,,,VooDooDriver Events
+@subsection javascript
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node puts,,,VooDooDriver Events
+@subsection puts
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node script,,,VooDooDriver Events
+@subsection script
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node timestamp,,,VooDooDriver Events
+@subsection timestamp
+
+Timestamp updates VooDooDriver's internal timestamp variable.  This
+variable 
+
+Valid Accessor Attributes:
+
+None.
+
+Valid Action Attributes:
+
+None.
+
+@node variable,,,VooDooDriver Events
+@subsection variable
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node wait,,,VooDooDriver Events
+@subsection wait
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node whitelist,,,VooDooDriver Events
+@subsection whitelist
+
+@node HTML Events
+@section HTML Events
+
+
+
+@subsection Textfield
+@subsection Textarea
+@subsection Label
+@subsection Button
+@subsection UL
+@subsection Filefield
+@subsection TD
+@subsection Select
+@subsection Select_List
+@subsection H1
+@subsection H
+@subsection H3
+@subsection H4
+@subsection H5
+@subsection H6
+@subsection Pre
+@subsection Table
+@subsection TR
+@subsection Radio
+@subsection P
+@subsection Map
+@subsection Frame
+@subsection Form
+@subsection Div
+@subsection Area
+@subsection LI
+@subsection Link
+@subsection Image
+@subsection Text_Field
+@subsection Span
+@subsection Hidden
+
+
+@bye
