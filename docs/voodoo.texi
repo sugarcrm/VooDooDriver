@@ -22,6 +22,30 @@
 @node Invocation
 @chapter Invocation
 
+The VooDooDriver package consists of two jar files, VooDooDriver.jar
+and VDDReporter.jar.  VooDooDriver itself is in VooDooDriver.jar, and
+VDDReporter, a postprocessor for VooDooDriver results is in
+VDDReporter.jar.
+
+@menu
+* VooDooDriver::
+* VDDReporter::
+@end menu
+
+@node VooDooDriver,,,Invocation
+@section VooDooDriver
+
+
+@subsection Command Line Arguments
+
+
+@node VDDReporter,,,Invocation
+@section VDDReporter
+
+@subsection Command Line Arguments
+
+
+
 @node Test Script Format
 @chapter Test Script Format
 
@@ -206,6 +230,8 @@ HTML element.
 @subsection var
 
 
+@c ===========================================================================
+
 @node VooDooDriver Events
 @section VooDooDriver Events
 
@@ -214,53 +240,23 @@ events within VooDooDriver itself.  These events are described in this
 section.
 
 @menu
-* assert: assert-event:
-* assertpagefile::
 * attach::
 * browser::
 * csv::
+* delete::
 * dnd::
 * execute::
+* javaplugin::
 * javascript::
+* pluginloader::
 * puts::
+* screenshot::
 * script::
 * timestamp::
-* variable::
+* var: var-event
 * wait::
 * whitelist::
 @end menu
-
-@node assert-event,,,VooDooDriver Events
-@subsection assert
-
-
-@subsubsection Valid Accessor Attributes
-
-@itemize @bullet
-@end itemize
-
-@subsubsection Valid Action Attributes
-
-@subsubsection Example
-
-@example
-@end example
-
-@node assertpagefile,,,VooDooDriver Events
-@subsection assertpagefile
-
-
-@subsubsection Valid Accessor Attributes
-
-@itemize @bullet
-@end itemize
-
-@subsubsection Valid Action Attributes
-
-@subsubsection Example
-
-@example
-@end example
 
 @node attach,,,VooDooDriver Events
 @subsection attach
@@ -272,8 +268,8 @@ execute in the context of the new browser window.
 @subsubsection Valid Accessor Attributes
 
 @itemize @bullet
-@item @ref{title}
-@item @ref{url}
+@item title (@pxref{title})
+@item url (@pxref{url})
 @end itemize
 
 @subsubsection Valid Action Attributes
@@ -322,6 +318,22 @@ None.
 @example
 @end example
 
+@node delete,,,VooDooDriver Events
+@subsection delete
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
 @node dnd,,,VooDooDriver Events
 @subsection dnd
 
@@ -354,8 +366,40 @@ None.
 @example
 @end example
 
+@node javaplugin,,,VooDooDriver Events
+@subsection javaplugin
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
 @node javascript,,,VooDooDriver Events
 @subsection javascript
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+@node pluginloader,,,VooDooDriver Events
+@subsection pluginloader
 
 
 @subsubsection Valid Accessor Attributes
@@ -386,6 +430,23 @@ None.
 @example
 @end example
 
+@node screenshot,,,VooDooDriver Events
+@subsection screenshot
+
+
+@subsubsection Valid Accessor Attributes
+
+@itemize @bullet
+@end itemize
+
+@subsubsection Valid Action Attributes
+
+@subsubsection Example
+
+@example
+@end example
+
+
 @node script,,,VooDooDriver Events
 @subsection script
 
@@ -402,6 +463,7 @@ None.
 @example
 @end example
 
+
 @node timestamp,,,VooDooDriver Events
 @subsection timestamp
 
@@ -416,8 +478,8 @@ Valid Action Attributes:
 
 None.
 
-@node variable,,,VooDooDriver Events
-@subsection variable
+@node var-event,,,VooDooDriver Events
+@subsection var
 
 
 @subsubsection Valid Accessor Attributes
@@ -451,42 +513,231 @@ None.
 @node whitelist,,,VooDooDriver Events
 @subsection whitelist
 
+
+@c ===========================================================================
+
 @node HTML Events
 @section HTML Events
 
+HTML events are the core of VooDooDriver.  Each event corresponds to
+an HTML tag in the page under test.
 
 
-@subsection Textfield
-@subsection Textarea
-@subsection Label
-@subsection Button
-@subsection UL
-@subsection Filefield
-@subsection TD
-@subsection Select
-@subsection Select_List
-@subsection H1
-@subsection H
-@subsection H3
-@subsection H4
-@subsection H5
-@subsection H6
-@subsection Pre
-@subsection Table
-@subsection TR
-@subsection Radio
-@subsection P
-@subsection Map
-@subsection Frame
-@subsection Form
-@subsection Div
-@subsection Area
-@subsection LI
-@subsection Link
-@subsection Image
-@subsection Text_Field
-@subsection Span
-@subsection Hidden
+@menu
+Document Body Structure Events
+* div::
+* span::
+* h1::
+* h2::
+* h3::
+* h4::
+* h5::
+* h6::
+
+Text Events
+* p::
+* pre::
+
+List Events
+* ul::
+* ol::
+* li::
+* dl::
+* dt::
+* dd::
+
+Table Events
+* table::
+* caption::
+* thead::
+* tbody::
+* tfoot::
+* colgroup::
+* col::
+* tr::
+* th::
+* td::
+
+Link Events
+* link::
+
+Object, Image, and Applet Events
+* image::
+* object::
+* map::
+* area::
+
+Frame Events
+* iframe::
+* frame::
+
+Form Events
+* form::
+* input::
+* textfield::
+* password::
+* checkbox::
+* radio::
+* button::
+* filefield::
+* hidden::
+* select::
+* textarea::
+* label::
+@end menu
+
+@node div,,,HTML Events
+@subsection div
+
+@node span,,,HTML Events
+@subsection span
+
+@node h1,,,HTML Events
+@subsection h1
+
+@node h2,,,HTML Events
+@subsection h2
+
+@node h3,,,HTML Events
+@subsection h3
+
+@node h4,,,HTML Events
+@subsection h4
+
+@node h5,,,HTML Events
+@subsection h5
+
+@node h6,,,HTML Events
+@subsection h6
+
+@node p,,,HTML Events
+@subsection p
+
+@node pre,,,HTML Events
+@subsection pre
+
+@node ul,,,HTML Events
+@subsection ul
+
+@node ol,,,HTML Events
+@subsection ol
+
+@node li,,,HTML Events
+@subsection li
+
+@node dl,,,HTML Events
+@subsection dl
+
+Not implemented.  File a bug if you need this functionality.
+
+@node dt,,,HTML Events
+@subsection dt
+
+Not implemented.  File a bug if you need this functionality.
+
+@node dd,,,HTML Events
+@subsection dd
+
+Not implemented.  File a bug if you need this functionality.
+
+@node table,,,HTML Events
+@subsection table
+
+@node caption,,,HTML Events
+@subsection caption
+
+Not implemented.  File a bug if you need this functionality.
+
+@node thead,,,HTML Events
+@subsection thead
+
+@node tbody,,,HTML Events
+@subsection tbody
+
+@node tfoot,,,HTML Events
+@subsection tfoot
+
+Not implemented.  File a bug if you need this functionality.
+
+@node colgroup,,,HTML Events
+@subsection colgroup
+
+Not implemented.  File a bug if you need this functionality.
+
+@node col,,,HTML Events
+@subsection col
+
+Not implemented.  File a bug if you need this functionality.
+
+@node tr,,,HTML Events
+@subsection tr
+
+@node th,,,HTML Events
+@subsection th
+
+Not implemented.  File a bug if you need this functionality.
+
+@node td,,,HTML Events
+@subsection td
+
+@node link,,,HTML Events
+@subsection link
+
+@node image,,,HTML Events
+@subsection image
+
+@node object,,,HTML Events
+@subsection object
+
+Not implemented.  File a bug if you need this functionality.
+
+@node map,,,HTML Events
+@subsection map
+
+@node area,,,HTML Events
+@subsection area
+
+@node iframe,,,HTML Events
+@subsection iframe
+
+@node frame,,,HTML Events
+@subsection frame
+
+@node form,,,HTML Events
+@subsection form
+
+@node input,,,HTML Events
+@subsection input
+
+@node textfield,,,HTML Events
+@subsection textfield
+
+@node password,,,HTML Events
+@subsection password
+
+@node checkbox,,,HTML Events
+@subsection checkbox
+
+@node radio,,,HTML Events
+@subsection radio
+
+@node button,,,HTML Events
+@subsection button
+
+@node filefield,,,HTML Events
+@subsection filefield
+
+@node hidden,,,HTML Events
+@subsection hidden
+
+@node select,,,HTML Events
+@subsection select
+
+@node textarea,,,HTML Events
+@subsection textarea
+
+@node label,,,HTML Events
+@subsection label
 
 
 @bye
