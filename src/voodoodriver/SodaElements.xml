@@ -778,7 +778,7 @@
       </soda_attributes>
    </input>
 
-   <textfield html_tag="input" html_type="text">
+   <textfield html_tag="input" html_type="text|password">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
