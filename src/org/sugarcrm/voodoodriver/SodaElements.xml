@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soda>
    <!--
-      Copyright 2011 SugarCRM Inc.
+      Copyright 2011-2012 SugarCRM Inc.
 
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
       License.
    -->
 
-   <timestamp>
-   </timestamp>
 
-   <execute>
-      <soda_attributes>
-         <accessor type="string">name</accessor>
-      </soda_attributes>
-   </execute>
+   <!-- VooDooDriver Events
+
+        These events are actions within VooDooDriver itself.  They
+        correspond to test events, rather than to events on the page.
+   -->
 
    <arg>
    </arg>
@@ -38,42 +36,11 @@
       </accessor_attributes>
    </attach>
 
-   <var>
-      <accessor_attributes>
-         <accessor type="string">set</accessor>
-         <accessor type="string">var</accessor>
-         <accessor type="string">unset</accessor>
-      </accessor_attributes> 
-   </var>
-
-   <script>
-      <accessor_attributes>
-         <accessor type="string">file</accessor>
-         <accessor type="string">fileset</accessor>
-         <accessor type="string">csv</accessor>
-      </accessor_attributes> 
-   </script>
-
-   <csv>
-      <accessor_attributes>
-         <accessor type="string">file</accessor>
-         <accessor type="string">var</accessor>
-      </accessor_attributes> 
-   </csv>
-
-   <wait>
-       <accessor_attributes>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="string">condition</accessor>
-      </accessor_attributes>
-   </wait>
-
-   <puts>
-      <accessor_attributes>
-         <accessor type="string">text</accessor>
-         <accessor type="string">txt</accessor>
-      </accessor_attributes>
-   </puts>
+   <assert>
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+      </soda_attributes>
+   </assert>
 
    <browser>
       <accessor_attributes>
@@ -97,6 +64,424 @@
          <accessor type="string">jscriptevent</accessor>
       </soda_attributes>
    </browser>
+
+   <csv>
+      <accessor_attributes>
+         <accessor type="string">file</accessor>
+         <accessor type="string">var</accessor>
+      </accessor_attributes> 
+   </csv>
+
+   <delete>
+      <soda_attributes>
+         <accessor type="string">name</accessor>
+      </soda_attributes>
+   </delete>
+
+   <dnd>
+      <soda_attributes>
+         <accessor type="string">src</accessor>
+         <accessor type="string">dst</accessor>
+      </soda_attributes>
+   </dnd>
+
+   <execute>
+      <soda_attributes>
+         <accessor type="string">name</accessor>
+      </soda_attributes>
+   </execute>
+
+   <javaplugin>
+      <soda_attributes>
+         <accessor type="string">classname</accessor>
+      </soda_attributes>
+   </javaplugin>
+
+   <javascript>
+      <soda_attributes>
+         <accessor type="string">content</accessor>
+         <accessor type="string">file</accessor>
+      </soda_attributes>
+   </javascript>
+
+   <pluginloader>
+      <soda_attributes>
+         <accessor type="string">classname</accessor>
+         <accessor type="string">file</accessor>
+      </soda_attributes>
+   </pluginloader>
+
+   <puts>
+      <accessor_attributes>
+         <accessor type="string">text</accessor>
+         <accessor type="string">txt</accessor>
+      </accessor_attributes>
+   </puts>
+
+   <screenshot>
+      <soda_attributes>
+         <accessor type="string">file</accessor>
+      </soda_attributes>
+   </screenshot>
+
+   <script>
+      <accessor_attributes>
+         <accessor type="string">file</accessor>
+         <accessor type="string">fileset</accessor>
+         <accessor type="string">csv</accessor>
+      </accessor_attributes> 
+   </script>
+
+   <timestamp>
+   </timestamp>
+
+   <var>
+      <accessor_attributes>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+         <accessor type="string">unset</accessor>
+      </accessor_attributes> 
+   </var>
+
+   <wait>
+       <accessor_attributes>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">condition</accessor>
+      </accessor_attributes>
+   </wait>
+
+   <whitelist>
+      <soda_attributes>
+         <accessor type="string">add</accessor>
+         <accessor type="string">delete</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">content</accessor>
+         <accessor type="string">action</accessor>
+      </soda_attributes>
+   </whitelist>
+
+   <!-- HTML Events
+
+        These events correspond directly to HTML elements on the page.
+        The ordering of HTML events corresponds to the order they
+        appear on W3C's HTML4 page: http://www.w3.org/TR/html4.
+   -->
+
+   <!-- ALERT is an orphan event.  It corresponds to a javascript
+        action, so it isn't an HTML event, but it's a property of the
+        page, so it isn't a VooDooDriver event.  It's most sensible
+        just to stick it here.
+   -->
+   <alert>
+      <soda_attributes>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+      </soda_attributes>
+   </alert>
+
+   <!-- The global structure of an HTML document: The document body. -->
+
+   <div html_tag="div">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+          <accessor type="string">index</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </div>
+
+   <span html_tag="span">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="string">vartext</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">jswait</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </span>
+
+   <h1 html_tag="h1">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h1>
+
+   <h2 html_tag="h2">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h2>
+
+   <h3 html_tag="h3">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h3>
+
+   <h4 html_tag="h4">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h4>
+
+   <h5 html_tag="h5">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h5>
+
+   <h6 html_tag="h6">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </h6>
+
+   <!-- Missing ADDRESS event -->
+
+   <!-- Text -->
+
+   <!-- Missing text events: EM, STRONG, DFN, CODE, SAMP, KBD, VAR, CITE,
+                             ABBR, ACRONYM, BLOCKQUOTE, Q, SUB, SUP -->
+
+   <p html_tag="p">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </p>
+
+   <!-- Missing BR event -->
+
+   <pre html_tag="pre">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </pre>
+
+   <!-- Missing INS, DEL events -->
+
+   <!-- Lists -->
+
+   <ul html_tag="ul">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </ul>
+
+   <ol html_tag="ol">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </ol>
+
+   <li html_tag="li">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </li>
+
+   <!-- Missing definition lists: DL, DT, DD -->
+
+   <!-- Tables -->
+
+   <table html_tag="table">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">required</accessor>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </table>
+
+   <!-- Missing CAPTION event -->
 
    <thead html_tag="thead">
       <accessor_attributes>
@@ -123,6 +508,8 @@
       </soda_attributes>
    </thead>
 
+   <!-- Missing TFOOT event -->
+
    <tbody html_tag="tbody">
       <accessor_attributes>
          <accessor type="string">class</accessor>
@@ -148,6 +535,228 @@
       </soda_attributes>
    </tbody>
 
+   <!-- Missing COLGROUP and COL events -->
+
+   <tr html_tag="tr">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="string">index</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </tr>
+
+   <!-- Missing TH event -->
+
+   <td html_tag="td">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">click</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </td>
+
+   <!-- Links -->
+
+   <!-- Ugh.  For historical reasons, the A tag is called "LINK".
+        Nevermind that there already exists a LINK tag in HTML.
+        Unfortunately, changing this will be annoying at best.
+   -->
+   <link html_tag="a">
+      <accessor_attributes>
+         <accessor type="string">href</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="string">index</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">click</accessor>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">jswait</accessor>
+         <accessor type="boolean">assertPage</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </link>
+
+   <!-- Missing LINK and BASE events -->
+
+   <!-- Objects, images, and applets -->
+
+   <image html_tag="img">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">src</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </image>
+
+   <!-- Missing OBJECT and APPLET events -->
+
+   <map html_tag="map">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </map>
+
+   <area html_tag="area">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </area>
+
+   <!-- Alignment, font styles, and horizontal rules -->
+
+   <!-- Missing events: TT, I, B, BIG, SMALL, STRIKE, S, U, FONT,
+                        BASEFONT, HR
+   -->
+
+   <!-- Frames -->
+
+   <!-- Why are there two <frame> events?  The one that corresponds to
+        IFRAME should probably be called <iframe>, no? -->
+
+   <!-- Missing FRAMESET and NOFRAMES events -->
+
+   <frame html_tag="iframe">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">src</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">save</accessor>
+      </soda_attributes>
+   </frame>
+
+   <frame>
+      <soda_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+      </soda_attributes>
+   </frame>
+
+   <!-- Forms -->
+
+   <form html_tag="form">
+      <accessor_attributes>
+         <accessor type="string">name</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">method</accessor>
+         <accessor type="string">action</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">xpath</accessor>
+         <accessor type="string">css</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+      </soda_attributes>
+   </form>
+
    <input html_tag="input">
       <accessor_attributes>
          <accessor type="string">class</accessor>
@@ -169,7 +778,7 @@
       </soda_attributes>
    </input>
 
-   <textfield html_tag="input" html_type="text">
+   <textfield html_tag="input" html_type="text|password">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -237,7 +846,7 @@
       </soda_attributes>
    </password>
 
-   <textarea html_tag="textarea">
+   <checkbox html_tag="input" html_type="checkbox">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -251,10 +860,13 @@
 
       <soda_attributes>
          <accessor type="string">set</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">assert</accessor>
-         <accessor type="string">timeout</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="boolean">disabled</accessor>
+         <accessor type="boolean">assertPage</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
@@ -262,46 +874,35 @@
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
-   </textarea>
+   </checkbox>
 
-   <h3 html_tag="h3">
+   <radio html_tag="input" html_typ="radio">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
+         <accessor type="string">value</accessor>
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="string">set</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h3>
-
-   <label html_tag="label">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">for</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
+         <accessor type="boolean">checked</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
-   </label>
+   </radio>
 
+   <!-- N.B. there is, in fact, an HTML tag "button" -->
    <button html_tag="input|button" html_type="button|submit|reset">
       <accessor_attributes>
          <accessor type="string">name</accessor>
@@ -333,61 +934,6 @@
       </soda_attributes>
    </button>
 
-   <h4 html_tag="h4">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h4>
-
-   <ul html_tag="ul">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </ul>
-
-   <ol html_tag="ol">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </ol>
-
    <filefield html_tag="input" html_type="file">
       <accessor_attributes>
          <accessor type="string">name</accessor>
@@ -411,67 +957,28 @@
       </soda_attributes>
    </filefield>
 
-   <h5 html_tag="h5">
+   <hidden html_tag="input" html_type="hidden">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
+         <accessor type="string">method</accessor>
          <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
+         <accessor type="string">value</accessor>
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h5>
-
-   <td html_tag="td">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="string">click</accessor>
+         <accessor type="string">var</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
       </soda_attributes>
-   </td>
+   </hidden>
 
-   <h6 html_tag="h6">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h6>
+   <!-- Missing input type=image -->
 
    <select html_tag="select">
       <accessor_attributes>
@@ -528,69 +1035,9 @@
       </soda_attributes>
    </select_list>
 
-   <pre html_tag="pre">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
+   <!-- Missing OPTION event -->
 
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </pre>
-
-   <tr html_tag="tr">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-         <accessor type="string">index</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </tr>
-
-   <table html_tag="table">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">required</accessor>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">click</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </table>
-
-   <radio html_tag="input" html_typ="radio">
+   <textarea html_tag="textarea">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -604,57 +1051,10 @@
 
       <soda_attributes>
          <accessor type="string">set</accessor>
-         <accessor type="boolean">click</accessor>
-         <accessor type="boolean">disabled</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="boolean">checked</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </radio>
-
-   <p html_tag="p">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </p>
-
-   <checkbox html_tag="input" html_type="checkbox">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">set</accessor>
-         <accessor type="boolean">click</accessor>
          <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="integer">timeout</accessor>
+         <accessor type="string">timeout</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="boolean">disabled</accessor>
-         <accessor type="boolean">assertPage</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
@@ -662,347 +1062,31 @@
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
-   </checkbox>
+   </textarea>
 
-   <map html_tag="map">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </map>
-
-   <frame html_tag="iframe">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">src</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </frame>
-
-   <form html_tag="form">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">method</accessor>
-         <accessor type="string">action</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-      </soda_attributes>
-   </form>
-
-   <div html_tag="div">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-          <accessor type="string">index</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </div>
-
-   <area html_tag="area">
+   <label html_tag="label">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
+         <accessor type="string">for</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </area>
-
-   <li html_tag="li">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </li>
-
-   <link html_tag="a">
-      <accessor_attributes>
-         <accessor type="string">href</accessor>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-         <accessor type="string">index</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="boolean">alert</accessor>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">jswait</accessor>
-         <accessor type="boolean">assertPage</accessor>
-         <accessor type="boolean">disabled</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </link>
-
-   <h1 html_tag="h1">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h1>
-
-   <image html_tag="img">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">src</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">alt</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="boolean">alert</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
-   </image>
+   </label>
 
-   <h2 html_tag="h2">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
+   <!-- Missing FIELDSET and LEGEND events -->
 
-      <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-      </soda_attributes>
-   </h2>
+   <!-- Scripts -->
 
-   <span html_tag="span">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">vartext</accessor>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">jswait</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </span>
-
-   <hidden html_tag="input" html_type="hidden">
-      <accessor_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">method</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">var</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-      </soda_attributes>
-   </hidden>
-
-   <whitelist>
-      <soda_attributes>
-         <accessor type="string">add</accessor>
-         <accessor type="string">delete</accessor>
-         <accessor type="string">name</accessor>
-         <accessor type="string">content</accessor>
-         <accessor type="string">action</accessor>
-      </soda_attributes>
-   </whitelist>
-
-   <assert>
-      <soda_attributes>
-         <accessor type="string">assert</accessor>
-      </soda_attributes>
-   </assert>
-
-   <javascript>
-      <soda_attributes>
-         <accessor type="string">content</accessor>
-         <accessor type="string">file</accessor>
-      </soda_attributes>
-   </javascript>
-
-   <dnd>
-      <soda_attributes>
-         <accessor type="string">src</accessor>
-         <accessor type="string">dst</accessor>
-      </soda_attributes>
-   </dnd>
-
-   <pluginloader>
-      <soda_attributes>
-         <accessor type="string">classname</accessor>
-         <accessor type="string">file</accessor>
-      </soda_attributes>
-   </pluginloader>
-
-   <javaplugin>
-      <soda_attributes>
-         <accessor type="string">classname</accessor>
-      </soda_attributes>
-   </javaplugin>
-
-   <delete>
-      <soda_attributes>
-         <accessor type="string">name</accessor>
-      </soda_attributes>
-   </delete>
-
-   <alert>
-      <soda_attributes>
-         <accessor type="boolean">alert</accessor>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-      </soda_attributes>
-   </alert>
-
-   <screenshot>
-      <soda_attributes>
-         <accessor type="string">file</accessor>
-      </soda_attributes>
-   </screenshot>
-
-   <frame>
-      <soda_attributes>
-         <accessor type="string">name</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-      </soda_attributes>
-   </frame>
+   <!-- Missing SCRIPT and NOSCRIPT events -->
 </soda>
