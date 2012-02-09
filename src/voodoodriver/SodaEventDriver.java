@@ -331,6 +331,7 @@ public class SodaEventDriver implements Runnable {
    private boolean handleSingleEvent(SodaHash event, WebElement parent) {
       boolean result = false;
       WebElement element = null;
+      SodaElements type = (SodaElements)event.get("type");
 
       if (isStopped()) {
          return result;
@@ -338,7 +339,7 @@ public class SodaEventDriver implements Runnable {
 
       this.resetThreadTime();
 
-      switch ((SodaElements) event.get("type")) {
+      switch (type) {
       case BROWSER:
          result = browserEvent(event, parent);
          break;
@@ -362,14 +363,12 @@ public class SodaEventDriver implements Runnable {
          break;
       case BUTTON:
          element = buttonEvent(event, parent);
-         this.firePlugin(null, SodaElements.BUTTON, SodaPluginEventType.AFTEREVENT);
          break;
       case CSV:
          result = csvEvent(event);
          break;
       case LINK:
          element = linkEvent(event, parent);
-         this.firePlugin(null, SodaElements.LINK, SodaPluginEventType.AFTEREVENT);
          break;
       case CHECKBOX:
          element = checkboxEvent(event, parent);
@@ -418,8 +417,6 @@ public class SodaEventDriver implements Runnable {
          break;
       case IMAGE:
          element = imageEvent(event, parent);
-         this.firePlugin(null, SodaElements.IMAGE,
-                         SodaPluginEventType.AFTEREVENT);
          break;
       case DND:
          result = dndEvent(event);
@@ -429,11 +426,9 @@ public class SodaEventDriver implements Runnable {
          break;
       case LI:
          element = liEvent(event, parent);
-
          break;
       case RADIO:
          element = radioEvent(event, parent);
-
          break;
       case EXECUTE:
          result = executeEvent(event);
@@ -443,19 +438,15 @@ public class SodaEventDriver implements Runnable {
          break;
       case UL:
          result = ulEvent(event);
-
          break;
       case OL:
          result = olEvent(event);
-
          break;
       case MAP:
          result = mapEvent(event);
-
          break;
       case AREA:
          result = areaEvent(event);
-
          break;
       case PLUGINLOADER:
          result = pluginloaderEvent(event);
@@ -482,10 +473,11 @@ public class SodaEventDriver implements Runnable {
          element = inputEvent(event, parent);
          break;
       default:
-         System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
+         System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
          System.exit(1);
       }
 
+      this.firePlugin(null, type, SodaPluginEventType.AFTEREVENT);
       this.resetThreadTime();
 
       if (element != null) {
