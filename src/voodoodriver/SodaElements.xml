@@ -201,6 +201,7 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
@@ -471,6 +472,7 @@
 
       <soda_attributes>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="boolean">exist</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">click</accessor>
@@ -503,6 +505,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -530,6 +533,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -609,6 +613,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">jswait</accessor>
          <accessor type="boolean">assertPage</accessor>
@@ -800,8 +805,8 @@
          <accessor type="boolean">default</accessor>
          <accessor type="boolean">clear</accessor>
          <accessor type="boolean">exist</accessor>
-         <accessor type="integer">timeout</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">jswait</accessor>
          <accessor type="boolean">disabled</accessor>
@@ -999,6 +1004,7 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="string">click</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">include</accessor>
          <accessor type="string">noninclude</accessor>
          <accessor type="boolean">disabled</accessor>
@@ -1054,6 +1060,7 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">timeout</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
