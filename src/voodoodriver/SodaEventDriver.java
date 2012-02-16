@@ -3484,6 +3484,18 @@ public class SodaEventDriver implements Runnable {
             assvalue = this.replaceString(assvalue);
             this.report.AssertNot(assvalue, element.getAttribute("value"));
          }
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, SodaElements.TEXTAREA,
+                            SodaPluginEventType.BEFORECLICK);
+            this.report.Log("Clicking textarea.");
+            element.click();
+            this.report.Log("Finished clicking textarea.");
+            this.firePlugin(element, SodaElements.TEXTAREA,
+                            SodaPluginEventType.AFTERCLICK);
+         }
+
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
