@@ -18,7 +18,7 @@
    <property name="helpmessage" location="${src}/helpmessage.txt" />
    <property name="officialName" value="VooDooDriver" />
    <property name="version" value="0.0.1" />
-   <property name="year" value="2011" />
+   <property name="year" value="2012" />
    
    <pathconvert property="jars.classes" pathsep=" ">
       <mapper>
@@ -39,7 +39,14 @@
    </pathconvert>
 
    <target name="docs">
-      <javadoc sourcepath="${src}" destdir="${dist}/javadocs" />
+      <javadoc sourcepath="${src}" destdir="${dist}/javadocs">
+         <classpath>
+            <pathelement path="${classpath}"/>
+            <fileset dir="lib">
+               <include name="**/*.jar"/>
+            </fileset>
+         </classpath>
+      </javadoc>
    </target>
    
    <target name="api-docs" depends="init">
@@ -95,8 +102,11 @@
       </propertyfile>
    </target>
    
-   <target name="debug" depends="clean,init,api-docs,copy-launchers,docs" description="Compile the source in debug mode" >
-      <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" 
+   <target name="debug"
+           depends="clean,init,api-docs,copy-launchers,docs"
+           description="Compile the source in debug mode" >
+      <javac srcdir="${src}" destdir="${build}"
+             debug="true" debuglevel="lines,vars,source" 
              includeantruntime="false">
          <classpath>
             <pathelement path="${classpath}"/>
@@ -153,7 +163,9 @@
       </javac>
    </target>
    
-   <target name="default-build" depends="compile,api-docs,copy-launchers,docs" description="generate the distribution" >
+   <target name="default-build"
+           depends="compile,api-docs,copy-launchers,docs"
+           description="generate the distribution" >
       <copy todir="${dist}/lib">
          <fileset dir="lib/libs" />
       </copy>
