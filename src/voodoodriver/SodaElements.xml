@@ -554,6 +554,7 @@
 
       <soda_attributes>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">click</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
