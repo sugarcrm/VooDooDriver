@@ -26,4 +26,4 @@ ${INFO} : ${SOURCE}
 kinda-clean :
 	rm -f *.aux *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr
 clean : kinda-clean
-	rm -f ${PDF} ${HTML}
+	rm -f ${PDF} ${HTML} ${INFO}
