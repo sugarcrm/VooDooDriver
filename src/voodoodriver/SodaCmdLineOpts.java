@@ -1,5 +1,5 @@
 /*
-Copyright 2011 SugarCRM Inc.
+Copyright 2011-2012 SugarCRM Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,210 +16,458 @@ limitations under the License.
 
 package voodoodriver;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.ArrayList;
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.FilenameUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
+
 
 /**
- * A class for parsing all the of needed command line options for voodoodriver.
+ * Actions to take during command line argument processing.
+ *
+ * @author Jon duSaint
+ */
+
+interface VooDooCmdLineArgAction {
+
+   /**
+    * Handle a command line argument.
+    *
+    * @param name     the name of the argument
+    * @param arg      the argument's value, if any
+    * @param isArray  whether this argument can appear multiple times
+    */
+
+   public void handle(String name, String arg, boolean isArray);
+}
+
+
+/**
+ * VooDooDriver command line option/argument processing
  *
  * @author trampus
- *
+ * @author Jon duSaint
  */
+
 public class SodaCmdLineOpts {
 
+   /**
+    * File containing the canonical list of VooDooDriver command line options.
+    */
+   private String validOptsFile = "options.xml";
+
+   /**
+    * Data structure created from validOptsFile.
+    */
+   private SodaHash validOpts;
+
+   /**
+    * Command line options after processing command line.
+    */
    private SodaHash options = null;
-   private SodaHash gvars = null;
-   private ArrayList<String> tests = null;
-   private ArrayList<String> suites = null;
-   private String flavor = null;
-   private String saveHtml = null;
-   private SodaHash hijacks = null;
-   private String resultDir = null;
-   private String blocklistFile = null;
-   private Boolean version = false;
-   private String browser = null;
-   private Boolean testdelay = false;
-   private Boolean skipcssErrors = false;
-   private Boolean help = false;
-   private String profile = null;
-   private String plugin = null;
-   private String configfile = null;
-   private String downloaddir = null;
-   private String assertPageFile = null;
-   private String restartcount = "0";
-   private String restarttest = null;
-   private String attachtimeout = "0";
-   private Boolean haltOnFailure = false;
 
-   public SodaCmdLineOpts(String[] args) {
 
-      try {
-         this.gvars = new SodaHash();
-         this.hijacks = new SodaHash();
-         this.tests = new ArrayList<String>();
-         this.suites = new ArrayList<String>();
+   /**
+    * Process a file or directory command line argument.
+    */
 
-         for (int i = 0; i <= args.length -1; i++) {
-            if (args[i].contains("--hijack")) {
-               this.handleHijackValue(args[i]);
-            } else if(args[i].contains("--gvar")) {
-               this.handleGvarsValue(args[i]);
-            } else if (args[i].contains("--suite")) {
-               handleSuites(args[i]);
-            } else if (args[i].contains("--test")) {
-               handleTests(args[i]);
-            } else if (args[i].contains("--browser")) {
-               args[i] = args[i].replaceAll("--browser=", "");
-               this.browser = args[i];
-               System.out.printf("(*)Browser: %s\n", this.browser);
-            } else if (args[i].contains("--flavor")) {
-               args[i] = args[i].replaceAll("--flavor=", "");
-               this.flavor = args[i];
-               System.out.printf("(*)Flavor: %s\n", this.flavor);
-            } else if (args[i].contains("--savehtml")) {
-               args[i] = args[i].replaceAll("--savehtml=", "");
-               this.saveHtml = args[i];
-               System.out.printf("(*)SaveHTML: %s\n", this.saveHtml);
-            } else if (args[i].contains("--version")) {
-               this.version = true;
-               System.out.printf("(*)Version: %s\n", this.version);
-            } else if (args[i].contains("--resultdir")) {
-               args[i] = args[i].replaceAll("--resultdir=", "");
-               this.resultDir = args[i];
-               this.resultDir = FilenameUtils.separatorsToSystem(this.resultDir);
-               System.out.printf("(*)Result Dir: %s\n", this.resultDir);
-            } else if (args[i].contains("--blocklistfile")) {
-               args[i] = args[i].replaceAll("--blocklistfile=", "");
-               this.blocklistFile = args[i];
-               this.blocklistFile = FilenameUtils.separatorsToSystem(this.blocklistFile);
-               System.out.printf("(*)Blocklistfile: %s\n", this.blocklistFile);
-            } else if (args[i].contains("--testdelay")) {
-               this.testdelay = true;
-               System.out.printf("(*)Testdelay: %s\n", this.testdelay);
-            } else if (args[i].contains("--skipcsserrors")) {
-               this.skipcssErrors = true;
-               System.out.printf("(*)Skip CSS Errors: %s\n", this.skipcssErrors);
-            } else if (args[i].contains("--help")) {
-               this.help = true;
-            } else if (args[i].contains("--help")) {
-               this.profile = args[i];
-               System.out.printf("(*)Browser Profile: %s\n", this.profile);
-            } else if (args[i].contains("--plugin")) {
-               this.plugin = args[i];
-               this.plugin = this.plugin.replace("--plugin=", "");
-               System.out.printf("(*)VooDooDriver Plugin File: %s\n", this.plugin);
-            } else if (args[i].contains("--config")) {
-               this.configfile = args[i];
-               this.configfile = this.configfile.replace("--config=", "");
-               this.configfile = FilenameUtils.separatorsToSystem(this.configfile);
-               System.out.printf("(*)VooDooDriver Config File: %s\n", this.configfile);
-            } else if (args[i].contains("--downloaddir")) {
-                  this.downloaddir = args[i];
-                  this.downloaddir = this.downloaddir.replace("--downloaddir=", "");
-                  this.downloaddir = FilenameUtils.separatorsToSystem(this.downloaddir);
-                  System.out.printf("(*)Download Directory: %s\n", this.downloaddir);
-            } else if (args[i].contains("--assertpagefile")) {
-                  this.assertPageFile = args[i];
-                  this.assertPageFile = this.assertPageFile.replace("--assertpagefile=", "");
-                  this.assertPageFile = FilenameUtils.separatorsToSystem(this.assertPageFile);
-                  System.out.printf("(*)Assertpagefile: %s\n", this.assertPageFile);
-             } else if (args[i].contains("--restartcount")) {
-                this.restartcount = args[i].replaceAll("--restartcount=", "");
-             } else if (args[i].contains("--restarttest")) {
-                this.restarttest = args[i];
-                this.restarttest = this.restarttest.replaceAll("--restarttest=", "");
-             } else if (args[i].contains("--attachtimeout")) {
-                this.attachtimeout = args[i].replace("--attachtimeout=", "");
-            } else if (args[i].equals("--haltOnFailure")) {
-               this.haltOnFailure = true;
-             } else {
-                System.err.printf("(!)Error: Unknown command line flag passed to VooDooDriver: '%s'!\n", args[i]);
-             }
+   private class VooDooCmdLineFileArgAction implements VooDooCmdLineArgAction {
+      private boolean isDir;
+
+      /**
+       * Create a VooDooCmdLineFileArgAction, differentiating file and dir.
+       *
+       * @param action  either file or dir
+       */
+
+      public VooDooCmdLineFileArgAction(String action) {
+         isDir = action.equals("dir");
+      }
+
+      public void handle(String name, String arg, boolean isArray) {
+         if (arg.isEmpty()) {
+            System.err.printf("(!)Missing argument to --%s\n", name);
+            System.exit(1);
          }
 
-         this.options = new SodaHash();
-         this.options.put("skipcsserrors", this.skipcssErrors);
-         this.options.put("testdelay", this.testdelay);
-         this.options.put("blocklistfile", this.blocklistFile);
-         this.options.put("resultdir", this.resultDir);
-         this.options.put("version", this.version);
-         this.options.put("savehtml", this.saveHtml);
-         this.options.put("flavor", this.flavor);
-         this.options.put("browser", this.browser);
-         this.options.put("tests", this.tests);
-         this.options.put("suites", this.suites);
-         this.options.put("gvars", this.gvars);
-         this.options.put("hijacks", this.hijacks);
-         this.options.put("help", this.help);
-         this.options.put("profile", this.profile);
-         this.options.put("plugin", this.plugin);
-         this.options.put("config", this.configfile);
-         this.options.put("downloaddir", this.downloaddir);
-         this.options.put("assertpagefile", this.assertPageFile);
-         this.options.put("restartcount", this.restartcount);
-         this.options.put("restarttest", this.restarttest);
-         this.options.put("attachtimeout", this.attachtimeout);
-         this.options.put("haltonfailure", this.haltOnFailure);
-      } catch (Exception exp) {
-         exp.printStackTrace();
-         this.options = null;
+         File f = new File(FilenameUtils.separatorsToSystem(arg));
+         if (isDir) {
+            if (f.exists()) {
+               if (!f.isDirectory()) {
+                  System.err.printf("(!)Directory '%s' for --%s is a file\n",
+                                    arg, name);
+                  System.exit(1);
+               }
+               if (f.list().length > 0) {
+                  System.err.printf("(!)Directory '%s' for --%s is not empty\n",
+                                    arg, name);
+                  System.exit(1);
+               }
+            }
+         } else if (!f.exists()) {
+            System.err.printf("(!)Failed to find --%s file '%s'", name, arg);
+            System.exit(1);
+         }
+
+         if (isArray) {
+            /*
+             * Once all the code that uses this is fixed, this will be
+             * stored as ArrayList<File>.
+             */
+            if (!options.containsKey(name)) {
+               options.put(name, new ArrayList<String>());
+            }
+            @SuppressWarnings("unchecked")
+               ArrayList<String> a = (ArrayList<String>)options.get(name);
+            a.add(arg);
+         } else {
+            options.put(name, arg);
+         }
       }
    }
 
-   /**
-    * Parses the --gvar command line option.
-    *
-    * @param str The gvar command line.
-    */
-   private void handleGvarsValue(String str) {
-      str = str.replace("--gvar=", "");
-      String[] data = str.split("::");
-      this.gvars.put("global."+data[0], data[1]);
-      System.out.printf("(*)GVar: %s => %s\n", "global."+data[0], data[1]);
-   }
 
    /**
-    * Parses the --hijack command line option.
-    *
-    * @param str The hijack command line.
+    * Process a string command line argument.
     */
-   private void handleHijackValue(String str) {
-      str = str.replace("--hijack=", "");
-      String[] data = str.split("::");
-      this.hijacks.put(data[0], data[1]);
-      System.out.printf("(*)HiJack: %s => %s\n", data[0], data[1]);
+
+   private class VooDooCmdLineStringAction implements VooDooCmdLineArgAction {
+      public void handle(String name, String arg, boolean isArray) {
+         if (arg.isEmpty()) {
+            System.err.printf("(!)Missing argument to --%s\n", name);
+            System.exit(1);
+         }
+         if (isArray) {
+            if (!options.containsKey(name)) {
+               options.put(name, new ArrayList<String>());
+            }
+            @SuppressWarnings("unchecked")
+               ArrayList<String> a = (ArrayList<String>)options.get(name);
+            a.add(arg);
+         } else {
+            options.put(name, arg);
+         }
+      }
    }
 
-   /**
-    * Parses the --test command line option.
-    *
-    * @param str The test command line.
-    */
-   private void handleTests(String str) {
-      str = str.replace("--test=", "");
-      str = FilenameUtils.separatorsToSystem(str);
-      this.tests.add(str);
-      System.out.printf("(*)Test Added: %s\n", str);
-   }
 
    /**
-    * Parses the --suite command line option.
-    *
-    * @param str The suite command line.
+    * Process an integer command line argument.
     */
-   private void handleSuites(String str) {
-      str = str.replace("--suite=", "");
-      str = FilenameUtils.separatorsToSystem(str);
-      this.suites.add(str);
-      System.out.printf("(*)Suite Added: %s\n", str);
+
+   private class VooDooCmdLineIntegerAction implements VooDooCmdLineArgAction {
+      public void handle(String name, String arg, boolean isArray) {
+         try {
+            int i = Integer.valueOf(arg);
+         } catch (java.lang.NumberFormatException e) {
+            System.err.printf("(!)Invalid argument to --%s '%s'\n", name, arg);
+         }
+
+         if (isArray) {
+            /*
+             * Once the code that uses this is fixed, this will be
+             * ArrayList<Integer>.
+             */
+            if (!options.containsKey(name)) {
+               options.put(name, new ArrayList<String>());
+            }
+            @SuppressWarnings("unchecked")
+               ArrayList<String> a = (ArrayList<String>)options.get(name);
+            a.add(arg);
+         } else {
+            options.put(name, arg);
+         }
+      }
    }
 
+
    /**
-    * Returns the parsed options.
+    * Process a key-value pair command line argument.
+    */
+
+   private class VooDooCmdLineKVPAction implements VooDooCmdLineArgAction {
+      public void handle(String name, String arg, boolean isArray) {
+         if (!options.containsKey(name)) {
+            options.put(name, new SodaHash());
+         }
+
+         String[] kvp = arg.split("::");
+         if (kvp.length != 2) {
+            System.err.printf("(!)Invalid argument to --%s '%s'\n", name, arg);
+         }
+         String key = kvp[0];
+         String value = kvp[1];
+
+         /* Hack: gvars need "global." prepended. */
+         if (name.equals("gvar")) {
+            key = "global." + key;
+         }
+
+         ((SodaHash)options.get(name)).put(key, value);
+      }
+   }
+
+
+   /**
+    * Process a boolean command line argument (a switch).
+    */
+
+   private class VooDooCmdLineBooleanAction implements VooDooCmdLineArgAction {
+      public void handle(String name, String arg, boolean isArray) {
+         options.put(name, true);
+      }
+   }
+
+
+   /**
+    * Load valid command line options from options.xml.
+    *
+    * <p>XXX: Although options.xml is not currently validated, it
+    * really should be.  This routine assumes the file is valid and
+    * conforms to the block comment at the top of the file.</p>
+    */
+
+   private void loadCommandLineOpts() {
+      InputStream optFile = null;
+      String name, jar;
+      DocumentBuilder db;
+      Document doc = null;
+      NodeList optNodes;
+
+      /* Get an InputStream for options.xml */
+      name = getClass().getName().replace('.', '/');
+      jar = getClass().getResource("/" + name + ".class").toString();
+
+      if (jar.startsWith("jar:")) {
+         optFile = getClass().getResourceAsStream(validOptsFile);
+      } else {
+         File f = new File(getClass().getResource(validOptsFile).getFile());
+         try {
+            optFile = new FileInputStream(f);
+         } catch (java.io.FileNotFoundException e) {
+            System.err.println("(!)Failed to find options.xml: " + e);
+            System.exit(1);
+         }
+      }
+
+      /* Parse the XML */
+      try {
+         db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+         doc = db.parse(optFile);
+      } catch (javax.xml.parsers.ParserConfigurationException e) {
+         System.err.println("(!)Trouble loading XML parser: " + e);
+         System.exit(1);
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error reading options.xml: " + e);
+      } catch (org.xml.sax.SAXException e) {
+         System.err.println("(!)options.xml malformed? " + e);
+         System.exit(1);
+      }
+
+      optNodes = doc.getDocumentElement().getElementsByTagName("option");
+
+      /* Stick all the options into a hash. */
+      this.validOpts = new SodaHash();
+
+      for (int k = 0; k < optNodes.getLength(); k++) {
+         NamedNodeMap e = optNodes.item(k).getAttributes();
+         SodaHash opt = new SodaHash();
+         VooDooCmdLineArgAction action = null;
+         String arg = e.getNamedItem("arg").getNodeValue();
+         boolean isArray = arg.endsWith("s");
+
+         if (arg.startsWith("file") || arg.startsWith("dir")) {
+            action = new VooDooCmdLineFileArgAction(arg);
+         } else if (arg.startsWith("string")) {
+            action = new VooDooCmdLineStringAction();
+         } else if (arg.startsWith("integer")) {
+            action = new VooDooCmdLineIntegerAction();
+         } else if (arg.equals("kvp")) {
+            action = new VooDooCmdLineKVPAction();
+         } else if (arg.equals("none")) {
+            action = new VooDooCmdLineBooleanAction();
+         } else {
+            System.err.println("(!)Invalid arg: " + arg);
+         }
+
+         opt.put("action", action);
+         opt.put("isArray", isArray);
+         opt.put("help", e.getNamedItem("help").getNodeValue());
+         this.validOpts.put(e.getNamedItem("name").getNodeValue(), opt);
+      }
+   }
+
+
+   /**
+    * Determine a command line argument's name.
+    *
+    * This involves stripping off the leading '--' and any trailing
+    * '=' with everything after.
+    *
+    * @param arg  the command line argument
+    * @return the command line argument's name
+    */
+
+   private String getArgName(String arg) {
+      return arg.replaceAll("^--([^=]+).*$", "$1");
+   }
+
+
+   /**
+    * Determine a command line argument's value.
+    *
+    * The value is everything after the first '='.  If there is no
+    * '=', an empty string is returned.
+    *
+    * @param arg  the command line argument
+    * @return the command line argument's value
+    */
+
+   private String getArgValue(String arg) {
+      int i = arg.indexOf('=');
+      return (i < 0) ? "" : arg.substring(i + 1);
+   }
+
+
+   /**
+    * Word wrap a string, starting at the specified column.
+    *    
+    * @param s    the string to word wrap
+    * @param col  the number of spaces to insert after each newline
+    * @return  a nicely word-wrapped and padded string
+    */
+
+   private String wrap (String s, int col) {
+      if (col > 50) {
+         col = 50;
+      }
+      String spc = ((col > 0) ?
+                    String.format("%" + String.valueOf(col) + "s", "") :
+                    "");
+      s = s.replaceAll("(.{" + String.valueOf(68 - col) + "}\\S*)\\s+", "$1\n");
+      s = s.replaceAll("\n", "\n" + spc);
+      return s.trim();
+   }
+
+
+   /**
+    * Print VooDooDriver's help message.
+    *
+    * The option strings and their help text come from options.txt.
+    * This routine merely formats them nicely and prints some external
+    * information.
+    */
+
+   private void printHelp() {
+      System.out.println("Usage: java -jar VooDooDriver.jar [options]\n");
+      System.out.println("Options:");
+
+      String[] keys = this.validOpts.keySet().toArray(new String[0]);
+      java.util.Arrays.sort(keys);
+      int col = 0;
+      /* Once through to size the options, once through to print them. Sigh. */
+      for (String key: keys) {
+         if (key.length() > col) {
+            col = key.length();
+         }
+      }
+      for (String key: keys) {
+         String h = wrap((String)((SodaHash)this.validOpts.get(key)).get("help"),
+                         col + 5); // Initial space, "--", and two spaces after
+         System.out.printf(" %" + String.valueOf(col + 2) + "s  %s\n",
+                           "--" + key, h);
+      }
+
+      System.out.println("\n" +
+                         wrap("Either --suite or --test is required.  " +
+                              "'=' joins options and their arguments. " +
+                              "'::' joins key-value pairs.", 0));
+      System.out.println("\nExamples:\n");
+      System.out.println("   " + wrap("java -jar VooDooDriver.jar " +
+                                      "--browser=firefox " +
+                                      "--gvar=scriptsdir::/home/me/soda " +
+                                      "--suite=testSuite.xml", 8));
+      System.out.println("\n" + wrap("Runs testSuite.xml on firefox using " +
+                                     "/home/me/soda as the internal global " +
+                                     "variable 'scriptsdir'.", 0));
+   }
+
+
+   /**
+    * Print VooDooDriver's version information.
+    */
+
+   private void printVersion() {
+      VDDVersionInfo vinfo = new VDDVersionInfo();
+      System.out.printf("(*)VooDooDriver Version: %s\n",
+                        vinfo.getVDDVersion());
+   }
+
+
+   /**
+    * Constructor for SodaCmdLineOpts.
+    */
+
+   public SodaCmdLineOpts() {
+      loadCommandLineOpts();
+   }
+
+
+   /**
+    * Parse command line options using our option specification.
+    *
+    * Both --help and --version are handled here.  The values for all
+    * other command line options are stored in an internal data
+    * structure that can be accessed with getOptions().
+    *
+    * @param args  arguments from the command line
+    */
+
+   public void parse(String[] args) {
+      this.options = new SodaHash();
+
+      for (String arg: args) {
+         SodaHash opt;
+         String argName = getArgName(arg);
+         String argValue = getArgValue(arg);
+
+         opt = (SodaHash)this.validOpts.get(argName);
+         if (opt == null) {
+            System.err.println("(!)Error: Unknown command line argument \"" +
+                               argName + "\"");
+            System.exit(1);
+         }
+
+         VooDooCmdLineArgAction action =
+            (VooDooCmdLineArgAction)opt.get("action");
+         action.handle(argName, argValue, (Boolean)opt.get("isArray"));
+      }
+
+
+      if (options.containsKey("help") &&
+          (Boolean)options.get("help")) {
+         printHelp();
+         System.exit(0);
+      } else if (options.containsKey("version") &&
+                 (Boolean)options.get("version")) {
+         printVersion();
+         System.exit(0);
+      }
+   }
+
+
+   /**
+    * Return the parsed command line arguments.
     *
     * @return {@link SodaHash}
     */
+
    public SodaHash getOptions() {
       return this.options;
    }

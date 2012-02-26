@@ -15,8 +15,8 @@
    <property name="issuesreport-header" location="${src}/vddlogger/issues-header.txt" />
    <property name="summaryreport-header" location="${src}/vddlogger/summaryreporter-header.txt" />
    <property name="reportlog-header" location="${src}/vddlogger/reportlogheader.txt" />
-   <property name="helpmessage" location="${src}/helpmessage.txt" />
    <property name="officialName" value="VooDooDriver" />
+   <property name="options" location="${src}/voodoodriver/options.xml"/>
    <property name="version" value="0.0.1" />
    <property name="year" value="2012" />
    
@@ -39,7 +39,7 @@
    </pathconvert>
 
    <target name="docs">
-      <javadoc sourcepath="${src}" destdir="${dist}/javadocs">
+      <javadoc sourcepath="${src}" destdir="${dist}/javadocs" private="true">
          <classpath>
             <pathelement path="${classpath}"/>
             <fileset dir="lib">
@@ -122,7 +122,7 @@
       <copy todir="${build}/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/vddlogger" file="${summaryreport-header}" />
       <copy todir="${build}/vddlogger" file="${reportlog-header}" />
-      <copy todir="${build}" file="${helpmessage}" />
+      <copy todir="${build}/voodoodriver" file="${options}" />
       
       <antcall target="create-propfile" />
       
@@ -175,7 +175,7 @@
       <copy todir="${build}/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/vddlogger" file="${summaryreport-header}" />
       <copy todir="${build}/vddlogger" file="${reportlog-header}" />
-      <copy todir="${build}" file="${helpmessage}" />
+      <copy todir="${build}/voodoodriver" file="${options}" />
       
       <antcall target="create-propfile" />
       
