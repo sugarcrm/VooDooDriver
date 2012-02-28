@@ -111,7 +111,7 @@ public class SodaCmdLineOpts {
                }
             }
          } else if (!f.exists()) {
-            System.err.printf("(!)Failed to find --%s file '%s'", name, arg);
+            System.err.printf("(!)Failed to find --%s file '%s'\n", name, arg);
             System.exit(1);
          }
 
