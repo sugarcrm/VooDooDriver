@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="VooDooDriver" default="default-build" basedir=".">
    <description>Build script for VooDooDriver</description>
-   
+
    <!-- set global properties for this build -->
    <property name="buildnum" value="666" />
    <property name="bin" location="bin"/>
@@ -15,8 +15,8 @@
    <property name="issuesreport-header" location="${src}/org/sugarcrm/vddlogger/issues-header.txt" />
    <property name="summaryreport-header" location="${src}/org/sugarcrm/vddlogger/summaryreporter-header.txt" />
    <property name="reportlog-header" location="${src}/org/sugarcrm/vddlogger/reportlogheader.txt" />
-   <property name="helpmessage" location="${src}/helpmessage.txt" />
    <property name="officialName" value="VooDooDriver" />
+   <property name="options" location="${src}/org/sugarcrm/voodoodriver/options.xml"/>
    <property name="version" value="0.0.1" />
    <property name="year" value="2011" />
 	
@@ -29,6 +29,7 @@
             <globmapper from="*" to="lib/*" />
          </chainedmapper>
       </mapper>
+
       <path>
          <!-- lib.home contains all jar files, in several subdirectories -->
          <fileset dir="${lib}/libs">
@@ -38,15 +39,22 @@
    </pathconvert>
 
    <target name="docs">
-      <javadoc sourcepath="${src}" destdir="${dist}/javadocs" />
+      <javadoc sourcepath="${src}" destdir="${dist}/javadocs">
+         <classpath>
+            <pathelement path="${classpath}"/>
+            <fileset dir="lib">
+               <include name="**/*.jar"/>
+            </fileset>
+         </classpath>
+      </javadoc>
    </target>
-	
+
    <target name="api-docs" depends="init">
       <copy todir="${dist}/docs">
          <fileset dir="docs/" />
       </copy>
    </target>
-	
+
    <target name="copy-launchers" depends="init">
       <copy todir="${dist}">
          <fileset dir="launchers/" />
@@ -58,9 +66,9 @@
       <tstamp/>
       <!-- Create the build directory structure used by compile -->
       <mkdir dir="${build}"/>
-   	<mkdir dir="${bin}" />
-   	<mkdir dir="${dist}" />
-   	<mkdir dir="${dist}/lib"/>
+      <mkdir dir="${bin}" />
+      <mkdir dir="${dist}" />
+      <mkdir dir="${dist}/lib"/>
    </target>
 
    <target name="clean">
@@ -75,10 +83,10 @@
       <delete failonerror="false">
          <fileset dir="${bin}" />
       </delete>
-   	
-   	<delete failonerror="false" file="${product-zip}" />
-   	
-   	<delete dir="${bin}" failonerror="false" />
+
+      <delete failonerror="false" file="${product-zip}" />
+
+      <delete dir="${bin}" failonerror="false" />
       <delete dir="${build}" failonerror="false" />
       <delete dir="${dist}" failonerror="false" />
    </target>
@@ -94,8 +102,11 @@
       </propertyfile>
    </target>
 	
-   <target name="debug" depends="clean,init,api-docs,copy-launchers,docs" description="compile the source in debug mode" >
-      <javac srcdir="${src}" destdir="${build}" debug="true" debuglevel="lines,vars,source" 
+   <target name="debug"
+           depends="clean,init,api-docs,copy-launchers,docs"
+           description="compile the source in debug mode" >
+      <javac srcdir="${src}" destdir="${build}" debug="true"
+             debuglevel="lines,vars,source" 
              includeantruntime="false">
          <classpath>
             <pathelement path="${classpath}"/>
@@ -111,7 +122,7 @@
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${reportlog-header}" />
-      <copy todir="${build}" file="${helpmessage}" />
+      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${options}" />
 	
       <antcall target="create-propfile" />
 
@@ -132,14 +143,14 @@
             <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
          </manifest>
       </jar>
-
+      
       <copy todir="${dist}/lib">
          <fileset dir="lib/libs" />
       </copy>
-
+      
       <zip destfile="${bin}/VooDooDriver-debug.zip" basedir="${dist}"/>
    </target>
-
+   
    <target name="compile" depends="init" description="compile the source " >
       <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
          <classpath>
@@ -162,7 +173,7 @@
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${reportlog-header}" />
-      <copy todir="${build}" file="${helpmessage}" />
+      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${options}" />
 
       <antcall target="create-propfile" />
    	

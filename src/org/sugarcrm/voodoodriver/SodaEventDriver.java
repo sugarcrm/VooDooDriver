@@ -331,6 +331,7 @@ public class SodaEventDriver implements Runnable {
    private boolean handleSingleEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       WebElement element = null;
+      SodaElements type = (SodaElements)event.get("type");
 
       if (isStopped()) {
          return result;
@@ -338,7 +339,7 @@ public class SodaEventDriver implements Runnable {
 
       this.resetThreadTime();
 
-      switch ((SodaElements) event.get("type")) {
+      switch (type) {
       case BROWSER:
          result = browserEvent(event, parent);
          break;
@@ -362,14 +363,12 @@ public class SodaEventDriver implements Runnable {
          break;
       case BUTTON:
          element = buttonEvent(event, parent);
-         this.firePlugin(null, SodaElements.BUTTON, SodaPluginEventType.AFTEREVENT);
          break;
       case CSV:
          result = csvEvent(event);
          break;
       case LINK:
          element = linkEvent(event, parent);
-         this.firePlugin(null, SodaElements.LINK, SodaPluginEventType.AFTEREVENT);
          break;
       case CHECKBOX:
          element = checkboxEvent(event, parent);
@@ -418,8 +417,6 @@ public class SodaEventDriver implements Runnable {
          break;
       case IMAGE:
          element = imageEvent(event, parent);
-         this.firePlugin(null, SodaElements.IMAGE,
-                         SodaPluginEventType.AFTEREVENT);
          break;
       case DND:
          result = dndEvent(event);
@@ -429,11 +426,9 @@ public class SodaEventDriver implements Runnable {
          break;
       case LI:
          element = liEvent(event, parent);
-
          break;
       case RADIO:
          element = radioEvent(event, parent);
-
          break;
       case EXECUTE:
          result = executeEvent(event);
@@ -443,19 +438,15 @@ public class SodaEventDriver implements Runnable {
          break;
       case UL:
          result = ulEvent(event);
-
          break;
       case OL:
          result = olEvent(event);
-
          break;
       case MAP:
          result = mapEvent(event);
-
          break;
       case AREA:
          result = areaEvent(event);
-
          break;
       case PLUGINLOADER:
          result = pluginloaderEvent(event);
@@ -482,10 +473,11 @@ public class SodaEventDriver implements Runnable {
          element = inputEvent(event, parent);
          break;
       default:
-         System.out.printf("(*)Unknown command: '%s'!\n", event.get("type").toString());
+         System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
          System.exit(1);
       }
 
+      this.firePlugin(null, type, SodaPluginEventType.AFTEREVENT);
       this.resetThreadTime();
 
       if (element != null) {
@@ -507,7 +499,7 @@ public class SodaEventDriver implements Runnable {
     * @param required  whether the element was required
     */
 
-   private void logElementNotVisible(boolean required, SodaHash event) {
+   private void logElementNotVisible(boolean required, VDDHash event) {
       String how = event.get("how").toString();
       String what = this.replaceString(event.get(how).toString());
       String msg = ("The element you are trying to access (" +
@@ -2798,7 +2790,7 @@ public class SodaEventDriver implements Runnable {
     * @return the &lt;thead&gt; {@link WebElement} or null
     */
 
-   private WebElement theadEvent(SodaHash event, WebElement parent) {
+   private WebElement theadEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -2876,7 +2868,7 @@ public class SodaEventDriver implements Runnable {
     * @return the &lt;tbody&gt; {@link WebElement} or null
     */
 
-   private WebElement tbodyEvent(SodaHash event, WebElement parent) {
+   private WebElement tbodyEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
       WebElement element = null;
@@ -2946,7 +2938,7 @@ public class SodaEventDriver implements Runnable {
       return element;
    }
 
-   private WebElement findElement(SodaHash event, WebElement parent,
+   private WebElement findElement(VDDHash event, WebElement parent,
          boolean required) {
       WebElement element = null;
       By by = null;
@@ -3157,7 +3149,7 @@ public class SodaEventDriver implements Runnable {
     */
 
    private List<WebElement> filterElements(List<WebElement> elements,
-                                           SodaHash event) {
+                                           VDDHash event) {
       ArrayList<WebElement> filtered =
          new ArrayList<WebElement>(elements.size());
       String html_tag = (String)event.get("html_tag");
@@ -3492,6 +3484,18 @@ public class SodaEventDriver implements Runnable {
             assvalue = this.replaceString(assvalue);
             this.report.AssertNot(assvalue, element.getAttribute("value"));
          }
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, SodaElements.TEXTAREA,
+                            SodaPluginEventType.BEFORECLICK);
+            this.report.Log("Clicking textarea.");
+            element.click();
+            this.report.Log("Finished clicking textarea.");
+            this.firePlugin(element, SodaElements.TEXTAREA,
+                            SodaPluginEventType.AFTERCLICK);
+         }
+
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {

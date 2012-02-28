@@ -1,0 +1,85 @@
+<!--
+    Complete list of VooDooDriver command line options
+
+    Copyright 2012 SugarCRM Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    Please see the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!--
+    Each possible command line option is represented by an <option>.  Each
+    of those must have three attributes: name, arg, and help.
+
+       name - The name of the command line option
+       arg  - What kind of argument the option has and what to do with it
+       help - Help text for the option
+
+    Valid values for arg are:
+
+       file    - File name.  The file must exist.
+       dir     - Directory name.  If the directory exists, it must be empty.
+       string  - Unparsed string
+       integer - Integer
+       kvp     - Key Value pair, 
+       none    - No argument, just a boolean flag
+
+    Appending an "s" to file, string, or integer means more than one
+    of this option may appear and each subsequent option is added to
+    an internal array.  kvp args get stored to an internal hash.
+
+    Beware: this isn't currently validated but probably will be at
+    some point, so get it right.
+-->
+
+<voodoo>
+   <option name="assertpagefile" arg="file"
+           help="XML file containing assertions to make after each page load"/>
+   <option name="attachtimeout" arg="integer"
+           help="The timeout after an attach finishes"/>
+   <option name="blocklistfile" arg="file"
+           help="An XML file specifying tests to block from running"/>
+   <option name="browser" arg="string"
+           help="Browser to test. Valid values are firefox, chrome, and ie"/>
+   <option name="config" arg="file"
+           help="Load alternate config file"/>
+   <option name="downloaddir" arg="dir"
+           help="Location for saving downloaded files"/>
+   <option name="gvar" arg="kvp"
+           help="A global variable within VooDooDriver, specified as a key-value pair"/>
+   <option name="hijack" arg="kvp"
+           help="A key-value pair that hijacks csv file values with the same name"/>
+
+   <option name="haltOnFailure" arg="none"
+           help="Stop the test run as soon as any failure occurs"/>
+   <option name="help" arg="none"
+           help="Print a help message and exit"/>
+   <option name="plugin" arg="file"
+           help="An XML file specifying a VooDooDriver plugin and its parameters"/>
+   <option name="profile" arg="none"
+           help="The name of the profile with which to start the browser"/>
+   <option name="restartcount" arg="integer"
+           help="The number of tests in a suite to run before restarting the browser"/>
+   <option name="restarttest" arg="string"
+           help="A test that runs after each browser restart but before the next test"/>
+   <option name="resultdir" arg="dir"
+           help="Output directory for results"/>
+   <option name="savehtml" arg="string"
+           help="Save the web page on specified event. Supported events are
+warning, error, assertfail, exception, watchdog, all"/>
+   <option name="suite" arg="files"
+           help="A VooDooDriver test suite to run"/>
+   <option name="test" arg="files"
+           help="VooDooDriver test file to run"/>
+   <option name="version" arg="none"
+           help="Print version information and exit"/>
+</voodoo>
