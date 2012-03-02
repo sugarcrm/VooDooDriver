@@ -3016,7 +3016,7 @@ public class SodaEventDriver implements Runnable {
             }
          }
 
-         switch (SodaElementsHow.valueOf(how.toUpperCase())) {
+         switch (ElementHow.valueOf(how.toUpperCase())) {
          case ID:
             by = By.id(what);
             break;

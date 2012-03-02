@@ -16,7 +16,7 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
-public enum SodaElementsHow {
+public enum ElementHow {
    ID,
    CLASS,
    CSS,
