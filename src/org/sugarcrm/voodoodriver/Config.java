@@ -55,7 +55,7 @@ interface VooDooCmdLineArgAction {
  * @author Jon duSaint
  */
 
-public class SodaCmdLineOpts {
+public class Config {
 
    /**
     * File containing the canonical list of VooDooDriver command line options.
@@ -411,10 +411,10 @@ public class SodaCmdLineOpts {
 
 
    /**
-    * Constructor for SodaCmdLineOpts.
+    * Constructor for Config.
     */
 
-   public SodaCmdLineOpts() {
+   public Config() {
       loadCommandLineOpts();
    }
 

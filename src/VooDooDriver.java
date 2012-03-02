@@ -28,7 +28,7 @@ import org.sugarcrm.voodoodriver.VDDBlockList;
 import org.sugarcrm.voodoodriver.VDDBlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.Chrome;
-import org.sugarcrm.voodoodriver.SodaCmdLineOpts;
+import org.sugarcrm.voodoodriver.Config;
 import org.sugarcrm.voodoodriver.SodaConfigParser;
 import org.sugarcrm.voodoodriver.SodaEvents;
 import org.sugarcrm.voodoodriver.SodaFirefox;
@@ -288,7 +288,7 @@ public class VooDooDriver {
       SodaEvents plugins = null;
       VDDBlockList blockList = null;
 
-      SodaCmdLineOpts opts = new SodaCmdLineOpts();
+      Config opts = new Config();
       opts.parse(args);
       VDDHash cmdOpts = opts.getOptions();
 
@@ -315,14 +315,14 @@ public class VooDooDriver {
       }
 
       if (config.containsKey("attachtimeout")) {
-         /* XXX: Handle in SodaCmdLineOpts */
+         /* XXX: Handle in Config */
          Integer t = new Integer((String)config.get("attachtimeout"));
          config.put("attachtimeout", t);
          System.out.printf("(*)Setting attach timeout to %ss.\n", t);
       }
 
       if (config.containsKey("restartcount")) {
-         /* XXX: Handle in SodaCmdLineOpts */
+         /* XXX: Handle in Config */
          Integer r = new Integer((String)config.get("restartcount"));
          config.put("restartcount", r);
          System.out.printf("(*)Restart count => '%d'\n", r);
