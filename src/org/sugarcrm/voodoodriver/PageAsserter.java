@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SodaPageAsserter {
+public class PageAsserter {
 
    private ArrayList<String> ignores = null;
    private ArrayList<String> checkes = null;
@@ -34,7 +34,7 @@ public class SodaPageAsserter {
    private SodaReporter reporter = null;
    private VDDHash whiteList = null;
 
-   public SodaPageAsserter(String assertFile, SodaReporter reporter, VDDHash whitelist) {
+   public PageAsserter(String assertFile, SodaReporter reporter, VDDHash whitelist) {
       this.reporter = reporter;
       this.ignores = new ArrayList<String>();
       this.checkes = new ArrayList<String>();

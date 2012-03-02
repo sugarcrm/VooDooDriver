@@ -38,7 +38,7 @@ public abstract class Browser implements BrowserInterface {
    private String profile = null;
    private SodaReporter reporter = null;
    private String assertPageFile = null;
-   private SodaPageAsserter asserter = null;
+   private PageAsserter asserter = null;
 
    /**
     * Constructor
@@ -343,7 +343,7 @@ public abstract class Browser implements BrowserInterface {
 
       if (this.asserter == null && this.assertPageFile != null) {
          try {
-            this.asserter = new SodaPageAsserter(this.assertPageFile, this.reporter, whitelist);
+            this.asserter = new PageAsserter(this.assertPageFile, this.reporter, whitelist);
          } catch (Exception exp) {
             this.reporter.ReportException(exp);
          }
@@ -468,7 +468,7 @@ public abstract class Browser implements BrowserInterface {
     */
    public void setAssertPageFile(String filename, SodaReporter reporter) {
       this.assertPageFile = filename;
-      this.asserter = new SodaPageAsserter(filename, reporter, null);
+      this.asserter = new PageAsserter(filename, reporter, null);
    }
 
    /**
