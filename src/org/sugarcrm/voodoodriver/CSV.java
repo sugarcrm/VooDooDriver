@@ -22,14 +22,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import au.com.bytecode.opencsv.CSVParser;
 
-public class SodaCSV {
+public class CSV {
 
    private SodaReporter report = null;
    private ArrayList<String> keys = null;
    private CSVData data = null;
    private CSVParser parser = null;
 
-   public SodaCSV(String csvfile, SodaReporter reporter) {
+   public CSV(String csvfile, SodaReporter reporter) {
       FileInputStream fs = null;
       BufferedReader br = null;
 
@@ -49,33 +49,22 @@ public class SodaCSV {
       }
    }
 
-   /*
-    * getData -- method
-    *    This method returns the data generated from a soda CSV file.
+   /**
+    * Return the data read from a CSV file.
     *
-    * Input:
-    *    None.
-    *
-    *
-    * Output:
-    *    returns a CSVData object.
-    *
+    * @return CSVData object.
     */
+
    public CSVData getData() {
       return this.data;
    }
 
-   /*
-    * createData -- method
-    *    This method reads the csv file and process the file into an array of hashes.
+   /**
+    * Read the CSV file and process the file into an array of hashes.
     *
-    * Input:
-    *    br: the BufferedReader for the open csv file, after the key line has been read.
-    *
-    * Output:
-    *    None.
-    *
+    * @param br  BufferedReader for the CSV file with line 1 consumed
     */
+
    private void createData(BufferedReader br) {
       String line = "";
       String[] linedata;
@@ -105,16 +94,10 @@ public class SodaCSV {
       }
    }
 
-   /*
-    * findKeys -- method
-    *    This method finds the csv files key line and processes the line into an array.
+   /**
+    * Find the CSV file's key line and process the line into an array.
     *
-    * Input:
-    *    br: The BufferedReader for the open file starting at the beginning of the file.
-    *
-    * Output:
-    *    None.
-    *
+    * @param br  BufferedReader for the open file
     */
    private void findKeys(BufferedReader br) {
       String line = "";

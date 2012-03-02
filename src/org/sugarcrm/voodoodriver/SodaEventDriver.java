@@ -2569,7 +2569,7 @@ public class SodaEventDriver implements Runnable {
 
    private boolean csvEvent(VDDHash event) {
       boolean result = false;
-      SodaCSV csv = null;
+      CSV csv = null;
       CSVData csv_data = null;
       String var_name = null;
       String csv_filename = "";
@@ -2607,7 +2607,7 @@ public class SodaEventDriver implements Runnable {
       msg = String.format("Processing CSV file: '%s'...", csv_filename);
       this.report.Log(msg);
 
-      csv = new SodaCSV(csv_filename, this.report);
+      csv = new CSV(csv_filename, this.report);
       csv_data = csv.getData();
 
       for (int i = 0; i <= csv_data.size() - 1; i++) {
