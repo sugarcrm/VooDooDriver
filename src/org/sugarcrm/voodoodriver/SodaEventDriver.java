@@ -2713,10 +2713,10 @@ public class SodaEventDriver implements Runnable {
             for (int i = 0; i <= event_count; i++) {
                String key = event.keySet().toArray()[i].toString();
                String key_id = "BROWSER_" + key;
-               SodaBrowserMethods method = null;
+               BrowserMethods method = null;
 
-               if (SodaBrowserMethods.isMember(key_id)) {
-                  method = SodaBrowserMethods.valueOf(key_id);
+               if (BrowserMethods.isMember(key_id)) {
+                  method = BrowserMethods.valueOf(key_id);
                } else {
                   continue;
                }

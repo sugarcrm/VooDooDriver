@@ -22,7 +22,7 @@ package org.sugarcrm.voodoodriver;
  * @author trampus
  *
  */
-public enum SodaBrowserMethods {
+public enum BrowserMethods {
    BROWSER_cssprop,
    BROWSER_cssvalue,
    BROWSER_assertnot,
@@ -41,9 +41,9 @@ public enum SodaBrowserMethods {
     */
    static public boolean isMember(String aName) {
       boolean result = false;
-      SodaBrowserMethods[] values = SodaBrowserMethods.values();
+      BrowserMethods[] values = BrowserMethods.values();
 
-      for (SodaBrowserMethods amethod : values) {
+      for (BrowserMethods amethod : values) {
          if (amethod.name().equals(aName)) {
             result = true;
             break;
