@@ -18,11 +18,11 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.HashMap;
 
-public class VDDPluginsHash extends HashMap<String, Class<PluginInterface>>{
+public class PluginsHash extends HashMap<String, Class<PluginInterface>>{
 
    private static final long serialVersionUID = 1L;
 
-   public VDDPluginsHash () {
+   public PluginsHash () {
       super();
    }
 

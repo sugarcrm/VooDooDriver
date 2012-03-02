@@ -58,7 +58,7 @@ public class EventLoop implements Runnable {
    private Events plugIns = null;
    private VDDHash JavaPlugings = null;
    private VDDHash ElementStore = null;
-   private VDDPluginsHash loadedPlugins = null;
+   private PluginsHash loadedPlugins = null;
    private String currentHWnd = null;
    private int attachTimeout = 0;
    private String csvOverrideFile = null;
@@ -85,7 +85,7 @@ public class EventLoop implements Runnable {
 
       this.whitelist = new VDDHash();
       this.JavaPlugings = new VDDHash();
-      this.loadedPlugins = new VDDPluginsHash();
+      this.loadedPlugins = new PluginsHash();
 
       if (oldvars != null) {
          sodaVars = oldvars;
