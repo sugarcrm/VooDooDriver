@@ -16,13 +16,15 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
+
 /**
  * Enum class for all of the supported browser actions.
  *
  * @author trampus
  *
  */
-public enum SodaBrowserActions {
+
+public enum VDDBrowserActions {
    CLOSE,
    BACK,
    REFRESH,

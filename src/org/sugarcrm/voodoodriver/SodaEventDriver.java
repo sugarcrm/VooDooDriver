@@ -2681,7 +2681,7 @@ public class SodaEventDriver implements Runnable {
    private boolean browserEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean assertPage = true;
-      SodaBrowserActions browser_action = null;
+      VDDBrowserActions browser_action = null;
 
       this.resetThreadTime();
 
@@ -2689,7 +2689,7 @@ public class SodaEventDriver implements Runnable {
 
       try {
          if (event.containsKey("action")) {
-            browser_action = SodaBrowserActions.valueOf(event.get("action").toString().toUpperCase());
+            browser_action = VDDBrowserActions.valueOf(event.get("action").toString().toUpperCase());
             switch (browser_action) {
             case REFRESH:
                this.report.Log("Calling Browser event refresh.");
