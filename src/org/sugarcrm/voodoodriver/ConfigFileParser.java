@@ -1,4 +1,3 @@
-package org.sugarcrm.voodoodriver;
 /*
 Copyright 2011 SugarCRM Inc.
 
@@ -14,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 Please see the License for the specific language governing permissions and
 limitations under the License.
 */
+
+package org.sugarcrm.voodoodriver;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -32,7 +33,7 @@ import org.w3c.dom.NodeList;
  * @author trampus
  *
  */
-public class SodaConfigParser {
+public class ConfigFileParser {
 
    private File configFile = null;
 
@@ -41,7 +42,7 @@ public class SodaConfigParser {
     *
     * @param configfile VooDooDriver config file.
     */
-   public SodaConfigParser(File configfile) {
+   public ConfigFileParser(File configfile) {
       this.configFile = configfile;
 
    }

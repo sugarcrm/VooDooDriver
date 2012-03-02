@@ -29,7 +29,7 @@ import org.sugarcrm.voodoodriver.VDDBlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.Chrome;
 import org.sugarcrm.voodoodriver.Config;
-import org.sugarcrm.voodoodriver.SodaConfigParser;
+import org.sugarcrm.voodoodriver.ConfigFileParser;
 import org.sugarcrm.voodoodriver.SodaEvents;
 import org.sugarcrm.voodoodriver.SodaFirefox;
 import org.sugarcrm.voodoodriver.VDDHash;
@@ -104,7 +104,7 @@ public class VooDooDriver {
       VDDHash gvars = new VDDHash();
       VDDHash hijacks = new VDDHash();
       VDDHash configOpts = new VDDHash();
-      SodaConfigParser configParser = null;
+      ConfigFileParser configParser = null;
       SodaEvents configFileOpts = null;
 
       configOpts.put("gvar", gvars);
@@ -122,7 +122,7 @@ public class VooDooDriver {
       System.out.printf("(*)Reading VooDooDriver config file '%s'.\n",
                         configFile.getName());
 
-      configParser = new SodaConfigParser(configFile);
+      configParser = new ConfigFileParser(configFile);
       configFileOpts = configParser.parse();
       int argsLen = configFileOpts.size() - 1;
 
