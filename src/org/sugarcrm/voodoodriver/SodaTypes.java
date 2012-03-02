@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 
 public class SodaTypes {
    private Document doc = null;
-   private SodaElementsList datatypes = null;
+   private ElementsList datatypes = null;
 
    public SodaTypes() {
       File testFD = null;
@@ -52,12 +52,12 @@ public class SodaTypes {
       }
    }
 
-   private SodaElementsList parse(NodeList node) {
-      SodaElementsList dataList = null;
+   private ElementsList parse(NodeList node) {
+      ElementsList dataList = null;
 
       int len = 0;
       try {
-         dataList = new SodaElementsList();
+         dataList = new ElementsList();
       } catch (Exception exp) {
          exp.printStackTrace();
       }
@@ -143,7 +143,7 @@ public class SodaTypes {
       return hash;
    }
 
-   public SodaElementsList getTypes() {
+   public ElementsList getTypes() {
       return datatypes;
    }
 

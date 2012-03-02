@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
 public class SodaXML {
 
    private Document doc = null;
-   private SodaElementsList types = null;
+   private ElementsList types = null;
    private SodaTypes sodaTypes = null;
    private SodaEvents events = null;
    private SodaReporter reporter = null;
