@@ -45,7 +45,7 @@ import org.openqa.selenium.support.ui.Select;
  * @author trampus
  *
  */
-public class SodaEventDriver implements Runnable {
+public class EventLoop implements Runnable {
 
    private SodaEvents testEvents = null;
    private Browser Browser = null;
@@ -75,7 +75,7 @@ public class SodaEventDriver implements Runnable {
     * @param oldvars  {@link VDDHash}
     * @param plugins  {@link SodaEvents}
     */
-   public SodaEventDriver(Browser browser, SodaEvents events,
+   public EventLoop(Browser browser, SodaEvents events,
          SodaReporter reporter, VDDHash gvars, VDDHash hijacks,
          VDDHash oldvars, SodaEvents plugins) {
       testEvents = events;
@@ -118,7 +118,7 @@ public class SodaEventDriver implements Runnable {
       this.threadTime = new Date();
       String hwnd = this.Browser.getDriver().getWindowHandle();
       this.setCurrentHWND(hwnd);
-      this.runner = new Thread(this, "SodaEventDriver-Thread");
+      this.runner = new Thread(this, "EventLoop-Thread");
       runner.start();
    }
 

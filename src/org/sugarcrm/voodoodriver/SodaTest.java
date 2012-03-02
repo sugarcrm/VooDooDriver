@@ -23,7 +23,7 @@ public class SodaTest {
 
    private Browser Browser = null;
    private String testFile = "";
-   private SodaEventDriver eventDriver = null;
+   private EventLoop eventDriver = null;
    private SodaEvents events = null;
    private SodaReporter reporter = null;
    private VDDHash GVars = null;
@@ -86,7 +86,7 @@ public class SodaTest {
       this.PlugIns = plugins;
    }
 
-   public SodaEventDriver getSodaEventDriver() {
+   public EventLoop getEventLoop() {
       return this.eventDriver;
    }
 
@@ -136,7 +136,7 @@ public class SodaTest {
       result = CheckTestBlocked();
       if (!result) {
          long current = 0;
-         eventDriver = new SodaEventDriver(this.Browser, events, this.reporter, this.GVars, this.HiJacks,
+         eventDriver = new EventLoop(this.Browser, events, this.reporter, this.GVars, this.HiJacks,
                this.OldVars, this.PlugIns);
 
          if (this.attachTimeout > 0) {

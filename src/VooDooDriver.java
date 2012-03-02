@@ -667,8 +667,8 @@ public class VooDooDriver {
                   writeSummary(suiteRptFD,
                                String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
-                  if (testobj.getSodaEventDriver() != null) {
-                     vars = testobj.getSodaEventDriver().getSodaVars();
+                  if (testobj.getEventLoop() != null) {
+                     vars = testobj.getEventLoop().getSodaVars();
                   }
 
                   test_results_hash = testobj.getReporter().getResults();
@@ -747,8 +747,8 @@ public class VooDooDriver {
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
-            if (testobj.getSodaEventDriver() != null) {
-               vars = testobj.getSodaEventDriver().getSodaVars();
+            if (testobj.getEventLoop() != null) {
+               vars = testobj.getEventLoop().getSodaVars();
             }
 
             test_results_hash = testobj.getReporter().getResults();
