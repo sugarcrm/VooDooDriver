@@ -24,12 +24,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-public class SodaSuiteParser {
+public class SuiteParser {
 
    private SodaTestList tests = null;
    private VDDHash gvars = null;
 
-   public SodaSuiteParser(String suitefile, VDDHash gvars) {
+   public SuiteParser(String suitefile, VDDHash gvars) {
       Document doc = null;
       File suiteFD = null;
       DocumentBuilderFactory dbf = null;

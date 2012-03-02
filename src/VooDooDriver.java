@@ -34,7 +34,7 @@ import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.Firefox;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.IE;
-import org.sugarcrm.voodoodriver.SodaSuiteParser;
+import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SodaSupportedBrowser;
 import org.sugarcrm.voodoodriver.SodaTest;
 import org.sugarcrm.voodoodriver.SodaTestList;
@@ -597,7 +597,7 @@ public class VooDooDriver {
          SodaTest testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SodaSuiteParser suiteP = new SodaSuiteParser(suite_name, gvars);
+         SuiteParser suiteP = new SuiteParser(suite_name, gvars);
          SodaTestList suite_test_list = suiteP.getTests();
          VDDHash vars = null;
          SodaTestResults test_results_hash = null;
