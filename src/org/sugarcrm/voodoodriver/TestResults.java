@@ -18,11 +18,11 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.HashMap;
 
-public class SodaTestResults extends HashMap<String, Object> {
+public class TestResults extends HashMap<String, Object> {
 
    private static final long serialVersionUID = 1L;
 
-   public SodaTestResults() {
+   public TestResults() {
       super();
    }
 }

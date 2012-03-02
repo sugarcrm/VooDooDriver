@@ -118,11 +118,11 @@ public class Reporter {
       return this.reportLog;
    }
 
-   public SodaTestResults getResults() {
-      SodaTestResults result = null;
+   public TestResults getResults() {
+      TestResults result = null;
       Integer res = 0;
 
-      result = new SodaTestResults();
+      result = new TestResults();
       result.put("testlog", this.reportLog);
       result.put("blocked", this.Blocked);
       result.put("exceptions", this.Exceptions);

@@ -183,7 +183,7 @@ public class Test {
    }
 
    private void logResults() {
-      SodaTestResults tmp = this.reporter.getResults();
+      TestResults tmp = this.reporter.getResults();
       int len = tmp.keySet().size() -1;
       String res = "Soda Test Report:";
 

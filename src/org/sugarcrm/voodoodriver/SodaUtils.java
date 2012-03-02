@@ -73,7 +73,8 @@ public class SodaUtils {
       return res;
    }
 
-   public static void PrintSuiteReportToConsole(String suitename, ArrayList<SodaTestResults> list) {
+   public static void PrintSuiteReportToConsole(String suitename,
+                                                ArrayList<TestResults> list) {
       String linemarker = StringUtils.repeat("#", 80);
 
       System.out.printf("\n%s\n", linemarker);

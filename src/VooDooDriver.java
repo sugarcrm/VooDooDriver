@@ -38,7 +38,7 @@ import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestList;
-import org.sugarcrm.voodoodriver.SodaTestResults;
+import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.SodaUtils;
 
 
@@ -598,9 +598,9 @@ public class VooDooDriver {
          SuiteParser suiteP = new SuiteParser(suite_name, gvars);
          TestList suite_test_list = suiteP.getTests();
          VDDHash vars = null;
-         SodaTestResults test_results_hash = null;
-         ArrayList<SodaTestResults> test_resultsStore =
-            new ArrayList<SodaTestResults>();
+         TestResults test_results_hash = null;
+         ArrayList<TestResults> test_resultsStore =
+            new ArrayList<TestResults>();
 
          /* Loop over tests within each suite. */
          suiteStartTime = new Date();
