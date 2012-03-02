@@ -27,7 +27,7 @@ import org.openqa.selenium.WebElement;
  * @author trampus
  *
  */
-public interface SodaBrowserInterface {
+public interface BrowserInterface {
 
    public void newBrowser();
 

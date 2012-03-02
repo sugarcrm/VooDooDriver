@@ -20,7 +20,7 @@ import org.openqa.selenium.Mouse;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
-public class SodaFirefox extends SodaBrowser implements SodaBrowserInterface {
+public class SodaFirefox extends SodaBrowser implements BrowserInterface {
 
    private String downloadDirecotry = null;
 
