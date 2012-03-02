@@ -33,7 +33,7 @@ import org.sugarcrm.voodoodriver.ConfigFileParser;
 import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.Firefox;
 import org.sugarcrm.voodoodriver.VDDHash;
-import org.sugarcrm.voodoodriver.SodaIE;
+import org.sugarcrm.voodoodriver.IE;
 import org.sugarcrm.voodoodriver.SodaSuiteParser;
 import org.sugarcrm.voodoodriver.SodaSupportedBrowser;
 import org.sugarcrm.voodoodriver.SodaTest;
@@ -423,7 +423,7 @@ public class VooDooDriver {
          browser = new Chrome();
          break;
       case IE:
-         browser = new SodaIE();
+         browser = new IE();
          break;
       }
 
@@ -567,7 +567,7 @@ public class VooDooDriver {
          browser = new Chrome();
          break;
       case IE:
-         browser = new SodaIE();
+         browser = new IE();
          break;
       }
 
