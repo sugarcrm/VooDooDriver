@@ -2681,7 +2681,7 @@ public class EventLoop implements Runnable {
    private boolean browserEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean assertPage = true;
-      VDDBrowserActions browser_action = null;
+      BrowserActions browser_action = null;
 
       this.resetThreadTime();
 
@@ -2689,7 +2689,7 @@ public class EventLoop implements Runnable {
 
       try {
          if (event.containsKey("action")) {
-            browser_action = VDDBrowserActions.valueOf(event.get("action").toString().toUpperCase());
+            browser_action = BrowserActions.valueOf(event.get("action").toString().toUpperCase());
             switch (browser_action) {
             case REFRESH:
                this.report.Log("Calling Browser event refresh.");

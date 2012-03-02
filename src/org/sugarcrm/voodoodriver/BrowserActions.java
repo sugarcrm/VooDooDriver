@@ -24,7 +24,7 @@ package org.sugarcrm.voodoodriver;
  *
  */
 
-public enum VDDBrowserActions {
+public enum BrowserActions {
    CLOSE,
    BACK,
    REFRESH,
