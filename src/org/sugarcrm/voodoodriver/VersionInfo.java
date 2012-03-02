@@ -21,12 +21,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class VDDVersionInfo {
+public class VersionInfo {
 
    private final String propFile = "vdd.properties";
    private final String propName = "version";
 
-   public VDDVersionInfo() {
+   public VersionInfo() {
 
    }
 

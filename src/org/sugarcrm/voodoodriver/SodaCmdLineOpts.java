@@ -404,7 +404,7 @@ public class SodaCmdLineOpts {
     */
 
    private void printVersion() {
-      VDDVersionInfo vinfo = new VDDVersionInfo();
+      VersionInfo vinfo = new VersionInfo();
       System.out.printf("(*)VooDooDriver Version: %s\n",
                         vinfo.getVDDVersion());
    }

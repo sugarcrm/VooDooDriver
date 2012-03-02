@@ -40,7 +40,6 @@ import org.sugarcrm.voodoodriver.SodaTest;
 import org.sugarcrm.voodoodriver.SodaTestList;
 import org.sugarcrm.voodoodriver.SodaTestResults;
 import org.sugarcrm.voodoodriver.SodaUtils;
-import org.sugarcrm.voodoodriver.VDDVersionInfo;
 
 
 /**
