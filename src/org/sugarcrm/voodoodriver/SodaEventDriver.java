@@ -2570,7 +2570,7 @@ public class SodaEventDriver implements Runnable {
    private boolean csvEvent(VDDHash event) {
       boolean result = false;
       SodaCSV csv = null;
-      SodaCSVData csv_data = null;
+      CSVData csv_data = null;
       String var_name = null;
       String csv_filename = "";
       String msg = "";

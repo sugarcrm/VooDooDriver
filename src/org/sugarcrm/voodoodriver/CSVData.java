@@ -18,14 +18,14 @@ package org.sugarcrm.voodoodriver;
 
 import java.util.ArrayList;
 
-public class SodaCSVData extends ArrayList<VDDHash> {
+public class CSVData extends ArrayList<VDDHash> {
 
    /**
     *
     */
    private static final long serialVersionUID = 1L;
 
-   public SodaCSVData() {
+   public CSVData() {
       super();
    }
 

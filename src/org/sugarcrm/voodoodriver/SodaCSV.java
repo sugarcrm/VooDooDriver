@@ -26,7 +26,7 @@ public class SodaCSV {
 
    private SodaReporter report = null;
    private ArrayList<String> keys = null;
-   private SodaCSVData data = null;
+   private CSVData data = null;
    private CSVParser parser = null;
 
    public SodaCSV(String csvfile, SodaReporter reporter) {
@@ -38,7 +38,7 @@ public class SodaCSV {
 
       try {
          this.keys = new ArrayList<String>();
-         data = new SodaCSVData();
+         data = new CSVData();
 
          fs = new FileInputStream(csvfile);
          br = new BufferedReader(new InputStreamReader(fs));
@@ -58,10 +58,10 @@ public class SodaCSV {
     *
     *
     * Output:
-    *    returns a SodaCSVData object.
+    *    returns a CSVData object.
     *
     */
-   public SodaCSVData getData() {
+   public CSVData getData() {
       return this.data;
    }
 
