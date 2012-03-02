@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SodaOSInfo {
+public class OSInfo {
 
-   public SodaOSInfo() {
+   public OSInfo() {
    }
 
    public static SodaSupportedOS getOS() {

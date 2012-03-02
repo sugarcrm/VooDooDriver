@@ -35,7 +35,7 @@ public class IE extends Browser implements BrowserInterface {
    }
 
    public void forceClose() {
-      SodaOSInfo.killProcesses(SodaOSInfo.getProcessIDs("iexplorer"));
+      OSInfo.killProcesses(OSInfo.getProcessIDs("iexplorer"));
       this.setBrowserClosed();
    }
 

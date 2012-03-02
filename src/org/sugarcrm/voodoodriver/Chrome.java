@@ -59,7 +59,7 @@ public class Chrome extends Browser {
     * Kills the native chome browser process.
     */
    public void forceClose() {
-      SodaOSInfo.killProcesses(SodaOSInfo.getProcessIDs("Google Chrome"));
+      OSInfo.killProcesses(OSInfo.getProcessIDs("Google Chrome"));
       this.setBrowserClosed();
    }
 

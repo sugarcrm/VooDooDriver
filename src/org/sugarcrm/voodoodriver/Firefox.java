@@ -89,7 +89,7 @@ public class Firefox extends Browser implements BrowserInterface {
 
    public void forceClose() {
       try {
-         SodaOSInfo.killProcesses(SodaOSInfo.getProcessIDs("firefox"));
+         OSInfo.killProcesses(OSInfo.getProcessIDs("firefox"));
       } catch (Exception exp) {
          exp.printStackTrace();
       }
