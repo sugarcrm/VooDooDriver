@@ -622,7 +622,7 @@ public class EventLoop implements Runnable {
       } else {
          filename = event.get("file").toString();
          filename = this.replaceString(filename);
-         SodaUtils.takeScreenShot(filename, this.report);
+         Utils.takeScreenShot(filename, this.report);
       }
 
       this.report.Log("Screenshot event finished.");
@@ -2064,7 +2064,7 @@ public class EventLoop implements Runnable {
             use_URL = false;
             String tmp_index = event.get("index").toString();
             tmp_index = this.replaceString(tmp_index);
-            if (!SodaUtils.isInt(tmp_index)) {
+            if (!Utils.isInt(tmp_index)) {
                msg = String.format("Error: index is not an integer: '%s'!", tmp_index);
                this.report.ReportError(msg);
                this.report.Log("Attach event finished.");
@@ -2966,7 +2966,7 @@ public class EventLoop implements Runnable {
          String inx = event.get("index").toString();
          inx = this.replaceString(inx);
 
-         if (!SodaUtils.isInt(inx)) {
+         if (!Utils.isInt(inx)) {
             msg = String.format("Error: index value: '%s' is not an integer!",inx);
             this.report.ReportError(msg);
             return null;
@@ -3283,7 +3283,7 @@ public class EventLoop implements Runnable {
                if (tmp.containsKey("jsfile")) {
                   String jsfile = (String) tmp.get("jsfile");
                   jsfile = FilenameUtils.separatorsToSystem(jsfile);
-                  String user_js = SodaUtils.FileToStr(jsfile);
+                  String user_js = Utils.FileToStr(jsfile);
                   if (user_js != null) {
                      js = js.concat(user_js);
                      result = true;
@@ -3698,7 +3698,7 @@ public class EventLoop implements Runnable {
       value = this.replaceString(value);
 
       try {
-         SodaUtils.isEnabled(element, this.report, Boolean.valueOf(value));
+         Utils.isEnabled(element, this.report, Boolean.valueOf(value));
       } catch (Exception exp) {
          this.report.ReportException(exp);
       }

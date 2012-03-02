@@ -75,7 +75,7 @@ public class SuiteParser {
          for (int x = 0; x <= atts_len; x++) {
             String attr_name = attrs.item(x).getNodeName();
             String attr_value = attrs.item(x).getNodeValue();
-            attr_value = SodaUtils.replaceString(attr_value, this.gvars);
+            attr_value = Utils.replaceString(attr_value, this.gvars);
             System.out.printf("'%s' => '%s'\n", attr_name, attr_value);
             File fd_tmp = null;
 

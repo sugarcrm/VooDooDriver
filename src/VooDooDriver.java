@@ -39,7 +39,7 @@ import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestList;
 import org.sugarcrm.voodoodriver.TestResults;
-import org.sugarcrm.voodoodriver.SodaUtils;
+import org.sugarcrm.voodoodriver.Utils;
 
 
 /**
@@ -58,7 +58,7 @@ public class VooDooDriver {
 
    private static void dumpJavaInfo() {
       HashMap<String, String> javainfo = null;
-      javainfo = SodaUtils.getJavaInfo();
+      javainfo = Utils.getJavaInfo();
 
       String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
       Arrays.sort(jinfoKeys);
@@ -661,7 +661,7 @@ public class VooDooDriver {
                   writeSummary(suiteRptFD,
                                String.format("\t\t\t<stoptime>%s</stoptime>\n",
                                              date_str));
-                  String msg = SodaUtils.GetRunTime(test_start_time, now);
+                  String msg = Utils.GetRunTime(test_start_time, now);
                   writeSummary(suiteRptFD,
                                String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
@@ -741,7 +741,7 @@ public class VooDooDriver {
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<stoptime>%s</stoptime>\n",
                                        date_str));
-            String msg = SodaUtils.GetRunTime(test_start_time, now);
+            String msg = Utils.GetRunTime(test_start_time, now);
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
@@ -813,8 +813,8 @@ public class VooDooDriver {
 
 
          String msg = String.format("\t\t<runtime>%s</runtime>\n",
-                                    SodaUtils.GetRunTime(suiteStartTime,
-                                                         suiteStopTime));
+                                    Utils.GetRunTime(suiteStartTime,
+                                                     suiteStopTime));
          writeSummary(suiteRptFD,
                       String.format("\t\t<starttime>%s</starttime>\n",
                                     startTimeStr));

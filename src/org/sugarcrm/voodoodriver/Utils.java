@@ -44,7 +44,7 @@ import org.openqa.selenium.WebElement;
  * @author trampus
  *
  */
-public class SodaUtils {
+public class Utils {
 
    /**
     * Creates an MD5 sum of your string data.

@@ -430,7 +430,7 @@ public class Reporter {
          bw.write(src);
          bw.close();
          //this.LastSavedPage = new_save_file;
-         //this.CurrentMD5 = SodaUtils.MD5(src);
+         //this.CurrentMD5 = Utils.MD5(src);
          this.Log(String.format("HTML Saved: %s", new_save_file));
       } catch (Exception exp) {
          this.ReportException(exp);
