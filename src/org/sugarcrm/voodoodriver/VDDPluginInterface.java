@@ -20,6 +20,6 @@ import org.openqa.selenium.WebElement;
 
 public interface VDDPluginInterface {
 
-   public int execute(String[] args, SodaBrowser browser, WebElement element);
+   public int execute(String[] args, Browser browser, WebElement element);
 
 }

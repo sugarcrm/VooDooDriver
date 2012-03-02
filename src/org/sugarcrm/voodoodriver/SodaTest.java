@@ -21,7 +21,7 @@ import java.util.Date;
 
 public class SodaTest {
 
-   private SodaBrowser Browser = null;
+   private Browser Browser = null;
    private String testFile = "";
    private SodaEventDriver eventDriver = null;
    private SodaEvents events = null;
@@ -38,7 +38,7 @@ public class SodaTest {
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
 
-   public SodaTest(String testFile, SodaBrowser browser, VDDHash gvars, VDDHash hijacks,
+   public SodaTest(String testFile, Browser browser, VDDHash gvars, VDDHash hijacks,
          VDDBlockList blocklist, VDDHash oldvars, String suitename, String reportDir,
          String saveHtml) {
       this.Browser = browser;

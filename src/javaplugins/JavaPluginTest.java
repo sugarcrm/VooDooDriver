@@ -18,7 +18,7 @@ package javaplugins;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.sugarcrm.voodoodriver.SodaBrowser;
+import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.VDDPluginInterface;
 
 /**
@@ -30,7 +30,7 @@ import org.sugarcrm.voodoodriver.VDDPluginInterface;
 public class JavaPluginTest implements VDDPluginInterface {
 
    @Override
-   public int execute(String[] args, SodaBrowser browser, WebElement element) {
+   public int execute(String[] args, Browser browser, WebElement element) {
       System.out.printf("(*)Plugin: Starting VDD JavaPluginTest...\n");
 
       if (args == null && element == null){

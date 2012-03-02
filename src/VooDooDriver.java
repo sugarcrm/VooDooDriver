@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.sugarcrm.voodoodriver.VDDBlockList;
 import org.sugarcrm.voodoodriver.VDDBlockListParser;
-import org.sugarcrm.voodoodriver.SodaBrowser;
+import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.SodaChrome;
 import org.sugarcrm.voodoodriver.SodaCmdLineOpts;
 import org.sugarcrm.voodoodriver.SodaConfigParser;
@@ -391,7 +391,7 @@ public class VooDooDriver {
       /* XXX End block to be refactored. */
 
       File resultFD = null;
-      SodaBrowser browser = null;
+      Browser browser = null;
       int len = 0;
       SodaTest testobj = null;
 
@@ -500,7 +500,7 @@ public class VooDooDriver {
       String report_file_name = resultdir;
       String hostname = "";
       FileOutputStream suiteRptFD = null;
-      SodaBrowser browser = null;
+      Browser browser = null;
       Date now = null;
       Date suiteStartTime = null;
       Date suiteStopTime = null;

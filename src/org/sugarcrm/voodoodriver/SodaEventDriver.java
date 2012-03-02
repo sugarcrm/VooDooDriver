@@ -48,7 +48,7 @@ import org.openqa.selenium.support.ui.Select;
 public class SodaEventDriver implements Runnable {
 
    private SodaEvents testEvents = null;
-   private SodaBrowser Browser = null;
+   private Browser Browser = null;
    private VDDHash sodaVars = null;
    private SodaReporter report = null;
    private VDDHash hijacks = null;
@@ -67,7 +67,7 @@ public class SodaEventDriver implements Runnable {
    /**
     * The class Constructor.
     *
-    * @param browser  {@link SodaBrowser}
+    * @param browser  {@link Browser}
     * @param events   {@link SodaEvents}
     * @param reporter {@link SodaReporter}
     * @param gvars    {@link VDDHash}
@@ -75,7 +75,7 @@ public class SodaEventDriver implements Runnable {
     * @param oldvars  {@link VDDHash}
     * @param plugins  {@link SodaEvents}
     */
-   public SodaEventDriver(SodaBrowser browser, SodaEvents events,
+   public SodaEventDriver(Browser browser, SodaEvents events,
          SodaReporter reporter, VDDHash gvars, VDDHash hijacks,
          VDDHash oldvars, SodaEvents plugins) {
       testEvents = events;

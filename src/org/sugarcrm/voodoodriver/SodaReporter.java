@@ -38,7 +38,7 @@ public class SodaReporter {
    private int WatchDog = 0;
    private String LineSeparator = null;
    private int SavePageNum = 0;
-   private SodaBrowser browser = null;
+   private Browser browser = null;
    private boolean isRestart = false;
    private String testName = null;
    private boolean saveOnWarning = false;
@@ -87,7 +87,7 @@ public class SodaReporter {
       this.isRestart = restart;
    }
 
-   public void setSaveHTML(String setting, SodaBrowser browser) {
+   public void setSaveHTML(String setting, Browser browser) {
       this.browser = browser;
       this.saveHTML = true;
       String[] opts = setting.split(",");

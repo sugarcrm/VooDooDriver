@@ -25,7 +25,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
  * @author trampus
  *
  */
-public class SodaChrome extends SodaBrowser {
+public class SodaChrome extends Browser {
 
    public SodaChrome() {
 

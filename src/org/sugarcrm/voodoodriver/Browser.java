@@ -31,7 +31,7 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
  * @author trampus
  *
  */
-public abstract class SodaBrowser implements BrowserInterface {
+public abstract class Browser implements BrowserInterface {
 
    private WebDriver Driver = null;
    private boolean closed = true;
@@ -44,7 +44,7 @@ public abstract class SodaBrowser implements BrowserInterface {
     * Constructor
     *
     */
-   public SodaBrowser() {
+   public Browser() {
 
    }
 

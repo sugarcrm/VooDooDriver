@@ -19,7 +19,7 @@ package org.sugarcrm.voodoodriver;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
-public class SodaIE extends SodaBrowser implements BrowserInterface {
+public class SodaIE extends Browser implements BrowserInterface {
 
    public SodaIE() {
 
