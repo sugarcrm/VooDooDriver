@@ -18,7 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import org.openqa.selenium.WebElement;
 
-public interface VDDPluginInterface {
+public interface PluginInterface {
 
    public int execute(String[] args, Browser browser, WebElement element);
 

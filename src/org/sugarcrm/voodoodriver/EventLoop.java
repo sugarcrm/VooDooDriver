@@ -191,7 +191,7 @@ public class EventLoop implements Runnable {
          VDDClassLoader loader = new VDDClassLoader(ClassLoader.getSystemClassLoader());
 
          try {
-            Class<VDDPluginInterface> tmp_class = loader.loadClass(classname,
+            Class<PluginInterface> tmp_class = loader.loadClass(classname,
                   classfile);
             this.loadedPlugins.put(classname, tmp_class);
          } catch (Exception exp) {
@@ -800,9 +800,9 @@ public class EventLoop implements Runnable {
       try {
          VDDClassLoader loader = new VDDClassLoader(
                ClassLoader.getSystemClassLoader());
-         Class<VDDPluginInterface> tmp_class = loader.loadClass(classname,
+         Class<PluginInterface> tmp_class = loader.loadClass(classname,
                classfile);
-         VDDPluginInterface inner = tmp_class.newInstance();
+         PluginInterface inner = tmp_class.newInstance();
          this.report.Log("Executing plugin now.");
          err = inner.execute(args, this.Browser, parent);
          if (err != 0) {
@@ -861,7 +861,7 @@ public class EventLoop implements Runnable {
             System.out.printf("Loading class into memory: '%s'!\n", classname);
             VDDClassLoader loader = new VDDClassLoader(
                   ClassLoader.getSystemClassLoader());
-            Class<VDDPluginInterface> tmp_class = loader.loadClass(classname,
+            Class<PluginInterface> tmp_class = loader.loadClass(classname,
                   filename);
             this.loadedPlugins.put(classname, tmp_class);
          } catch (ClassNotFoundException exp) {
@@ -3321,12 +3321,12 @@ public class EventLoop implements Runnable {
          VDDHash data = this.plugIns.get(index);
          String classname = data.get("classname").toString();
          String msg = "";
-         Class<VDDPluginInterface> tmp_class = this.loadedPlugins.get(classname);
+         Class<PluginInterface> tmp_class = this.loadedPlugins.get(classname);
          msg = String.format("");
 
          try {
             int err = 0;
-            VDDPluginInterface inst = tmp_class.newInstance();
+            PluginInterface inst = tmp_class.newInstance();
 
             String tmp_hwnd = this.getCurrentHWND();
             if (this.windowExists(tmp_hwnd)) {
