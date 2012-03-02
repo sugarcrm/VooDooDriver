@@ -36,7 +36,7 @@ import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.IE;
 import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
-import org.sugarcrm.voodoodriver.SodaTest;
+import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.SodaTestList;
 import org.sugarcrm.voodoodriver.SodaTestResults;
 import org.sugarcrm.voodoodriver.SodaUtils;
@@ -392,7 +392,7 @@ public class VooDooDriver {
       File resultFD = null;
       Browser browser = null;
       int len = 0;
-      SodaTest testobj = null;
+      Test testobj = null;
 
       if (tests.size() == 0) {
          return;
@@ -438,8 +438,8 @@ public class VooDooDriver {
          test_file = FilenameUtils.separatorsToSystem(test_file);
          System.out.printf("Starting Test: '%s'.\n", test_file);
 
-         testobj = new SodaTest(test_file, browser, gvars, hijacks, null,
-                                null, null, resultdir, savehtml);
+         testobj = new Test(test_file, browser, gvars, hijacks, null,
+                            null, null, resultdir, savehtml);
          if (assertpage != null) {
             testobj.setAssertPage(assertpage);
          }
@@ -592,7 +592,7 @@ public class VooDooDriver {
          suite_base_noext = m.replaceAll("");
 
          suite_fd = null;
-         SodaTest testobj = null;
+         Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
          SuiteParser suiteP = new SuiteParser(suite_name, gvars);
@@ -636,7 +636,7 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new SodaTest(restartTest, browser, gvars, hijacks,
+                  testobj = new Test(restartTest, browser, gvars, hijacks,
                                          blockList, vars, suite_base_noext,
                                          resultdir, savehtml);
                   testobj.setIsRestartTest(true);
@@ -718,9 +718,9 @@ public class VooDooDriver {
                System.out.printf("(*)New browser created.\n");
             }
 
-            testobj = new SodaTest(current_test, browser, gvars, hijacks,
-                                   blockList, vars, suite_base_noext,
-                                   resultdir, savehtml);
+            testobj = new Test(current_test, browser, gvars, hijacks,
+                               blockList, vars, suite_base_noext,
+                               resultdir, savehtml);
             if (assertpage != null) {
                testobj.setAssertPage(assertpage);
             }
