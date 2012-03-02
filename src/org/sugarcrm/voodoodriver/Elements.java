@@ -16,7 +16,7 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
-public enum SodaElements {
+public enum Elements {
    WHITELIST,
    INPUT,
    BUTTON,
@@ -86,9 +86,9 @@ public enum SodaElements {
 
    static public boolean isMember(String aName) {
       boolean result = false;
-      SodaElements[] values = SodaElements.values();
+      Elements[] values = Elements.values();
 
-      for (SodaElements amethod : values) {
+      for (Elements amethod : values) {
          if (amethod.name().equals(aName)) {
             result = true;
             break;

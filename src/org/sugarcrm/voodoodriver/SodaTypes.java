@@ -40,9 +40,9 @@ public class SodaTypes {
          db = dbf.newDocumentBuilder();
 
          if (classJar.startsWith("jar:")) {
-            doc = db.parse(getClass().getResourceAsStream("SodaElements.xml"));
+            doc = db.parse(getClass().getResourceAsStream("Elements.xml"));
          } else {
-            testFD = new File(getClass().getResource("SodaElements.xml").getFile());
+            testFD = new File(getClass().getResource("Elements.xml").getFile());
             doc = db.parse(testFD);
          }
 
@@ -73,7 +73,7 @@ public class SodaTypes {
          }
 
          data.put(name, 0);
-         if (SodaElements.isMember(name.toUpperCase())) {
+         if (Elements.isMember(name.toUpperCase())) {
             if (child.hasAttributes()) {
                NamedNodeMap attrs = child.getAttributes();
                String validAttrs[] = {"html_tag", "html_type"};
@@ -84,7 +84,7 @@ public class SodaTypes {
                   }
                }
             }
-            data.put("type", SodaElements.valueOf(name.toUpperCase()));
+            data.put("type", Elements.valueOf(name.toUpperCase()));
             if (child.hasChildNodes()) {
                NodeList kids = child.getChildNodes();
                for (int x = 0; x <= kids.getLength() -1; x++) {

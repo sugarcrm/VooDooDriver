@@ -331,7 +331,7 @@ public class SodaEventDriver implements Runnable {
    private boolean handleSingleEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       WebElement element = null;
-      SodaElements type = (SodaElements)event.get("type");
+      Elements type = (Elements)event.get("type");
 
       if (isStopped()) {
          return result;
@@ -696,7 +696,7 @@ public class SodaEventDriver implements Runnable {
 
          handleVars(alert_text, event);
 
-         this.firePlugin(null, SodaElements.ALERT,
+         this.firePlugin(null, Elements.ALERT,
                SodaPluginEventType.AFTERDIALOGCLOSED);
 
          result = true;
@@ -909,10 +909,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("UL click started.");
-            this.firePlugin(element, SodaElements.UL,
+            this.firePlugin(element, Elements.UL,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.UL,
+            this.firePlugin(element, Elements.UL,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("UL click finished.");
          }
@@ -961,10 +961,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Area click started.");
-            this.firePlugin(element, SodaElements.AREA,
+            this.firePlugin(element, Elements.AREA,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.AREA,
+            this.firePlugin(element, Elements.AREA,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Area click finished.");
          }
@@ -1008,10 +1008,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Map click started.");
-            this.firePlugin(element, SodaElements.MAP,
+            this.firePlugin(element, Elements.MAP,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.MAP,
+            this.firePlugin(element, Elements.MAP,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Map click finished.");
          }
@@ -1060,10 +1060,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("OL click started.");
-            this.firePlugin(element, SodaElements.OL,
+            this.firePlugin(element, Elements.OL,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.OL,
+            this.firePlugin(element, Elements.OL,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("OL click finished.");
          }
@@ -1227,10 +1227,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Image click started.");
-            this.firePlugin(element, SodaElements.IMAGE,
+            this.firePlugin(element, Elements.IMAGE,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.IMAGE,
+            this.firePlugin(element, Elements.IMAGE,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Image click finished.");
          }
@@ -1263,7 +1263,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.FILEFIELD,
+         this.firePlugin(element, Elements.FILEFIELD,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -1330,10 +1330,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Click element.");
-            this.firePlugin(element, SodaElements.LI,
+            this.firePlugin(element, Elements.LI,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.LI,
+            this.firePlugin(element, Elements.LI,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Click finished.");
          }
@@ -1379,10 +1379,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Click element.");
-            this.firePlugin(element, SodaElements.TR,
+            this.firePlugin(element, Elements.TR,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.TR,
+            this.firePlugin(element, Elements.TR,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Click finished.");
          }
@@ -1429,10 +1429,10 @@ public class SodaEventDriver implements Runnable {
 
          if (click) {
             this.report.Log("Click element.");
-            this.firePlugin(element, SodaElements.TD,
+            this.firePlugin(element, Elements.TD,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.TD,
+            this.firePlugin(element, Elements.TD,
                   SodaPluginEventType.AFTERCLICK);
             this.report.Log("Click finished.");
          }
@@ -1511,7 +1511,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.SPAN,
+         this.firePlugin(element, Elements.SPAN,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -1524,10 +1524,10 @@ public class SodaEventDriver implements Runnable {
          handleVars(value, event);
 
          if (click) {
-            this.firePlugin(element, SodaElements.SPAN,
+            this.firePlugin(element, Elements.SPAN,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.SPAN,
+            this.firePlugin(element, Elements.SPAN,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -1582,7 +1582,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.INPUT, SodaPluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.INPUT, SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1634,7 +1634,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.RADIO,
+         this.firePlugin(element, Elements.RADIO,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -1652,12 +1652,12 @@ public class SodaEventDriver implements Runnable {
          handleVars(value, event);
 
          if (click) {
-            this.firePlugin(element, SodaElements.RADIO,
+            this.firePlugin(element, Elements.RADIO,
                   SodaPluginEventType.BEFORECLICK);
             this.report.Log("Clicking Element.");
             element.click();
             this.report.Log("Click finished.");
-            this.firePlugin(element, SodaElements.RADIO,
+            this.firePlugin(element, Elements.RADIO,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -1726,7 +1726,7 @@ public class SodaEventDriver implements Runnable {
          element = this.findElement(event, parent, required);
          if (element != null) {
             Select sel = new Select(element);
-            this.firePlugin(element, SodaElements.SELECT,
+            this.firePlugin(element, Elements.SELECT,
                   SodaPluginEventType.AFTERFOUND);
 
             this.checkDisabled(event, element);
@@ -1767,7 +1767,7 @@ public class SodaEventDriver implements Runnable {
                   sel = new Select(element);
                }
 
-               this.firePlugin(element, SodaElements.SELECT,
+               this.firePlugin(element, Elements.SELECT,
                      SodaPluginEventType.AFTERSET);
             }
 
@@ -1835,10 +1835,10 @@ public class SodaEventDriver implements Runnable {
             }
 
             if (click) {
-               this.firePlugin(element, SodaElements.FORM,
+               this.firePlugin(element, Elements.FORM,
                                SodaPluginEventType.BEFORECLICK);
                element.click();
-               this.firePlugin(element, SodaElements.FORM,
+               this.firePlugin(element, Elements.FORM,
                                SodaPluginEventType.AFTERCLICK);
             }
 
@@ -1940,7 +1940,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.FORM,
+         this.firePlugin(element, Elements.FORM,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -1950,10 +1950,10 @@ public class SodaEventDriver implements Runnable {
          }
 
          if (click) {
-            this.firePlugin(element, SodaElements.FORM,
+            this.firePlugin(element, Elements.FORM,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.FORM,
+            this.firePlugin(element, Elements.FORM,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -1988,7 +1988,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.TABLE,
+         this.firePlugin(element, Elements.TABLE,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -1998,10 +1998,10 @@ public class SodaEventDriver implements Runnable {
          }
 
          if (click) {
-            this.firePlugin(element, SodaElements.TABLE,
+            this.firePlugin(element, Elements.TABLE,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.TABLE,
+            this.firePlugin(element, Elements.TABLE,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -2254,7 +2254,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.DIV,
+         this.firePlugin(element, Elements.DIV,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -2264,10 +2264,10 @@ public class SodaEventDriver implements Runnable {
          }
 
          if (click) {
-            this.firePlugin(element, SodaElements.DIV,
+            this.firePlugin(element, Elements.DIV,
                   SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.DIV,
+            this.firePlugin(element, Elements.DIV,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -2406,16 +2406,16 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.CHECKBOX, SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
             if (click) {
-               this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.BEFORECLICK);
+               this.firePlugin(element, Elements.CHECKBOX, SodaPluginEventType.BEFORECLICK);
                element.click();
-               this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
             }
          }
 
@@ -2429,7 +2429,7 @@ public class SodaEventDriver implements Runnable {
             } else {
                msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
                element.click();
-               this.firePlugin(element, SodaElements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, SodaPluginEventType.AFTERCLICK);
             }
             this.report.Log(msg);
          }
@@ -2516,7 +2516,7 @@ public class SodaEventDriver implements Runnable {
          value = element.getText();
          handleVars(value, event);
 
-         this.firePlugin(element, SodaElements.LINK,
+         this.firePlugin(element, Elements.LINK,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -2536,10 +2536,10 @@ public class SodaEventDriver implements Runnable {
             value = this.replaceString(value);
             this.report.Log(String.format("Clicking Link: '%s' => '%s'", how,
                                           value));
-            this.firePlugin(element, SodaElements.LINK,
+            this.firePlugin(element, Elements.LINK,
                             SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.LINK,
+            this.firePlugin(element, Elements.LINK,
                   SodaPluginEventType.AFTERCLICK);
          } else {
             String msg = String.format(
@@ -2808,7 +2808,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.THEAD,
+         this.firePlugin(element, Elements.THEAD,
                          SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
@@ -2817,10 +2817,10 @@ public class SodaEventDriver implements Runnable {
 
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
-            this.firePlugin(element, SodaElements.THEAD,
+            this.firePlugin(element, Elements.THEAD,
                             SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.THEAD,
+            this.firePlugin(element, Elements.THEAD,
                             SodaPluginEventType.AFTERCLICK);
          }
 
@@ -2886,7 +2886,7 @@ public class SodaEventDriver implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, SodaElements.TBODY,
+         this.firePlugin(element, Elements.TBODY,
                          SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
@@ -2895,10 +2895,10 @@ public class SodaEventDriver implements Runnable {
 
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
-            this.firePlugin(element, SodaElements.TBODY,
+            this.firePlugin(element, Elements.TBODY,
                             SodaPluginEventType.BEFORECLICK);
             element.click();
-            this.firePlugin(element, SodaElements.TBODY,
+            this.firePlugin(element, Elements.TBODY,
                             SodaPluginEventType.AFTERCLICK);
          }
 
@@ -3260,7 +3260,7 @@ public class SodaEventDriver implements Runnable {
       return result;
    }
 
-   private boolean firePlugin(WebElement element, SodaElements type, SodaPluginEventType eventType) {
+   private boolean firePlugin(WebElement element, Elements type, SodaPluginEventType eventType) {
       boolean result = false;
       int len = 0;
       String js = "var CONTROL = arguments[0];\n\n";
@@ -3378,7 +3378,7 @@ public class SodaEventDriver implements Runnable {
          String value = element.getAttribute("value");
          handleVars(value, event);
 
-         this.firePlugin(element, SodaElements.BUTTON,
+         this.firePlugin(element, Elements.BUTTON,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -3395,12 +3395,12 @@ public class SodaEventDriver implements Runnable {
          }
 
          if (click) {
-            this.firePlugin(element, SodaElements.BUTTON,
+            this.firePlugin(element, Elements.BUTTON,
                   SodaPluginEventType.BEFORECLICK);
             this.report.Log("Clicking button.");
             element.click();
             this.report.Log("Finished clicking button.");
-            this.firePlugin(element, SodaElements.BUTTON,
+            this.firePlugin(element, Elements.BUTTON,
                   SodaPluginEventType.AFTERCLICK);
          }
 
@@ -3446,7 +3446,7 @@ public class SodaEventDriver implements Runnable {
          String value = element.getAttribute("value");
          handleVars(value, event);
 
-         this.firePlugin(element, SodaElements.TEXTAREA,
+         this.firePlugin(element, Elements.TEXTAREA,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -3487,12 +3487,12 @@ public class SodaEventDriver implements Runnable {
 
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
-            this.firePlugin(element, SodaElements.TEXTAREA,
+            this.firePlugin(element, Elements.TEXTAREA,
                             SodaPluginEventType.BEFORECLICK);
             this.report.Log("Clicking textarea.");
             element.click();
             this.report.Log("Finished clicking textarea.");
-            this.firePlugin(element, SodaElements.TEXTAREA,
+            this.firePlugin(element, Elements.TEXTAREA,
                             SodaPluginEventType.AFTERCLICK);
          }
 
@@ -3526,7 +3526,7 @@ public class SodaEventDriver implements Runnable {
             return null;
          }
 
-         this.firePlugin(element, SodaElements.TEXTFIELD,
+         this.firePlugin(element, Elements.TEXTFIELD,
                SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
@@ -3612,7 +3612,7 @@ public class SodaEventDriver implements Runnable {
             return null;
          }
 
-         this.firePlugin(element, SodaElements.PASSWORD, SodaPluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.PASSWORD, SodaPluginEventType.AFTERFOUND);
 
          this.checkDisabled(event, element);
 

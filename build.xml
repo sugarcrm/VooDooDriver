@@ -10,7 +10,7 @@
    <property name="dist"  location="VooDooDriver"/>
    <property name="lib" location="./lib"/>
    <property name="product-zip" location="${bin}/VooDooDriver.zip"/>
-   <property name="sodaelements" location="${src}/org/sugarcrm/voodoodriver/SodaElements.xml"/>
+   <property name="sodaelements" location="${src}/org/sugarcrm/voodoodriver/Elements.xml"/>
    <property name="suitereport-header" location="${src}/org/sugarcrm/vddlogger/suitereporter-header.txt" />
    <property name="issuesreport-header" location="${src}/org/sugarcrm/vddlogger/issues-header.txt" />
    <property name="summaryreport-header" location="${src}/org/sugarcrm/vddlogger/summaryreporter-header.txt" />
