@@ -24,13 +24,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * The <code>SodaXML</code> class reads a soda test script and converts
+ * The <code>XML</code> class reads a soda test script and converts
  * it into a {@link Events} class.
  *
  * @author trampus
  */
 
-public class SodaXML {
+public class XML {
 
    private Document doc = null;
    private ElementsList types = null;
@@ -39,13 +39,13 @@ public class SodaXML {
    private Reporter reporter = null;
 
    /**
-    * Initialize a SodaXML object using the provided soda test script.
+    * Initialize a XML object using the provided soda test script.
     *
     * @param sodaTest full path to a soda test file
     * @param reporter {@link Reporter} object for logging messages and errors
     */
 
-   public SodaXML(String sodaTest, Reporter reporter) {
+   public XML(String sodaTest, Reporter reporter) {
       File testFD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;

@@ -2313,7 +2313,7 @@ public class EventLoop implements Runnable {
 
    private boolean scriptEvent(VDDHash event) {
       boolean result = false;
-      SodaXML xml = null;
+      XML xml = null;
       String testfile = "";
       File fd = null;
       Events newEvents = null;
@@ -2330,7 +2330,7 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         xml = new SodaXML(testfile, null);
+         xml = new XML(testfile, null);
          newEvents = xml.getEvents();
          this.processEvents(newEvents, null);
 

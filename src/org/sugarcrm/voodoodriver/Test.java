@@ -96,11 +96,11 @@ public class Test {
 
    private boolean loadTestFile() {
       boolean result = false;
-      SodaXML xml = null;
+      XML xml = null;
 
       try {
          System.out.printf("Loading Soda Test: '%s'.\n", testFile);
-         xml = new SodaXML(testFile, this.reporter);
+         xml = new XML(testFile, this.reporter);
          this.events = xml.getEvents();
          System.out.printf("Finished.\n");
       } catch (Exception exp) {
