@@ -16,7 +16,7 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
-public enum SodaSupportedOS {
+public enum SupportedOS {
    WINDOWS,
    OSX,
    LINUX;

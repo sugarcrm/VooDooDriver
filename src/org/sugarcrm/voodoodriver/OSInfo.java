@@ -27,17 +27,17 @@ public class OSInfo {
    public OSInfo() {
    }
 
-   public static SodaSupportedOS getOS() {
-      SodaSupportedOS type = null;
+   public static SupportedOS getOS() {
+      SupportedOS type = null;
       String value = "";
 
       value = System.getProperty("os.name").toLowerCase();
       if (value.contains("win")) {
-         type = SodaSupportedOS.WINDOWS;
+         type = SupportedOS.WINDOWS;
       } else if (value.contains("linux")) {
-         type = SodaSupportedOS.LINUX;
+         type = SupportedOS.LINUX;
       } else if (value.contains("mac")) {
-         type = SodaSupportedOS.OSX;
+         type = SupportedOS.OSX;
       } else {
          type = null;
       }
@@ -112,7 +112,7 @@ public class OSInfo {
 
    public static ArrayList<Integer> getProcessIDs(String process) {
       ArrayList<Integer> pids = null;
-      SodaSupportedOS os = getOS();
+      SupportedOS os = getOS();
 
       switch(os) {
       case OSX:
@@ -190,7 +190,7 @@ public class OSInfo {
    public static boolean killProcesses(ArrayList<Integer> list) {
       boolean result = false;
       boolean err = false;
-      SodaSupportedOS os = getOS();
+      SupportedOS os = getOS();
       int len = list.size() -1;
 
       for (int i = 0; i <= len; i++) {
