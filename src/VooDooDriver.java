@@ -27,7 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.sugarcrm.voodoodriver.VDDBlockList;
 import org.sugarcrm.voodoodriver.VDDBlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
-import org.sugarcrm.voodoodriver.SodaChrome;
+import org.sugarcrm.voodoodriver.Chrome;
 import org.sugarcrm.voodoodriver.SodaCmdLineOpts;
 import org.sugarcrm.voodoodriver.SodaConfigParser;
 import org.sugarcrm.voodoodriver.SodaEvents;
@@ -420,7 +420,7 @@ public class VooDooDriver {
          browser = new SodaFirefox();
          break;
       case CHROME:
-         browser = new SodaChrome();
+         browser = new Chrome();
          break;
       case IE:
          browser = new SodaIE();
@@ -564,7 +564,7 @@ public class VooDooDriver {
          browser = new SodaFirefox();
          break;
       case CHROME:
-         browser = new SodaChrome();
+         browser = new Chrome();
          break;
       case IE:
          browser = new SodaIE();
