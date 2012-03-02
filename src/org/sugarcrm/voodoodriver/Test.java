@@ -29,7 +29,7 @@ public class Test {
    private VDDHash GVars = null;
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
-   private VDDBlockList blocked = null;
+   private BlockList blocked = null;
    private boolean WatchDog = false;
    private Events PlugIns = null;
    private String SaveHTML = "";
@@ -38,9 +38,9 @@ public class Test {
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
 
-   public Test(String testFile, Browser browser, VDDHash gvars, VDDHash hijacks,
-         VDDBlockList blocklist, VDDHash oldvars, String suitename, String reportDir,
-         String saveHtml) {
+   public Test(String testFile, Browser browser, VDDHash gvars,
+               VDDHash hijacks, BlockList blocklist, VDDHash oldvars,
+               String suitename, String reportDir, String saveHtml) {
       this.Browser = browser;
       this.testFile = testFile;
       this.HiJacks = hijacks;

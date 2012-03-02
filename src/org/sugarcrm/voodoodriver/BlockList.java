@@ -24,11 +24,11 @@ import java.util.ArrayList;
  * @author trampus
  *
  */
-public class VDDBlockList extends ArrayList<VDDHash> {
+public class BlockList extends ArrayList<VDDHash> {
 
    private static final long serialVersionUID = 1L;
 
-   public VDDBlockList() {
+   public BlockList() {
       super();
    }
 }

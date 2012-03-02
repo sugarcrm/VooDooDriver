@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.sugarcrm.voodoodriver.VDDBlockList;
+import org.sugarcrm.voodoodriver.BlockList;
 import org.sugarcrm.voodoodriver.VDDBlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.Chrome;
@@ -286,7 +286,7 @@ public class VooDooDriver {
 
    public static void main(String[] args) {
       Events plugins = null;
-      VDDBlockList blockList = null;
+      BlockList blockList = null;
 
       Config opts = new Config();
       opts.parse(args);
@@ -350,7 +350,7 @@ public class VooDooDriver {
          VDDBlockListParser sbp = new VDDBlockListParser(f);
          blockList = sbp.parse();
       } else {
-         blockList = new VDDBlockList();
+         blockList = new BlockList();
       }
       config.put("blocklist", blockList);
 
@@ -482,7 +482,7 @@ public class VooDooDriver {
       SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
-      VDDBlockList blockList = (VDDBlockList)config.get("blocklist");
+      BlockList blockList = (BlockList)config.get("blocklist");
       Events plugins = (Events)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
       String downloaddir = (String)config.get("downloaddir");;

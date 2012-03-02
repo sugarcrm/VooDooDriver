@@ -45,12 +45,12 @@ public class VDDBlockListParser {
    /**
     * Parses the block list file.
     *
-    * @return   Returns a VDDBlockList.
+    * @return   Returns a BlockList.
     *
-    * @see VDDBlockList
+    * @see BlockList
     */
-   public VDDBlockList parse() {
-      VDDBlockList list = null;
+   public BlockList parse() {
+      BlockList list = null;
       File FD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
@@ -62,7 +62,7 @@ public class VDDBlockListParser {
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
          doc = db.parse(FD);
-         list = new VDDBlockList();
+         list = new BlockList();
       } catch (Exception exp) {
          System.err.printf("(!)Error: %s\n", exp.getMessage());
          list = null;
