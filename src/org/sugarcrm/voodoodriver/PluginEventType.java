@@ -16,7 +16,7 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
-public enum SodaPluginEventType {
+public enum PluginEventType {
    BEFORECLICK,
    AFTERCLICK,
    AFTERSET,
