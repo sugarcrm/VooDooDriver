@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 
 public class SuiteParser {
 
-   private SodaTestList tests = null;
+   private TestList tests = null;
    private VDDHash gvars = null;
 
    public SuiteParser(String suitefile, VDDHash gvars) {
@@ -42,7 +42,7 @@ public class SuiteParser {
       }
 
       try {
-         this.tests = new SodaTestList();
+         this.tests = new TestList();
          suiteFD = new File(suitefile);
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
@@ -53,7 +53,7 @@ public class SuiteParser {
       }
    }
 
-   public SodaTestList getTests() {
+   public TestList getTests() {
       return this.tests;
    }
 
