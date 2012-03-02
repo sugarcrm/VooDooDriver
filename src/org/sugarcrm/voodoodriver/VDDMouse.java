@@ -25,10 +25,10 @@ import org.openqa.selenium.internal.Locatable;
 
 public class VDDMouse {
 
-   private SodaReporter reporter = null;
+   private Reporter reporter = null;
    private Robot robo = null;
 
-   public VDDMouse(SodaReporter reporter) {
+   public VDDMouse(Reporter reporter) {
       this.reporter = reporter;
 
       try {

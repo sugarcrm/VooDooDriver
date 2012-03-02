@@ -25,7 +25,7 @@ public class SodaTest {
    private String testFile = "";
    private EventLoop eventDriver = null;
    private Events events = null;
-   private SodaReporter reporter = null;
+   private Reporter reporter = null;
    private VDDHash GVars = null;
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
@@ -59,7 +59,7 @@ public class SodaTest {
          resultsdir = resultsdir + "/" + suitename;
       }
 
-      this.reporter = new SodaReporter(report_name, resultsdir);
+      this.reporter = new Reporter(report_name, resultsdir);
 
       if (saveHtml != null && saveHtml.length() > 0) {
          this.reporter.setSaveHTML(this.SaveHTML, browser);
@@ -90,7 +90,7 @@ public class SodaTest {
       return this.eventDriver;
    }
 
-   public SodaReporter getReporter() {
+   public Reporter getReporter() {
       return this.reporter;
    }
 

@@ -71,12 +71,12 @@ public interface BrowserInterface {
 
    public void setDownloadDirectory(String dir);
 
-   public void setAssertPageFile(String filename, SodaReporter reporter);
+   public void setAssertPageFile(String filename, Reporter reporter);
 
    public String getAssertPageFile();
 
    public Mouse getMouse();
 
-   public SodaReporter getReporter();
+   public Reporter getReporter();
 
 }

@@ -31,10 +31,10 @@ public class PageAsserter {
    private ArrayList<String> ignores = null;
    private ArrayList<String> checkes = null;
    private File fd = null;
-   private SodaReporter reporter = null;
+   private Reporter reporter = null;
    private VDDHash whiteList = null;
 
-   public PageAsserter(String assertFile, SodaReporter reporter, VDDHash whitelist) {
+   public PageAsserter(String assertFile, Reporter reporter, VDDHash whitelist) {
       this.reporter = reporter;
       this.ignores = new ArrayList<String>();
       this.checkes = new ArrayList<String>();

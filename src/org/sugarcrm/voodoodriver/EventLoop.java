@@ -50,7 +50,7 @@ public class EventLoop implements Runnable {
    private Events testEvents = null;
    private Browser Browser = null;
    private VDDHash sodaVars = null;
-   private SodaReporter report = null;
+   private Reporter report = null;
    private VDDHash hijacks = null;
    private Date threadTime = null;
    private volatile Thread runner;
@@ -69,14 +69,14 @@ public class EventLoop implements Runnable {
     *
     * @param browser  {@link Browser}
     * @param events   {@link Events}
-    * @param reporter {@link SodaReporter}
+    * @param reporter {@link Reporter}
     * @param gvars    {@link VDDHash}
     * @param hijacks  {@link VDDHash}
     * @param oldvars  {@link VDDHash}
     * @param plugins  {@link Events}
     */
    public EventLoop(Browser browser, Events events,
-         SodaReporter reporter, VDDHash gvars, VDDHash hijacks,
+         Reporter reporter, VDDHash gvars, VDDHash hijacks,
          VDDHash oldvars, Events plugins) {
       testEvents = events;
       this.Browser = browser;

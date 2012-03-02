@@ -140,7 +140,7 @@ public class SodaUtils {
       return result;
    }
 
-   public static boolean takeScreenShot(String outputFile, SodaReporter reporter) {
+   public static boolean takeScreenShot(String outputFile, Reporter reporter) {
       boolean result = false;
       Robot r = null;
       String msg = "";
@@ -236,7 +236,7 @@ public class SodaUtils {
       return result;
    }
 
-   public static void isEnabled(WebElement element, SodaReporter reporter, boolean state) {
+   public static void isEnabled(WebElement element, Reporter reporter, boolean state) {
       boolean eleState = false;
       String msg = "";
 

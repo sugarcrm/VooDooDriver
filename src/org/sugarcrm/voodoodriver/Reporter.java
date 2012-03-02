@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 
-public class SodaReporter {
+public class Reporter {
 
    private String resultDir = "";
    private String reportLog = null;
@@ -48,7 +48,7 @@ public class SodaReporter {
    private boolean saveOnWatchDog = false;
    private boolean saveHTML = false;
 
-   public SodaReporter(String reportName, String resultDir) {
+   public Reporter(String reportName, String resultDir) {
       Date now = new Date();
       String frac = String.format("%1$tN", now);
       String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);

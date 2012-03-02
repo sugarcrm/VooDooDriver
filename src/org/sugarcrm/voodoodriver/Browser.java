@@ -36,7 +36,7 @@ public abstract class Browser implements BrowserInterface {
    private WebDriver Driver = null;
    private boolean closed = true;
    private String profile = null;
-   private SodaReporter reporter = null;
+   private Reporter reporter = null;
    private String assertPageFile = null;
    private PageAsserter asserter = null;
 
@@ -58,15 +58,15 @@ public abstract class Browser implements BrowserInterface {
    }
 
    /**
-    * Set the internal {@link SodaReporter} object.
+    * Set the internal {@link Reporter} object.
     *
-    * @param rep An existing {@link SodaReporter} object.
+    * @param rep An existing {@link Reporter} object.
     */
-   public void setReporter(SodaReporter rep) {
+   public void setReporter(Reporter rep) {
       this.reporter = rep;
    }
 
-   public SodaReporter getReporter() {
+   public Reporter getReporter() {
       return this.reporter;
    }
 
@@ -466,7 +466,7 @@ public abstract class Browser implements BrowserInterface {
     *
     * @param filename
     */
-   public void setAssertPageFile(String filename, SodaReporter reporter) {
+   public void setAssertPageFile(String filename, Reporter reporter) {
       this.assertPageFile = filename;
       this.asserter = new PageAsserter(filename, reporter, null);
    }

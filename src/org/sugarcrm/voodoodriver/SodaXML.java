@@ -36,16 +36,16 @@ public class SodaXML {
    private ElementsList types = null;
    private SodaTypes sodaTypes = null;
    private Events events = null;
-   private SodaReporter reporter = null;
+   private Reporter reporter = null;
 
    /**
     * Initialize a SodaXML object using the provided soda test script.
     *
     * @param sodaTest full path to a soda test file
-    * @param reporter {@link SodaReporter} object for logging messages and errors
+    * @param reporter {@link Reporter} object for logging messages and errors
     */
 
-   public SodaXML(String sodaTest, SodaReporter reporter) {
+   public SodaXML(String sodaTest, Reporter reporter) {
       File testFD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;

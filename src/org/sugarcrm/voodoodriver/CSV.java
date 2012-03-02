@@ -24,12 +24,12 @@ import au.com.bytecode.opencsv.CSVParser;
 
 public class CSV {
 
-   private SodaReporter report = null;
+   private Reporter report = null;
    private ArrayList<String> keys = null;
    private CSVData data = null;
    private CSVParser parser = null;
 
-   public CSV(String csvfile, SodaReporter reporter) {
+   public CSV(String csvfile, Reporter reporter) {
       FileInputStream fs = null;
       BufferedReader br = null;
 
