@@ -34,7 +34,7 @@ public class SodaXML {
 
    private Document doc = null;
    private ElementsList types = null;
-   private SodaTypes sodaTypes = null;
+   private Types sodaTypes = null;
    private Events events = null;
    private Reporter reporter = null;
 
@@ -57,7 +57,7 @@ public class SodaXML {
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
          doc = db.parse(testFD);
-         sodaTypes = new SodaTypes();
+         sodaTypes = new Types();
          types = sodaTypes.getTypes();
          events = this.parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {

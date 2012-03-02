@@ -24,11 +24,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SodaTypes {
+public class Types {
    private Document doc = null;
    private ElementsList datatypes = null;
 
-   public SodaTypes() {
+   public Types() {
       File testFD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
