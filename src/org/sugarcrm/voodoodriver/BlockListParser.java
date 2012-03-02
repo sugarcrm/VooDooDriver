@@ -29,7 +29,7 @@ import org.w3c.dom.NodeList;
  * @author trampus
  *
  */
-public class VDDBlockListParser {
+public class BlockListParser {
 
    private String file_name = null;
 
@@ -38,7 +38,7 @@ public class VDDBlockListParser {
     *
     * @param file   The blocklist xml file to parse.
     */
-   public VDDBlockListParser(String file) {
+   public BlockListParser(String file) {
       this.file_name = file;
    }
 
