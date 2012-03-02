@@ -16,7 +16,7 @@ limitations under the License.
 
 package org.sugarcrm.voodoodriver;
 
-public enum SodaSupportedBrowser {
+public enum SupportedBrowser {
    FIREFOX,
    IE,
    CHROME

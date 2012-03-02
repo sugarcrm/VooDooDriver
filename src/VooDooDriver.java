@@ -35,7 +35,7 @@ import org.sugarcrm.voodoodriver.Firefox;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.IE;
 import org.sugarcrm.voodoodriver.SuiteParser;
-import org.sugarcrm.voodoodriver.SodaSupportedBrowser;
+import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.SodaTest;
 import org.sugarcrm.voodoodriver.SodaTestList;
 import org.sugarcrm.voodoodriver.SodaTestResults;
@@ -308,7 +308,7 @@ public class VooDooDriver {
       }
       try {
          String b = (String)config.get("browser");
-         config.put("browser", SodaSupportedBrowser.valueOf(b.toUpperCase()));
+         config.put("browser", SupportedBrowser.valueOf(b.toUpperCase()));
       } catch (IllegalArgumentException e) {
          System.out.println("(!)Unsupported browser: " + config.get("browser"));
          System.exit(2);
@@ -378,8 +378,7 @@ public class VooDooDriver {
       @SuppressWarnings("unchecked")
          ArrayList<String> tests = (ArrayList<String>)config.get("test");
       String resultdir = (String)config.get("resultdir");;
-      SodaSupportedBrowser browserType =
-         (SodaSupportedBrowser)config.get("browser");
+      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       Events plugins = (Events)config.get("plugin");
@@ -480,8 +479,7 @@ public class VooDooDriver {
       @SuppressWarnings("unchecked")
          ArrayList<String> suites = (ArrayList<String>)config.get("suite");
       String resultdir = (String)config.get("resultdir");;
-      SodaSupportedBrowser browserType =
-         (SodaSupportedBrowser)config.get("browser");
+      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       VDDBlockList blockList = (VDDBlockList)config.get("blocklist");
