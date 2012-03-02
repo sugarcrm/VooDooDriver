@@ -47,7 +47,7 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class EventLoop implements Runnable {
 
-   private SodaEvents testEvents = null;
+   private Events testEvents = null;
    private Browser Browser = null;
    private VDDHash sodaVars = null;
    private SodaReporter report = null;
@@ -55,7 +55,7 @@ public class EventLoop implements Runnable {
    private Date threadTime = null;
    private volatile Thread runner;
    private volatile Boolean threadStop = false;
-   private SodaEvents plugIns = null;
+   private Events plugIns = null;
    private VDDHash JavaPlugings = null;
    private VDDHash ElementStore = null;
    private VDDPluginsHash loadedPlugins = null;
@@ -68,16 +68,16 @@ public class EventLoop implements Runnable {
     * The class Constructor.
     *
     * @param browser  {@link Browser}
-    * @param events   {@link SodaEvents}
+    * @param events   {@link Events}
     * @param reporter {@link SodaReporter}
     * @param gvars    {@link VDDHash}
     * @param hijacks  {@link VDDHash}
     * @param oldvars  {@link VDDHash}
-    * @param plugins  {@link SodaEvents}
+    * @param plugins  {@link Events}
     */
-   public EventLoop(Browser browser, SodaEvents events,
+   public EventLoop(Browser browser, Events events,
          SodaReporter reporter, VDDHash gvars, VDDHash hijacks,
-         VDDHash oldvars, SodaEvents plugins) {
+         VDDHash oldvars, Events plugins) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
@@ -96,7 +96,7 @@ public class EventLoop implements Runnable {
       this.ElementStore = new VDDHash();
       this.plugIns = plugins;
       if (this.plugIns == null) {
-         this.plugIns = new SodaEvents();
+         this.plugIns = new Events();
       }
 
       if (gvars != null) {
@@ -312,7 +312,7 @@ public class EventLoop implements Runnable {
       return tmp;
    }
 
-   private void processEvents(SodaEvents events, WebElement parent) {
+   private void processEvents(Events events, WebElement parent) {
       int event_count = events.size() - 1;
 
       for (int i = 0; i <= event_count; i++) {
@@ -324,7 +324,7 @@ public class EventLoop implements Runnable {
       }
    }
 
-   public SodaEvents getElements() {
+   public Events getElements() {
       return testEvents;
    }
 
@@ -593,7 +593,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), null);
+            this.processEvents((Events) event.get("children"), null);
          } else {
             this.report.Log("Switching back to default frame.");
             this.Browser.getDriver().switchTo().defaultContent();
@@ -918,7 +918,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -1017,7 +1017,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -1344,7 +1344,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((SodaEvents) event.get("children"), element);
+         this.processEvents((Events) event.get("children"), element);
       }
 
       this.report.Log("LI event finished.");
@@ -1393,7 +1393,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((SodaEvents) event.get("children"), element);
+         this.processEvents((Events) event.get("children"), element);
       }
 
       this.report.Log("TR event finished.");
@@ -1444,7 +1444,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((SodaEvents) event.get("children"), element);
+         this.processEvents((Events) event.get("children"), element);
       }
 
       this.report.Log("TD event finished.");
@@ -1552,7 +1552,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -1902,7 +1902,7 @@ public class EventLoop implements Runnable {
                }
 
                if (event.containsKey("children") && element != null) {
-                  this.processEvents((SodaEvents)event.get("children"), element);
+                  this.processEvents((Events)event.get("children"), element);
                }
             }
 
@@ -1958,7 +1958,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2029,7 +2029,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2177,7 +2177,7 @@ public class EventLoop implements Runnable {
          msg = String.format("Switching to window handle: '%s'.", found_handle);
          this.report.Log(msg);
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), null);
+            this.processEvents((Events) event.get("children"), null);
          }
 
          this.Browser.setBrowserState(false);
@@ -2297,7 +2297,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -2316,7 +2316,7 @@ public class EventLoop implements Runnable {
       SodaXML xml = null;
       String testfile = "";
       File fd = null;
-      SodaEvents newEvents = null;
+      Events newEvents = null;
 
       testfile = event.get("file").toString();
       testfile = this.replaceString(testfile);
@@ -2627,7 +2627,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((SodaEvents) event.get("children"), null);
+            this.processEvents((Events) event.get("children"), null);
          }
       }
 
@@ -2847,7 +2847,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2925,7 +2925,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((SodaEvents) event.get("children"), element);
+            this.processEvents((Events) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);

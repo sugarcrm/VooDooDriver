@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * The <code>SodaXML</code> class reads a soda test script and converts
- * it into a {@link SodaEvents} class.
+ * it into a {@link Events} class.
  *
  * @author trampus
  */
@@ -35,7 +35,7 @@ public class SodaXML {
    private Document doc = null;
    private ElementsList types = null;
    private SodaTypes sodaTypes = null;
-   private SodaEvents events = null;
+   private Events events = null;
    private SodaReporter reporter = null;
 
    /**
@@ -71,12 +71,12 @@ public class SodaXML {
    }
 
    /**
-    * Accessor for the {@link SodaEvents} object created from the soda test script.
+    * Accessor for the {@link Events} object created from the soda test script.
     *
-    * @return SodaEvents object
+    * @return Events object
     */
 
-   public SodaEvents getEvents() {
+   public Events getEvents() {
       return this.events;
    }
 
@@ -218,14 +218,14 @@ public class SodaXML {
     * Parse XML Nodes from Soda test script.
     *
     * @param nodes  NodeList from the soda xml test.
-    * @return SodaEvents object with Soda test script events
+    * @return Events object with Soda test script events
     */
 
-   private SodaEvents parse(NodeList nodes) {
+   private Events parse(NodeList nodes) {
       VDDHash data = null;
-      SodaEvents dataList = null;
+      Events dataList = null;
 
-      dataList = new SodaEvents();
+      dataList = new Events();
 
       for (int i = 0; i < nodes.getLength(); i++) {
          Node child = nodes.item(i);
@@ -275,7 +275,7 @@ public class SodaXML {
                String[] list = processArgs(child.getChildNodes());
                data.put("args", list);
             } else {
-               SodaEvents tmp = parse(child.getChildNodes());
+               Events tmp = parse(child.getChildNodes());
                if (tmp == null) {
                   return null;
                }

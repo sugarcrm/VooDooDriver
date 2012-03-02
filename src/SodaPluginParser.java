@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.sugarcrm.voodoodriver.SodaEvents;
+import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.VDDHash;
 
 public class SodaPluginParser {
@@ -46,11 +46,11 @@ public class SodaPluginParser {
       this.Nodedata = doc.getDocumentElement().getChildNodes();
    }
 
-   public SodaEvents parse() throws Exception {
-      SodaEvents data = null;
+   public Events parse() throws Exception {
+      Events data = null;
       int len = this.Nodedata.getLength() -1;
 
-      data = new SodaEvents();
+      data = new Events();
 
       for (int i = 0; i <= len; i++) {
          Node child = this.Nodedata.item(i);

@@ -30,7 +30,7 @@ import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.Chrome;
 import org.sugarcrm.voodoodriver.Config;
 import org.sugarcrm.voodoodriver.ConfigFileParser;
-import org.sugarcrm.voodoodriver.SodaEvents;
+import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.SodaFirefox;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.SodaIE;
@@ -105,7 +105,7 @@ public class VooDooDriver {
       VDDHash hijacks = new VDDHash();
       VDDHash configOpts = new VDDHash();
       ConfigFileParser configParser = null;
-      SodaEvents configFileOpts = null;
+      Events configFileOpts = null;
 
       configOpts.put("gvar", gvars);
       configOpts.put("hijack", hijacks);
@@ -285,7 +285,7 @@ public class VooDooDriver {
     */
 
    public static void main(String[] args) {
-      SodaEvents plugins = null;
+      Events plugins = null;
       VDDBlockList blockList = null;
 
       Config opts = new Config();
@@ -382,7 +382,7 @@ public class VooDooDriver {
          (SodaSupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
-      SodaEvents plugins = (SodaEvents)config.get("plugin");
+      Events plugins = (Events)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
@@ -485,7 +485,7 @@ public class VooDooDriver {
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       VDDBlockList blockList = (VDDBlockList)config.get("blocklist");
-      SodaEvents plugins = (SodaEvents)config.get("plugin");
+      Events plugins = (Events)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");

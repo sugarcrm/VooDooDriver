@@ -50,10 +50,10 @@ public class ConfigFileParser {
    /**
     * Parses the VooDooDriver config file.
     *
-    * @return {@link SodaEvents}
+    * @return {@link Events}
     */
-   public SodaEvents parse() {
-      SodaEvents options = new SodaEvents();
+   public Events parse() {
+      Events options = new Events();
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
       Document doc = null;

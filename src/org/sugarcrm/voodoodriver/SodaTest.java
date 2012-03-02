@@ -24,14 +24,14 @@ public class SodaTest {
    private Browser Browser = null;
    private String testFile = "";
    private EventLoop eventDriver = null;
-   private SodaEvents events = null;
+   private Events events = null;
    private SodaReporter reporter = null;
    private VDDHash GVars = null;
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
    private VDDBlockList blocked = null;
    private boolean WatchDog = false;
-   private SodaEvents PlugIns = null;
+   private Events PlugIns = null;
    private String SaveHTML = "";
    private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
    private String assertPage = null;
@@ -82,7 +82,7 @@ public class SodaTest {
       this.Browser.setAssertPageFile(this.assertPage, this.reporter);
    }
 
-   public void setPlugins(SodaEvents plugins) {
+   public void setPlugins(Events plugins) {
       this.PlugIns = plugins;
    }
 
