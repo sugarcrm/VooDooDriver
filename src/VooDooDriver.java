@@ -24,23 +24,22 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import voodoodriver.SodaBlockList;
-import voodoodriver.SodaBlockListParser;
-import voodoodriver.SodaBrowser;
-import voodoodriver.SodaChrome;
-import voodoodriver.SodaCmdLineOpts;
-import voodoodriver.SodaConfigParser;
-import voodoodriver.SodaEvents;
-import voodoodriver.SodaFirefox;
-import voodoodriver.SodaHash;
-import voodoodriver.SodaIE;
-import voodoodriver.SodaSuiteParser;
-import voodoodriver.SodaSupportedBrowser;
-import voodoodriver.SodaTest;
-import voodoodriver.SodaTestList;
-import voodoodriver.SodaTestResults;
-import voodoodriver.SodaUtils;
-import voodoodriver.VDDVersionInfo;
+import org.sugarcrm.voodoodriver.BlockList;
+import org.sugarcrm.voodoodriver.BlockListParser;
+import org.sugarcrm.voodoodriver.Browser;
+import org.sugarcrm.voodoodriver.Chrome;
+import org.sugarcrm.voodoodriver.Config;
+import org.sugarcrm.voodoodriver.ConfigFileParser;
+import org.sugarcrm.voodoodriver.Events;
+import org.sugarcrm.voodoodriver.Firefox;
+import org.sugarcrm.voodoodriver.VDDHash;
+import org.sugarcrm.voodoodriver.IE;
+import org.sugarcrm.voodoodriver.SuiteParser;
+import org.sugarcrm.voodoodriver.SupportedBrowser;
+import org.sugarcrm.voodoodriver.Test;
+import org.sugarcrm.voodoodriver.TestList;
+import org.sugarcrm.voodoodriver.TestResults;
+import org.sugarcrm.voodoodriver.Utils;
 
 
 /**
@@ -53,23 +52,13 @@ public class VooDooDriver {
    final static String defaultSodaConfigFile = "soda-config.xml";
 
    /**
-    * Print command line option usage information
-    */
-
-   public static void printUsage() {
-      VooDooHelp help = new VooDooHelp();
-      help.printHelp();
-   }
-
-
-   /**
     * Dump JVM information to the console and warn if a non-Sun jvm is
     * being used.
     */
 
    private static void dumpJavaInfo() {
       HashMap<String, String> javainfo = null;
-      javainfo = SodaUtils.getJavaInfo();
+      javainfo = Utils.getJavaInfo();
 
       String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
       Arrays.sort(jinfoKeys);
@@ -94,63 +83,51 @@ public class VooDooDriver {
     * be changed with the --config command line option.
     *
     * @param cmdOpts  parsed command line options
-    * @return SodaHash with four entries:
+    * @return VDDHash with four entries:
     *            <dl>
-    *              <dt>gvars</dt>
-    *              <dd>SodaHash of global variables from the
+    *              <dt>gvar</dt>
+    *              <dd>VDDHash of global variables from the
     *                  configuration file</dd>
-    *              <dt>hijacks</dt>
-    *              <dd>SodaHash of SodaVar substitutions from the
+    *              <dt>hijack</dt>
+    *              <dd>VDDHash of SodaVar substitutions from the
     *                  configuration file</dd>
-    *              <dt>suites</dt>
+    *              <dt>suite</dt>
     *              <dd>ArrayList of suites listed in the configuration
     *                  file</dd>
-    *              <dt>tests</dt>
+    *              <dt>test</dt>
     *              <dd>ArrayList of tests listed in the configuration
     *                  file</dd>
     *            </dl>
     */
 
-   @SuppressWarnings("unchecked")
-   private static SodaHash readConfigFile(SodaHash cmdOpts) {
-      String configFile = defaultSodaConfigFile;
-      File sodaConfigFD = null;
-      SodaHash gvars = new SodaHash();
-      SodaHash hijacks = new SodaHash();
-      ArrayList<String> SodaSuitesList = null;
-      ArrayList<String> SodaTestsList = null;
-      SodaHash returnVal = new SodaHash();
-      SodaConfigParser configParser = null;
-      SodaEvents configFileOpts = null;
+   private static VDDHash readConfigFile(File configFile) {
+      VDDHash gvars = new VDDHash();
+      VDDHash hijacks = new VDDHash();
+      VDDHash configOpts = new VDDHash();
+      ConfigFileParser configParser = null;
+      Events configFileOpts = null;
 
-      returnVal.put("gvars", gvars);
-      returnVal.put("hijacks", hijacks);
-      returnVal.put("suites", null);
-      returnVal.put("tests", null);
+      configOpts.put("gvar", gvars);
+      configOpts.put("hijack", hijacks);
+      configOpts.put("suite", null);
+      configOpts.put("test", null);
 
-      if (cmdOpts.containsKey("config") && cmdOpts.get("config") != null) {
-         configFile = cmdOpts.get("config").toString();
-      }
-      sodaConfigFD = new File(configFile);
-
-      if (!sodaConfigFD.exists()) {
-         if (configFile != defaultSodaConfigFile) {
-            System.out.printf("(!)Error: Specified config file '%s' does not exist!\n",
-                              configFile);
-            System.exit(5);
+      if (configFile == null) {
+         configFile = new File(defaultSodaConfigFile);
+         if (!configFile.exists()) {
+            return configOpts;
          }
-         return returnVal;
       }
 
       System.out.printf("(*)Reading VooDooDriver config file '%s'.\n",
-                        configFile);
+                        configFile.getName());
 
-      configParser = new SodaConfigParser(sodaConfigFD);
+      configParser = new ConfigFileParser(configFile);
       configFileOpts = configParser.parse();
       int argsLen = configFileOpts.size() - 1;
 
       for (int i = 0; i <= argsLen; i++) {
-         SodaHash tmp = configFileOpts.get(i);
+         VDDHash tmp = configFileOpts.get(i);
          String type = tmp.get("type").toString();
          String name = null;
          String value = null;
@@ -173,13 +150,14 @@ public class VooDooDriver {
 
             for (String s: validCmdopts) {
                if (name.contains(s)) {
-                  cmdOpts.put(s, value);
+                  configOpts.put(s, value);
                   System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n",
                                     name, value);
                }
             }
          } else if (type.contains("hijacks")) {
-            ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
+            @SuppressWarnings("unchecked")
+               ArrayList<String> jacks = (ArrayList<String>)tmp.get("hijacks");
 
             for (int x = 0; x <= jacks.size() -1; x++) {
                String[] jdata = jacks.get(x).split("::");
@@ -189,25 +167,114 @@ public class VooDooDriver {
             }
 
          } else if (type.contains("suites")) {
-            SodaSuitesList = (ArrayList<String>)tmp.get("suites");
+            @SuppressWarnings("unchecked") ArrayList<String>
+               SodaSuitesList = (ArrayList<String>)tmp.get("suites");
             for (int x = 0; x <= SodaSuitesList.size() -1; x++) {
                String sname = SodaSuitesList.get(x);
                System.out.printf("(*)Adding Config-File suite file: '%s'\n",
                                  sname);
             }
-            returnVal.put("suites", SodaSuitesList);
+            configOpts.put("suite", SodaSuitesList);
          } else if (type.contains("tests")) {
-            SodaTestsList = (ArrayList<String>)tmp.get("tests");
+            @SuppressWarnings("unchecked") ArrayList<String>
+               SodaTestsList = (ArrayList<String>)tmp.get("tests");
             for (int x = 0; x <= SodaTestsList.size() -1; x++) {
                String tname = SodaTestsList.get(x);
                System.out.printf("(*)Adding Config-File test file: '%s'\n",
                                  tname);
             }
-            returnVal.put("suites", SodaTestsList);
+            configOpts.put("test", SodaTestsList);
          }
       }
 
-      return returnVal;
+      return configOpts;
+   }
+
+
+   /**
+    * Create a default result directory name.
+    *
+    * @return default result directory name
+    */
+
+   private static String defaultResultDir() {
+      Date now = new Date();
+      String frac = String.format("%1$tN", now);
+      String dstr = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+      frac = frac.subSequence(0, 3).toString();
+      dstr += String.format(".%s", frac);
+
+      return System.getProperty("user.dir") + File.separator + dstr;
+   }
+
+
+   /**
+    * Merge config file and command line options, applying defaults as needed.
+    *
+    * @param fileOpts  options from the config file
+    * @param cmdOpts   options from the command line
+    * @return {@link VDDHash} with all options
+    */
+
+   @SuppressWarnings("unchecked")
+   private static VDDHash mergeConfigs(VDDHash fileOpts, VDDHash cmdOpts) {
+      VDDHash opts = new VDDHash();
+
+      /* Defaults */
+      opts.put("attachtimeout", 0);
+      opts.put("haltOnFailure", false);
+      opts.put("restartcount", "0");
+      opts.put("resultdir", defaultResultDir());
+
+      /* Merge gvar */
+      VDDHash gvar = new VDDHash();
+      try {
+         gvar.putAll((VDDHash)fileOpts.remove("gvar"));
+      } catch (NullPointerException e) {}
+      try {
+         gvar.putAll((VDDHash)cmdOpts.remove("gvar"));
+      } catch (NullPointerException e) {}
+
+      /* Merge hijack */
+      VDDHash hijack = new VDDHash();
+      try {
+         hijack.putAll((VDDHash)fileOpts.remove("hijack"));
+      } catch (NullPointerException e) {}
+      try {
+         hijack.putAll((VDDHash)cmdOpts.remove("hijack"));
+      } catch (NullPointerException e) {}
+
+      /* Merge suite */
+      ArrayList<String> suite = new ArrayList<String>();
+      try {
+         suite.addAll((ArrayList<String>)fileOpts.remove("suite"));
+      } catch (NullPointerException e) {}
+      try {
+         suite.addAll((ArrayList<String>)cmdOpts.remove("suite"));
+      } catch (NullPointerException e) {}
+
+      /* Merge test */
+      ArrayList<String> test = new ArrayList<String>();
+      try {
+         test.addAll((ArrayList<String>)fileOpts.remove("test"));
+      } catch (NullPointerException e) {}
+      try {
+         test.addAll((ArrayList<String>)cmdOpts.remove("test"));
+      } catch (NullPointerException e) {}
+
+      /* Merge all from the config file */
+      opts.putAll(fileOpts);
+
+      /* Merge all from the command line */
+      opts.putAll(cmdOpts);
+
+      /* Store gvar, hijack, suite, and test */
+      opts.put("gvar", gvar);
+      opts.put("hijack", hijack);
+      opts.put("suite", suite);
+      opts.put("test", test);
+
+      return opts;
    }
 
 
@@ -217,183 +284,82 @@ public class VooDooDriver {
     * @param args  array of command line arguments
     */
 
-   @SuppressWarnings("unchecked")
    public static void main(String[] args) {
-      String blockListFile = null;
-      SodaBlockList blockList = null;
-      SodaCmdLineOpts opts = null;
-      SodaHash cmdOpts = null;
-      SodaSupportedBrowser browserType = null;
-      ArrayList<String> SodaSuitesList = null;
-      ArrayList<String> SodaTestsList = null;
-      String pluginFile = null;
-      SodaPluginParser plugParser = null;
-      SodaEvents plugins = null;
-      String savehtml = "";
-      String downloadDir = null;
-      String assertpage = null;
-      SodaHash gvars = null;
-      int restartCount = 0;
-      String restartTest = null;
-      int attachTimeout = 0;
-      SodaHash hijacks = null;
-      String resultdir = null;
-      Boolean haltOnFailure = false;
+      Events plugins = null;
+      BlockList blockList = null;
 
-      System.out.printf("(*)Starting VooDooDriver...\n");
+      Config opts = new Config();
+      opts.parse(args);
+      VDDHash cmdOpts = opts.getOptions();
+
+      System.out.println("(*)Starting VooDooDriver...");
+      VDDHash cfg = readConfigFile(cmdOpts.containsKey("config") ?
+                                    new File((String)cmdOpts.get("config")) :
+                                    null);
+
+      VDDHash config = mergeConfigs(cfg, cmdOpts);
+
+      // XXX: Implement dumpConfig(config);
       dumpJavaInfo();
 
+      if (!config.containsKey("browser")) {
+         System.out.println("(!)Error: Missing --browser argument!");
+         System.exit(1);
+      }
       try {
-         opts = new SodaCmdLineOpts(args);
-         cmdOpts = opts.getOptions();
-         SodaHash config = readConfigFile(cmdOpts);
-         gvars = (SodaHash)config.get("gvars");
-         hijacks = (SodaHash)config.get("hijacks");
-         SodaSuitesList = (ArrayList<String>)config.get("suites");
-         SodaTestsList = (ArrayList<String>)config.get("tests");
+         String b = (String)config.get("browser");
+         config.put("browser", SupportedBrowser.valueOf(b.toUpperCase()));
+      } catch (IllegalArgumentException e) {
+         System.out.println("(!)Unsupported browser: " + config.get("browser"));
+         System.exit(2);
+      }
 
-         gvars.putAll((SodaHash)cmdOpts.get("gvars"));
-         hijacks.putAll((SodaHash)cmdOpts.get("hijacks"));
+      if (config.containsKey("attachtimeout")) {
+         /* XXX: Handle in Config */
+         Integer t = new Integer((String)config.get("attachtimeout"));
+         config.put("attachtimeout", t);
+         System.out.printf("(*)Setting attach timeout to %ss.\n", t);
+      }
 
-         if ((Boolean)cmdOpts.get("help")) {
-            printUsage();
-            System.exit(0);
-         }
+      if (config.containsKey("restartcount")) {
+         /* XXX: Handle in Config */
+         Integer r = new Integer((String)config.get("restartcount"));
+         config.put("restartcount", r);
+         System.out.printf("(*)Restart count => '%d'\n", r);
+      }
 
-         if ((Boolean)cmdOpts.get("version")) {
-            VDDVersionInfo vinfo = new VDDVersionInfo();
-            System.out.printf("(*)VooDooDriver Version: %s\n",
-                              vinfo.getVDDVersion());
-            System.exit(0);
-         }
+      if (config.containsKey("savehtml")) {
+         System.out.printf("(*)SaveHTML: %s\n", config.get("savehtml"));
+      }
 
-         attachTimeout = new Integer((String)cmdOpts.get("attachtimeout"));
-         restartTest = (String)cmdOpts.get("restarttest");
-         restartCount = new Integer((String)cmdOpts.get("restartcount"));
-
-         if (attachTimeout > 0) {
-            System.out.printf("(*)Setting the default Attach Timeout to: '%s' seconds.\n",
-                              attachTimeout);
-         }
-
-         if (restartCount > 0) {
-            System.out.printf("(*)Restart Count => '%d'\n", restartCount);
-
-            if (restartTest != null) {
-               System.out.printf("(*)Restart Test => '%s'.\n", restartTest);
-               File retmp = new File(restartTest);
-
-               if (!retmp.exists()) {
-                  System.out.printf("(!)Error: failed to find Restart Test: => '%s'!\n\n",
-                                    restartTest);
-                  System.exit(5);
-               }
-            }
-         }
-
-         if (cmdOpts.get("browser") == null) {
-            System.out.printf("(!)Error: Missing --browser commandline option!\n\n");
-            System.exit(-1);
-         }
-
-         if (cmdOpts.get("assertpagefile") != null) {
-            assertpage = cmdOpts.get("assertpagefile").toString();
-         }
-
-         if (cmdOpts.get("downloaddir") != null) {
-            downloadDir = cmdOpts.get("downloaddir").toString();
-         }
-         if (cmdOpts.get("haltonfailure") != null) {
-            haltOnFailure = (Boolean)cmdOpts.get("haltonfailure");
-         }
-
-         String cmdSaveHtml = (String)cmdOpts.get("savehtml");
-         if (cmdSaveHtml != null && !cmdSaveHtml.isEmpty()) {
-            savehtml = cmdSaveHtml;
-         }
-         System.out.printf("(*)SaveHTML: %s\n", savehtml);
-
-         pluginFile = (String)cmdOpts.get("plugin");
-         if (pluginFile != null) {
-            pluginFile = FilenameUtils.separatorsToSystem(pluginFile);
-            System.out.printf("(*)Loading Plugins from file: '%s'.\n", pluginFile);
-            plugParser = new SodaPluginParser(pluginFile);
-            plugins = plugParser.parse();
-         }
-
+      if (config.containsKey("plugin")) {
+         String p = (String)config.get("plugin");
+         System.out.println("(*)Loading plugins from " + p);
          try {
-            browserType = SodaSupportedBrowser.valueOf(cmdOpts.get("browser").toString().toUpperCase());
-         } catch (Exception expBrowser) {
-            System.out.printf("(!)Unsupported browser: '%s'!\n", cmdOpts.get("browser").toString());
-            System.out.printf("(!)Exiting!\n\n");
-            System.exit(2);
+            SodaPluginParser plugParser = new SodaPluginParser(p);
+            config.put("plugin", plugParser.parse());
+         } catch (Exception e) {
+            /* XXX: Just what Exception does SodaPluginParser actually throw? */
+            System.err.println("(!)Failed to load plugin file: " + e);
+            System.exit(1);
          }
+      }
 
-         blockListFile = (String)cmdOpts.get("blocklistfile");
-         if (blockListFile != null) {
-            blockListFile = FilenameUtils.separatorsToSystem(blockListFile);
-            SodaBlockListParser sbp = new SodaBlockListParser(blockListFile);
-            blockList = sbp.parse();
-         } else {
-            System.out.printf("(*)No Block list file to parse.\n");
-            blockList = new SodaBlockList();
-         }
+      if (config.containsKey("blocklistfile")) {
+         String f = (String)config.get("blocklistfile");
+         BlockListParser sbp = new BlockListParser(f);
+         blockList = sbp.parse();
+      } else {
+         blockList = new BlockList();
+      }
+      config.put("blocklist", blockList);
 
-         String cmdResultdir = (String)cmdOpts.get("resultdir");
-         if (cmdResultdir != null && !cmdResultdir.isEmpty()) {
-            resultdir = cmdResultdir;
-         }
-         if (resultdir == null) {
-            Date now = new Date();
-            String cwd = System.getProperty("user.dir");
-            String frac = String.format("%1$tN", now);
-            String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
-            frac = frac.subSequence(0, 3).toString();
-            date_str += String.format(".%s", frac);
+      if (config.containsKey("suite")) {
+         RunSuites(config);
+      }
 
-            cwd = cwd.concat("/");
-            cwd = cwd.concat(date_str);
-            cwd = FilenameUtils.separatorsToSystem(cwd);
-            resultdir = cwd;
-         }
-
-         ArrayList<String> cmdSuites = (ArrayList<String>)cmdOpts.get("suites");
-         if ((cmdSuites != null) && (!cmdSuites.isEmpty())) {
-
-            if (SodaSuitesList == null) {
-               SodaSuitesList = new ArrayList<String>();
-            }
-            SodaSuitesList.addAll(cmdSuites);
-         }
-
-         if ((SodaSuitesList != null) && (!SodaSuitesList.isEmpty())) {
-            if (resultdir == null) {
-               System.out.printf("(!)Error: Missing command line flag --resultdir!\n");
-               System.out.printf("--)--resultdir is needed when running SODA suites.\n\n");
-               System.exit(3);
-            }
-
-            RunSuites(SodaSuitesList, resultdir, browserType, gvars, hijacks, blockList, plugins, savehtml, downloadDir,
-                 assertpage, restartTest, restartCount, attachTimeout, haltOnFailure);
-         }
-
-         ArrayList<String> cmdTests = (ArrayList<String>)cmdOpts.get("tests");
-         if (cmdTests != null && !cmdTests.isEmpty()) {
-            if (SodaTestsList == null) {
-               SodaTestsList = new ArrayList<String>();
-            }
-
-            SodaTestsList.addAll(cmdTests);
-         } else {
-            SodaTestsList = new ArrayList<String>();
-         }
-
-         if (!SodaTestsList.isEmpty()) {
-            RunTests(SodaTestsList, resultdir, browserType, gvars, hijacks,
-                plugins, savehtml, downloadDir, assertpage, attachTimeout, haltOnFailure);
-         }
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      if (config.containsKey("test")) {
+         RunTests(config);
       }
 
       System.out.printf("(*)VooDooDriver Finished.\n");
@@ -404,29 +370,33 @@ public class VooDooDriver {
    /**
     * Run the tests specified on the command line with --test
     *
-    * @param tests          array of tests to run
-    * @param resultdir      output directory
-    * @param browserType    which browser to test against
-    * @param gvars          test global variables
-    * @param hijacks        hijacks
-    * @param plugins        plugins to use during test execution
-    * @param savehtml       value of --savehtml command line option
-    * @param downloaddir    download directory
-    * @param assertpage     assert page
-    * @param attachTimeout  attach timeout
-    * @param haltOnFailure  value of --haltOnFailure command line option
+    * @param config  VooDooDriver configuration
     */
 
-   private static void RunTests(ArrayList<String> tests, String resultdir,
-                                SodaSupportedBrowser browserType,
-                                SodaHash gvars, SodaHash hijacks,
-                                SodaEvents plugins, String savehtml,
-                                String downloaddir, String assertpage,
-                                int attachTimeout, Boolean haltOnFailure) {
+   private static void RunTests(VDDHash config) {
+      /* XXX Start block to be refactored. */
+      @SuppressWarnings("unchecked")
+         ArrayList<String> tests = (ArrayList<String>)config.get("test");
+      String resultdir = (String)config.get("resultdir");;
+      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
+      VDDHash gvars = (VDDHash)config.get("gvar");
+      VDDHash hijacks = (VDDHash)config.get("hijack");
+      Events plugins = (Events)config.get("plugin");
+      String savehtml = (String)config.get("savehtml");;
+      String downloaddir = (String)config.get("downloaddir");;
+      String assertpage = (String)config.get("assertpage");
+      int attachTimeout = (Integer)config.get("attachtimeout");;
+      Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
+      /* XXX End block to be refactored. */
+
       File resultFD = null;
-      SodaBrowser browser = null;
+      Browser browser = null;
       int len = 0;
-      SodaTest testobj = null;
+      Test testobj = null;
+
+      if (tests.size() == 0) {
+         return;
+      }
 
       System.out.printf("(*)Running Soda Tests now...\n");
 
@@ -446,13 +416,13 @@ public class VooDooDriver {
 
       switch (browserType) {
       case FIREFOX:
-         browser = new SodaFirefox();
+         browser = new Firefox();
          break;
       case CHROME:
-         browser = new SodaChrome();
+         browser = new Chrome();
          break;
       case IE:
-         browser = new SodaIE();
+         browser = new IE();
          break;
       }
 
@@ -468,8 +438,8 @@ public class VooDooDriver {
          test_file = FilenameUtils.separatorsToSystem(test_file);
          System.out.printf("Starting Test: '%s'.\n", test_file);
 
-         testobj = new SodaTest(test_file, browser, gvars, hijacks, null,
-                                null, null, resultdir, savehtml);
+         testobj = new Test(test_file, browser, gvars, hijacks, null,
+                            null, null, resultdir, savehtml);
          if (assertpage != null) {
             testobj.setAssertPage(assertpage);
          }
@@ -501,41 +471,42 @@ public class VooDooDriver {
    /**
     * Run all test suites
     *
-    * @param suites
-    * @param resultdir      output directory
-    * @param browserType    which browser to test against
-    * @param gvars          test global variables
-    * @param hijacks        hijacks
-    * @param blockList      
-    * @param plugins        plugins to use during test execution
-    * @param savehtml       value of --savehtml command line option
-    * @param downloaddir    download directory
-    * @param assertpage     assert page
-    * @param restartTest    restart the browser when running this test
-    * @param restartCount   restart the browser after running this number
-    *                       of tests
-    * @param attachTimeout  attach timeout
-    * @param haltOnFailure  value of --haltOnFailure command line option
+    * @param config  VooDooDriver configuration
     */
 
-   private static void RunSuites(ArrayList<String> suites, String resultdir,
-                                 SodaSupportedBrowser browserType,
-                                 SodaHash gvars, SodaHash hijacks,
-                                 SodaBlockList blockList, SodaEvents plugins,
-                                 String savehtml, String downloaddir,
-                                 String assertpage, String restartTest,
-                                 int restartCount, int attachTimeout,
-                                 Boolean haltOnFailure) {
+   private static void RunSuites(VDDHash config) {
+      /* XXX Start block to be refactored. */
+      @SuppressWarnings("unchecked")
+         ArrayList<String> suites = (ArrayList<String>)config.get("suite");
+      String resultdir = (String)config.get("resultdir");;
+      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
+      VDDHash gvars = (VDDHash)config.get("gvar");
+      VDDHash hijacks = (VDDHash)config.get("hijack");
+      BlockList blockList = (BlockList)config.get("blocklist");
+      Events plugins = (Events)config.get("plugin");
+      String savehtml = (String)config.get("savehtml");;
+      String downloaddir = (String)config.get("downloaddir");;
+      String assertpage = (String)config.get("assertpage");
+      String restartTest = (String)config.get("restarttest");
+      int restartCount = (Integer)config.get("restartcount");
+      int attachTimeout = (Integer)config.get("attachtimeout");;
+      Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
+      /* XXX End block to be refactored. */
+
       int len = suites.size() -1;
       File resultFD = null;
       String report_file_name = resultdir;
       String hostname = "";
       FileOutputStream suiteRptFD = null;
-      SodaBrowser browser = null;
+      Browser browser = null;
       Date now = null;
       Date suiteStartTime = null;
       Date suiteStopTime = null;
       Boolean terminateRun = false;
+
+      if (suites.size() == 0) {
+         return;
+      }
 
       System.out.printf("(*)Running Suite files now...\n");
       System.out.printf("(*)Timeout: %s\n", attachTimeout);
@@ -588,13 +559,13 @@ public class VooDooDriver {
 
       switch (browserType) {
       case FIREFOX:
-         browser = new SodaFirefox();
+         browser = new Firefox();
          break;
       case CHROME:
-         browser = new SodaChrome();
+         browser = new Chrome();
          break;
       case IE:
-         browser = new SodaIE();
+         browser = new IE();
          break;
       }
 
@@ -621,15 +592,15 @@ public class VooDooDriver {
          suite_base_noext = m.replaceAll("");
 
          suite_fd = null;
-         SodaTest testobj = null;
+         Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SodaSuiteParser suiteP = new SodaSuiteParser(suite_name, gvars);
-         SodaTestList suite_test_list = suiteP.getTests();
-         SodaHash vars = null;
-         SodaTestResults test_results_hash = null;
-         ArrayList<SodaTestResults> test_resultsStore =
-            new ArrayList<SodaTestResults>();
+         SuiteParser suiteP = new SuiteParser(suite_name, gvars);
+         TestList suite_test_list = suiteP.getTests();
+         VDDHash vars = null;
+         TestResults test_results_hash = null;
+         ArrayList<TestResults> test_resultsStore =
+            new ArrayList<TestResults>();
 
          /* Loop over tests within each suite. */
          suiteStartTime = new Date();
@@ -665,7 +636,7 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new SodaTest(restartTest, browser, gvars, hijacks,
+                  testobj = new Test(restartTest, browser, gvars, hijacks,
                                          blockList, vars, suite_base_noext,
                                          resultdir, savehtml);
                   testobj.setIsRestartTest(true);
@@ -690,12 +661,12 @@ public class VooDooDriver {
                   writeSummary(suiteRptFD,
                                String.format("\t\t\t<stoptime>%s</stoptime>\n",
                                              date_str));
-                  String msg = SodaUtils.GetRunTime(test_start_time, now);
+                  String msg = Utils.GetRunTime(test_start_time, now);
                   writeSummary(suiteRptFD,
                                String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
-                  if (testobj.getSodaEventDriver() != null) {
-                     vars = testobj.getSodaEventDriver().getSodaVars();
+                  if (testobj.getEventLoop() != null) {
+                     vars = testobj.getEventLoop().getSodaVars();
                   }
 
                   test_results_hash = testobj.getReporter().getResults();
@@ -747,9 +718,9 @@ public class VooDooDriver {
                System.out.printf("(*)New browser created.\n");
             }
 
-            testobj = new SodaTest(current_test, browser, gvars, hijacks,
-                                   blockList, vars, suite_base_noext,
-                                   resultdir, savehtml);
+            testobj = new Test(current_test, browser, gvars, hijacks,
+                               blockList, vars, suite_base_noext,
+                               resultdir, savehtml);
             if (assertpage != null) {
                testobj.setAssertPage(assertpage);
             }
@@ -770,12 +741,12 @@ public class VooDooDriver {
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<stoptime>%s</stoptime>\n",
                                        date_str));
-            String msg = SodaUtils.GetRunTime(test_start_time, now);
+            String msg = Utils.GetRunTime(test_start_time, now);
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
 
-            if (testobj.getSodaEventDriver() != null) {
-               vars = testobj.getSodaEventDriver().getSodaVars();
+            if (testobj.getEventLoop() != null) {
+               vars = testobj.getEventLoop().getSodaVars();
             }
 
             test_results_hash = testobj.getReporter().getResults();
@@ -842,8 +813,8 @@ public class VooDooDriver {
 
 
          String msg = String.format("\t\t<runtime>%s</runtime>\n",
-                                    SodaUtils.GetRunTime(suiteStartTime,
-                                                         suiteStopTime));
+                                    Utils.GetRunTime(suiteStartTime,
+                                                     suiteStopTime));
          writeSummary(suiteRptFD,
                       String.format("\t\t<starttime>%s</starttime>\n",
                                     startTimeStr));

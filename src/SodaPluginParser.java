@@ -1,5 +1,5 @@
 /*
-Copyright 2011 SugarCRM Inc.
+Copyright 2011-2012 SugarCRM Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import voodoodriver.SodaEvents;
-import voodoodriver.SodaHash;
+import org.sugarcrm.voodoodriver.Events;
+import org.sugarcrm.voodoodriver.VDDHash;
 
 public class SodaPluginParser {
 
@@ -46,11 +46,11 @@ public class SodaPluginParser {
       this.Nodedata = doc.getDocumentElement().getChildNodes();
    }
 
-   public SodaEvents parse() throws Exception {
-      SodaEvents data = null;
+   public Events parse() throws Exception {
+      Events data = null;
       int len = this.Nodedata.getLength() -1;
 
-      data = new SodaEvents();
+      data = new Events();
 
       for (int i = 0; i <= len; i++) {
          Node child = this.Nodedata.item(i);
@@ -65,7 +65,7 @@ public class SodaPluginParser {
             continue;
          }
 
-         SodaHash tmp = new SodaHash();
+         VDDHash tmp = new VDDHash();
 
          int clen = child.getChildNodes().getLength() -1;
          String controls = "";
@@ -92,7 +92,7 @@ public class SodaPluginParser {
             int cdata_len = control_data.length -1;
 
             for (int p = 0; p <= cdata_len; p++) {
-               SodaHash newdata = new SodaHash();
+               VDDHash newdata = new VDDHash();
                newdata.putAll(tmp);
                newdata.put("control", control_data[p]);
                data.add(newdata);

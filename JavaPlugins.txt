@@ -11,7 +11,7 @@ Question:
 What does the program allow you access to?
 
 Answer:
-The plugin allows access to VDD's SodaBrowser instance, also if the plugin is parented by other VDD command’s such as :
+The plugin allows access to VDD's Browser instance, also if the plugin is parented by other VDD command’s such as :
 
 <div id="foo">
   <javaplugin classname="myclass" />
