@@ -140,7 +140,7 @@
       <!-- LogReporter build -->
       <jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
          <manifest>
-            <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
+            <attribute name="Main-Class" value="org.sugarcrm.vddlogger.VddLogConverter"/>
          </manifest>
       </jar>
       
@@ -191,7 +191,7 @@
       <!-- LogReporter build -->
       <jar jarfile="${dist}/VDDReporter.jar" basedir="${build}">
          <manifest>
-            <attribute name="Main-Class" value="vddlogger.VddLogConverter"/>
+            <attribute name="Main-Class" value="org.sugarcrm.vddlogger.VddLogConverter"/>
          </manifest>
       </jar>
 

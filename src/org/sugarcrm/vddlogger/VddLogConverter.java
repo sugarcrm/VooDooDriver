@@ -50,7 +50,8 @@ public class VddLogConverter {
          File suiteFD = new File(suitefile);
 
          if (!suiteFD.exists()) {
-            System.out.printf("(!)Error: Failed to find suite file: '%s'!\n\n");
+            System.out.printf("(!)Error: Failed to find suite file: '%s'!\n\n",
+                              suitefile);
             System.exit(3);
          }
 
