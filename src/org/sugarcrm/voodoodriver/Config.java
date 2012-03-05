@@ -104,11 +104,6 @@ public class Config {
                                     arg, name);
                   System.exit(1);
                }
-//               if (f.list().length > 0) {
-//                  System.err.printf("(!)Directory '%s' for --%s is not empty\n",
-//                                    arg, name);
-//                  System.exit(1);
-//               }
             }
          } else if (!f.exists()) {
             System.err.printf("(!)Failed to find --%s file '%s'\n", name, arg);
