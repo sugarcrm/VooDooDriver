@@ -150,7 +150,18 @@ public class VooDooDriver {
 
             for (String s: validCmdopts) {
                if (name.contains(s)) {
-                  configOpts.put(s, value);
+                  if (name.equals("attachtimeout")) {
+                     /* The only integer cmdopt */
+                     try {
+                        configOpts.put(s, Integer.valueOf(value));
+                     } catch (java.lang.NumberFormatException e) {
+                        System.err.printf("(!)Invalid cmdopt for %s '%s'\n",
+                                          name, value);
+                        System.exit(1);
+                     }
+                  } else {
+                     configOpts.put(s, value);
+                  }
                   System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n",
                                     name, value);
                }
@@ -223,7 +234,7 @@ public class VooDooDriver {
       /* Defaults */
       opts.put("attachtimeout", 0);
       opts.put("haltOnFailure", false);
-      opts.put("restartcount", "0");
+      opts.put("restartcount", 0);
       opts.put("resultdir", defaultResultDir());
 
       /* Merge gvar */
@@ -315,17 +326,13 @@ public class VooDooDriver {
       }
 
       if (config.containsKey("attachtimeout")) {
-         /* XXX: Handle in Config */
-         Integer t = new Integer((String)config.get("attachtimeout"));
-         config.put("attachtimeout", t);
-         System.out.printf("(*)Setting attach timeout to %ss.\n", t);
+         System.out.printf("(*)Setting attach timeout to %ss.\n",
+                           (Integer)config.get("attachtimeout"));
       }
 
       if (config.containsKey("restartcount")) {
-         /* XXX: Handle in Config */
-         Integer r = new Integer((String)config.get("restartcount"));
-         config.put("restartcount", r);
-         System.out.printf("(*)Restart count => '%d'\n", r);
+         System.out.printf("(*)Restart count => '%d'\n",
+                           (Integer)config.get("restartcount"));
       }
 
       if (config.containsKey("savehtml")) {

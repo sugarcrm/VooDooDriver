@@ -158,25 +158,23 @@ public class Config {
 
    private class VooDooCmdLineIntegerAction implements VooDooCmdLineArgAction {
       public void handle(String name, String arg, boolean isArray) {
+         int i = 0;
          try {
-            int i = Integer.valueOf(arg);
+            i = Integer.valueOf(arg);
          } catch (java.lang.NumberFormatException e) {
             System.err.printf("(!)Invalid argument to --%s '%s'\n", name, arg);
+            System.exit(1);
          }
 
          if (isArray) {
-            /*
-             * Once the code that uses this is fixed, this will be
-             * ArrayList<Integer>.
-             */
             if (!options.containsKey(name)) {
-               options.put(name, new ArrayList<String>());
+               options.put(name, new ArrayList<Integer>());
             }
             @SuppressWarnings("unchecked")
-               ArrayList<String> a = (ArrayList<String>)options.get(name);
-            a.add(arg);
+               ArrayList<Integer> a = (ArrayList<Integer>)options.get(name);
+            a.add(i);
          } else {
-            options.put(name, arg);
+            options.put(name, i);
          }
       }
    }
