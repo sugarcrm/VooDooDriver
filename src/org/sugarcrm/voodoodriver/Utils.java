@@ -83,30 +83,26 @@ public class Utils {
 
    }
 
+
    /**
     * Reads a text file into a String object.
     *
-    * @param filename    The file to read in.
-    * @return Returns a String containing the contents of the text file.
+    * @param filename  the file to read in.
+    * @return {@link String} containing the contents of the file
     *
     */
-   public static String FileToStr(String filename) {
+
+   public static String FileToStr(String filename) throws java.io.FileNotFoundException, java.io.IOException {
       String result = "";
       BufferedReader reader = null;
 
       filename = FilenameUtils.separatorsToSystem(filename);
-
-      try {
-         reader = new BufferedReader(new FileReader(filename));
-         String line = "";
-         while ((line = reader.readLine()) != null) {
-            result = result.concat(line + "\n");
-         }
-         reader.close();
-      } catch (Exception exp) {
-         exp.printStackTrace();
-         result = null;
+      reader = new BufferedReader(new FileReader(filename));
+      String line = "";
+      while ((line = reader.readLine()) != null) {
+         result = result.concat(line + "\n");
       }
+      reader.close();
 
       return result;
    }
