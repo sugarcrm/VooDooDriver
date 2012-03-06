@@ -3289,7 +3289,7 @@ public class EventLoop implements Runnable {
          return false;
       }
 
-      this.report.Log("Plugin Event Started.");
+      this.report.Log("Plugin event started.");
 
       try {
          res = this.Browser.executeJS(js, element);
@@ -3303,7 +3303,7 @@ public class EventLoop implements Runnable {
                                  "' return value is not an integer (" +
                                  String.valueOf(res) + ")");
       }
-      this.report.Log("Plugin Event Finished.");
+      this.report.Log("Plugin event finished.");
 
       if (rv != 0) {
          String msg = String.format("Plugin Event failed (return value = %d)",
@@ -3312,6 +3312,71 @@ public class EventLoop implements Runnable {
       }
 
       return rv == 0;
+   }
+
+
+   /**
+    * Execute a java plugin
+    *
+    * @param plugin  the java plugin
+    * @param element the element on the current HTML page
+    * @return true if the plugin succeeded, false otherwise
+    */
+
+   private boolean fireJavaPlugin(VDDHash plugin, WebElement element) {
+      PluginInterface inst = null;
+      Exception exc = null;
+      String errm = null;
+      int rv = 0;
+
+      String classname = String.valueOf(plugin.get("classname"));
+      this.report.Log("Plugin event " + classname + " started.");
+
+      Class<PluginInterface> pluginClass = this.loadedPlugins.get(classname);
+      try {
+         inst = pluginClass.newInstance();
+      } catch (java.lang.InstantiationException e) {
+         errm = "Failed to instantiate plugin " + classname;
+         exc = e;
+      } catch (java.lang.IllegalAccessException e) {
+         errm = "No access to plugin " + classname;
+         exc = e;
+      } catch (Exception e) {
+         /*
+          * Any exceptions raised during execution of the plugin
+          * object constructor will end up here.
+          */
+         errm = "Unexpected exception during instantiation of " + classname;
+         exc = e;
+      }
+
+      if (exc != null) {
+         this.report.ReportError(errm);
+         this.report.ReportException(exc);
+         return false;
+      }
+
+      try {
+         rv = inst.execute(null, this.Browser, element);
+      } catch (Exception e) {
+         /*
+          * Because all software can't be perfect ;)
+          */
+         this.report.ReportError("Exception during plugin (" + classname +
+                                 ") execution.");
+         this.report.ReportException(e);
+         return false;
+      }
+
+      if (rv != 0) {
+         this.report.ReportError("Plugin " + classname +
+                                 " failed (error code " + rv + ").");
+         return false;
+      }
+
+      this.report.Log("Plugin event " + classname + " finished.");
+   
+      return true;
    }
 
 
@@ -3331,6 +3396,11 @@ public class EventLoop implements Runnable {
       boolean isJs = false;
 
       if (this.plugIns == null) {
+         return true;
+      }
+
+      if (!this.windowExists(this.getCurrentHWND())) {
+         this.report.Log("Browser window closed. Skipping plugin execution.");
          return true;
       }
 
@@ -3360,55 +3430,19 @@ public class EventLoop implements Runnable {
          }
       }
 
+      if (index < 0) {
+         return true;
+      }
+
       if (isJs) {
-         /*
-          * Execute a javascript plugin.
-          */
          result = fireJSPlugin(this.plugIns.get(index), element);
       } else {
-         /*
-          * Execute a java plugin.
-          */
-
-         if (index > -1) {
-            VDDHash data = this.plugIns.get(index);
-            String classname = data.get("classname").toString();
-            String msg = "";
-            Class<PluginInterface> tmp_class = this.loadedPlugins.get(classname);
-            msg = String.format("");
-
-            try {
-               int err = 0;
-               PluginInterface inst = tmp_class.newInstance();
-
-               String tmp_hwnd = this.getCurrentHWND();
-               if (this.windowExists(tmp_hwnd)) {
-                  msg = String.format("Starting plugin: '%s'.", classname);
-                  this.report.Log(msg);
-
-                  err = inst.execute(null, this.Browser, element);
-                  if (err != 0) {
-                     msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!",
-                                         classname, err);
-                     this.report.ReportError(msg);
-                  } else {
-                     msg = String.format("Plugin: '%s' finished.", classname);
-                     this.report.Log(msg);
-                  }
-               } else {
-                  msg = "Found the browser window has been closed, skipping executing plugin.";
-                  this.report.Log(msg);
-               }
-
-            } catch (Exception exp) {
-               this.report.ReportException(exp);
-               result = false;
-            }
-         }
+         result = fireJavaPlugin(this.plugIns.get(index), element);
       }
 
       return result;
    }
+
 
    private WebElement buttonEvent(VDDHash event, WebElement parent) {
       boolean click = true;
