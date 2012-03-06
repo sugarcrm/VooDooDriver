@@ -3260,7 +3260,16 @@ public class EventLoop implements Runnable {
       return result;
    }
 
-   private boolean firePlugin(WebElement element, Elements type, PluginEventType eventType) {
+   /**
+    * Execute a plugin that matches the current element and plugin event
+    *
+    * @param element    the element on the current HTML page
+    * @param type       the element's type
+    * @param eventType  the type of plugin event
+    */
+
+   private boolean firePlugin(WebElement element, Elements type,
+                              PluginEventType eventType) {
       boolean result = false;
       int len = 0;
       String js = "var CONTROL = arguments[0];\n\n";
@@ -3271,6 +3280,16 @@ public class EventLoop implements Runnable {
       }
 
       len = this.plugIns.size() - 1;
+
+      /*
+       * Search through the list of plugins for those with control and
+       * event specifications matching the control and event that're
+       * executing this callback.  This code currently only fires the
+       * first plugin matched.  If the plugin specifies "jsfile" (and
+       * the file can be read), result is true, otherwise it is false,
+       * and index is set to the index of the plugin within
+       * this.plugIns.
+       */
 
       for (int i = 0; i <= len; i++) {
          VDDHash tmp = this.plugIns.get(i);
@@ -3302,6 +3321,10 @@ public class EventLoop implements Runnable {
          }
       }
 
+      /*
+       * Execute a javascript plugin.
+       */
+
       if (result && index < 0) {
          this.report.Log("Plugin Event Started.");
          Object res = this.Browser.executeJS(js, element);
@@ -3316,6 +3339,10 @@ public class EventLoop implements Runnable {
 
          this.report.Log("Plugin Event Finished.");
       }
+
+      /*
+       * Execute a java plugin.
+       */
 
       if (index > -1) {
          VDDHash data = this.plugIns.get(index);
