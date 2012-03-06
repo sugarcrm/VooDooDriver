@@ -25,6 +25,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Types {
+   private final String EVENTS = "Events.xml";
    private Document doc = null;
    private ElementsList datatypes = null;
 
@@ -34,19 +35,20 @@ public class Types {
       DocumentBuilder db = null;
 
       try {
-         String className = this.getClass().getName().replace('.', '/');
-         String classJar =  this.getClass().getResource("/" + className + ".class").toString();
+         String className = getClass().getName().replace('.', '/');
+         String classJar =  getClass().getResource("/" + className +
+                                                   ".class").toString();
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
 
          if (classJar.startsWith("jar:")) {
-            doc = db.parse(getClass().getResourceAsStream("Elements.xml"));
+            doc = db.parse(getClass().getResourceAsStream(EVENTS));
          } else {
-            testFD = new File(getClass().getResource("Elements.xml").getFile());
+            testFD = new File(getClass().getResource(EVENTS).getFile());
             doc = db.parse(testFD);
          }
 
-         datatypes = this.parse(doc.getDocumentElement().getChildNodes());
+         datatypes = parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {
          exp.printStackTrace();
       }
@@ -90,7 +92,8 @@ public class Types {
                for (int x = 0; x <= kids.getLength() -1; x++) {
                   Node kid = kids.item(x);
                   String kid_name = kid.getNodeName();
-                  if (kid_name.contains("soda_attributes") || kid_name.contains("accessor_attributes")) {
+                  if (kid_name.contains("soda_attributes") ||
+                      kid_name.contains("accessor_attributes")) {
                      data.put(kid_name, parseAccessors(kid.getChildNodes()));
                   }
                }
