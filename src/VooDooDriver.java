@@ -32,14 +32,15 @@ import org.sugarcrm.voodoodriver.Config;
 import org.sugarcrm.voodoodriver.ConfigFileParser;
 import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.Firefox;
-import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.IE;
+import org.sugarcrm.voodoodriver.PluginLoader;
 import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestList;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.VDDHash;
 
 
 /**
@@ -343,10 +344,11 @@ public class VooDooDriver {
          String p = (String)config.get("plugin");
          System.out.println("(*)Loading plugins from " + p);
          try {
-            SodaPluginParser plugParser = new SodaPluginParser(p);
-            config.put("plugin", plugParser.parse());
+            PluginLoader loader = new PluginLoader(p);
+            config.put("plugin", loader.parse());
          } catch (Exception e) {
             /* XXX: Just what Exception does SodaPluginParser actually throw? */
+            /* A: It literally throws exception. That needs to be fixed. */
             System.err.println("(!)Failed to load plugin file: " + e);
             System.exit(1);
          }

@@ -38,13 +38,15 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+
 /**
- * This is the heart of all of VooDooDriver.  This class handles executing all of the SODA
- * language commands in the web browser.
+ * This is the heart of all of VooDooDriver.  This class handles
+ * executing all of the SODA language commands in the web browser.
  *
  * @author trampus
  *
  */
+
 public class EventLoop implements Runnable {
 
    private Events testEvents = null;
