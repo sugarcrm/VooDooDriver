@@ -29,6 +29,7 @@ public interface Plugin {
    public void setElements(String[] elements);
    public void setEvents(String[] events);
    public void setArgs(String[] args);
+   public boolean matches(PluginEvent event);
    public boolean matches(Elements element, PluginEvent event);
    public boolean matches(String className);
    public boolean execute(WebElement element, Browser browser, Reporter report);
@@ -104,6 +105,28 @@ class PluginSuper implements Plugin {
 
    public void setArgs(String[] args) {
       this.args = args;
+   }
+
+
+   /**
+    * Determine whether element and event match this plugin's specification.
+    *
+    * @param event    current plugin event
+    * @return  whether this plugin's spec matches
+    */
+
+   public boolean matches(PluginEvent event) {
+      if (this.events == null) {
+         return false;
+      }
+
+      for (PluginEvent e: this.events) {
+         if (e.equals(event)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
 

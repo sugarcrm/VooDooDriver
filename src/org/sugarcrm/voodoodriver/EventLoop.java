@@ -3208,39 +3208,94 @@ public class EventLoop implements Runnable {
 
 
    /**
-    * Execute a plugin that matches the current element and plugin event
+    * Perform pre-fire checks for plugin execution.
     *
-    * @param element    the element on the current HTML page
-    * @param type       the element's type
-    * @param eventType  the type of plugin event
+    * If this routine returns false, plugin execution will be skipped.
+    *
+    * @return true if plugins can execute, false otherwise
     */
 
-   private boolean firePlugin(WebElement element, Elements type,
-                              PluginEvent eventType) {
-      boolean result = false;
-
+   private boolean pluginPrefireCheck() {
       if (this.plugins.size() == 0) {
-         return true;
+         return false;
       }
 
       if (!this.windowExists(this.getCurrentHWND())) {
          this.report.Log("Browser window closed. Skipping plugin execution.");
+         return false;
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Execute all plugins.
+    *
+    * @param element    the element on the current HTML page
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
          return true;
       }
 
-      /*
-       * Search through the list of plugins for those with control and
-       * event specifications matching the control and event that're
-       * executing this callback.  This code currently only fires the
-       * first plugin matched.  If the plugin specifies "jsfile" (and
-       * the file can be read), result is true, otherwise it is false,
-       * and index is set to the index of the plugin within
-       * this.plugIns.
-       */
+      for (Plugin plugin: this.plugins) {
+         result &= plugin.execute(element, this.Browser, this.report);
+      }
+
+      return result;
+   }
+
+
+   /**
+    * Execute all plugins that match a plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, PluginEvent eventType) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
 
       for (Plugin plugin: this.plugins) {
-         if (plugin.matches(type, eventType)) {
-            result = plugin.execute(element, this.Browser, this.report);
+         if (plugin.matches(eventType)) {
+            result &= plugin.execute(element, this.Browser, this.report);
+         }
+      }
+
+      return result;
+   }
+
+
+   /**
+    * Execute a plugin that matches the current element and plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param type       the element's type
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, Elements elementType,
+                              PluginEvent eventType) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
+
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(elementType, eventType)) {
+            result &= plugin.execute(element, this.Browser, this.report);
          }
       }
 
