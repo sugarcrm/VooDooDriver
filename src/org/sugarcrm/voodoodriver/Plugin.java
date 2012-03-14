@@ -29,7 +29,7 @@ public interface Plugin {
    public void setElements(String[] elements);
    public void setEvents(String[] events);
    public void setArgs(String[] args);
-   public boolean matches(Elements element, PluginEventType event);
+   public boolean matches(Elements element, PluginEvent event);
    public boolean matches(String className);
    public boolean execute(WebElement element, Browser browser, Reporter report);
 }
@@ -53,7 +53,7 @@ class PluginSuper implements Plugin {
     * Array of plugin events that this plugin executes in response to.
     */
 
-   private PluginEventType[] events = null;
+   private PluginEvent[] events = null;
 
    /**
     * Array of arguments to pass to the plugin.
@@ -66,7 +66,7 @@ class PluginSuper implements Plugin {
     * Assign this plugin's list of HTML elements.
     *
     * Each element in the array is converted from a string to the
-    * corresponding {@link Element}.
+    * corresponding {@link Elements}.
     *
     * @param elements  array of HTML elements
     */
@@ -83,15 +83,15 @@ class PluginSuper implements Plugin {
     * Assign this plugin's list of plugin events.
     *
     * Each event in the array is converted from a string to the
-    * corresponding {@link PluginEventType}.
+    * corresponding {@link PluginEvent}.
     *
     * @param events  array of plugin events
     */
 
    public void setEvents(String[] events) {
-      this.events = new PluginEventType[events.length];
+      this.events = new PluginEvent[events.length];
       for (int k = 0; k < events.length; k++) {
-         this.events[k] = PluginEventType.valueOf(events[k].toUpperCase());
+         this.events[k] = PluginEvent.valueOf(events[k].toUpperCase());
       }
    }
 
@@ -115,7 +115,7 @@ class PluginSuper implements Plugin {
     * @return  whether this plugin's spec matches
     */
 
-   public boolean matches(Elements element, PluginEventType event) {
+   public boolean matches(Elements element, PluginEvent event) {
       boolean elementMatches = false;
       boolean eventMatches = false;
 
@@ -130,7 +130,7 @@ class PluginSuper implements Plugin {
          }
       }
 
-      for (PluginEventType e: this.events) {
+      for (PluginEvent e: this.events) {
          if (e.equals(event)) {
             eventMatches = true;
             break;

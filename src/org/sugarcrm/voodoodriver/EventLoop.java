@@ -448,7 +448,7 @@ public class EventLoop implements Runnable {
          System.exit(1);
       }
 
-      this.firePlugin(null, type, PluginEventType.AFTEREVENT);
+      this.firePlugin(null, type, PluginEvent.AFTEREVENT);
       this.resetThreadTime();
 
       if (element != null) {
@@ -668,7 +668,7 @@ public class EventLoop implements Runnable {
          handleVars(alert_text, event);
 
          this.firePlugin(null, Elements.ALERT,
-               PluginEventType.AFTERDIALOGCLOSED);
+               PluginEvent.AFTERDIALOGCLOSED);
 
          result = true;
       } catch (NoAlertPresentException exp) {
@@ -856,10 +856,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("UL click started.");
             this.firePlugin(element, Elements.UL,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.UL,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("UL click finished.");
          }
 
@@ -908,10 +908,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Area click started.");
             this.firePlugin(element, Elements.AREA,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.AREA,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Area click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -955,10 +955,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Map click started.");
             this.firePlugin(element, Elements.MAP,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.MAP,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Map click finished.");
          }
 
@@ -1007,10 +1007,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("OL click started.");
             this.firePlugin(element, Elements.OL,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.OL,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("OL click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1174,10 +1174,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Image click started.");
             this.firePlugin(element, Elements.IMAGE,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.IMAGE,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Image click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1210,7 +1210,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.FILEFIELD,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1277,10 +1277,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.LI,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.LI,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1326,10 +1326,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.TR,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TR,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1376,10 +1376,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.TD,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TD,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1458,7 +1458,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.SPAN,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1471,10 +1471,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.SPAN,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.SPAN,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -1528,7 +1528,7 @@ public class EventLoop implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, Elements.INPUT, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.INPUT, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1581,7 +1581,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.RADIO,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1599,12 +1599,12 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.RADIO,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             this.report.Log("Clicking Element.");
             element.click();
             this.report.Log("Click finished.");
             this.firePlugin(element, Elements.RADIO,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -1673,7 +1673,7 @@ public class EventLoop implements Runnable {
          if (element != null) {
             Select sel = new Select(element);
             this.firePlugin(element, Elements.SELECT,
-                  PluginEventType.AFTERFOUND);
+                  PluginEvent.AFTERFOUND);
 
             this.checkDisabled(event, element);
 
@@ -1714,7 +1714,7 @@ public class EventLoop implements Runnable {
                }
 
                this.firePlugin(element, Elements.SELECT,
-                     PluginEventType.AFTERSET);
+                     PluginEvent.AFTERSET);
             }
 
             if (event.containsKey("assert")) {
@@ -1782,10 +1782,10 @@ public class EventLoop implements Runnable {
 
             if (click) {
                this.firePlugin(element, Elements.FORM,
-                               PluginEventType.BEFORECLICK);
+                               PluginEvent.BEFORECLICK);
                element.click();
                this.firePlugin(element, Elements.FORM,
-                               PluginEventType.AFTERCLICK);
+                               PluginEvent.AFTERCLICK);
             }
 
             if (event.containsKey("jscriptevent")) {
@@ -1887,7 +1887,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.FORM,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1897,10 +1897,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.FORM,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.FORM,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1935,7 +1935,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TABLE,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1945,10 +1945,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.TABLE,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TABLE,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2201,7 +2201,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.DIV,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -2211,10 +2211,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.DIV,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.DIV,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2352,16 +2352,16 @@ public class EventLoop implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
             if (click) {
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.BEFORECLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.BEFORECLICK);
                element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
             }
          }
 
@@ -2375,7 +2375,7 @@ public class EventLoop implements Runnable {
             } else {
                msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
                element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
             }
             this.report.Log(msg);
          }
@@ -2463,7 +2463,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.LINK,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -2483,10 +2483,10 @@ public class EventLoop implements Runnable {
             this.report.Log(String.format("Clicking Link: '%s' => '%s'", how,
                                           value));
             this.firePlugin(element, Elements.LINK,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.LINK,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          } else {
             String msg = String.format(
                   "Found Link: '%s' but not clicking as click => '%s'.", value,
@@ -2755,7 +2755,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.THEAD,
-                         PluginEventType.AFTERFOUND);
+                         PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
 
@@ -2764,10 +2764,10 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.THEAD,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.THEAD,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2833,7 +2833,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TBODY,
-                         PluginEventType.AFTERFOUND);
+                         PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
 
@@ -2842,10 +2842,10 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.TBODY,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TBODY,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -3216,7 +3216,7 @@ public class EventLoop implements Runnable {
     */
 
    private boolean firePlugin(WebElement element, Elements type,
-                              PluginEventType eventType) {
+                              PluginEvent eventType) {
       boolean result = false;
 
       if (this.plugins.size() == 0) {
@@ -3271,7 +3271,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.BUTTON,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3288,12 +3288,12 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.BUTTON,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             this.report.Log("Clicking button.");
             element.click();
             this.report.Log("Finished clicking button.");
             this.firePlugin(element, Elements.BUTTON,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("jscriptevent")) {
@@ -3339,7 +3339,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.TEXTAREA,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3380,12 +3380,12 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.TEXTAREA,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             this.report.Log("Clicking textarea.");
             element.click();
             this.report.Log("Finished clicking textarea.");
             this.firePlugin(element, Elements.TEXTAREA,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -3419,7 +3419,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TEXTFIELD,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3504,7 +3504,7 @@ public class EventLoop implements Runnable {
             return null;
          }
 
-         this.firePlugin(element, Elements.PASSWORD, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.PASSWORD, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
