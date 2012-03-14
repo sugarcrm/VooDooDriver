@@ -57,14 +57,13 @@ public class EventLoop implements Runnable {
    private Date threadTime = null;
    private volatile Thread runner;
    private volatile Boolean threadStop = false;
-   private Events plugIns = null;
-   private VDDHash JavaPlugings = null;
    private VDDHash ElementStore = null;
-   private PluginsHash loadedPlugins = null;
    private String currentHWnd = null;
    private int attachTimeout = 0;
    private String csvOverrideFile = null;
    private VDDHash whitelist = null;
+   private ArrayList<Plugin> plugins = null;
+
 
    /**
     * The class Constructor.
@@ -79,15 +78,13 @@ public class EventLoop implements Runnable {
     */
    public EventLoop(Browser browser, Events events,
          Reporter reporter, VDDHash gvars, VDDHash hijacks,
-         VDDHash oldvars, Events plugins) {
+         VDDHash oldvars, Plugin plugins) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
 
       this.whitelist = new VDDHash();
-      this.JavaPlugings = new VDDHash();
-      this.loadedPlugins = new PluginsHash();
 
       if (oldvars != null) {
          sodaVars = oldvars;
@@ -96,10 +93,6 @@ public class EventLoop implements Runnable {
       }
 
       this.ElementStore = new VDDHash();
-      this.plugIns = plugins;
-      if (this.plugIns == null) {
-         this.plugIns = new Events();
-      }
 
       if (gvars != null) {
          int len = gvars.keySet().size();
@@ -113,7 +106,10 @@ public class EventLoop implements Runnable {
          }
       }
 
-      this.loadJavaEventPlugins();
+      this.plugins = new ArrayList<Plugin>();
+      if (plugins != null) {
+         this.plugins.add(plugins);
+      }
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
       this.sodaVars.put("currentdate", df.format(new Date()));
@@ -173,33 +169,6 @@ public class EventLoop implements Runnable {
     */
    private String getCurrentHWND() {
       return this.currentHWnd;
-   }
-
-   /**
-    * Loads and stores all of the java Event Plugin classes.
-    *
-    */
-   private void loadJavaEventPlugins() {
-      int len = this.plugIns.size() - 1;
-
-      for (int i = 0; i <= len; i++) {
-         VDDHash tmp = this.plugIns.get(i);
-         if (!tmp.containsKey("classname")) {
-            continue;
-         }
-
-         String classname = tmp.get("classname").toString();
-         String classfile = tmp.get("classfile").toString();
-         VDDClassLoader loader = new VDDClassLoader(ClassLoader.getSystemClassLoader());
-
-         try {
-            Class<PluginInterface> tmp_class = loader.loadClass(classname,
-                  classfile);
-            this.loadedPlugins.put(classname, tmp_class);
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-         }
-      }
    }
 
    /**
@@ -749,138 +718,113 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+
+   /**
+    * Execute a <javaplugin> event.
+    *
+    * @param event   the <javaplugin> event
+    * @param parent  the parent HTML element
+    * @return whether plugin execution succeeded
+    */
+
    private boolean javapluginEvent(VDDHash event, WebElement parent) {
-      boolean result = false;
-      String[] args = null;
-      String classname = "";
-      String classfile = "";
-      VDDHash classdata;
-      String msg = "";
-      int err = 0;
+      String classname;
+      Plugin plugin = null;
+      boolean result;
 
       this.report.Log("Javaplugin event started.");
 
       if (!event.containsKey("classname")) {
-         this.report.ReportError("Javaplugin event missing attribute: 'classname'!");
-         this.report.Log("Javaplugin event finished.");
+         report.ReportError("Javaplugin event missing attribute 'classname'!");
+         report.Log("Javaplugin event finished.");
          return false;
       }
 
-      classname = event.get("classname").toString();
-      if (!this.JavaPlugings.containsKey(classname)) {
-         msg = String.format("Faild to find loaded plugin: '%s'!", classname);
-         this.report.ReportError(msg);
-         this.report.Log("Javaplugin event finished.");
+      classname = (String)event.get("classname");
+      
+      for (Plugin p: this.plugins) {
+         if (p.matches(classname)) {
+            plugin = p;
+            break;
+         }
+      }
+      if (plugin == null) {
+         report.ReportError("Failed to find a loaded plugin with classname " +
+                            classname);
+         report.Log("Javaplugin event finished.");
          return false;
       }
 
-      classdata = (VDDHash) this.JavaPlugings.get(classname);
-      classfile = classdata.get("file").toString();
-
-      msg = String.format("Loading classname: '%s'.", classname);
-      this.report.Log(msg);
-      if (!this.JavaPlugings.containsKey(classname)) {
-         msg = String.format("Error failed to find a loaded plugin with classname: '%s'!",
-               classname);
-         this.report.ReportError(msg);
-         this.report.Log("Javaplugin event finished.");
-         return false;
-      }
-
-      if (event.containsKey("args")) {
-         args = (String[]) event.get("args");
+      if (!event.containsKey("args")) {
+         plugin.setArgs(null);
+      } else {
+         String[] args = (String[])event.get("args");
 
          if (args != null) {
-            int len = args.length - 1;
-
-            for (int i = 0; i <= len; i++) {
-               args[i] = this.replaceString(args[i]);
+            for (int k = 0; k < args.length; k++) {
+               args[k] = replaceString(args[k]);
             }
          }
+
+         plugin.setArgs(args);
       }
 
-      try {
-         VDDClassLoader loader = new VDDClassLoader(
-               ClassLoader.getSystemClassLoader());
-         Class<PluginInterface> tmp_class = loader.loadClass(classname,
-               classfile);
-         PluginInterface inner = tmp_class.newInstance();
-         this.report.Log("Executing plugin now.");
-         err = inner.execute(args, this.Browser, parent);
-         if (err != 0) {
-            msg = String.format("Javaplugin returned a non-zero value: '%d'!",
-                  err);
-            this.report.ReportError(msg);
-            result = false;
-         }
-         this.report.Log("Plugin finished executing.");
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         result = false;
+      result = plugin.execute(parent, this.Browser, report);
+
+      if (result == false) {
+         report.ReportError("Javaplugin failed");
       }
 
-      this.report.Log("Javaplugin event finished.");
+      report.Log("Javaplugin event finished.");
+
       return result;
    }
 
-   private boolean pluginloaderEvent(VDDHash event) {
-      boolean result = false;
-      String filename = "";
-      String classname = "";
-      File tmp = null;
-      VDDHash data = null;
 
-      this.report.Log("PluginLoader event started.");
+   /**
+    * Execute a <pluginloader> event
+    *
+    * @param event  the <pluginloader> event
+    * @return whether loading the new plugin succeeded
+    */
+
+   private boolean pluginloaderEvent(VDDHash event) {
+      String classname;
+      String classfile;
+      boolean result = true;
+
+      report.Log("PluginLoader event started.");
 
       if (!event.containsKey("file")) {
-         this.report
-               .ReportError("Error: Missing 'file' attribute for pluginloader command!");
-         this.report.Log("PluginLoader event finished.");
+         report.ReportError("Missing 'file' attribute for <pluginloader>");
+         report.Log("PluginLoader event finished.");
          return false;
       }
 
       if (!event.containsKey("classname")) {
-         this.report.ReportError("Error: Missing 'classname' attribute for pluginloader command!");
-         this.report.Log("PluginLoader event finished.");
+         report.ReportError("Missing 'classname' attribute for <pluginloader>");
+         report.Log("PluginLoader event finished.");
          return false;
       }
 
-      filename = event.get("file").toString();
-      filename = this.replaceString(filename);
-      classname = event.get("classname").toString();
-      classname = this.replaceString(classname);
+      classfile = (String)event.get("file");
+      classname = (String)event.get("classname");
 
-      tmp = new File(filename);
-      if (!tmp.exists()) {
-         String msg = String.format("Error: failed to find file: '%s'!", filename);
-         this.report.ReportError(msg);
-         return false;
+      report.Log("Loading plugin with classname=" + classname);
+
+      try {
+         this.plugins.add(new JavaPlugin(classname, classfile));
+      } catch (PluginException e) {
+         report.ReportError("Failed to load plugin " + classname);
+         report.ReportException(e);
+         result = false;
       }
 
-      // load & store plugin //
-      if (!this.loadedPlugins.containsKey(classname)) {
-         try {
-            System.out.printf("Loading class into memory: '%s'!\n", classname);
-            VDDClassLoader loader = new VDDClassLoader(
-                  ClassLoader.getSystemClassLoader());
-            Class<PluginInterface> tmp_class = loader.loadClass(classname,
-                  filename);
-            this.loadedPlugins.put(classname, tmp_class);
-         } catch (ClassNotFoundException exp) {
-            this.report.ReportException(exp);
-            result = false;
-         }
-      }
-
-      data = new VDDHash();
-      data.put("file", filename);
-      data.put("classname", classname);
-      data.put("enabled", true);
-      this.JavaPlugings.put(classname, data);
-      this.report.Log("PluginLoader event finished.");
+      report.Log("PluginLoader event finished.");
 
       return result;
    }
+
 
    private boolean ulEvent(VDDHash event) {
       boolean required = true;
@@ -3264,125 +3208,6 @@ public class EventLoop implements Runnable {
 
 
    /**
-    * Execute a javascript plugin
-    *
-    * @param plugin  the javascript plugin
-    * @param element the element on the current HTML page
-    * @return true if the plugin succeeded, false otherwise
-    */
-
-   private boolean fireJSPlugin(VDDHash plugin, WebElement element) {
-      String js = "var CONTROL = arguments[0];\n\n";
-      String jsFile = (String)plugin.get("jsfile");
-      String err = null;
-      Object res = null;
-      int rv = 0;
-
-      try {
-         js += Utils.FileToStr(jsFile);
-      } catch (java.io.FileNotFoundException e) {
-         err = String.format("Specified plugin not found '%s'", jsFile);
-      } catch (java.io.IOException e) {
-         err = String.format("Error reading plugin file '%s': %s", jsFile, e);
-      }
-
-      if (err != null) {
-         this.report.ReportError(err);
-         return false;
-      }
-
-      this.report.Log("Plugin event started.");
-
-      try {
-         res = this.Browser.executeJS(js, element);
-         rv = Integer.valueOf(String.valueOf(res));
-      } catch (org.openqa.selenium.WebDriverException e) {
-         this.report.ReportError("Exception executing JS plugin " + jsFile);
-         this.report.ReportException(e);
-         return false;
-      } catch (java.lang.NumberFormatException e) {
-         this.report.ReportError("JS Plugin '" + jsFile +
-                                 "' return value is not an integer (" +
-                                 String.valueOf(res) + ")");
-      }
-      this.report.Log("Plugin event finished.");
-
-      if (rv != 0) {
-         String msg = String.format("Plugin Event failed (return value = %d)",
-                                    rv);
-         this.report.ReportError(msg);
-      }
-
-      return rv == 0;
-   }
-
-
-   /**
-    * Execute a java plugin
-    *
-    * @param plugin  the java plugin
-    * @param element the element on the current HTML page
-    * @return true if the plugin succeeded, false otherwise
-    */
-
-   private boolean fireJavaPlugin(VDDHash plugin, WebElement element) {
-      PluginInterface inst = null;
-      Exception exc = null;
-      String errm = null;
-      int rv = 0;
-
-      String classname = String.valueOf(plugin.get("classname"));
-      this.report.Log("Plugin event " + classname + " started.");
-
-      Class<PluginInterface> pluginClass = this.loadedPlugins.get(classname);
-      try {
-         inst = pluginClass.newInstance();
-      } catch (java.lang.InstantiationException e) {
-         errm = "Failed to instantiate plugin " + classname;
-         exc = e;
-      } catch (java.lang.IllegalAccessException e) {
-         errm = "No access to plugin " + classname;
-         exc = e;
-      } catch (Exception e) {
-         /*
-          * Any exceptions raised during execution of the plugin
-          * object constructor will end up here.
-          */
-         errm = "Unexpected exception during instantiation of " + classname;
-         exc = e;
-      }
-
-      if (exc != null) {
-         this.report.ReportError(errm);
-         this.report.ReportException(exc);
-         return false;
-      }
-
-      try {
-         rv = inst.execute(null, this.Browser, element);
-      } catch (Exception e) {
-         /*
-          * Because all software can't be perfect ;)
-          */
-         this.report.ReportError("Exception during plugin (" + classname +
-                                 ") execution.");
-         this.report.ReportException(e);
-         return false;
-      }
-
-      if (rv != 0) {
-         this.report.ReportError("Plugin " + classname +
-                                 " failed (error code " + rv + ").");
-         return false;
-      }
-
-      this.report.Log("Plugin event " + classname + " finished.");
-   
-      return true;
-   }
-
-
-   /**
     * Execute a plugin that matches the current element and plugin event
     *
     * @param element    the element on the current HTML page
@@ -3393,11 +3218,8 @@ public class EventLoop implements Runnable {
    private boolean firePlugin(WebElement element, Elements type,
                               PluginEventType eventType) {
       boolean result = false;
-      int len = 0;
-      int index = -1;
-      boolean isJs = false;
 
-      if (this.plugIns == null) {
+      if (this.plugins.size() == 0) {
          return true;
       }
 
@@ -3405,8 +3227,6 @@ public class EventLoop implements Runnable {
          this.report.Log("Browser window closed. Skipping plugin execution.");
          return true;
       }
-
-      len = this.plugIns.size() - 1;
 
       /*
        * Search through the list of plugins for those with control and
@@ -3418,28 +3238,10 @@ public class EventLoop implements Runnable {
        * this.plugIns.
        */
 
-      for (int i = 0; i <= len; i++) {
-         VDDHash tmp = this.plugIns.get(i);
-
-         if (tmp.get("control").toString()
-               .contains((type.toString().toLowerCase()))) {
-            if (tmp.get("event").toString()
-                  .contains(eventType.toString().toLowerCase())) {
-               index = i;
-               isJs = tmp.containsKey("jsfile");
-               break;
-            }
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(type, eventType)) {
+            result = plugin.execute(element, this.Browser, this.report);
          }
-      }
-
-      if (index < 0) {
-         return true;
-      }
-
-      if (isJs) {
-         result = fireJSPlugin(this.plugIns.get(index), element);
-      } else {
-         result = fireJavaPlugin(this.plugIns.get(index), element);
       }
 
       return result;

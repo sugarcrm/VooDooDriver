@@ -31,7 +31,7 @@ public class Test {
    private VDDHash HiJacks = null;
    private BlockList blocked = null;
    private boolean WatchDog = false;
-   private Events PlugIns = null;
+   private Plugin plugins = null;
    private String SaveHTML = "";
    private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
    private String assertPage = null;
@@ -82,8 +82,8 @@ public class Test {
       this.Browser.setAssertPageFile(this.assertPage, this.reporter);
    }
 
-   public void setPlugins(Events plugins) {
-      this.PlugIns = plugins;
+   public void setPlugins(Plugin plugins) {
+      this.plugins = plugins;
    }
 
    public EventLoop getEventLoop() {
@@ -136,8 +136,9 @@ public class Test {
       result = CheckTestBlocked();
       if (!result) {
          long current = 0;
-         eventDriver = new EventLoop(this.Browser, events, this.reporter, this.GVars, this.HiJacks,
-               this.OldVars, this.PlugIns);
+         eventDriver = new EventLoop(this.Browser, events, this.reporter,
+                                     this.GVars, this.HiJacks,
+                                     this.OldVars, this.plugins);
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);

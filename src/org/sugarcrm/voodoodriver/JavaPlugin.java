@@ -51,13 +51,16 @@ public class JavaPlugin extends PluginSuper implements Plugin {
     */
 
    private void loadPlugin() throws PluginException {
-      Exception exc = null;
+      Throwable exc = null;
       String errm = null;
 
       VDDClassLoader c = new VDDClassLoader(ClassLoader.getSystemClassLoader());
       try {
          Class<PluginInterface> pluginClass = c.loadClass(className, classFile);
          this.plugin = pluginClass.newInstance();
+      } catch (java.lang.NoClassDefFoundError e) {
+         errm = "No class definition found for plugin class " + className;
+         exc = e;
       } catch (java.lang.ClassNotFoundException e) {
          errm = "No class definition found for plugin class " + className;
          exc = e;
@@ -95,6 +98,18 @@ public class JavaPlugin extends PluginSuper implements Plugin {
       this.classFile = classFile;
 
       loadPlugin();
+   }
+
+
+   /**
+    * Determine whether the specified class name matches this class name.
+    *
+    * @param className  name of the Java class
+    * @return whether the specified class name matches this class name
+    */
+
+   public boolean matches(String className) {
+      return className != null && this.className.equals(className);
    }
 
 

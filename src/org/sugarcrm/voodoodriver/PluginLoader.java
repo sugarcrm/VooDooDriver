@@ -20,90 +20,136 @@ package org.sugarcrm.voodoodriver;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
+/**
+ * VooDooDriver plugin loader
+ *
+ * @author trampus
+ * @author Jon duSaint
+ */
+
 public class PluginLoader {
 
-   private NodeList Nodedata = null;
+   /**
+    * The filename of the plugin config file.
+    */
 
-   public PluginLoader(String filename) throws Exception {
-      File fd = null;
-      DocumentBuilderFactory dbf = null;
-      DocumentBuilder db = null;
-      Document doc = null;
+   private String pluginFilename;
 
-      fd = new File(filename);
-      if (!fd.exists()) {
-         throw new Exception("Failed to find file: " + filename);
+   /**
+    * The <plugin> node from the parsed plugin config file.
+    */
+
+   private Node pluginNode;
+
+
+   /**
+    * Read and parse the XML plugin configuration file
+    *
+    * @param plugin  path to the XML plugin configuration file
+    */
+
+   public PluginLoader(String plugin) throws PluginException {
+      Element data;
+
+      this.pluginFilename = plugin;
+
+      try {
+         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+         DocumentBuilder db = dbf.newDocumentBuilder();
+         Document doc = db.parse(new File(plugin));
+         data = doc.getDocumentElement();
+      } catch (javax.xml.parsers.ParserConfigurationException e) {
+         throw new PluginException("??? Failed configuring plugin XML parser");
+      } catch (java.io.IOException e) {
+         throw new PluginException("Unable to read " + plugin, e);
+      } catch (org.xml.sax.SAXException e) {
+         throw new PluginException("XML error in " + plugin, e);
       }
 
-      dbf = DocumentBuilderFactory.newInstance();
-      db = dbf.newDocumentBuilder();
-      doc = db.parse(fd);
-      this.Nodedata = doc.getDocumentElement().getChildNodes();
+      if (!data.getNodeName().equals("data")) {
+         throw new PluginException("Plugin " + plugin +
+                                   " missing <data> root element");
+      }
+
+      NodeList nl = data.getChildNodes();
+      for (int k = 0; k < nl.getLength(); k++) {
+         Node node = nl.item(k);
+         if (node.getNodeName().equals("plugin")) {
+            if (!node.hasChildNodes()) {
+               throw new PluginException("Plugin " + plugin + " <plugin> " +
+                                         "node contains no information");
+            }
+            this.pluginNode = node;
+            return;
+         }
+      }
+
+      throw new PluginException("Plugin " + plugin +
+                                " missing <plugin> element");
    }
 
-   public Events parse() throws Exception {
-      Events data = null;
-      int len = this.Nodedata.getLength() -1;
 
-      data = new Events();
+   /**
+    * Load the VooDooDriver plugin
+    *
+    * @return  either a {@link JavaPlugin} or a {@link JsPlugin}
+    */
 
-      for (int i = 0; i <= len; i++) {
-         Node child = this.Nodedata.item(i);
-         String name = child.getNodeName();
+   public Plugin load() throws PluginException {
+      Plugin plugin;
+      String classname = null;
+      String classfile = null;
+      String jsfile = null;
+      String elements[] = null;
+      String events[] = null;
+      String args[] = null;
 
-         if (!name.contains("plugin")) {
+      NodeList nl = pluginNode.getChildNodes();
+      for (int k = 0; k < nl.getLength(); k++) {
+         Node node = nl.item(k);
+         String name = node.getNodeName().toLowerCase();
+
+         if (name.equals("classname")) {
+            classname = node.getTextContent();
+         } else if (name.equals("classfile")) {
+            classfile = node.getTextContent();
+         } else if (name.equals("jsfile")) {
+            jsfile = node.getTextContent();
+         } else if (name.equals("control")) {
+            elements = node.getTextContent().split(",");
+         } else if (name.equals("event")) {
+            events = node.getTextContent().split(",");
+         } else if (name.equals("event")) {
+            args = node.getTextContent().split(",");
+         } else if (name.contains("#text")) {
             continue;
-         }
-
-         if (!child.hasChildNodes()) {
-            System.out.printf("(!)Error: Failed to find all needed data for plugin node!\n");
-            continue;
-         }
-
-         VDDHash tmp = new VDDHash();
-
-         int clen = child.getChildNodes().getLength() -1;
-         String controls = "";
-         for (int cindex = 0; cindex <= clen; cindex++) {
-            Node info = child.getChildNodes().item(cindex);
-            String cname = info.getNodeName();
-            cname = cname.toLowerCase();
-
-            if (cname.contains("#text")) {
-               continue;
-            }
-
-            if (cname.contains("control")) {
-               controls = info.getTextContent();
-               continue;
-            }
-
-            String value = info.getTextContent();
-            tmp.put(cname, value);
-         }
-
-         if (controls.contains(",")) {
-            String[] control_data = controls.split(",");
-            int cdata_len = control_data.length -1;
-
-            for (int p = 0; p <= cdata_len; p++) {
-               VDDHash newdata = new VDDHash();
-               newdata.putAll(tmp);
-               newdata.put("control", control_data[p]);
-               data.add(newdata);
-               System.out.printf("Adding control permute: %s\n", control_data[p]);
-            }
          } else {
-            tmp.put("control", controls);
-            data.add(tmp);
+            System.out.println("(W)Unknown plugin tag '" + name + "' in " +
+                               pluginFilename);
+            continue;
          }
       }
 
-      return data;
+      if (classname != null && classfile != null) {
+         plugin = new JavaPlugin(classname, classfile);
+      } else if (jsfile != null) {
+         plugin = new JsPlugin(jsfile);
+      } else {
+         throw new PluginException("Plugin " + pluginFilename +
+                                   " is neither a javascript plugin nor a" +
+                                   " java plugin.");
+      }
+
+      plugin.setElements(elements);
+      plugin.setEvents(events);
+      plugin.setArgs(args);
+
+      return plugin;
    }
 }
