@@ -32,7 +32,6 @@ public class Test {
    private BlockList blocked = null;
    private boolean WatchDog = false;
    private Plugin plugins = null;
-   private String SaveHTML = "";
    private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
    private String assertPage = null;
    private int attachTimeout = 0;
@@ -40,7 +39,8 @@ public class Test {
 
    public Test(String testFile, Browser browser, VDDHash gvars,
                VDDHash hijacks, BlockList blocklist, VDDHash oldvars,
-               String suitename, String reportDir, String saveHtml) {
+               String suitename, String reportDir, String saveHtml,
+               String screenshot) {
       this.Browser = browser;
       this.testFile = testFile;
       this.HiJacks = hijacks;
@@ -50,7 +50,6 @@ public class Test {
       String resultsdir = reportDir;
       String report_name = "";
       File tmp_file = new File(testFile);
-      this.SaveHTML = saveHtml;
 
       report_name = tmp_file.getName();
       report_name = report_name.replaceAll(".xml$", "");
@@ -60,10 +59,15 @@ public class Test {
       }
 
       this.reporter = new Reporter(report_name, resultsdir);
+      this.reporter.setTestName(testFile);
+      this.reporter.setBrowser(browser);
 
       if (saveHtml != null && saveHtml.length() > 0) {
-         this.reporter.setSaveHTML(this.SaveHTML, browser);
-         this.reporter.setTestName(testFile);
+         this.reporter.setSaveHTML(saveHtml);
+      }
+
+      if (screenshot != null && screenshot.length() > 0) {
+         this.reporter.setScreenshot(screenshot);
       }
 
       this.Browser.setReporter(this.reporter);

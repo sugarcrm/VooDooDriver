@@ -76,6 +76,10 @@
    <option name="savehtml" arg="string"
            help="Save the web page on specified event. Supported events are
 warning, error, assertfail, exception, watchdog, all"/>
+   <option name="screenshot" arg="string"
+           help="Take screenshots on specified events. Supported events are
+warning, error, assertfail, exception, watchdog, all. WARNING: Screenshots
+can consume disk space quickly. Be sure you have enough."/>
    <option name="suite" arg="files"
            help="A VooDooDriver test suite to run"/>
    <option name="test" arg="files"

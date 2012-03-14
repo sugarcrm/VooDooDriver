@@ -137,41 +137,76 @@ public class Utils {
       return result;
    }
 
+
+   /**
+    * Take a screen shot and save it to the specified file.
+    *
+    * @param outputFile  file to save the screenshot into
+    * @param reporter    {@link Reporter} object for logging errors
+    * @return whether the screenshot was taken successfully
+    */
+
    public static boolean takeScreenShot(String outputFile, Reporter reporter) {
-      boolean result = false;
+      return takeScreenShot(outputFile, reporter, true);
+   }
+
+
+   /**
+    * Take a screen shot and save it to the specified file.
+    *
+    * @param outputFile  file to save the screenshot into
+    * @param reporter    {@link Reporter} object for logging errors
+    * @param logOK whether logging to reporter is OK.  false if this
+    *              is called from a reporter object.
+    * @return whether the screenshot was taken successfully
+    */
+
+   public static boolean takeScreenShot(String outputFile, Reporter reporter,
+                                        boolean logOK) {
       Robot r = null;
-      String msg = "";
 
       reporter.Log("Taking Screenshot.");
 
-      try {
-
-         File tmp = new File(outputFile);
-         if (tmp.exists()) {
-            msg = String.format("Existing screenshot file will be over written: '%s'.", outputFile);
-            reporter.Warn(msg);
-            tmp = null;
-         }
-
-         r = new Robot();
-         Rectangle rec = new Rectangle();
-         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-         dim.setSize(dim);
-         rec.setSize(dim);
-         BufferedImage img = r.createScreenCapture(rec);
-         ImageIO.write(img, "png", new File(outputFile));
-         msg = String.format("Screenshot file: %s", outputFile);
-         reporter.Log(msg);
-      } catch (Exception exp) {
-         reporter.ReportException(exp);
-         result = false;
+      File tmp = new File(outputFile);
+      if (tmp.exists() && logOK) {
+         String msg;
+         msg = String.format("Existing screenshot '%s' will be overwritten.",
+                             outputFile);
+         reporter.Warn(msg);
       }
 
+      try {
+         r = new Robot();
+      } catch (java.awt.AWTException e) {
+         if (logOK) {
+            reporter.ReportError("Screenshot failed (running headless?)");
+            reporter.ReportException(e);
+         }
+         return false;
+      }
+
+      Rectangle rec = new Rectangle();
+      Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+      dim.setSize(dim);
+      rec.setSize(dim);
+      BufferedImage img = r.createScreenCapture(rec);
+
+      try {
+         ImageIO.write(img, "png", new File(outputFile));
+      } catch (java.io.IOException e) {
+         if (logOK) {
+            reporter.ReportError("Screenshot failed (I/O Error)");
+            reporter.ReportException(e);
+         }
+         return false;
+      }
+
+      reporter.Log(String.format("Screenshot file: %s", outputFile));
       reporter.Log("Screenshot finished.");
 
-      return result;
-
+      return true;
    }
+
 
    public static HashMap<String, String> getJavaInfo() {
       HashMap<String, String> data = new HashMap<String, String>();

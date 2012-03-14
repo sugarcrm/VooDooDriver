@@ -146,7 +146,7 @@ public class VooDooDriver {
             }
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"browser", "attachtimeout", "resultdir",
-                                     "savehtml", "plugin"};
+                                     "savehtml", "screenshot", "plugin"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
 
@@ -341,6 +341,10 @@ public class VooDooDriver {
          System.out.printf("(*)SaveHTML: %s\n", config.get("savehtml"));
       }
 
+      if (config.containsKey("screenshot")) {
+         System.out.printf("(*)Screenshot: %s\n", config.get("screenshot"));
+      }
+
       if (config.containsKey("plugin")) {
          String p = (String)config.get("plugin");
          System.out.println("(*)Loading plugins from " + p);
@@ -391,6 +395,7 @@ public class VooDooDriver {
       VDDHash hijacks = (VDDHash)config.get("hijack");
       Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
+      String screenshot = (String)config.get("screenshot");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       int attachTimeout = (Integer)config.get("attachtimeout");;
@@ -447,7 +452,7 @@ public class VooDooDriver {
          System.out.printf("Starting Test: '%s'.\n", test_file);
 
          testobj = new Test(test_file, browser, gvars, hijacks, null,
-                            null, null, resultdir, savehtml);
+                            null, null, resultdir, savehtml, screenshot);
          if (assertpage != null) {
             testobj.setAssertPage(assertpage);
          }
@@ -493,6 +498,7 @@ public class VooDooDriver {
       BlockList blockList = (BlockList)config.get("blocklist");
       Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
+      String screenshot = (String)config.get("screenshot");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       String restartTest = (String)config.get("restarttest");
@@ -645,8 +651,8 @@ public class VooDooDriver {
                                              date_str));
 
                   testobj = new Test(restartTest, browser, gvars, hijacks,
-                                         blockList, vars, suite_base_noext,
-                                         resultdir, savehtml);
+                                     blockList, vars, suite_base_noext,
+                                     resultdir, savehtml, screenshot);
                   testobj.setIsRestartTest(true);
 
                   if (assertpage != null) {
@@ -728,7 +734,7 @@ public class VooDooDriver {
 
             testobj = new Test(current_test, browser, gvars, hijacks,
                                blockList, vars, suite_base_noext,
-                               resultdir, savehtml);
+                               resultdir, savehtml, screenshot);
             if (assertpage != null) {
                testobj.setAssertPage(assertpage);
             }
