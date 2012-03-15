@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -25,12 +25,13 @@ import org.openqa.selenium.WebElement;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 
+
 /**
- * An base class for adding new web browser support for VooDooDriver.
+ * Base class for VooDooDriver browser support.
  *
  * @author trampus
- *
  */
+
 public abstract class Browser implements BrowserInterface {
 
    private WebDriver Driver = null;
@@ -95,11 +96,13 @@ public abstract class Browser implements BrowserInterface {
       this.closed = true;
    }
 
+
    /**
-    * Tells you if the browser windows was closed for this object.
+    * Return whether the browser window is closed.
     *
-    * @return {@linkplain boolean}
+    * @return true if the browser window is close, false otherwise
     */
+
    public boolean getBrowserCloseState() {
       return this.closed;
    }
@@ -302,7 +305,7 @@ public abstract class Browser implements BrowserInterface {
     *
     * @param value The value to check if exists in the browser.
     *
-    * @return {@link boolean} result
+    * @return {@link Boolean} result
     */
    public boolean Assert(String value) {
       boolean result = false;

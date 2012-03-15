@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.vddlogger;
 
@@ -224,17 +224,15 @@ public class VddSuiteReporter {
       return result;
    }
 
+
    /**
-    * generates a html table row based on data from .log report file
+    * Generate an HTML table row based on data from .log report file.
     *
-    * @param fileName - name of the .log report file this table row is representing
-    * @param failed - status of the test. 0 = failed, 1 = passed, 2 = blocked
-    *
-    * Note:
-    * I find it odd that the intern needed to change failed = 0, when -1 was already
-    * 0 and 0 always means success in C programming...
-    *
+    * @param fileName name of the .log report file this table row represents
+    * @param status   0 == passed, 1 == failed, otherwise == blocked
+    * @param line     line in log file
     */
+
    public void generateTableRow(String fileName, int status, String line){
       String html = "\t<td class=\"td_issues_data\"></td>\n";
       String tmp_filename = fileName;
