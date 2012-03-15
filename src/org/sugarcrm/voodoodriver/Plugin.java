@@ -20,29 +20,14 @@ import org.openqa.selenium.WebElement;
 
 
 /**
- * Internal representation of a VooDooDriver plugin
+ * VooDooDriver Plugin superclass.
+ *
+ * This class is the internal representation of a VooDooDriver plugin.
  *
  * @author Jon duSaint
  */
 
-public interface Plugin {
-   public void setElements(String[] elements);
-   public void setEvents(String[] events);
-   public void setArgs(String[] args);
-   public boolean matches(PluginEvent event);
-   public boolean matches(Elements element, PluginEvent event);
-   public boolean matches(String className);
-   public boolean execute(WebElement element, Browser browser, Reporter report);
-}
-
-
-/**
- * VooDooDriver Plugin superclass
- *
- * @author Jon duSaint
- */
-
-class PluginSuper implements Plugin {
+public abstract class Plugin {
 
    /**
     * Array of HTML elements that this plugin executes in response to.
@@ -171,10 +156,7 @@ class PluginSuper implements Plugin {
     * @return false
     */
 
-   public boolean matches(String className) {
-      return false;
-   }
-
+   public abstract boolean matches(String className);
 
    /**
     * Execute the current plugin.
@@ -185,8 +167,6 @@ class PluginSuper implements Plugin {
     * @return false -- this class must be subclassed
     */
 
-   public boolean execute(WebElement element, Browser browser,
-                          Reporter report) {
-      return false;
-   }
+   public abstract boolean execute(WebElement element, Browser browser,
+                                   Reporter report);
 }

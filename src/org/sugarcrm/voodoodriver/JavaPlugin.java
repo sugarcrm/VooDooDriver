@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
  * @author Jon duSaint
  */
 
-public class JavaPlugin extends PluginSuper implements Plugin {
+public class JavaPlugin extends Plugin {
 
    /**
     * The class name of this plugin.

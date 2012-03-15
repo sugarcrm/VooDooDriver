@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
  * @author Jon duSaint
  */
 
-public class JsPlugin extends PluginSuper implements Plugin {
+public class JsPlugin extends Plugin {
 
    /**
     * Path to the javascript plugin file.
