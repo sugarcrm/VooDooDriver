@@ -34,7 +34,7 @@ public class XML {
 
    private Document doc = null;
    private ElementsList types = null;
-   private Types sodaTypes = null;
+   private EventLoader sodaTypes = null;
    private Events events = null;
    private Reporter reporter = null;
 
@@ -57,7 +57,7 @@ public class XML {
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
          doc = db.parse(testFD);
-         sodaTypes = new Types();
+         sodaTypes = new EventLoader();
          types = sodaTypes.getTypes();
          events = this.parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {
