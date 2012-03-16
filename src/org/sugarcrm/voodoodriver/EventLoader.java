@@ -17,6 +17,8 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -32,96 +34,134 @@ import org.w3c.dom.NodeList;
  */
 
 public class EventLoader {
+
+   /**
+    * XML file containing descriptions of all events.
+    */
+
    private final String EVENTS = "Events.xml";
-   private Document doc = null;
-   private ElementsList datatypes = null;
 
-   public EventLoader() {
-      File testFD = null;
-      DocumentBuilderFactory dbf = null;
+   /**
+    * Processed list of events from Events.xml.
+    */
+
+   private ElementsList events;
+
+   /**
+    * Names of events.  Redundantly stored here to speed lookup in isValid.
+    */
+
+   private VDDHash eventNames;
+
+
+   /**
+    * Instantiate EventLoader class and load Events.xml.
+    */
+
+   public EventLoader() throws VDDException {
+      Class c = getClass();
+      String className = c.getName().replace('.', '/');
+      String classJar =  c.getResource("/" + className + ".class").toString();
+
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = null;
-
       try {
-         String className = getClass().getName().replace('.', '/');
-         String classJar =  getClass().getResource("/" + className +
-                                                   ".class").toString();
-         dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
-
-         if (classJar.startsWith("jar:")) {
-            doc = db.parse(getClass().getResourceAsStream(EVENTS));
-         } else {
-            testFD = new File(getClass().getResource(EVENTS).getFile());
-            doc = db.parse(testFD);
-         }
-
-         datatypes = parse(doc.getDocumentElement().getChildNodes());
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (javax.xml.parsers.ParserConfigurationException e) {
+         throw new VDDException("Failed to load XML parser for Events.xml", e);
       }
+
+      InputStream eis = null;
+      if (classJar.startsWith("jar:")) {
+         eis = c.getResourceAsStream(EVENTS);
+      } else {
+         try {
+            eis = new FileInputStream(c.getResource(EVENTS).getFile());
+         } catch (java.io.FileNotFoundException e) {
+            throw new VDDException("Failed to find Events.xml", e);
+         }
+      }
+
+      Document d = null;
+      try {
+         d = db.parse(eis);
+      } catch (java.io.IOException e) {
+         throw new VDDException("Failed to read Events.xml", e);
+      } catch (org.xml.sax.SAXException e) {
+         throw new VDDException("Illegal XML in Events.xml", e);
+      }
+
+      this.loadEvents(d.getDocumentElement().getChildNodes());
    }
 
-   private ElementsList parse(NodeList node) {
-      ElementsList dataList = null;
 
-      int len = 0;
-      try {
-         dataList = new ElementsList();
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+   /**
+    * Load all events from the {@link NodeList} created from Events.xml.
+    *
+    * @param nodes  {@link NodeList} of event nodes
+    */
 
-      len = node.getLength();
-      for (int i = 0; i <= len -1; i++) {
+   private void loadEvents(NodeList nodes) throws VDDException {
+      this.events = new ElementsList();
+      this.eventNames = new VDDHash();
+
+      for (int k = 0; k < nodes.getLength(); k++) {
+         Node node = nodes.item(k);
          VDDHash data = new VDDHash();
-         Node child = node.item(i);
-         String name = child.getNodeName();
+         String name = node.getNodeName();
 
          if (name.startsWith("#") || name.contains("comment")) {
             continue;
          }
 
+         if (!Elements.isMember(name.toUpperCase())) {
+            throw new VDDException("Unknown type '" + name + "' in Events.xml");
+         }
+
+         eventNames.put(name.toUpperCase(), true);
          data.put(name, 0);
-         if (Elements.isMember(name.toUpperCase())) {
-            if (child.hasAttributes()) {
-               NamedNodeMap attrs = child.getAttributes();
-               String validAttrs[] = {"html_tag", "html_type"};
-               for (String key: validAttrs) {
-                  Node value = attrs.getNamedItem(key);
-                  if (value != null) {
-                     data.put(key, value.getNodeValue());
-                  }
+         data.put("type", Elements.valueOf(name.toUpperCase()));
+
+         if (node.hasAttributes()) {
+            NamedNodeMap attrs = node.getAttributes();
+            String validAttrs[] = {"html_tag", "html_type"};
+            for (String key: validAttrs) {
+               Node value = attrs.getNamedItem(key);
+               if (value != null) {
+                  data.put(key, value.getNodeValue());
                }
             }
-            data.put("type", Elements.valueOf(name.toUpperCase()));
-            if (child.hasChildNodes()) {
-               NodeList kids = child.getChildNodes();
-               for (int x = 0; x <= kids.getLength() -1; x++) {
-                  Node kid = kids.item(x);
-                  String kid_name = kid.getNodeName();
-                  if (kid_name.contains("soda_attributes") ||
-                      kid_name.contains("accessor_attributes")) {
-                     data.put(kid_name, parseAccessors(kid.getChildNodes()));
-                  }
-               }
-            }
-         } else {
-            System.out.printf("(!)Error: Unknown type: '%s'!\n", name);
          }
 
-         if (!data.isEmpty()) {
-            dataList.add(data);
+         if (node.hasChildNodes()) {
+            NodeList children = node.getChildNodes();
+            for (int m = 0; m < children.getLength(); m++) {
+               Node child = children.item(m);
+               String childName = child.getNodeName();
+
+               if (childName.equals("soda_attributes") ||
+                   childName.equals("accessor_attributes")) {
+                  data.put(childName, parseAccessors(child.getChildNodes()));
+               }
+            }
          }
+
+         this.events.add(data);
       }
-
-      return dataList;
    }
+
+
+   /**
+    * Process the attributes lists for events.
+    *
+    * @param {@link NodeList} of attributes
+    * @return {@link VDDHash} of processed attributes
+    */
 
    private VDDHash parseAccessors(NodeList nodes) {
       VDDHash hash = new VDDHash();
-      int len = nodes.getLength() -1;
 
-      for (int i = 0; i <= len; i++) {
+      for (int i = 0; i < nodes.getLength(); i++) {
          String node_name = nodes.item(i).getNodeName();
          if (node_name == "#text") {
             continue;
@@ -153,24 +193,26 @@ public class EventLoader {
       return hash;
    }
 
+
+   /**
+    * Get the list of events processed from Events.xml.
+    *
+    * @return {@link ElementsList} of processed events
+    */
+
    public ElementsList getTypes() {
-      return datatypes;
+      return events;
    }
 
-   // this needs to be redone //
-   public boolean isValid(String name) {
-      boolean result = false;
-      int len = datatypes.size() -1;
 
-      for (int i = 0; i <= len; i++) {
-         if (datatypes.get(i).containsKey(name)) {
-            result = true;
-            break;
-         } else {
-            result = false;
-         }
-      }
+   /**
+    * Verify that an event from a test script is valid.
+    *
+    * @param event  event from a test script
+    * @return whether that event is found in Events.xml
+    */
 
-      return result;
+   public boolean isValid(String event) {
+      return eventNames.containsKey(event.toUpperCase());
    }
 }
