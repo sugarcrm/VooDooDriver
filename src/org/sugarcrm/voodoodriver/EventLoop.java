@@ -2259,7 +2259,7 @@ public class EventLoop implements Runnable {
 
    private boolean scriptEvent(VDDHash event) {
       boolean result = false;
-      XML xml = null;
+      TestLoader loader = null;
       String testfile = "";
       File fd = null;
       Events newEvents = null;
@@ -2276,8 +2276,8 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         xml = new XML(testfile, null);
-         newEvents = xml.getEvents();
+         loader = new TestLoader(testfile, null);
+         newEvents = loader.getEvents();
          this.processEvents(newEvents, null);
 
       } catch (Exception exp) {

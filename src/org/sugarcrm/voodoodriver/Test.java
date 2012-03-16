@@ -100,12 +100,12 @@ public class Test {
 
    private boolean loadTestFile() {
       boolean result = false;
-      XML xml = null;
+      TestLoader loader = null;
 
       try {
          System.out.printf("Loading Soda Test: '%s'.\n", testFile);
-         xml = new XML(testFile, this.reporter);
-         this.events = xml.getEvents();
+         loader = new TestLoader(testFile, this.reporter);
+         this.events = loader.getEvents();
          System.out.printf("Finished.\n");
       } catch (Exception exp) {
          this.reporter.ReportException(exp);
