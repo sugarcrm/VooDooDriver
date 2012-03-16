@@ -1,6 +1,6 @@
 /*
- * Copyright 2012 SugarCRM Inc.
- *
+ * Copyright 2011-2012 SugarCRM Inc.
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You
  * may may obtain a copy of the License at
@@ -18,40 +18,41 @@ package org.sugarcrm.voodoodriver;
 
 
 /**
- * VooDooDriver plugin specific exception.
- *
- * This class is used for all exceptions thrown by a plugin.
- * Unwrapping the underlying exception is left to the caller.
+ * Class for miscellaneous VDD-specific exceptions.
  *
  * @author Jon duSaint
  */
 
-public class PluginException extends VDDException {
-
+public class VDDException extends Exception {
 
    /**
     * Construct a new exception with <code>null</code> as its detail message.
     */
 
-   public PluginException() {
+   public VDDException() {
       super();
    }
 
 
    /**
     * Construct a new exception with the specified detail message.
+    *
+    * @param message  the detail message
     */
 
-   public PluginException(String message) {
+   public VDDException(String message) {
       super(message);
    }
 
 
    /**
     * Construct a new exception with the specified detail message and cause.
+    *
+    * @param message  the detail message
+    * @param cause    the low-level cause of this exception or <code>null</code>
     */
 
-   public PluginException(String message, Throwable cause) {
+   public VDDException(String message, Throwable cause) {
       super(message, cause);
    }
 }

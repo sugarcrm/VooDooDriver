@@ -352,7 +352,8 @@ public class VooDooDriver {
             PluginLoader loader = new PluginLoader(p);
             config.put("plugin", loader.load());
          } catch (org.sugarcrm.voodoodriver.PluginException e) {
-            System.err.println("(!)Failed to load plugin file: " + e);
+            System.err.println("(!)Failed to load plugin file:");
+            e.printStackTrace(System.err);
             System.exit(1);
          }
       }
