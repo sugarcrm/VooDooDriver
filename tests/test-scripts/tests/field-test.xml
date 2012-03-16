@@ -44,10 +44,10 @@
 	<button id="button" />
 	<browser assert="good" />
 	
-	<browser asert="{@text_record.box1}" />
-	<browser asert="{@text_record.box2}" />
-	<browser asert="{@text_record.box3}" />
-	<browser asert="{@text_record.box4}" />
+	<browser assert="{@text_record.box1}" />
+	<browser assert="{@text_record.box2}" />
+	<browser assert="{@text_record.box3}" />
+	<browser assert="{@text_record.box4}" />
 	
 	<!-- test filefield -->
 	<button id="button2" />
