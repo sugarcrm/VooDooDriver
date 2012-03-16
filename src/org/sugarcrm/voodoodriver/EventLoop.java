@@ -2126,7 +2126,7 @@ public class EventLoop implements Runnable {
             this.processEvents((Events) event.get("children"), null);
          }
 
-         this.Browser.setBrowserState(false);
+         this.Browser.setBrowserOpened();
          this.Browser.getDriver().switchTo().window(currentWindow);
          this.setCurrentHWND(currentWindow);
          msg = String.format("Switching back to window handle: '%s'.",
