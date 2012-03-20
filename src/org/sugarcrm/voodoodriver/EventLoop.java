@@ -38,13 +38,15 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+
 /**
- * This is the heart of all of VooDooDriver.  This class handles executing all of the SODA
- * language commands in the web browser.
+ * This is the heart of all of VooDooDriver.  This class handles
+ * executing all of the SODA language commands in the web browser.
  *
  * @author trampus
  *
  */
+
 public class EventLoop implements Runnable {
 
    private Events testEvents = null;
@@ -55,14 +57,13 @@ public class EventLoop implements Runnable {
    private Date threadTime = null;
    private volatile Thread runner;
    private volatile Boolean threadStop = false;
-   private Events plugIns = null;
-   private VDDHash JavaPlugings = null;
    private VDDHash ElementStore = null;
-   private PluginsHash loadedPlugins = null;
    private String currentHWnd = null;
    private int attachTimeout = 0;
    private String csvOverrideFile = null;
    private VDDHash whitelist = null;
+   private ArrayList<Plugin> plugins = null;
+
 
    /**
     * The class Constructor.
@@ -77,15 +78,13 @@ public class EventLoop implements Runnable {
     */
    public EventLoop(Browser browser, Events events,
          Reporter reporter, VDDHash gvars, VDDHash hijacks,
-         VDDHash oldvars, Events plugins) {
+         VDDHash oldvars, Plugin plugins) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
 
       this.whitelist = new VDDHash();
-      this.JavaPlugings = new VDDHash();
-      this.loadedPlugins = new PluginsHash();
 
       if (oldvars != null) {
          sodaVars = oldvars;
@@ -94,10 +93,6 @@ public class EventLoop implements Runnable {
       }
 
       this.ElementStore = new VDDHash();
-      this.plugIns = plugins;
-      if (this.plugIns == null) {
-         this.plugIns = new Events();
-      }
 
       if (gvars != null) {
          int len = gvars.keySet().size();
@@ -111,7 +106,10 @@ public class EventLoop implements Runnable {
          }
       }
 
-      this.loadJavaEventPlugins();
+      this.plugins = new ArrayList<Plugin>();
+      if (plugins != null) {
+         this.plugins.add(plugins);
+      }
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
       this.sodaVars.put("currentdate", df.format(new Date()));
@@ -171,33 +169,6 @@ public class EventLoop implements Runnable {
     */
    private String getCurrentHWND() {
       return this.currentHWnd;
-   }
-
-   /**
-    * Loads and stores all of the java Event Plugin classes.
-    *
-    */
-   private void loadJavaEventPlugins() {
-      int len = this.plugIns.size() - 1;
-
-      for (int i = 0; i <= len; i++) {
-         VDDHash tmp = this.plugIns.get(i);
-         if (!tmp.containsKey("classname")) {
-            continue;
-         }
-
-         String classname = tmp.get("classname").toString();
-         String classfile = tmp.get("classfile").toString();
-         VDDClassLoader loader = new VDDClassLoader(ClassLoader.getSystemClassLoader());
-
-         try {
-            Class<PluginInterface> tmp_class = loader.loadClass(classname,
-                  classfile);
-            this.loadedPlugins.put(classname, tmp_class);
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-         }
-      }
    }
 
    /**
@@ -477,7 +448,7 @@ public class EventLoop implements Runnable {
          System.exit(1);
       }
 
-      this.firePlugin(null, type, PluginEventType.AFTEREVENT);
+      this.firePlugin(null, type, PluginEvent.AFTEREVENT);
       this.resetThreadTime();
 
       if (element != null) {
@@ -697,7 +668,7 @@ public class EventLoop implements Runnable {
          handleVars(alert_text, event);
 
          this.firePlugin(null, Elements.ALERT,
-               PluginEventType.AFTERDIALOGCLOSED);
+               PluginEvent.AFTERDIALOGCLOSED);
 
          result = true;
       } catch (NoAlertPresentException exp) {
@@ -747,138 +718,113 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+
+   /**
+    * Execute a <javaplugin> event.
+    *
+    * @param event   the <javaplugin> event
+    * @param parent  the parent HTML element
+    * @return whether plugin execution succeeded
+    */
+
    private boolean javapluginEvent(VDDHash event, WebElement parent) {
-      boolean result = false;
-      String[] args = null;
-      String classname = "";
-      String classfile = "";
-      VDDHash classdata;
-      String msg = "";
-      int err = 0;
+      String classname;
+      Plugin plugin = null;
+      boolean result;
 
       this.report.Log("Javaplugin event started.");
 
       if (!event.containsKey("classname")) {
-         this.report.ReportError("Javaplugin event missing attribute: 'classname'!");
-         this.report.Log("Javaplugin event finished.");
+         report.ReportError("Javaplugin event missing attribute 'classname'!");
+         report.Log("Javaplugin event finished.");
          return false;
       }
 
-      classname = event.get("classname").toString();
-      if (!this.JavaPlugings.containsKey(classname)) {
-         msg = String.format("Faild to find loaded plugin: '%s'!", classname);
-         this.report.ReportError(msg);
-         this.report.Log("Javaplugin event finished.");
+      classname = (String)event.get("classname");
+      
+      for (Plugin p: this.plugins) {
+         if (p.matches(classname)) {
+            plugin = p;
+            break;
+         }
+      }
+      if (plugin == null) {
+         report.ReportError("Failed to find a loaded plugin with classname " +
+                            classname);
+         report.Log("Javaplugin event finished.");
          return false;
       }
 
-      classdata = (VDDHash) this.JavaPlugings.get(classname);
-      classfile = classdata.get("file").toString();
-
-      msg = String.format("Loading classname: '%s'.", classname);
-      this.report.Log(msg);
-      if (!this.JavaPlugings.containsKey(classname)) {
-         msg = String.format("Error failed to find a loaded plugin with classname: '%s'!",
-               classname);
-         this.report.ReportError(msg);
-         this.report.Log("Javaplugin event finished.");
-         return false;
-      }
-
-      if (event.containsKey("args")) {
-         args = (String[]) event.get("args");
+      if (!event.containsKey("args")) {
+         plugin.setArgs(null);
+      } else {
+         String[] args = (String[])event.get("args");
 
          if (args != null) {
-            int len = args.length - 1;
-
-            for (int i = 0; i <= len; i++) {
-               args[i] = this.replaceString(args[i]);
+            for (int k = 0; k < args.length; k++) {
+               args[k] = replaceString(args[k]);
             }
          }
+
+         plugin.setArgs(args);
       }
 
-      try {
-         VDDClassLoader loader = new VDDClassLoader(
-               ClassLoader.getSystemClassLoader());
-         Class<PluginInterface> tmp_class = loader.loadClass(classname,
-               classfile);
-         PluginInterface inner = tmp_class.newInstance();
-         this.report.Log("Executing plugin now.");
-         err = inner.execute(args, this.Browser, parent);
-         if (err != 0) {
-            msg = String.format("Javaplugin returned a non-zero value: '%d'!",
-                  err);
-            this.report.ReportError(msg);
-            result = false;
-         }
-         this.report.Log("Plugin finished executing.");
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         result = false;
+      result = plugin.execute(parent, this.Browser, report);
+
+      if (result == false) {
+         report.ReportError("Javaplugin failed");
       }
 
-      this.report.Log("Javaplugin event finished.");
+      report.Log("Javaplugin event finished.");
+
       return result;
    }
 
-   private boolean pluginloaderEvent(VDDHash event) {
-      boolean result = false;
-      String filename = "";
-      String classname = "";
-      File tmp = null;
-      VDDHash data = null;
 
-      this.report.Log("PluginLoader event started.");
+   /**
+    * Execute a <pluginloader> event
+    *
+    * @param event  the <pluginloader> event
+    * @return whether loading the new plugin succeeded
+    */
+
+   private boolean pluginloaderEvent(VDDHash event) {
+      String classname;
+      String classfile;
+      boolean result = true;
+
+      report.Log("PluginLoader event started.");
 
       if (!event.containsKey("file")) {
-         this.report
-               .ReportError("Error: Missing 'file' attribute for pluginloader command!");
-         this.report.Log("PluginLoader event finished.");
+         report.ReportError("Missing 'file' attribute for <pluginloader>");
+         report.Log("PluginLoader event finished.");
          return false;
       }
 
       if (!event.containsKey("classname")) {
-         this.report.ReportError("Error: Missing 'classname' attribute for pluginloader command!");
-         this.report.Log("PluginLoader event finished.");
+         report.ReportError("Missing 'classname' attribute for <pluginloader>");
+         report.Log("PluginLoader event finished.");
          return false;
       }
 
-      filename = event.get("file").toString();
-      filename = this.replaceString(filename);
-      classname = event.get("classname").toString();
-      classname = this.replaceString(classname);
+      classfile = (String)event.get("file");
+      classname = (String)event.get("classname");
 
-      tmp = new File(filename);
-      if (!tmp.exists()) {
-         String msg = String.format("Error: failed to find file: '%s'!", filename);
-         this.report.ReportError(msg);
-         return false;
+      report.Log("Loading plugin with classname=" + classname);
+
+      try {
+         this.plugins.add(new JavaPlugin(classname, classfile));
+      } catch (PluginException e) {
+         report.ReportError("Failed to load plugin " + classname);
+         report.ReportException(e);
+         result = false;
       }
 
-      // load & store plugin //
-      if (!this.loadedPlugins.containsKey(classname)) {
-         try {
-            System.out.printf("Loading class into memory: '%s'!\n", classname);
-            VDDClassLoader loader = new VDDClassLoader(
-                  ClassLoader.getSystemClassLoader());
-            Class<PluginInterface> tmp_class = loader.loadClass(classname,
-                  filename);
-            this.loadedPlugins.put(classname, tmp_class);
-         } catch (ClassNotFoundException exp) {
-            this.report.ReportException(exp);
-            result = false;
-         }
-      }
-
-      data = new VDDHash();
-      data.put("file", filename);
-      data.put("classname", classname);
-      data.put("enabled", true);
-      this.JavaPlugings.put(classname, data);
-      this.report.Log("PluginLoader event finished.");
+      report.Log("PluginLoader event finished.");
 
       return result;
    }
+
 
    private boolean ulEvent(VDDHash event) {
       boolean required = true;
@@ -910,10 +856,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("UL click started.");
             this.firePlugin(element, Elements.UL,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.UL,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("UL click finished.");
          }
 
@@ -962,10 +908,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Area click started.");
             this.firePlugin(element, Elements.AREA,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.AREA,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Area click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1009,10 +955,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Map click started.");
             this.firePlugin(element, Elements.MAP,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.MAP,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Map click finished.");
          }
 
@@ -1061,10 +1007,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("OL click started.");
             this.firePlugin(element, Elements.OL,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.OL,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("OL click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1228,10 +1174,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Image click started.");
             this.firePlugin(element, Elements.IMAGE,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.IMAGE,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Image click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1264,7 +1210,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.FILEFIELD,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1331,10 +1277,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.LI,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.LI,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1380,10 +1326,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.TR,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TR,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1430,10 +1376,10 @@ public class EventLoop implements Runnable {
          if (click) {
             this.report.Log("Click element.");
             this.firePlugin(element, Elements.TD,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TD,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
             this.report.Log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
@@ -1512,7 +1458,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.SPAN,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1525,10 +1471,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.SPAN,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.SPAN,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -1582,7 +1528,7 @@ public class EventLoop implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, Elements.INPUT, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.INPUT, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1635,7 +1581,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.RADIO,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1653,12 +1599,12 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.RADIO,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             this.report.Log("Clicking Element.");
             element.click();
             this.report.Log("Click finished.");
             this.firePlugin(element, Elements.RADIO,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -1727,7 +1673,7 @@ public class EventLoop implements Runnable {
          if (element != null) {
             Select sel = new Select(element);
             this.firePlugin(element, Elements.SELECT,
-                  PluginEventType.AFTERFOUND);
+                  PluginEvent.AFTERFOUND);
 
             this.checkDisabled(event, element);
 
@@ -1768,7 +1714,7 @@ public class EventLoop implements Runnable {
                }
 
                this.firePlugin(element, Elements.SELECT,
-                     PluginEventType.AFTERSET);
+                     PluginEvent.AFTERSET);
             }
 
             if (event.containsKey("assert")) {
@@ -1836,10 +1782,10 @@ public class EventLoop implements Runnable {
 
             if (click) {
                this.firePlugin(element, Elements.FORM,
-                               PluginEventType.BEFORECLICK);
+                               PluginEvent.BEFORECLICK);
                element.click();
                this.firePlugin(element, Elements.FORM,
-                               PluginEventType.AFTERCLICK);
+                               PluginEvent.AFTERCLICK);
             }
 
             if (event.containsKey("jscriptevent")) {
@@ -1941,7 +1887,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.FORM,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1951,10 +1897,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.FORM,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.FORM,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1989,7 +1935,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TABLE,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -1999,10 +1945,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.TABLE,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TABLE,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2180,7 +2126,7 @@ public class EventLoop implements Runnable {
             this.processEvents((Events) event.get("children"), null);
          }
 
-         this.Browser.setBrowserState(false);
+         this.Browser.setBrowserOpened();
          this.Browser.getDriver().switchTo().window(currentWindow);
          this.setCurrentHWND(currentWindow);
          msg = String.format("Switching back to window handle: '%s'.",
@@ -2255,7 +2201,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.DIV,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -2265,10 +2211,10 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.DIV,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.DIV,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2313,7 +2259,7 @@ public class EventLoop implements Runnable {
 
    private boolean scriptEvent(VDDHash event) {
       boolean result = false;
-      XML xml = null;
+      TestLoader loader = null;
       String testfile = "";
       File fd = null;
       Events newEvents = null;
@@ -2330,8 +2276,8 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         xml = new XML(testfile, null);
-         newEvents = xml.getEvents();
+         loader = new TestLoader(testfile, null);
+         newEvents = loader.getEvents();
          this.processEvents(newEvents, null);
 
       } catch (Exception exp) {
@@ -2406,16 +2352,16 @@ public class EventLoop implements Runnable {
             return element;
          }
 
-         this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
             if (click) {
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.BEFORECLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.BEFORECLICK);
                element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
             }
          }
 
@@ -2429,7 +2375,7 @@ public class EventLoop implements Runnable {
             } else {
                msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
                element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEventType.AFTERCLICK);
+               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
             }
             this.report.Log(msg);
          }
@@ -2517,7 +2463,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.LINK,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -2537,10 +2483,10 @@ public class EventLoop implements Runnable {
             this.report.Log(String.format("Clicking Link: '%s' => '%s'", how,
                                           value));
             this.firePlugin(element, Elements.LINK,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.LINK,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          } else {
             String msg = String.format(
                   "Found Link: '%s' but not clicking as click => '%s'.", value,
@@ -2809,7 +2755,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.THEAD,
-                         PluginEventType.AFTERFOUND);
+                         PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
 
@@ -2818,10 +2764,10 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.THEAD,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.THEAD,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -2887,7 +2833,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TBODY,
-                         PluginEventType.AFTERFOUND);
+                         PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element); //??
 
@@ -2896,10 +2842,10 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.TBODY,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TBODY,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("assert")) {
@@ -3260,101 +3206,102 @@ public class EventLoop implements Runnable {
       return result;
    }
 
-   private boolean firePlugin(WebElement element, Elements type, PluginEventType eventType) {
-      boolean result = false;
-      int len = 0;
-      String js = "var CONTROL = arguments[0];\n\n";
-      int index = -1;
 
-      if (this.plugIns == null) {
+   /**
+    * Perform pre-fire checks for plugin execution.
+    *
+    * If this routine returns false, plugin execution will be skipped.
+    *
+    * @return true if plugins can execute, false otherwise
+    */
+
+   private boolean pluginPrefireCheck() {
+      if (this.plugins.size() == 0) {
+         return false;
+      }
+
+      if (!this.windowExists(this.getCurrentHWND())) {
+         this.report.Log("Browser window closed. Skipping plugin execution.");
+         return false;
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Execute all plugins.
+    *
+    * @param element    the element on the current HTML page
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
          return true;
       }
 
-      len = this.plugIns.size() - 1;
-
-      for (int i = 0; i <= len; i++) {
-         VDDHash tmp = this.plugIns.get(i);
-
-         if (tmp.get("control").toString()
-               .contains((type.toString().toLowerCase()))) {
-            if (tmp.get("event").toString()
-                  .contains(eventType.toString().toLowerCase())) {
-
-               if (tmp.containsKey("jsfile")) {
-                  String jsfile = (String) tmp.get("jsfile");
-                  jsfile = FilenameUtils.separatorsToSystem(jsfile);
-                  String user_js = Utils.FileToStr(jsfile);
-                  if (user_js != null) {
-                     js = js.concat(user_js);
-                     result = true;
-                     break;
-                  } else {
-                     String msg = String.format("Failed trying to read plugin source file: '%s'!",
-                           (String) tmp.get("jsfile"));
-                     this.report.ReportError(msg);
-                     result = false;
-                  }
-               } else {
-                  index = i;
-                  break;
-               }
-            }
-         }
+      for (Plugin plugin: this.plugins) {
+         result &= plugin.execute(element, this.Browser, this.report);
       }
 
-      if (result && index < 0) {
-         this.report.Log("Plugin Event Started.");
-         Object res = this.Browser.executeJS(js, element);
-         int tmp = Integer.valueOf(res.toString());
-         if (tmp == 0) {
-            result = true;
-         } else {
-            result = false;
-            String msg = String.format("Plugin Event Failed with return value: '%s'!", tmp);
-            this.report.ReportError(msg);
-         }
+      return result;
+   }
 
-         this.report.Log("Plugin Event Finished.");
+
+   /**
+    * Execute all plugins that match a plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, PluginEvent eventType) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
+         return true;
       }
 
-      if (index > -1) {
-         VDDHash data = this.plugIns.get(index);
-         String classname = data.get("classname").toString();
-         String msg = "";
-         Class<PluginInterface> tmp_class = this.loadedPlugins.get(classname);
-         msg = String.format("");
-
-         try {
-            int err = 0;
-            PluginInterface inst = tmp_class.newInstance();
-
-            String tmp_hwnd = this.getCurrentHWND();
-            if (this.windowExists(tmp_hwnd)) {
-               msg = String.format("Starting plugin: '%s'.", classname);
-               this.report.Log(msg);
-
-               err = inst.execute(null, this.Browser, element);
-               if (err != 0) {
-                  msg = String.format("Plugin Classname: '%s' failed returning error code: '%d'!",
-                              classname, err);
-                  this.report.ReportError(msg);
-               } else {
-                  msg = String.format("Plugin: '%s' finished.", classname);
-                  this.report.Log(msg);
-               }
-            } else {
-               msg = "Found the browser window has been closed, skipping executing plugin.";
-               this.report.Log(msg);
-            }
-
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-            result = false;
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(eventType)) {
+            result &= plugin.execute(element, this.Browser, this.report);
          }
       }
 
       return result;
    }
+
+
+   /**
+    * Execute a plugin that matches the current element and plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param type       the element's type
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, Elements elementType,
+                              PluginEvent eventType) {
+      boolean result = true;
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
+
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(elementType, eventType)) {
+            result &= plugin.execute(element, this.Browser, this.report);
+         }
+      }
+
+      return result;
+   }
+
 
    private WebElement buttonEvent(VDDHash event, WebElement parent) {
       boolean click = true;
@@ -3379,7 +3326,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.BUTTON,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3396,12 +3343,12 @@ public class EventLoop implements Runnable {
 
          if (click) {
             this.firePlugin(element, Elements.BUTTON,
-                  PluginEventType.BEFORECLICK);
+                  PluginEvent.BEFORECLICK);
             this.report.Log("Clicking button.");
             element.click();
             this.report.Log("Finished clicking button.");
             this.firePlugin(element, Elements.BUTTON,
-                  PluginEventType.AFTERCLICK);
+                  PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("jscriptevent")) {
@@ -3447,7 +3394,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.firePlugin(element, Elements.TEXTAREA,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3488,12 +3435,12 @@ public class EventLoop implements Runnable {
          if (event.containsKey("click") &&
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.TEXTAREA,
-                            PluginEventType.BEFORECLICK);
+                            PluginEvent.BEFORECLICK);
             this.report.Log("Clicking textarea.");
             element.click();
             this.report.Log("Finished clicking textarea.");
             this.firePlugin(element, Elements.TEXTAREA,
-                            PluginEventType.AFTERCLICK);
+                            PluginEvent.AFTERCLICK);
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -3527,7 +3474,7 @@ public class EventLoop implements Runnable {
          }
 
          this.firePlugin(element, Elements.TEXTFIELD,
-               PluginEventType.AFTERFOUND);
+               PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 
@@ -3612,7 +3559,7 @@ public class EventLoop implements Runnable {
             return null;
          }
 
-         this.firePlugin(element, Elements.PASSWORD, PluginEventType.AFTERFOUND);
+         this.firePlugin(element, Elements.PASSWORD, PluginEvent.AFTERFOUND);
 
          this.checkDisabled(event, element);
 

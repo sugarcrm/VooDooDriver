@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -23,29 +23,30 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+
 /**
- * The <code>XML</code> class reads a soda test script and converts
- * it into a {@link Events} class.
+ * This class reads a VooDooDriver/Soda test script and converts it
+ * into a {@link Events} class.
  *
  * @author trampus
  */
 
-public class XML {
+public class TestLoader {
 
    private Document doc = null;
    private ElementsList types = null;
-   private Types sodaTypes = null;
+   private EventLoader sodaTypes = null;
    private Events events = null;
    private Reporter reporter = null;
 
    /**
-    * Initialize a XML object using the provided soda test script.
+    * Initialize a TestLoader object using the provided soda test script.
     *
     * @param sodaTest full path to a soda test file
     * @param reporter {@link Reporter} object for logging messages and errors
     */
 
-   public XML(String sodaTest, Reporter reporter) {
+   public TestLoader(String sodaTest, Reporter reporter) {
       File testFD = null;
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
@@ -57,7 +58,7 @@ public class XML {
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
          doc = db.parse(testFD);
-         sodaTypes = new Types();
+         sodaTypes = new EventLoader();
          types = sodaTypes.getTypes();
          events = this.parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {

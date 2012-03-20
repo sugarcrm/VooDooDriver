@@ -37,16 +37,43 @@ public class Reporter {
    private int OtherErrors = 0;
    private int WatchDog = 0;
    private String LineSeparator = null;
-   private int SavePageNum = 0;
    private Browser browser = null;
    private boolean isRestart = false;
    private String testName = null;
-   private boolean saveOnWarning = false;
-   private boolean saveOnError = false;
-   private boolean saveOnAssertFailed = false;
-   private boolean saveOnException = false;
-   private boolean saveOnWatchDog = false;
-   private boolean saveHTML = false;
+
+   /**
+    * When to save the current HTML page.  Keys are the possible
+    * events, and the values are true or false.
+    */
+
+   private VDDHash saveHtmlOn;
+
+   /**
+    * Saved HTML page file name index.
+    */
+
+   private int saveHtmlIdx = 0;
+
+   /**
+    * When to take a screenshot.  Keys are the possible events, and
+    * the values are true or false.
+    */
+
+   private VDDHash screenshotOn;
+
+   /**
+    * Screenshot file name index.
+    */
+
+   private int screenshotIdx = 0;
+
+
+   /**
+    * Instantiate a Reporter object.
+    *
+    * @param reportName
+    * @param resultDir
+    */
 
    public Reporter(String reportName, String resultDir) {
       Date now = new Date();
@@ -77,6 +104,16 @@ public class Reporter {
       } catch (Exception exp) {
          exp.printStackTrace();
       }
+
+      /* Initialize screenshot and savehtml events */
+      String ssEvents[] = {"warning", "error", "assertfail", "exception",
+                           "watchdog"};
+      this.saveHtmlOn = new VDDHash();
+      this.screenshotOn = new VDDHash();
+      for (String ssEvent: ssEvents) {
+         this.saveHtmlOn.put(ssEvent, false);
+         this.screenshotOn.put(ssEvent, false);
+      }
    }
 
    public void setTestName(String name) {
@@ -87,32 +124,76 @@ public class Reporter {
       this.isRestart = restart;
    }
 
-   public void setSaveHTML(String setting, Browser browser) {
+   public void setBrowser(Browser browser) {
       this.browser = browser;
-      this.saveHTML = true;
-      String[] opts = setting.split(",");
+   }
 
-      for (int i = 0; i <= opts.length -1; i++) {
-         opts[i] = opts[i].toLowerCase();
-         if (opts[i].contains("warning")) {
-            this.saveOnWarning = true;
-         } else if (opts[i].contains("error")) {
-            this.saveOnError = true;
-         } else if (opts[i].contains("assertfail")) {
-            this.saveOnAssertFailed = true;
-         } else if (opts[i].contains("exception")) {
-            this.saveOnException = true;
-         } else if (opts[i].contains("watchdog")) {
-            this.saveOnWatchDog = true;
-         } else if (opts[i].contains("all")) {
-            this.saveOnWatchDog = true;
-            this.saveOnException = true;
-            this.saveOnAssertFailed = true;
-            this.saveOnError = true;
-            this.saveOnWarning = true;
+
+   /**
+    * Set the events for saving the current HTML page.
+    *
+    * Input is expected to a string that is either "all" or a
+    * comma-separated list of events.  Valid events are:
+    *
+    * <ul><li>warning</li>
+    *     <li>error</li>
+    *     <li>assertfail</li>
+    *     <li>exception</li>
+    *     <li>watchdog</li></ul>
+    *
+    * @param events  list of events
+    */
+
+   public void setSaveHTML(String events) {
+      if (events.equals("all")) {
+         for (String key: this.saveHtmlOn.keySet()) {
+            this.saveHtmlOn.put(key, true);
+         }
+      } else {
+         for (String event: events.split(",")) {
+            if (!this.saveHtmlOn.containsKey(event)) {
+               System.out.println("(!)Unrecognized event in savehtml list: " +
+                                  event);
+               continue;
+            }
+            this.saveHtmlOn.put(event, true);
          }
       }
    }
+
+
+   /**
+    * Set the events for taking a screenshot.
+    *
+    * Input is expected to a string that is either "all" or a
+    * comma-separated list of events.  Valid events are:
+    *
+    * <ul><li>warning</li>
+    *     <li>error</li>
+    *     <li>assertfail</li>
+    *     <li>exception</li>
+    *     <li>watchdog</li></ul>
+    *
+    * @param events  list of events
+    */
+
+   public void setScreenshot(String events) {
+      if (events.equals("all")) {
+         for (String key: this.screenshotOn.keySet()) {
+            this.screenshotOn.put(key, true);
+         }
+      } else {
+         for (String event: events.split(",")) {
+            if (!this.screenshotOn.containsKey(event)) {
+               System.out.println("(!)Unrecognized event in screenshot list: " +
+                                  event);
+               continue;
+            }
+            this.screenshotOn.put(event, true);
+         }
+      }
+   }
+
 
    public String getLogFileName() {
       return this.reportLog;
@@ -185,8 +266,11 @@ public class Reporter {
    public void Warn(String msg) {
       this._log("(W)" + msg);
 
-      if (this.saveOnWarning) {
+      if ((Boolean)this.saveHtmlOn.get("warning")) {
          this.SavePage();
+      }
+      if ((Boolean)this.screenshotOn.get("warning")) {
+         this.screenshot();
       }
    }
 
@@ -194,16 +278,22 @@ public class Reporter {
       this._log(String.format("(!)%s", msg));
       this.OtherErrors += 1;
 
-      if (this.saveOnError) {
+      if ((Boolean)this.saveHtmlOn.get("error")) {
          this.SavePage();
+      }
+      if ((Boolean)this.screenshotOn.get("error")) {
+         this.screenshot();
       }
    }
 
    public void ReportWatchDog() {
       this.WatchDog = 1;
 
-      if (this.saveOnWatchDog) {
+      if ((Boolean)this.saveHtmlOn.get("watchdog")) {
          this.SavePage();
+      }
+      if ((Boolean)this.screenshotOn.get("watchdog")) {
+         this.screenshot();
       }
    }
 
@@ -211,19 +301,16 @@ public class Reporter {
       this.Blocked = 1;
    }
 
-   /*
-    * ReportException -- Method
-    *    This method formats a java exception class into a SODA log entry.  Both the message and the stack
-    *    trace are reformatted and printed to the SODA log file, and the console.
+
+   /**
+    * Log the exception only.
     *
-    * Input:
-    *    e: The exception that happened.
-    *
-    * Output:
-    *    None.
+    * This helper routine is needed since some of the Reporter methods
+    * could need to report an exception.
     *
     */
-   public void ReportException(Exception e) {
+
+   private void justReportTheException(Exception e) {
       this.Exceptions += 1;
       String msg = "--Exception Backtrace: ";
       StackTraceElement[] trace = e.getStackTrace();
@@ -242,15 +329,35 @@ public class Reporter {
             msg += "--" + tmp;
          }
       } else {
-         msg = "Something really bad happened here and the exception is null!!!";
+         msg = "ReportException: Exception message is null!!!";
          e.printStackTrace();
       }
 
       this._log("(!)" + msg);
-      if (this.saveOnException) {
+   }
+
+
+   /**
+    * Log an exception.
+    *
+    * This method formats a java exception into a log entry.  Both the
+    * message and the stack trace are reformatted and printed to the
+    * SODA log file and the console.
+    *
+    * @param e  the exception to report
+    */
+
+   public void ReportException(Exception e) {
+      justReportTheException(e);
+
+      if ((Boolean)this.saveHtmlOn.get("exception")) {
          this.SavePage();
       }
+      if ((Boolean)this.screenshotOn.get("exception")) {
+         this.screenshot();
+      }
    }
+
 
    public boolean isRegex(String str) {
       boolean result = false;
@@ -281,23 +388,26 @@ public class Reporter {
 
    public boolean Assert(String msg, boolean state, boolean expected) {
       boolean result = false;
-      boolean fail = false;
       String status = "";
 
       if (state == expected) {
          this.PassedAsserts += 1;
          status = "(*)Assert Passed: ";
+         result = true;
       } else {
          this.FailedAsserts += 1;
          status = "(!)Assert Failed: ";
-         fail = true;
+         result = false;
       }
 
       status = status.concat(msg);
       this._log(status);
 
-      if (fail && this.saveOnAssertFailed) {
+      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
          this.SavePage();
+      }
+      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+         this.screenshot();
       }
 
       return result;
@@ -320,11 +430,6 @@ public class Reporter {
             this.FailedAsserts += 1;
             msg = String.format("(!)Assert Failed for find: '%s'!", value);
             this._log(msg);
-
-            if (this.saveOnAssertFailed) {
-               this.SavePage();
-            }
-
             result = false;
          }
       } else {
@@ -337,12 +442,15 @@ public class Reporter {
             this.FailedAsserts += 1;
             msg = String.format("(!)Assert Failed for find: '%s'!", value);
             this._log(msg);
-
-            if (this.saveOnAssertFailed) {
-               this.SavePage();
-            }
             result = false;
          }
+      }
+
+      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
+         this.SavePage();
+      }
+      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+         this.screenshot();
       }
 
       return result;
@@ -358,9 +466,6 @@ public class Reporter {
             this.FailedAsserts += 1;
             msg = String.format("(!)Assert Failed, Found Unexpected text: '%s'.", value);
             this._log(msg);
-            if (this.saveOnAssertFailed) {
-               this.SavePage();
-            }
             result = false;
          } else {
             this.PassedAsserts += 1;
@@ -373,11 +478,6 @@ public class Reporter {
             this.FailedAsserts += 1;
             msg = String.format("(!)Assertnot Failed: Found: '%s'.", value);
             this._log(msg);
-
-            if (this.saveOnAssertFailed) {
-               this.SavePage();
-            }
-
             result = false;
          } else {
             this.PassedAsserts += 1;
@@ -387,55 +487,95 @@ public class Reporter {
          }
       }
 
+      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
+         this.SavePage();
+      }
+      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+         this.screenshot();
+      }
+
       return result;
    }
 
-   public void SavePage() {
-      File dir = null;
-      File newfd = null;
-      String htmldir = this.resultDir;
-      String new_save_file = "";
-      String src = "";
-      String testname = "";
 
-      if (!this.saveHTML) {
-         return;
-      }
+   /**
+    * Create a file name.
+    *
+    * Use the specified directory, file name root, and file index to
+    * create the filename.  The directory is assumed to be relative to
+    * resultDir.
+    *
+    * @param dir   the directory in which to create the file name
+    * @param file  the file name root
+    * @param idx   one-up index of this file
+    * @param ext   file extension
+    * @return path and file name
+    */
 
-      src = this.browser.getPageSource();
+   private String makeFilename(String dir, String file, int idx, String ext) {
+      String test = "";
 
-      htmldir = htmldir.concat("/saved-html");
-      dir = new File(htmldir);
-      if (!dir.exists()) {
-         dir.mkdir();
+      String outfile = this.resultDir + "/" + dir;
+
+      File checkDir = new File(outfile);
+      if (!checkDir.exists()) {
+         checkDir.mkdir();
       }
 
       if (this.testName != null) {
          File tmp = new File(this.testName);
-         testname = tmp.getName();
-         testname = testname.substring(0, testname.length() -4);
-         testname = String.format("%s-", testname);
-         tmp = null;
+         test = tmp.getName();
+         test = String.format("%s-", test.substring(0, test.length() - 4));
       }
 
-      new_save_file = htmldir;
-      new_save_file = new_save_file.concat(String.format("/%ssavedhtml-%d.html", testname, this.SavePageNum));
-      new_save_file = FilenameUtils.separatorsToSystem(new_save_file);
-      this.SavePageNum += 1;
+      outfile += String.format("/%s%s-%d.%s", test, file, idx, ext);
 
-      newfd = new File(new_save_file);
+      return FilenameUtils.separatorsToSystem(outfile);
+   }
+
+
+   /**
+    * Save the current HTML page.
+    */
+
+   public void SavePage() {
+      String htmlFile = makeFilename("saved-html", "savedhtml",
+                                     this.saveHtmlIdx, "html");
+      this.saveHtmlIdx += 1;
+
+      String pageSource = this.browser.getPageSource();
 
       try {
-         BufferedWriter bw = new BufferedWriter(new FileWriter(newfd));
-         bw.write(src);
+         File f = new File(htmlFile);
+         BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+         bw.write(pageSource);
          bw.close();
-         //this.LastSavedPage = new_save_file;
-         //this.CurrentMD5 = Utils.MD5(src);
-         this.Log(String.format("HTML Saved: %s", new_save_file));
-      } catch (Exception exp) {
-         this.ReportException(exp);
+         this.Log(String.format("HTML Saved: %s", htmlFile));
+      } catch (java.io.IOException e) {
+         this.justReportTheException(e);
       }
    }
+
+
+   /**
+    * Take a screenshot of the current page.
+    */
+
+   public void screenshot() {
+      String screenshotFile = makeFilename("screenshots", "screenshot",
+                                           this.screenshotIdx, "png");
+      this.screenshotIdx += 1;
+
+      Utils.takeScreenShot(screenshotFile, this, false);
+   }
+
+
+   /**
+    * Clean up on object destruction.
+    *
+    * This method simply makes sure that the output file handle is
+    * properly closed.
+    */
 
    protected void finalize() throws Throwable {
        try {

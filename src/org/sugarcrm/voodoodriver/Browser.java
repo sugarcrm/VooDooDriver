@@ -1,163 +1,244 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 
+
 /**
- * An base class for adding new web browser support for VooDooDriver.
+ * Base class for VooDooDriver browser support.
  *
  * @author trampus
- *
+ * @author Jon duSaint
  */
-public abstract class Browser implements BrowserInterface {
+
+public abstract class Browser {
+
+   /**
+    * {@link WebDriver} backend
+    */
 
    private WebDriver Driver = null;
+
+   /**
+    * Whether the browser window is closed.
+    */
+
    private boolean closed = true;
+
+   /**
+    * The browser profile.
+    */
+
    private String profile = null;
+
+   /**
+    * {@link Reporter} object used for logging.
+    */
+
    private Reporter reporter = null;
+
+   /**
+    * Page assert file.
+    */
+
    private String assertPageFile = null;
+
+   /**
+    * {@link PageAsserter} object.
+    */
+
    private PageAsserter asserter = null;
 
-   /**
-    * Constructor
-    *
-    */
-   public Browser() {
-
-   }
 
    /**
-    * Tells you if you the current browser object closed.
+    * Set the name of the browser profile.
     *
-    * @return boolean
+    * @param profile  browser profile name
     */
-   public boolean isClosed() {
-      return this.closed;
-   }
 
-   /**
-    * Set the internal {@link Reporter} object.
-    *
-    * @param rep An existing {@link Reporter} object.
-    */
-   public void setReporter(Reporter rep) {
-      this.reporter = rep;
-   }
-
-   public Reporter getReporter() {
-      return this.reporter;
-   }
-
-   /**
-    * Sets the name of the browser profile to use.
-    *
-    * @param profile The name of the browser profile to use.
-    */
    public void setProfile(String profile) {
       this.profile = profile;
    }
 
+
    /**
-    * Gets the current set browser profile name.
+    * Get the name of the current browser profile.
     *
-    * @return {@linkplain String} The current browser profile name.
+    * @return current browser profile name
     */
    public String getProfile() {
       return this.profile;
    }
 
+
    /**
-    * tells the class that the browser window has been closed.
+    * Get the {@link Mouse} object for access to the raw input device.
+    *
+    * @return the {@link Mouse} device for this machine
     */
+
+   public abstract Mouse getMouse();
+
+
+   /**
+    * Create a new browser window.
+    */
+
+   public abstract void newBrowser();
+
+
+   /**
+    * Set this browser's download directory.
+    *
+    * @param dir  the download directory
+    */
+
+   public abstract void setDownloadDirectory(String dir);
+
+
+   /**
+    * Open the specified URL in the browser.
+    *
+    * @param url  URL to open
+    */
+
+   public void url(String url) {
+      try {
+         this.Driver.navigate().to(url);
+      } catch (Exception exp) {
+         exp.printStackTrace();  // XXX
+      }
+   }
+
+
+   /**
+    * Refresh/reload the current browser location.
+    */
+
+   public void refresh() {
+      this.Driver.navigate().refresh();
+   }
+
+
+   /**
+    * Navigate forward one page in the browser.
+    */
+
+   public void forward() {
+      this.Driver.navigate().forward();
+   }
+
+
+   /**
+    * Navigate back one page in the browser.
+    */
+
+   public void back() {
+      this.Driver.navigate().back();
+   }
+
+
+   /**
+    * Close the browser window.
+    */
+
+   public void close() {
+      this.Driver.close();
+      this.setBrowserClosed();
+   }
+
+
+   /**
+    * Force the browser window to close via the native operating system.
+    */
+
+   public abstract void forceClose();
+
+
+   /**
+    * Return whether the browser window is closed.
+    *
+    * @return true if the browser window is close, false otherwise
+    */
+
+   public boolean isClosed() {
+      return this.closed;
+   }
+
+
+   /**
+    * Set the browser closed state to true.
+    */
+
    public void setBrowserClosed() {
       this.closed = true;
    }
 
    /**
-    * Tells you if the browser windows was closed for this object.
-    *
-    * @return {@linkplain boolean}
+    * Set the browser closed state to false.
     */
-   public boolean getBrowserCloseState() {
-      return this.closed;
-   }
 
-   /**
-    * Sets a new WebDriver for the browser to use.
-    *
-    * @param driver
-    */
-   public void setDriver(WebDriver driver) {
-      this.Driver = driver;
-   }
-
-   /**
-    * Returns the current {@link WebDriver} instance.
-    *
-    * @return {@link WebDriver}
-    */
-   public WebDriver getDriver() {
-      return this.Driver;
-   }
-
-   /**
-    *  creates a newBrowser
-    */
-   public void newBrowser() {
+   public void setBrowserOpened() {
       this.closed = false;
    }
 
+
    /**
-    * Sets the state if the browser is open or closed.
+    * Fetch the page source for the loaded page.
     *
-    * @param state Sets the closed state for the browser.
+    * @return HTML source for the current page
     */
-   public void setBrowserState(boolean state) {
-      this.closed = state;
+
+   public String getPageSource() {
+      int retries = 20;
+
+      while (retries-- > 0) {
+         try {
+            return this.Driver.getPageSource();
+         } catch (Exception e) {}
+
+         try {
+            Thread.sleep(1000);
+         } catch (java.lang.InterruptedException e) {}
+      }
+
+      return "";
    }
 
+
    /**
-    * Tells the browser to bypass java Alert & confirm dialogs.
+    * Execute javascript in the browser.
     *
-    * @param alert   sets how you want to handle a confirm dialog.
+    * This method executes a javascript string in the context of the
+    * browser.  During execution, a variable, "CONTROL", is created
+    * for use by the script.
+    *
+    * @param script  The javascript to run in the browser.
+    * @param element The Element to use on the page as the CONTROL var.
+    * @return the {@link Object} returned by the javascript code
     */
-    public void alertHack(boolean alert) {
-
-    }
-
-    /**
-     * Execute javascript in the browser
-     *
-     * This method executes a javascript string in the context of the
-     * browser.  During execution, a variable, "CONTROL", is created
-     * for use by the script.
-     *
-     * @param script  The javascript to run in the browser.
-     * @param element The Element to use on the page as the CONTROL var.
-     * @return {@link Object}
-     */
 
    public Object executeJS(String script, WebElement element) {
       Object result = null;
@@ -172,12 +253,13 @@ public abstract class Browser implements BrowserInterface {
       return result;
    }
 
+
    /**
-    * Fire a javascript event in the browser for an HTML element
+    * Fire a javascript event in the browser for an HTML element.
     *
     * @param element    the HTML element
     * @param eventType  which javascript event to fire
-    * @return {@link String} results of executing the event
+    * @return the {@link String} value returned by the event
     */
 
    public String fire_event(WebElement element, String eventType) {
@@ -211,159 +293,39 @@ public abstract class Browser implements BrowserInterface {
       return (result == null) ? "" : result.toString();
    }
 
+
    /**
-    * Generates a browser event to be fired on a given control.
+    * Generate a browser event of the specified type.
     *
-    * @param type
-    *
-    * @return {@link String} results
+    * @param type  the type of browser event
+    * @return the resulting browser event code
     */
+
    public String generateUIEvent(UIEvents type) {
-      String result = "";
-
-      if (type != UIEvents.FOCUS) {
-         result = "var ele = arguments[0];\n";
-         result += "var evObj = document.createEvent('MouseEvents');\n";
-         result += "evObj.initMouseEvent( '" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+
-            "false, false, true, false, 0, null );\n";
-         result += "ele.dispatchEvent(evObj);\n";
-         result += "return 0;\n";
-      } else {
-         result = "var ele = arguments[0];\n";
-         result += "ele.focus();\nreturn 0;\n";
+      if (type == UIEvents.FOCUS) {
+         return ("var ele = arguments[0];\n" +
+                 "ele.focus();\nreturn 0;\n");
       }
 
-      return result;
+      return ("var ele = arguments[0];\n" +
+              "var evObj = document.createEvent('MouseEvents');\n" +
+              "evObj.initMouseEvent('" + type.toString().toLowerCase() + "'," +
+                                   " true, true, window, 1, 12, 345, 7, 220," +
+                                   " false, false, true, false, 0, null);\n" +
+              "ele.dispatchEvent(evObj);\n" +
+              "return 0;\n");
    }
 
-   /**
-    * Calls refresh in the browser.
-    */
-   public void refresh() {
-      this.Driver.navigate().refresh();
-   }
 
    /**
-    * Calls forward in the browser.
-    */
-   public void forward() {
-      this.Driver.navigate().forward();
-   }
-
-   /**
-    * Calls back in the browser.
-    */
-   public void back() {
-      this.Driver.navigate().back();
-   }
-
-   /**
-    * Calls close on the browser.
-    */
-   public void close() {
-      this.Driver.close();
-      this.setBrowserClosed();
-   }
-
-   /**
-    * Gets the page sources in the current browser window.
+    * Find an element in the browser's DOM.
     *
-    * @return {@link String} result
+    * @param by         element selection criteria
+    * @param retryTime  time limit (in seconds) for retries
+    *
+    * @return the {@link WebElement} if found or null
     */
-   public String getPageSource() {
-      String result = "";
-      int max = 20;
-      boolean failed = false;
 
-      for (int i = 0; i <= max; i++) {
-         try {
-            result = this.Driver.getPageSource();
-         } catch (Exception exp) {
-            failed = true;
-         }
-
-         if (failed) {
-            try {
-               Thread.currentThread();
-               Thread.sleep(1000);
-            } catch (Exception exp) {
-               exp.printStackTrace();
-            }
-         } else {
-            break;
-         }
-      }
-
-      return result;
-   }
-
-   /**
-    * Asserts if the given value exists in the browser text.
-    *
-    * @param value The value to check if exists in the browser.
-    *
-    * @return {@link boolean} result
-    */
-   public boolean Assert(String value) {
-      boolean result = false;
-      result = this.reporter.Assert(value, this.getPageSource());
-      return result;
-   }
-
-   public boolean Assert(String value, WebElement parent) {
-      boolean result = false;
-      result = this.reporter.Assert(value, parent.getText());
-      return result;
-   }
-
-   /**
-    * Asserts if the given value does not exist in the browser text.
-    *
-    * @param value The value to check if not exists in the browser.
-    *
-    * @return boolean
-    */
-   public boolean AssertNot(String value) {
-      boolean result = false;
-      result = this.reporter.AssertNot(value, this.getPageSource());
-      return result;
-   }
-
-   public boolean AssertNot(String value, WebElement parent) {
-      boolean result = false;
-      result = this.reporter.AssertNot(value, parent.getText());
-      return result;
-   }
-
-   /**
-    *
-    */
-   public boolean assertPage(VDDHash whitelist) {
-      boolean result = false;
-
-      if (this.asserter == null && this.assertPageFile != null) {
-         try {
-            this.asserter = new PageAsserter(this.assertPageFile, this.reporter, whitelist);
-         } catch (Exception exp) {
-            this.reporter.ReportException(exp);
-         }
-      }
-
-      if (this.asserter != null) {
-         this.asserter.assertPage(this.getPageSource(), whitelist);
-      }
-
-      return result;
-   }
-
-   /**
-    * Find an element in the browser's current DOM.
-    *
-    * @param by         search parameters for the element
-    * @param retryTime  maximum time in seconds to keep trying to find the element
-    *
-    * @return {@link WebElement}
-    */
    public WebElement findElement(By by, int retryTime) {
       long end = System.currentTimeMillis() + retryTime * 1000;
 
@@ -376,11 +338,12 @@ public abstract class Browser implements BrowserInterface {
       return null;
    }
 
+
    /**
-    * Find more then one element in the browser's current DOM.
+    * Find more then one element in the browser's DOM.
     *
     * @param by         element selection criteria
-    * @param retryTime  how long to continue retrying
+    * @param retryTime  time limit (in seconds) for retries
     * @return a {@link List} of all {@link WebElement}s found
     */
 
@@ -397,16 +360,20 @@ public abstract class Browser implements BrowserInterface {
       throw new NoSuchElementException("Failed to find element by " + by);
    }
 
+
    /**
-    * Finds more then one element in the browser's current DOM.
+    * Find an element in the browser's DOM using expanded search criteria.
     *
-    * @param by
-    * @param retryTime
-    * @param index
-    * @param required
-    * @return {@link WebElement}
+    * @param by         element selection criteria
+    * @param retryTime  time limit (in seconds) for retries
+    * @param index      index into the list of elements found
+    * @param required   whether this element must be found
+    * @param exists     whether this element exists
+    * @return the {@link WebElement} found
     */
-   public WebElement findElements(By by, int retryTime, int index, boolean required, boolean exists) {
+
+   public WebElement findElements(By by, int retryTime, int index,
+                                  boolean required, boolean exists) {
       WebElement result = null;
       List<WebElement> elements = null;
       int len = 0;
@@ -448,36 +415,155 @@ public abstract class Browser implements BrowserInterface {
       return result;
    }
 
+
    /**
-    * Tells the browser to go to this URL.
+    * Set the internal {@link Reporter} object.
     *
-    * @param url
+    * @param rep  a {@link Reporter} object
     */
-   public void url(String url) {
-      try {
-         this.Driver.navigate().to(url);
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+
+   public void setReporter(Reporter rep) {
+      this.reporter = rep;
+   }
+
+
+   /**
+    * Get the internal {@link Reporter} object.
+    *
+    * @return the {@link Reporter} object
+    */
+
+   public Reporter getReporter() {
+      return this.reporter;
+   }
+
+
+   /**
+    * Set the {@link WebDriver} for the browser to use.
+    *
+    * @param driver  the {@link WebDriver}
+    */
+
+   public void setDriver(WebDriver driver) {
+      this.Driver = driver;
    }
 
    /**
-    * Sets the classes internal var for where the assertpage config xml file is.
+    * Get the current {@link WebDriver}.
     *
-    * @param filename
+    * @return {@link WebDriver}
     */
+
+   public WebDriver getDriver() {
+      return this.Driver;
+   }
+
+
+   /**
+    * When set, the browser bypasses java Alert and Confirm dialogs.
+    *
+    * @param alert  whether to bypass alerts
+    */
+
+   public abstract void alertHack(boolean alert);
+
+
+   /**
+    * Assert the specified text is found in the current page.
+    *
+    * @param value  the search string
+    * @return whether the text was found
+    */
+
+   public boolean Assert(String value) {
+      return this.reporter.Assert(value, this.getPageSource());
+   }
+
+
+   /**
+    * Assert the specified text is found in a {@link WebElement}
+    *
+    * @param value   the search string
+    * @param parent  the element to search
+    * @return whether the text was found
+    */
+
+   public boolean Assert(String value, WebElement parent) {
+      return this.reporter.Assert(value, parent.getText());
+   }
+
+
+   /**
+    * Assert the specified text does not exist in the current page.
+    *
+    * @param value  the search string
+    * @return true if the text was not found, false otherwise
+    */
+
+   public boolean AssertNot(String value) {
+      return this.reporter.AssertNot(value, this.getPageSource());
+   }
+
+
+   /**
+    * Assert the specified text does not exist in a {@link WebElement}
+    *
+    * @param value   the search string
+    * @param parent  the element to search
+    * @return true if the text was not found, false otherwise
+    */
+
+   public boolean AssertNot(String value, WebElement parent) {
+      return this.reporter.AssertNot(value, parent.getText());
+   }
+
+
+   /**
+    * Check the current page against the page assert list.
+    *
+    * @param whitelist  {@link VDDHash} with values to ignore
+    */
+
+   public boolean assertPage(VDDHash whitelist) {
+      boolean result = false;
+
+      if (this.asserter == null && this.assertPageFile != null) {
+         try {
+            this.asserter = new PageAsserter(this.assertPageFile,
+                                             this.reporter, whitelist);
+         } catch (Exception exp) {
+            this.reporter.ReportException(exp);
+         }
+      }
+
+      if (this.asserter != null) {
+         this.asserter.assertPage(this.getPageSource(), whitelist);
+      }
+
+      return result;
+   }
+
+
+   /**
+    * Load the page assert file.
+    *
+    * @param filename  the file of page asserts
+    * @param reporter  {@link Reporter} object to use
+    */
+
    public void setAssertPageFile(String filename, Reporter reporter) {
       this.assertPageFile = filename;
       this.asserter = new PageAsserter(filename, reporter, null);
    }
 
+
    /**
-    * Gets the current assertpage file if any.
+    * Get page assert file.
     *
-    * @return null for no file, or a path to the file.
+    * @return page assert file or null, if no file has been assigned
     */
+
    public String getAssertPageFile() {
       return this.assertPageFile;
    }
-
 }

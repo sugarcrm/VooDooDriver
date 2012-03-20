@@ -31,8 +31,7 @@ public class Test {
    private VDDHash HiJacks = null;
    private BlockList blocked = null;
    private boolean WatchDog = false;
-   private Events PlugIns = null;
-   private String SaveHTML = "";
+   private Plugin plugins = null;
    private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
    private String assertPage = null;
    private int attachTimeout = 0;
@@ -40,7 +39,8 @@ public class Test {
 
    public Test(String testFile, Browser browser, VDDHash gvars,
                VDDHash hijacks, BlockList blocklist, VDDHash oldvars,
-               String suitename, String reportDir, String saveHtml) {
+               String suitename, String reportDir, String saveHtml,
+               String screenshot) {
       this.Browser = browser;
       this.testFile = testFile;
       this.HiJacks = hijacks;
@@ -50,7 +50,6 @@ public class Test {
       String resultsdir = reportDir;
       String report_name = "";
       File tmp_file = new File(testFile);
-      this.SaveHTML = saveHtml;
 
       report_name = tmp_file.getName();
       report_name = report_name.replaceAll(".xml$", "");
@@ -60,10 +59,15 @@ public class Test {
       }
 
       this.reporter = new Reporter(report_name, resultsdir);
+      this.reporter.setTestName(testFile);
+      this.reporter.setBrowser(browser);
 
       if (saveHtml != null && saveHtml.length() > 0) {
-         this.reporter.setSaveHTML(this.SaveHTML, browser);
-         this.reporter.setTestName(testFile);
+         this.reporter.setSaveHTML(saveHtml);
+      }
+
+      if (screenshot != null && screenshot.length() > 0) {
+         this.reporter.setScreenshot(screenshot);
       }
 
       this.Browser.setReporter(this.reporter);
@@ -82,8 +86,8 @@ public class Test {
       this.Browser.setAssertPageFile(this.assertPage, this.reporter);
    }
 
-   public void setPlugins(Events plugins) {
-      this.PlugIns = plugins;
+   public void setPlugins(Plugin plugins) {
+      this.plugins = plugins;
    }
 
    public EventLoop getEventLoop() {
@@ -96,12 +100,12 @@ public class Test {
 
    private boolean loadTestFile() {
       boolean result = false;
-      XML xml = null;
+      TestLoader loader = null;
 
       try {
          System.out.printf("Loading Soda Test: '%s'.\n", testFile);
-         xml = new XML(testFile, this.reporter);
-         this.events = xml.getEvents();
+         loader = new TestLoader(testFile, this.reporter);
+         this.events = loader.getEvents();
          System.out.printf("Finished.\n");
       } catch (Exception exp) {
          this.reporter.ReportException(exp);
@@ -136,8 +140,9 @@ public class Test {
       result = CheckTestBlocked();
       if (!result) {
          long current = 0;
-         eventDriver = new EventLoop(this.Browser, events, this.reporter, this.GVars, this.HiJacks,
-               this.OldVars, this.PlugIns);
+         eventDriver = new EventLoop(this.Browser, events, this.reporter,
+                                     this.GVars, this.HiJacks,
+                                     this.OldVars, this.plugins);
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);

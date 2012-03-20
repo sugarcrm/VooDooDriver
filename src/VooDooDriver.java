@@ -32,14 +32,16 @@ import org.sugarcrm.voodoodriver.Config;
 import org.sugarcrm.voodoodriver.ConfigFileParser;
 import org.sugarcrm.voodoodriver.Events;
 import org.sugarcrm.voodoodriver.Firefox;
-import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.IE;
+import org.sugarcrm.voodoodriver.Plugin;
+import org.sugarcrm.voodoodriver.PluginLoader;
 import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestList;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.VDDHash;
 
 
 /**
@@ -144,13 +146,24 @@ public class VooDooDriver {
             }
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"browser", "attachtimeout", "resultdir",
-                                     "savehtml", "plugin"};
+                                     "savehtml", "screenshot", "plugin"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
 
             for (String s: validCmdopts) {
                if (name.contains(s)) {
-                  configOpts.put(s, value);
+                  if (name.equals("attachtimeout")) {
+                     /* The only integer cmdopt */
+                     try {
+                        configOpts.put(s, Integer.valueOf(value));
+                     } catch (java.lang.NumberFormatException e) {
+                        System.err.printf("(!)Invalid cmdopt for %s '%s'\n",
+                                          name, value);
+                        System.exit(1);
+                     }
+                  } else {
+                     configOpts.put(s, value);
+                  }
                   System.out.printf("(*)Adding Config-File cmdopts: '%s' => '%s'.\n",
                                     name, value);
                }
@@ -223,7 +236,7 @@ public class VooDooDriver {
       /* Defaults */
       opts.put("attachtimeout", 0);
       opts.put("haltOnFailure", false);
-      opts.put("restartcount", "0");
+      opts.put("restartcount", 0);
       opts.put("resultdir", defaultResultDir());
 
       /* Merge gvar */
@@ -315,32 +328,32 @@ public class VooDooDriver {
       }
 
       if (config.containsKey("attachtimeout")) {
-         /* XXX: Handle in Config */
-         Integer t = new Integer((String)config.get("attachtimeout"));
-         config.put("attachtimeout", t);
-         System.out.printf("(*)Setting attach timeout to %ss.\n", t);
+         System.out.printf("(*)Setting attach timeout to %ss.\n",
+                           (Integer)config.get("attachtimeout"));
       }
 
       if (config.containsKey("restartcount")) {
-         /* XXX: Handle in Config */
-         Integer r = new Integer((String)config.get("restartcount"));
-         config.put("restartcount", r);
-         System.out.printf("(*)Restart count => '%d'\n", r);
+         System.out.printf("(*)Restart count => '%d'\n",
+                           (Integer)config.get("restartcount"));
       }
 
       if (config.containsKey("savehtml")) {
          System.out.printf("(*)SaveHTML: %s\n", config.get("savehtml"));
       }
 
+      if (config.containsKey("screenshot")) {
+         System.out.printf("(*)Screenshot: %s\n", config.get("screenshot"));
+      }
+
       if (config.containsKey("plugin")) {
          String p = (String)config.get("plugin");
          System.out.println("(*)Loading plugins from " + p);
          try {
-            SodaPluginParser plugParser = new SodaPluginParser(p);
-            config.put("plugin", plugParser.parse());
-         } catch (Exception e) {
-            /* XXX: Just what Exception does SodaPluginParser actually throw? */
-            System.err.println("(!)Failed to load plugin file: " + e);
+            PluginLoader loader = new PluginLoader(p);
+            config.put("plugin", loader.load());
+         } catch (org.sugarcrm.voodoodriver.PluginException e) {
+            System.err.println("(!)Failed to load plugin file:");
+            e.printStackTrace(System.err);
             System.exit(1);
          }
       }
@@ -381,8 +394,9 @@ public class VooDooDriver {
       SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
-      Events plugins = (Events)config.get("plugin");
+      Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
+      String screenshot = (String)config.get("screenshot");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       int attachTimeout = (Integer)config.get("attachtimeout");;
@@ -439,7 +453,7 @@ public class VooDooDriver {
          System.out.printf("Starting Test: '%s'.\n", test_file);
 
          testobj = new Test(test_file, browser, gvars, hijacks, null,
-                            null, null, resultdir, savehtml);
+                            null, null, resultdir, savehtml, screenshot);
          if (assertpage != null) {
             testobj.setAssertPage(assertpage);
          }
@@ -483,8 +497,9 @@ public class VooDooDriver {
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       BlockList blockList = (BlockList)config.get("blocklist");
-      Events plugins = (Events)config.get("plugin");
+      Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
+      String screenshot = (String)config.get("screenshot");;
       String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       String restartTest = (String)config.get("restarttest");
@@ -637,8 +652,8 @@ public class VooDooDriver {
                                              date_str));
 
                   testobj = new Test(restartTest, browser, gvars, hijacks,
-                                         blockList, vars, suite_base_noext,
-                                         resultdir, savehtml);
+                                     blockList, vars, suite_base_noext,
+                                     resultdir, savehtml, screenshot);
                   testobj.setIsRestartTest(true);
 
                   if (assertpage != null) {
@@ -720,7 +735,7 @@ public class VooDooDriver {
 
             testobj = new Test(current_test, browser, gvars, hijacks,
                                blockList, vars, suite_base_noext,
-                               resultdir, savehtml);
+                               resultdir, savehtml, screenshot);
             if (assertpage != null) {
                testobj.setAssertPage(assertpage);
             }

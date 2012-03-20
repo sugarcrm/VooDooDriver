@@ -1,27 +1,28 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
+
 /**
- * An enum class for all of the valid browser actions.
+ * An enumeration of all of valid browser actions.
  *
  * @author trampus
- *
  */
+
 public enum BrowserMethods {
    BROWSER_cssprop,
    BROWSER_cssvalue,
@@ -34,11 +35,12 @@ public enum BrowserMethods {
    BROWSER_assert;
 
    /**
-    * Checks to see if a given name exists in this enum.
+    * Determine whether the provided string is a member of this enum.
     *
-    * @param aName The name of the action you want to see if it exists for this class.
-    * @return {@link boolean}
+    * @param aName  browser method name to check
+    * @return {@link Boolean}
     */
+
    static public boolean isMember(String aName) {
       boolean result = false;
       BrowserMethods[] values = BrowserMethods.values();
