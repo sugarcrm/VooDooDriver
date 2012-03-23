@@ -16,6 +16,7 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.util.ArrayList;
 import org.openqa.selenium.WebElement;
 
 
@@ -114,23 +115,44 @@ public class JavaPlugin extends Plugin {
 
 
    /**
-    * Execute the java plugin.
+    * Merge args from this object and the {@link PluginData} object
     *
-    * @param element  the HTML element that the plugin is running against
-    * @param browser  current {@link Browser} object
-    * @param report   {@link Reporter} object
-    * @return true if execution was successful, false otherwise
+    * @param args  args list from the {@link PluginData} object
+    * @return combined args list or null if args and this.args is null
     */
 
-   public boolean execute(WebElement element, Browser browser,
-                          Reporter report) {
-      PluginInterface inst = null;
+   private String[] mergeArgs(String[] args) {
+      if (args == null && this.args == null) {
+         return null;
+      }
+
+      ArrayList<String> merged = new ArrayList<String>();
+
+      if (this.args != null) {
+         for (String a: this.args) {
+            merged.add(a);
+         }
+      }
+      if (args != null) {
+         for (String a: args) {
+            merged.add(a);
+         }
+      }
+
+      return merged.toArray(new String[0]);
+   }
+
+
+   public boolean execute(PluginData data, Reporter report) {
       int rv = 0;
+      PluginData localData = new PluginData(data);
 
       report.Log("Plugin event " + className + " started.");
 
+      localData.setArgs(this.mergeArgs(localData.getArgs()));
+
       try {
-         rv = plugin.execute(null, browser, element);
+         rv = plugin.execute(localData);
       } catch (Exception e) {
          /*
           * Because all software can't be perfect ;)
