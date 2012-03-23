@@ -1,0 +1,48 @@
+2012-03-23  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+The bulk of this merge consists of internal infrastructure changes to
+VooDooDriver.  Major areas improved are plugin infrastructure and
+event handling.
+
+= New Features =
+
+ * New auto-screenshot feature
+
+= Bugs Fixed =
+
+ * 48308: Receive exception Element not found in the cache when trying
+          to set option in drop down box
+ * 49560: Exception Requested location is outside the bounds of the document
+ * 50364: Please add auto-screenshot functionality on errors.
+ * 50978: Voodoo appears to be refusing to run if the resultdir is not empty.
+ * 51024: Voodoo Driver throws an exception if no attach timeout is specified.
+
+= All Changes =
+
+45bd363 Clean up and document EventLoader.
+83dbc8d Fix some bugs in the VDD regressions suite.
+ae0f259 Rework slightly VDD-specific exceptions.
+3abb144 Rename XML.java to TestLoader.java (Part 2)
+42ede22 Rename XML.java to TestLoader.java
+e32333a Rename Types.java to EventLoader.java (Part 2/2)
+ebe3251 Rename Types.java to EventLoader.java (Part 1/2)
+8c77e8a Clean up and document Browser and its subclasses.
+839ae93 Get rid of javadoc warnings
+820dd10 Convert Plugin from interface to abstract class
+9b50ba8 Remove PluginsHash
+7a5ad6c Add auto-screenshot functionality to VDD
+1c31888 Add methods for firing plugins without element/plugin event specs
+7c17a65 Reorder constants in Elements.java
+8160568 Finish renaming PluginEventType to PluginEvent
+b0bbb43 Rename PluginEventType to PluginEvent
+6cf6f56 Plumb new plugin infrastructure into VooDooDriver
+c319d96 Create a new VDD plugin infrastructure
+f8ea7c5 Finish renaming SodaPluginParser to PluginLoader
+1d80108 Move SodaPluginParser and rename it
+71447cd Split java plugin firing out into its own method
+d4ad01f Split javascript plugin firing out into its own method
+9f35f4a Document EventLoop.firePlugin
+a624dfe Rename Elements.xml to Events.xml
+3a2a4b0 Handle integer options as integers
+bb04747 Changed my mind and removed the check instead.
+4a4417d Disabling check for empty resultdir.
