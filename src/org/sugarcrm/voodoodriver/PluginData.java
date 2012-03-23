@@ -46,7 +46,7 @@ public class PluginData {
     * String enumeration of all implemented getters/setters.
     */
 
-   private final String[] methods = {"args", "browser", "element"};
+   private final String[] methods = {"args", "browser", "element", "sodavars"};
 
 
    /**
@@ -77,7 +77,8 @@ public class PluginData {
     * Enumerate which getters/setters are provided.
     *
     * @param method  name of methods to check for. Current methods are
-    *                <ul><li>args</li><li>browser</li><li>element</li></ul>
+    *                <ul><li>args</li><li>browser</li><li>element</li>
+    *                <li>sodavars</li></ul>
     * @return true if the methods exist, false otherwise
     */
 
@@ -167,4 +168,21 @@ public class PluginData {
       return (WebElement)this.d.get("element");
    }
 
+
+   /**
+    *
+    */
+
+   public void setSodaVars(VDDHash sodaVars) {
+      this.d.put("sodavars", new VDDHash(sodaVars));
+   }
+
+
+   /**
+    *
+    */
+
+   public VDDHash getSodaVars() {
+      return (VDDHash)this.d.get("sodavars");
+   }
 }

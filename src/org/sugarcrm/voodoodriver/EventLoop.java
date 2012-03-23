@@ -770,6 +770,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(parent);
       data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
 
       result = plugin.execute(data, report);
 
@@ -3248,6 +3249,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
 
       for (Plugin plugin: this.plugins) {
          result &= plugin.execute(data, this.report);
@@ -3275,6 +3277,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
 
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(eventType)) {
@@ -3306,6 +3309,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
 
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(elementType, eventType)) {

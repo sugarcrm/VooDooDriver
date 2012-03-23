@@ -18,6 +18,7 @@ package javaplugins;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.sugarcrm.voodoodriver.VDDHash;
 import org.sugarcrm.voodoodriver.PluginData;
 import org.sugarcrm.voodoodriver.PluginInterface;
 
@@ -40,6 +41,7 @@ public class JavaPluginTest implements PluginInterface {
 
       String []args = data.getArgs();
       WebElement element = data.getElement();
+      VDDHash sodaVars = data.getSodaVars();
 
       if (args == null && element == null) {
          return 1;
@@ -50,6 +52,13 @@ public class JavaPluginTest implements PluginInterface {
          System.out.printf("(*)Plugin: arg size: %d\n", args.length);
          element.findElement(By.id("text1")).clear();
          element.findElement(By.id("text1")).sendKeys(args[0]);
+      }
+
+      if (sodaVars != null) {
+         System.out.println("(*)All Soda Vars");
+         for (String k: sodaVars.keySet()) {
+            System.out.printf("--)'%s' => '%s'\n", k, sodaVars.get(k));
+         }
       }
 
       System.out.println("(*)Plugin: JavaPluginTest finished.");
