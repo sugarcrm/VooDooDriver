@@ -141,8 +141,8 @@ public class Test {
       if (!result) {
          long current = 0;
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
-                                     this.GVars, this.HiJacks,
-                                     this.OldVars, this.plugins);
+                                     this.GVars, this.HiJacks, this.OldVars,
+                                     this.plugins, this.testFile);
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);

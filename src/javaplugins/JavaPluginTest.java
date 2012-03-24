@@ -43,6 +43,9 @@ public class JavaPluginTest implements PluginInterface {
       WebElement element = data.getElement();
       VDDHash sodaVars = data.getSodaVars();
       VDDHash hijacks = data.getHijacks();
+      String testName = data.getTestName();
+
+      System.out.println("(*)VDD is currently running the test " + testName);
 
       if (args == null && element == null) {
          return 1;

@@ -63,6 +63,7 @@ public class EventLoop implements Runnable {
    private String csvOverrideFile = null;
    private VDDHash whitelist = null;
    private ArrayList<Plugin> plugins = null;
+   private String testName = "";
 
 
    /**
@@ -75,15 +76,16 @@ public class EventLoop implements Runnable {
     * @param hijacks  {@link VDDHash}
     * @param oldvars  {@link VDDHash}
     * @param plugins  {@link Events}
+    * @param testName the current running test
     */
-   public EventLoop(Browser browser, Events events,
-         Reporter reporter, VDDHash gvars, VDDHash hijacks,
-         VDDHash oldvars, Plugin plugins) {
+   public EventLoop(Browser browser, Events events, Reporter reporter,
+                    VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
+                    Plugin plugins, String testName) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
-
+      this.testName = testName;
       this.whitelist = new VDDHash();
 
       if (oldvars != null) {
@@ -772,6 +774,7 @@ public class EventLoop implements Runnable {
       data.setBrowser(this.Browser);
       data.setSodaVars(this.sodaVars);
       data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
 
       result = plugin.execute(data, report);
 
@@ -3252,6 +3255,7 @@ public class EventLoop implements Runnable {
       data.setBrowser(this.Browser);
       data.setSodaVars(this.sodaVars);
       data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
 
       for (Plugin plugin: this.plugins) {
          result &= plugin.execute(data, this.report);
@@ -3281,6 +3285,7 @@ public class EventLoop implements Runnable {
       data.setBrowser(this.Browser);
       data.setSodaVars(this.sodaVars);
       data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
 
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(eventType)) {
@@ -3314,6 +3319,7 @@ public class EventLoop implements Runnable {
       data.setBrowser(this.Browser);
       data.setSodaVars(this.sodaVars);
       data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
 
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(elementType, eventType)) {

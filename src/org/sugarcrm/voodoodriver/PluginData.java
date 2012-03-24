@@ -46,8 +46,8 @@ public class PluginData {
     * String enumeration of all implemented getters/setters.
     */
 
-   private final String[] methods = {"args", "browser", "element", "sodavars",
-                                     "hijacks"};
+   private final String[] methods = {"args", "browser", "element", "hijacks",
+                                     "sodavars", "testname"};
 
 
    /**
@@ -79,7 +79,7 @@ public class PluginData {
     *
     * @param method  name of methods to check for. Current methods are
     *                <ul><li>args</li><li>browser</li><li>element</li>
-    *                <li>sodavars</li><li>hijacks</li></ul>
+    *                <li>hijacks</li><li>sodavars</li><li>testname</li></ul>
     * @return true if the methods exist, false otherwise
     */
 
@@ -211,6 +211,28 @@ public class PluginData {
 
    public VDDHash getHijacks() {
       return (VDDHash)this.d.get("hijacks");
+   }
+
+
+   /**
+    * Set the current VDD test name
+    *
+    * @param testName  name of the current running test
+    */
+
+   public void setTestName(String testName) {
+      this.d.put("testname", testName);
+   }
+
+
+   /**
+    * Fetch the current test name.
+    *
+    * @return name of the current running test
+    */
+
+   public String getTestName() {
+      return (String)this.d.get("testname");
    }
 
 }
