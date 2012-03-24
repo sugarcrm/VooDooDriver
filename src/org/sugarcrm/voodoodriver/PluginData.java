@@ -46,7 +46,8 @@ public class PluginData {
     * String enumeration of all implemented getters/setters.
     */
 
-   private final String[] methods = {"args", "browser", "element", "sodavars"};
+   private final String[] methods = {"args", "browser", "element", "sodavars",
+                                     "hijacks"};
 
 
    /**
@@ -78,7 +79,7 @@ public class PluginData {
     *
     * @param method  name of methods to check for. Current methods are
     *                <ul><li>args</li><li>browser</li><li>element</li>
-    *                <li>sodavars</li></ul>
+    *                <li>sodavars</li><li>hijacks</li></ul>
     * @return true if the methods exist, false otherwise
     */
 
@@ -170,7 +171,9 @@ public class PluginData {
 
 
    /**
+    * Set the current Soda Vars.
     *
+    * @param sodaVars  {@link VDDHash} of Soda Vars
     */
 
    public void setSodaVars(VDDHash sodaVars) {
@@ -179,10 +182,35 @@ public class PluginData {
 
 
    /**
+    * Fetch the current Soda Vars.
     *
+    * @return {@link VDDHash} of current Soda Vars
     */
 
    public VDDHash getSodaVars() {
       return (VDDHash)this.d.get("sodavars");
    }
+
+
+   /**
+    * Set the current VDD hijacks
+    *
+    * @param hijacks  {@link VDDHash} of VDD hijacks
+    */
+
+   public void setHijacks(VDDHash hijacks) {
+      this.d.put("hijacks", new VDDHash(hijacks));
+   }
+
+
+   /**
+    * Fetch the current VDD hijacks.
+    *
+    * @return {@link VDDHash} of current VDD hijacks
+    */
+
+   public VDDHash getHijacks() {
+      return (VDDHash)this.d.get("hijacks");
+   }
+
 }

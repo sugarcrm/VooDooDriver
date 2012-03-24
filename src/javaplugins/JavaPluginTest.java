@@ -42,6 +42,7 @@ public class JavaPluginTest implements PluginInterface {
       String []args = data.getArgs();
       WebElement element = data.getElement();
       VDDHash sodaVars = data.getSodaVars();
+      VDDHash hijacks = data.getHijacks();
 
       if (args == null && element == null) {
          return 1;
@@ -58,6 +59,13 @@ public class JavaPluginTest implements PluginInterface {
          System.out.println("(*)All Soda Vars");
          for (String k: sodaVars.keySet()) {
             System.out.printf("--)'%s' => '%s'\n", k, sodaVars.get(k));
+         }
+      }
+
+      if (hijacks != null) {
+         System.out.println("(*)All VDD Hijacks");
+         for (String k: hijacks.keySet()) {
+            System.out.printf("--)'%s' => '%s'\n", k, hijacks.get(k));
          }
       }
 
