@@ -25,17 +25,16 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<soda>
-	<script file="tests/test-scripts/tests/buttons-test.xml" /> 
-	<script file="tests/test-scripts/tests/radio-test.xml" />
-	<script file="tests/test-scripts/tests/field-test.xml" />
-	<script file="tests/test-scripts/tests/misc-test.xml" />
-	<script file="tests/test-scripts/tests/table-test.xml" />
-	<script file="tests/test-scripts/tests/checkbox-test.xml" />
-	<script file="tests/test-scripts/tests/select-test.xml" />
-	<script file="tests/test-scripts/tests/list-test.xml" />  
-	<script file="tests/test-scripts/tests/image-test.xml" />  
-	<script file="tests/test-scripts/tests/javaplugin-test.xml" />
-	<script file="tests/test-scripts/tests/cleanup.xml" />
-  
+<soda>     
+   <script file="tests/test-scripts/tests/buttons-test.xml"/>
+   <script file="tests/test-scripts/tests/radio-test.xml"/>
+   <script file="tests/test-scripts/tests/field-test.xml"/>
+   <script file="tests/test-scripts/tests/misc-test.xml"/>
+   <script file="tests/test-scripts/tests/table-test.xml"/>
+   <script file="tests/test-scripts/tests/checkbox-test.xml"/>
+   <script file="tests/test-scripts/tests/select-test.xml"/>
+   <script file="tests/test-scripts/tests/list-test.xml"/>
+   <script file="tests/test-scripts/tests/image-test.xml"/>
+   <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
+   <script file="tests/test-scripts/tests/cleanup.xml"/>
 </soda>

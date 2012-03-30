@@ -55,17 +55,9 @@ public class JsPlugin extends Plugin {
    }
 
 
-   /**
-    * Execute the javascript plugin.
-    *
-    * @param element  the HTML element that the plugin is running against
-    * @param browser  current {@link Browser} object
-    * @param report   {@link Reporter} object
-    * @return true if execution was successful, false otherwise
-    */
-
-   public boolean execute(WebElement element, Browser browser,
-                          Reporter report) {
+   public boolean execute(PluginData data, Reporter report) {
+      WebElement element = data.getElement();
+      Browser browser = data.getBrowser();
       String js = "var CONTROL = arguments[0];\n\n";
       String err = null;
       Object res = null;

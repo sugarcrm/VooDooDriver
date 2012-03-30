@@ -63,6 +63,7 @@ public class EventLoop implements Runnable {
    private String csvOverrideFile = null;
    private VDDHash whitelist = null;
    private ArrayList<Plugin> plugins = null;
+   private String testName = "";
 
 
    /**
@@ -75,15 +76,16 @@ public class EventLoop implements Runnable {
     * @param hijacks  {@link VDDHash}
     * @param oldvars  {@link VDDHash}
     * @param plugins  {@link Events}
+    * @param testName the current running test
     */
-   public EventLoop(Browser browser, Events events,
-         Reporter reporter, VDDHash gvars, VDDHash hijacks,
-         VDDHash oldvars, Plugin plugins) {
+   public EventLoop(Browser browser, Events events, Reporter reporter,
+                    VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
+                    Plugin plugins, String testName) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
-
+      this.testName = testName;
       this.whitelist = new VDDHash();
 
       if (oldvars != null) {
@@ -730,6 +732,7 @@ public class EventLoop implements Runnable {
    private boolean javapluginEvent(VDDHash event, WebElement parent) {
       String classname;
       Plugin plugin = null;
+      PluginData data = new PluginData();
       boolean result;
 
       this.report.Log("Javaplugin event started.");
@@ -755,9 +758,7 @@ public class EventLoop implements Runnable {
          return false;
       }
 
-      if (!event.containsKey("args")) {
-         plugin.setArgs(null);
-      } else {
+      if (event.containsKey("args")) {
          String[] args = (String[])event.get("args");
 
          if (args != null) {
@@ -766,10 +767,16 @@ public class EventLoop implements Runnable {
             }
          }
 
-         plugin.setArgs(args);
+         data.setArgs(args);
       }
 
-      result = plugin.execute(parent, this.Browser, report);
+      data.setElement(parent);
+      data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
+      result = plugin.execute(data, report);
 
       if (result == false) {
          report.ReportError("Javaplugin failed");
@@ -3238,13 +3245,20 @@ public class EventLoop implements Runnable {
 
    private boolean firePlugin(WebElement element) {
       boolean result = true;
+      PluginData data = new PluginData();
 
       if (!pluginPrefireCheck()) {
          return true;
       }
 
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
       for (Plugin plugin: this.plugins) {
-         result &= plugin.execute(element, this.Browser, this.report);
+         result &= plugin.execute(data, this.report);
       }
 
       return result;
@@ -3261,14 +3275,21 @@ public class EventLoop implements Runnable {
 
    private boolean firePlugin(WebElement element, PluginEvent eventType) {
       boolean result = true;
+      PluginData data = new PluginData();
 
       if (!pluginPrefireCheck()) {
          return true;
       }
 
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(eventType)) {
-            result &= plugin.execute(element, this.Browser, this.report);
+            result &= plugin.execute(data, this.report);
          }
       }
 
@@ -3288,14 +3309,21 @@ public class EventLoop implements Runnable {
    private boolean firePlugin(WebElement element, Elements elementType,
                               PluginEvent eventType) {
       boolean result = true;
+      PluginData data = new PluginData();
 
       if (!pluginPrefireCheck()) {
          return true;
       }
 
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setSodaVars(this.sodaVars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
       for (Plugin plugin: this.plugins) {
          if (plugin.matches(elementType, eventType)) {
-            result &= plugin.execute(element, this.Browser, this.report);
+            result &= plugin.execute(data, this.report);
          }
       }
 

@@ -45,7 +45,7 @@ public abstract class Plugin {
     * Array of arguments to pass to the plugin.
     */
 
-   private String[] args = null;
+   protected String[] args = null;
 
 
    /**
@@ -158,15 +158,14 @@ public abstract class Plugin {
 
    public abstract boolean matches(String className);
 
+
    /**
     * Execute the current plugin.
     *
-    * @param element  the HTML element that the plugin is running against
-    * @param browser  current {@link Browser} object
+    * @param data     {@link PluginData} passed to the plugin
     * @param report   {@link Reporter} object
-    * @return false -- this class must be subclassed
+    * @return true on plugin success, false on failure
     */
 
-   public abstract boolean execute(WebElement element, Browser browser,
-                                   Reporter report);
+   public abstract boolean execute(PluginData data, Reporter report);
 }
