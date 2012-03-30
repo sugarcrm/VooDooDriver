@@ -1,3 +1,28 @@
+2012-03-30  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+This merge updates VooDooDriver's plugin interface.  Now, instead of
+passing individual arguments with "command-line" args, the element,
+and the browser object, a single opaque object containing all useful
+information is passed in.  See the javadocs for PluginInterface and
+PluginData for more information.
+
+= New Features =
+
+ * Plugins now are passed PluginData with much more runtime information
+
+= Bugs Fixed =
+
+ * 50365: Please give plugins read-only access to Voodoo/Soda vars.
+ * 50571: Ability to Fire a Plugin without requiring a SodaElement
+
+= All Changes =
+
+be6265c Add plugin access to the current test's name
+c47b492 Add plugin access to VDD hijacks
+acbc071 Add plugin access to Soda Vars
+17c959a Change PluginInterface
+
+
 2012-03-23  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 The bulk of this merge consists of internal infrastructure changes to
