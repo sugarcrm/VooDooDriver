@@ -68,6 +68,7 @@
    <csv>
       <accessor_attributes>
          <accessor type="string">file</accessor>
+         <accessor type="string">override</accessor>
          <accessor type="string">var</accessor>
       </accessor_attributes> 
    </csv>

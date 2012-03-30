@@ -2549,7 +2549,8 @@ public class EventLoop implements Runnable {
          String csv_txt = event.get("override").toString();
          csv_txt = this.replaceString(csv_txt);
          this.csvOverrideFile = csv_txt;
-         msg = String.format("Setting CSV file override to file: '%s'.", this.csvOverrideFile);
+         msg = String.format("Setting CSV file override to file: '%s'.",
+                             this.csvOverrideFile);
          this.report.Log(msg);
          this.report.Log("CSV event finished.");
          return true;
