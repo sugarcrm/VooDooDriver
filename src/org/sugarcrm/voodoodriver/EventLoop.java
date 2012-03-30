@@ -3426,17 +3426,21 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
-         if (event.containsKey("clear")) {
-            if (this.clickToBool(event.get("clear").toString())) {
-               this.report.Log("Clearing textarea.");
-               element.clear();
-            }
-         }
-
          if (event.containsKey("set")) {
             value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
+            element.clear();
+            element.sendKeys(value);
+         } else if (event.containsKey("clear")) {
+            if (this.clickToBool(event.get("clear").toString())) {
+               this.report.Log("Clearing textarea.");
+               element.clear();
+            }
+         } else if (event.containsKey("append")) {
+            value = event.get("append").toString();
+            value = this.replaceString(value);
+            this.report.Log(String.format("Appending Value to: '%s'.", value));
             element.sendKeys(value);
          }
 
