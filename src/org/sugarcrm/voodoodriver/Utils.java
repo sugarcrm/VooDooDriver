@@ -208,27 +208,25 @@ public class Utils {
    }
 
 
-   public static HashMap<String, String> getJavaInfo() {
-      HashMap<String, String> data = new HashMap<String, String>();
+   /**
+    * Record JVM information.
+    *
+    * @return {@link VDDHash} containing JVM information
+    */
 
-      data.put("java.vendor", null);
-      data.put("java.version", null);
-      data.put("os.arch", null);
-      data.put("os.name", null);
-      data.put("os.version", null);
-      data.put("user.name", null);
-      data.put("user.home", null);
-      data.put("user.dir", null);
+   public static VDDHash getJavaInfo() {
+      VDDHash data = new VDDHash();
 
-      String[] keys = data.keySet().toArray(new String[0]);
+      String[] keys = {"java.vendor", "java.version", "os.arch", "os.name",
+                       "os.version", "user.name", "user.home", "user.dir"};
 
-      for (int i = 0; i <= keys.length -1; i++) {
-         String value = System.getProperty(keys[i]);
-         data.put(keys[i], value);
+      for (String key: keys) {
+         data.put(key, System.getProperty(key));
       }
 
       return data;
    }
+
 
    public static boolean isInt(String str) {
       boolean result = false;

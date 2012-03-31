@@ -53,30 +53,58 @@ import org.sugarcrm.voodoodriver.VDDHash;
 public class VooDooDriver {
    final static String defaultSodaConfigFile = "soda-config.xml";
 
+
    /**
-    * Dump JVM information to the console and warn if a non-Sun jvm is
-    * being used.
+    * Dump key-value pairs from a {@link VDDHash}
+    *
+    * @param kvps  {@link VDDHash} to be dumped
+    */
+
+   private static void dumpKeys(VDDHash kvps) {
+      String[] keys = kvps.keySet().toArray(new String[0]);
+      int col = 0;
+      java.util.Arrays.sort(keys);
+      for (String key: keys) {
+         if (key.length() > col) {
+            col = key.length();
+         }
+      }
+      for (String key: keys) {
+         System.out.printf("--)%" + String.valueOf(col + 2) + "s: %s\n",
+                           key, kvps.get(key));
+      }
+   }
+
+
+   /**
+    * Dump JVM information to the console.
     */
 
    private static void dumpJavaInfo() {
-      HashMap<String, String> javainfo = null;
-      javainfo = Utils.getJavaInfo();
-
-      String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
-      Arrays.sort(jinfoKeys);
+      VDDHash javaInfo = Utils.getJavaInfo();
 
       System.out.printf("(*)Java RunTime Info:\n");
+      dumpKeys(javaInfo);
 
-      for (int i = 0; i <= jinfoKeys.length -1; i++) {
-         String value = javainfo.get(jinfoKeys[i]);
-         System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
-      }
-
-      if (javainfo.containsKey("java.vendor") &&
-          !javainfo.get("java.vendor").contains("Sun Microsystems Inc")) {
-         System.out.printf("\n(!)Warning: This is not a 'Sun Microsystems Inc.' JRE/JDK and is not supported!\n");
+      if (javaInfo.containsKey("java.vendor") &&
+          !javaInfo.get("java.vendor").toString().contains("Sun Microsystems")) {
+         System.out.println("(!)Warning: This is not a 'Sun Microsystems' " +
+                            "JRE/JDK and is not supported.");
       }
    }
+
+
+   /**
+    * Dump VooDooDriver configuration.
+    *
+    * @param config  VooDooDriver configuration
+    */
+
+   private static void dumpConfig(VDDHash config) {
+      System.out.println("(*)VooDooDriver Configuration:");
+      dumpKeys(config);
+   }
+
 
    /**
     * Read the VoodDooDriver configuration file.
@@ -312,8 +340,8 @@ public class VooDooDriver {
 
       VDDHash config = mergeConfigs(cfg, cmdOpts);
 
-      // XXX: Implement dumpConfig(config);
       dumpJavaInfo();
+      dumpConfig(config);
 
       if (!config.containsKey("browser")) {
          System.out.println("(!)Error: Missing --browser argument!");
@@ -325,24 +353,6 @@ public class VooDooDriver {
       } catch (IllegalArgumentException e) {
          System.out.println("(!)Unsupported browser: " + config.get("browser"));
          System.exit(2);
-      }
-
-      if (config.containsKey("attachtimeout")) {
-         System.out.printf("(*)Setting attach timeout to %ss.\n",
-                           (Integer)config.get("attachtimeout"));
-      }
-
-      if (config.containsKey("restartcount")) {
-         System.out.printf("(*)Restart count => '%d'\n",
-                           (Integer)config.get("restartcount"));
-      }
-
-      if (config.containsKey("savehtml")) {
-         System.out.printf("(*)SaveHTML: %s\n", config.get("savehtml"));
-      }
-
-      if (config.containsKey("screenshot")) {
-         System.out.printf("(*)Screenshot: %s\n", config.get("screenshot"));
       }
 
       if (config.containsKey("plugin")) {
