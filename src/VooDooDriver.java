@@ -471,55 +471,37 @@ public class VooDooDriver {
 
 
    /**
-    * Run the tests specified on the command line with --test
+    * Run the tests specified on the command line with --test.
     *
     * @param config  VooDooDriver configuration
     */
 
    private static void RunTests(VDDHash config) {
-      /* XXX Start block to be refactored. */
       @SuppressWarnings("unchecked")
          ArrayList<String> tests = (ArrayList<String>)config.get("test");
-      String resultdir = (String)config.get("resultdir");;
-      VDDHash gvars = (VDDHash)config.get("gvar");
-      VDDHash hijacks = (VDDHash)config.get("hijack");
-      Plugin plugins = (Plugin)config.get("plugin");
-      String savehtml = (String)config.get("savehtml");;
-      String screenshot = (String)config.get("screenshot");;
-      String assertpage = (String)config.get("assertpage");
-      int attachTimeout = (Integer)config.get("attachtimeout");;
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
-      /* XXX End block to be refactored. */
-
       Browser browser = (Browser)config.get("browser");
-      int len = 0;
-      Test testobj = null;
 
       if (tests.size() == 0) {
          return;
       }
 
-      System.out.printf("(*)Running Soda Tests now...\n");
+      System.out.printf("(*)Running Soda Tests...\n");
 
-      browser.newBrowser();
+      for (String test: tests) {
+         System.out.println("Starting Test " + test);
 
-      len = tests.size() -1;
-      for (int i = 0; i <= len; i++) {
-         String test_file = tests.get(i);
-         test_file = FilenameUtils.separatorsToSystem(test_file);
-         System.out.printf("Starting Test: '%s'.\n", test_file);
-
-         testobj = new Test(test_file, browser, gvars, hijacks, null,
-                            null, null, resultdir, savehtml, screenshot);
-         if (assertpage != null) {
-            testobj.setAssertPage(assertpage);
+         if (browser.isClosed()) {
+            browser.newBrowser();
          }
-         testobj.setPlugins(plugins);
-         testobj.runTest(false);
+
+         Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
+         t.runTest(false);
 
          if (haltOnFailure &&
-             (Integer)testobj.getReporter().getResults().get("result") != 0) {
-            System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
+             (Integer)t.getReporter().getResults().get("result") != 0) {
+            System.out.println("(*)Test failed and --haltOnFailure is set. " +
+                               "Terminating run...");
             break;
          }
       }
@@ -527,7 +509,7 @@ public class VooDooDriver {
 
 
    /**
-    * Helper function to log summary data
+    * Helper function to log summary data.
     */
 
    private static void writeSummary(FileOutputStream in, String msg) {
@@ -540,31 +522,19 @@ public class VooDooDriver {
 
 
    /**
-    * Run all test suites
+    * Run test suites specified with --suite.
     *
     * @param config  VooDooDriver configuration
     */
 
    private static void RunSuites(VDDHash config) {
-      /* XXX Start block to be refactored. */
       @SuppressWarnings("unchecked")
          ArrayList<String> suites = (ArrayList<String>)config.get("suite");
-      String resultdir = (String)config.get("resultdir");;
-      VDDHash gvars = (VDDHash)config.get("gvar");
-      VDDHash hijacks = (VDDHash)config.get("hijack");
-      BlockList blockList = (BlockList)config.get("blocklist");
-      Plugin plugins = (Plugin)config.get("plugin");
-      String savehtml = (String)config.get("savehtml");;
-      String screenshot = (String)config.get("screenshot");;
-      String assertpage = (String)config.get("assertpage");
       String restartTest = (String)config.get("restarttest");
       int restartCount = (Integer)config.get("restartcount");
-      int attachTimeout = (Integer)config.get("attachtimeout");;
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
-      /* XXX End block to be refactored. */
-
       int len = suites.size() -1;
-      String report_file_name = resultdir;
+      String report_file_name = (String)config.get("resultdir");
       String hostname = "";
       FileOutputStream suiteRptFD = null;
       Browser browser = (Browser)config.get("browser");
@@ -577,8 +547,7 @@ public class VooDooDriver {
          return;
       }
 
-      System.out.printf("(*)Running Suite files now...\n");
-      System.out.printf("(*)Timeout: %s\n", attachTimeout);
+      System.out.println("(*)Running Suite files...");
 
       try {
          InetAddress addr = InetAddress.getLocalHost();
@@ -637,7 +606,8 @@ public class VooDooDriver {
          Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SuiteParser suiteP = new SuiteParser(suite_name, gvars);
+         SuiteParser suiteP = new SuiteParser(suite_name,
+                                              (VDDHash)config.get("gvar"));
          TestList suite_test_list = suiteP.getTests();
          VDDHash vars = null;
          TestResults test_results_hash = null;
@@ -678,20 +648,10 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new Test(restartTest, browser, gvars, hijacks,
-                                     blockList, vars, suite_base_noext,
-                                     resultdir, savehtml, screenshot);
+                  testobj = new Test(config, restartTest, suite_base_noext,
+                                     vars);
                   testobj.setIsRestartTest(true);
 
-                  if (assertpage != null) {
-                     testobj.setAssertPage(assertpage);
-                  }
-
-                  if (plugins != null) {
-                     testobj.setPlugins(plugins);
-                  }
-
-                  testobj.setAttachTimeout(attachTimeout);
                   testobj.runTest(false);
                   now = new Date();
                   frac = String.format("%1$tN", now);
@@ -760,18 +720,8 @@ public class VooDooDriver {
                System.out.printf("(*)New browser created.\n");
             }
 
-            testobj = new Test(current_test, browser, gvars, hijacks,
-                               blockList, vars, suite_base_noext,
-                               resultdir, savehtml, screenshot);
-            if (assertpage != null) {
-               testobj.setAssertPage(assertpage);
-            }
+            testobj = new Test(config, current_test, suite_base_noext, vars);
 
-            if (plugins != null) {
-               testobj.setPlugins(plugins);
-            }
-
-            testobj.setAttachTimeout(attachTimeout);
             testobj.runTest(false);
 
             now = new Date();

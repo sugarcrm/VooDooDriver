@@ -37,17 +37,41 @@ public class Test {
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
 
-   public Test(String testFile, Browser browser, VDDHash gvars,
-               VDDHash hijacks, BlockList blocklist, VDDHash oldvars,
-               String suitename, String reportDir, String saveHtml,
-               String screenshot) {
-      this.Browser = browser;
+
+   /**
+    * Initialize a Test object.
+    *
+    * @param config     VDD configuration
+    * @param testFile   name of this test file
+    */
+
+   public Test(VDDHash config, String testFile) {
+      this(config, testFile, null, null);
+   }
+
+
+   /**
+    * Initialize a Test object.
+    *
+    * @param config     VDD configuration
+    * @param testFile   name of this test file
+    * @param suitename  name of the current Soda suite or null
+    * @param oldvars    gvars from last test
+    */
+
+   public Test(VDDHash config, String testFile, String suitename,
+               VDDHash oldvars) {
+
       this.testFile = testFile;
-      this.HiJacks = hijacks;
-      this.GVars = gvars;
-      this.blocked = blocklist;
       this.OldVars = oldvars;
-      String resultsdir = reportDir;
+      this.Browser = (Browser)config.get("browser");
+      this.HiJacks = (VDDHash)config.get("hijack");
+      this.GVars = (VDDHash)config.get("gvar");
+      this.blocked = (BlockList)config.get("blocklist");
+
+      String saveHtml = (String)config.get("savehtml");
+      String screenshot = (String)config.get("screenshot");
+      String resultsdir = (String)config.get("resultdir");
       String report_name = "";
       File tmp_file = new File(testFile);
 
@@ -60,7 +84,7 @@ public class Test {
 
       this.reporter = new Reporter(report_name, resultsdir);
       this.reporter.setTestName(testFile);
-      this.reporter.setBrowser(browser);
+      this.reporter.setBrowser((Browser)config.get("browser"));
 
       if (saveHtml != null && saveHtml.length() > 0) {
          this.reporter.setSaveHTML(saveHtml);
@@ -71,7 +95,16 @@ public class Test {
       }
 
       this.Browser.setReporter(this.reporter);
+
+      if (config.get("assertpage") != null) {
+         this.setAssertPage((String)config.get("assertpage"));
+      }
+      this.setPlugins(plugins);
+      if (config.get("attachtimeout") != null) {
+         this.setAttachTimeout((Integer)config.get("attachtimeout"));
+      }
    }
+
 
    public void setIsRestartTest(boolean isRestart) {
       this.isRestartTest = isRestart;
