@@ -1744,6 +1744,7 @@ public class EventLoop implements Runnable {
                int opt_len = options.size() - 1;
                String opt_val = "";
 
+               /* Check that this option exists */
                for (int i = 0; i <= opt_len; i++) {
                   opt_val = options.get(i).getText();
                   if (opt_val.contains(assert_value)) {
@@ -1783,6 +1784,15 @@ public class EventLoop implements Runnable {
                }
             }
 
+            if (event.containsKey("assertselected")) {
+               boolean anySelected = sel.getAllSelectedOptions().size() > 0;
+               boolean shouldBeSelected =
+                  clickToBool(event.get("assertselected").toString());
+
+               report.Assert("Option " + (anySelected ? "":"not ") + "selected",
+                             anySelected, shouldBeSelected);
+            }
+
             if (event.containsKey("click")) {
                click = this.clickToBool(event.get("click").toString());
             }
@@ -1819,7 +1829,6 @@ public class EventLoop implements Runnable {
             }
 
             if (included) {
-               sel = new Select(element);
                List<WebElement> options = sel.getOptions();
                int sel_len = options.size() - 1;
                boolean found = false;
