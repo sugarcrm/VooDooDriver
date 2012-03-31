@@ -320,14 +320,123 @@ public class VooDooDriver {
 
 
    /**
+    * Load VDD's {@link Browser} object.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void loadBrowser(VDDHash config) {
+      SupportedBrowser browserType = null;
+      Browser browser = null;
+
+      if (!config.containsKey("browser")) {
+         System.out.println("(!)Error: Missing --browser argument!");
+         System.exit(1);
+      }
+
+      try {
+         String b = (String)config.get("browser");
+         browserType = SupportedBrowser.valueOf(b.toUpperCase());
+      } catch (IllegalArgumentException e) {
+         System.out.println("(!)Unsupported browser: " + config.get("browser"));
+         System.exit(2);
+      }
+
+      switch (browserType) {
+      case FIREFOX:
+         browser = new Firefox();
+         break;
+      case CHROME:
+         browser = new Chrome();
+         break;
+      case IE:
+         browser = new IE();
+         break;
+      }
+
+      if (config.get("downloaddir") != null) {
+         browser.setDownloadDirectory((String)config.get("downloaddir"));
+      }
+
+      config.put("browser", browser);
+   }
+
+
+   /**
+    * Load command-line specified VDD plugins.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void loadPlugins(VDDHash config) {
+      if (!config.containsKey("plugin")) {
+         return;
+      }
+
+      String p = (String)config.get("plugin");
+
+      System.out.println("(*)Loading plugins from " + p);
+
+      try {
+         PluginLoader loader = new PluginLoader(p);
+         config.put("plugin", loader.load());
+      } catch (org.sugarcrm.voodoodriver.PluginException e) {
+         System.err.println("(!)Failed to load plugin file:");
+         e.printStackTrace(System.err);
+         System.exit(1);
+      }
+   }
+
+
+   /**
+    * Load VDD's block list.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void loadBlocklist(VDDHash config) {
+      BlockList blockList;
+
+      if (!config.containsKey("blocklistfile")) {
+         blockList = new BlockList();
+      } else {
+         String f = (String)config.get("blocklistfile");
+         BlockListParser sbp = new BlockListParser(f);
+         blockList = sbp.parse();
+      }
+
+      config.put("blocklist", blockList);
+   }
+
+
+   /**
+    * Create VDD's output directory.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void createResultDir(VDDHash config) {
+      File rd = new File(config.get("resultdir").toString());
+
+      if (!rd.exists()) {
+         System.out.println("(*)Creating result directory: " +
+                            config.get("resultdir"));
+         if (rd.mkdirs() == false) {
+            System.err.println("(!)Failed to create result directory: " +
+                               config.get("resultdir"));
+            System.exit(3);
+         }
+      }
+   }
+
+
+   /**
     * VooDooDriver entry point
     *
     * @param args  array of command line arguments
     */
 
    public static void main(String[] args) {
-      Events plugins = null;
-      BlockList blockList = null;
 
       Config opts = new Config();
       opts.parse(args);
@@ -343,39 +452,10 @@ public class VooDooDriver {
       dumpJavaInfo();
       dumpConfig(config);
 
-      if (!config.containsKey("browser")) {
-         System.out.println("(!)Error: Missing --browser argument!");
-         System.exit(1);
-      }
-      try {
-         String b = (String)config.get("browser");
-         config.put("browser", SupportedBrowser.valueOf(b.toUpperCase()));
-      } catch (IllegalArgumentException e) {
-         System.out.println("(!)Unsupported browser: " + config.get("browser"));
-         System.exit(2);
-      }
-
-      if (config.containsKey("plugin")) {
-         String p = (String)config.get("plugin");
-         System.out.println("(*)Loading plugins from " + p);
-         try {
-            PluginLoader loader = new PluginLoader(p);
-            config.put("plugin", loader.load());
-         } catch (org.sugarcrm.voodoodriver.PluginException e) {
-            System.err.println("(!)Failed to load plugin file:");
-            e.printStackTrace(System.err);
-            System.exit(1);
-         }
-      }
-
-      if (config.containsKey("blocklistfile")) {
-         String f = (String)config.get("blocklistfile");
-         BlockListParser sbp = new BlockListParser(f);
-         blockList = sbp.parse();
-      } else {
-         blockList = new BlockList();
-      }
-      config.put("blocklist", blockList);
+      loadBrowser(config);
+      loadPlugins(config);
+      loadBlocklist(config);
+      createResultDir(config);
 
       if (config.containsKey("suite")) {
          RunSuites(config);
@@ -401,20 +481,17 @@ public class VooDooDriver {
       @SuppressWarnings("unchecked")
          ArrayList<String> tests = (ArrayList<String>)config.get("test");
       String resultdir = (String)config.get("resultdir");;
-      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
       String screenshot = (String)config.get("screenshot");;
-      String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       int attachTimeout = (Integer)config.get("attachtimeout");;
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
       /* XXX End block to be refactored. */
 
-      File resultFD = null;
-      Browser browser = null;
+      Browser browser = (Browser)config.get("browser");
       int len = 0;
       Test testobj = null;
 
@@ -423,36 +500,6 @@ public class VooDooDriver {
       }
 
       System.out.printf("(*)Running Soda Tests now...\n");
-
-      resultFD = new File(resultdir);
-      if (!resultFD.exists()) {
-         System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n",
-                           resultdir);
-         try {
-            resultFD.mkdirs();
-         } catch (Exception exp) {
-            System.out.printf("(!)Error: Failed to create reportdir: '%s'!\n",
-                              resultdir);
-            System.out.printf("(!)Exception: %s\n", exp.getMessage());
-            System.exit(3);
-         }
-      }
-
-      switch (browserType) {
-      case FIREFOX:
-         browser = new Firefox();
-         break;
-      case CHROME:
-         browser = new Chrome();
-         break;
-      case IE:
-         browser = new IE();
-         break;
-      }
-
-      if (downloaddir != null) {
-         browser.setDownloadDirectory(downloaddir);
-      }
 
       browser.newBrowser();
 
@@ -503,14 +550,12 @@ public class VooDooDriver {
       @SuppressWarnings("unchecked")
          ArrayList<String> suites = (ArrayList<String>)config.get("suite");
       String resultdir = (String)config.get("resultdir");;
-      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
       VDDHash gvars = (VDDHash)config.get("gvar");
       VDDHash hijacks = (VDDHash)config.get("hijack");
       BlockList blockList = (BlockList)config.get("blocklist");
       Plugin plugins = (Plugin)config.get("plugin");
       String savehtml = (String)config.get("savehtml");;
       String screenshot = (String)config.get("screenshot");;
-      String downloaddir = (String)config.get("downloaddir");;
       String assertpage = (String)config.get("assertpage");
       String restartTest = (String)config.get("restarttest");
       int restartCount = (Integer)config.get("restartcount");
@@ -519,11 +564,10 @@ public class VooDooDriver {
       /* XXX End block to be refactored. */
 
       int len = suites.size() -1;
-      File resultFD = null;
       String report_file_name = resultdir;
       String hostname = "";
       FileOutputStream suiteRptFD = null;
-      Browser browser = null;
+      Browser browser = (Browser)config.get("browser");
       Date now = null;
       Date suiteStartTime = null;
       Date suiteStopTime = null;
@@ -535,21 +579,6 @@ public class VooDooDriver {
 
       System.out.printf("(*)Running Suite files now...\n");
       System.out.printf("(*)Timeout: %s\n", attachTimeout);
-
-      resultFD = new File(resultdir);
-      if (!resultFD.exists()) {
-         System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n",
-                           resultdir);
-
-         try {
-            resultFD.mkdirs();
-         } catch (Exception exp) {
-            System.out.printf("(!)Error: Failed to create reportdir: '%s'!\n",
-                              resultdir);
-            System.out.printf("(!)Exception: %s\n", exp.getMessage());
-            System.exit(3);
-         }
-      }
 
       try {
          InetAddress addr = InetAddress.getLocalHost();
@@ -580,18 +609,6 @@ public class VooDooDriver {
       } catch (Exception exp) {
          System.out.printf("(!)Error: %s!\n", exp.getMessage());
          System.exit(5);
-      }
-
-      switch (browserType) {
-      case FIREFOX:
-         browser = new Firefox();
-         break;
-      case CHROME:
-         browser = new Chrome();
-         break;
-      case IE:
-         browser = new IE();
-         break;
       }
 
       browser.newBrowser();
