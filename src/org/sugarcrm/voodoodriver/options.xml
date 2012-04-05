@@ -63,7 +63,7 @@
            help="Stop the test run as soon as any failure occurs"/>
    <option name="help" arg="none"
            help="Print a help message and exit"/>
-   <option name="plugin" arg="file"
+   <option name="plugin" arg="files"
            help="An XML file specifying a VooDooDriver plugin and its parameters"/>
    <option name="profile" arg="none"
            help="The name of the profile with which to start the browser"/>

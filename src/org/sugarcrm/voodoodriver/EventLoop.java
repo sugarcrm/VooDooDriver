@@ -80,7 +80,7 @@ public class EventLoop implements Runnable {
     */
    public EventLoop(Browser browser, Events events, Reporter reporter,
                     VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
-                    Plugin plugins, String testName) {
+                    ArrayList<Plugin> plugins, String testName) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
@@ -110,7 +110,7 @@ public class EventLoop implements Runnable {
 
       this.plugins = new ArrayList<Plugin>();
       if (plugins != null) {
-         this.plugins.add(plugins);
+         this.plugins.addAll(plugins);
       }
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");

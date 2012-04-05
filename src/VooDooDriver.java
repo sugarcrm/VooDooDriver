@@ -200,6 +200,21 @@ public class VooDooDriver {
                                           name, value);
                         System.exit(1);
                      }
+                  } else if (name.equals("plugin")) {
+                     /*
+                      * This is a hack.  This config file reading
+                      * really needs to be done in Config.java, and
+                      * that already has the means to handle array
+                      * options.
+                      */
+                     @SuppressWarnings("unchecked")
+                        ArrayList<String> plugins =
+                        (ArrayList<String>)configOpts.get(name);
+                     if (plugins == null) {
+                        plugins = new ArrayList<String>();
+                     }
+                     plugins.add(value);
+                     configOpts.put(name, plugins);
                   } else {
                      configOpts.put(s, value);
                   }
@@ -314,17 +329,27 @@ public class VooDooDriver {
          test.addAll((ArrayList<String>)cmdOpts.remove("test"));
       } catch (NullPointerException e) {}
 
+      /* Merge plugin */
+      ArrayList<String> plugin = new ArrayList<String>();
+      try {
+         plugin.addAll((ArrayList<String>)fileOpts.remove("plugin"));
+      } catch (NullPointerException e) {}
+      try {
+         plugin.addAll((ArrayList<String>)cmdOpts.remove("plugin"));
+      } catch (NullPointerException e) {}
+
       /* Merge all from the config file */
       opts.putAll(fileOpts);
 
       /* Merge all from the command line */
       opts.putAll(cmdOpts);
 
-      /* Store gvar, hijack, suite, and test */
+      /* Store gvar, hijack, suite, test, and plugin */
       opts.put("gvar", gvar);
       opts.put("hijack", hijack);
       opts.put("suite", suite);
       opts.put("test", test);
+      opts.put("plugin", plugin);
 
       return opts;
    }
@@ -384,18 +409,24 @@ public class VooDooDriver {
          return;
       }
 
-      String p = (String)config.get("plugin");
+      @SuppressWarnings("unchecked")
+         ArrayList<String> plugin = (ArrayList<String>)config.get("plugin");
+      ArrayList<Plugin> loadedPlugins = new ArrayList<Plugin>();
 
-      System.out.println("(*)Loading plugins from " + p);
+      for (String p: plugin) {
+         System.out.println("(*)Loading plugins from " + p);
 
-      try {
-         PluginLoader loader = new PluginLoader(p);
-         config.put("plugin", loader.load());
-      } catch (org.sugarcrm.voodoodriver.PluginException e) {
-         System.err.println("(!)Failed to load plugin file:");
-         e.printStackTrace(System.err);
-         System.exit(1);
+         try {
+            PluginLoader loader = new PluginLoader(p);
+            loadedPlugins.add(loader.load());
+         } catch (org.sugarcrm.voodoodriver.PluginException e) {
+            System.err.println("(!)Failed to load plugin file:");
+            e.printStackTrace(System.err);
+            System.exit(1);
+         }
       }
+      
+      config.put("plugin", loadedPlugins);
    }
 
 
