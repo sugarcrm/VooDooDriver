@@ -51,7 +51,18 @@ import org.sugarcrm.voodoodriver.VDDHash;
  */
 
 public class VooDooDriver {
+
+   /**
+    * Default name of the VooDooDriver configuration file.
+    */
+
    final static String defaultSodaConfigFile = "soda-config.xml";
+
+   /**
+    * Name of VooDooDriver's primary log file.
+    */
+
+   final static String vddLogFilename = "voodoo.log";
 
 
    /**
@@ -431,12 +442,58 @@ public class VooDooDriver {
 
 
    /**
+    * Start VDD logging.
+    *
+    * This method hijacks System.out and System.err with VDDLog objects.
+    */
+
+   private static void earlyLog() {
+      VDDLog out = new VDDLog(System.out);
+      System.setOut(out);
+      VDDLog err = new VDDLog(System.err);
+      System.setErr(err);
+   }
+
+
+   /**
+    * Create VDD log file and flush output queue to it.
+    *
+    * @param config  VDD configuration object
+    */
+
+   private static void lateLog(VDDHash config) {
+      String resultDir = (String)config.get("resultdir");
+      File vddLog = new File(resultDir + File.separator + vddLogFilename);
+      System.out.println("(*)Creating log file: " + vddLog);
+      FileOutputStream logStream = null;
+      try {
+         logStream = new FileOutputStream(vddLog);
+         ((VDDLog)System.out).openLog(logStream);
+         ((VDDLog)System.err).openLog(logStream);
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Failed to open VDD log. Continuing anyways.");
+      }
+   }
+
+
+   /**
+    * Close the VDD log file.
+    */
+
+   private static void closeLog() {
+      ((VDDLog)System.out).closeLog();
+   }
+
+
+   /**
     * VooDooDriver entry point
     *
     * @param args  array of command line arguments
     */
 
    public static void main(String[] args) {
+
+      earlyLog();
 
       Config opts = new Config();
       opts.parse(args);
@@ -446,16 +503,15 @@ public class VooDooDriver {
       VDDHash cfg = readConfigFile(cmdOpts.containsKey("config") ?
                                     new File((String)cmdOpts.get("config")) :
                                     null);
-
       VDDHash config = mergeConfigs(cfg, cmdOpts);
 
+      createResultDir(config);
+      lateLog(config);
       dumpJavaInfo();
       dumpConfig(config);
-
       loadBrowser(config);
       loadPlugins(config);
       loadBlocklist(config);
-      createResultDir(config);
 
       if (config.containsKey("suite")) {
          RunSuites(config);
@@ -465,7 +521,8 @@ public class VooDooDriver {
          RunTests(config);
       }
 
-      System.out.printf("(*)VooDooDriver Finished.\n");
+      System.out.println("(*)VooDooDriver Finished.");
+      closeLog();
       System.exit(0);
    }
 
