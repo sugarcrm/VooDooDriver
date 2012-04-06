@@ -646,12 +646,13 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="boolean">alert</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
