@@ -18,6 +18,7 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
+import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -39,41 +40,42 @@ public class PluginLoader {
     * The filename of the plugin config file.
     */
 
-   private String pluginFilename;
+   private File pluginFile;
 
    /**
     * The <plugin> node from the parsed plugin config file.
     */
 
-   private Node pluginNode;
+   private ArrayList<Node> pluginNodes;
 
 
    /**
     * Read and parse the XML plugin configuration file
     *
-    * @param plugin  path to the XML plugin configuration file
+    * @param pluginFile  path to the XML plugin configuration file
     */
 
-   public PluginLoader(String plugin) throws PluginException {
+   public PluginLoader(File pluginFile) throws PluginException {
       Element data;
 
-      this.pluginFilename = plugin;
+      this.pluginFile = pluginFile;
+      this.pluginNodes = new ArrayList<Node>();
 
       try {
          DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
          DocumentBuilder db = dbf.newDocumentBuilder();
-         Document doc = db.parse(new File(plugin));
+         Document doc = db.parse(pluginFile);
          data = doc.getDocumentElement();
       } catch (javax.xml.parsers.ParserConfigurationException e) {
          throw new PluginException("??? Failed configuring plugin XML parser");
       } catch (java.io.IOException e) {
-         throw new PluginException("Unable to read " + plugin, e);
+         throw new PluginException("Unable to read " + pluginFile, e);
       } catch (org.xml.sax.SAXException e) {
-         throw new PluginException("XML error in " + plugin, e);
+         throw new PluginException("XML error in " + pluginFile, e);
       }
 
       if (!data.getNodeName().equals("data")) {
-         throw new PluginException("Plugin " + plugin +
+         throw new PluginException("Plugin " + pluginFile +
                                    " missing <data> root element");
       }
 
@@ -82,26 +84,28 @@ public class PluginLoader {
          Node node = nl.item(k);
          if (node.getNodeName().equals("plugin")) {
             if (!node.hasChildNodes()) {
-               throw new PluginException("Plugin " + plugin + " <plugin> " +
+               throw new PluginException("Plugin " + pluginFile + " <plugin> " +
                                          "node contains no information");
             }
-            this.pluginNode = node;
-            return;
+            this.pluginNodes.add(node);
          }
       }
 
-      throw new PluginException("Plugin " + plugin +
-                                " missing <plugin> element");
+      if (this.pluginNodes.size() == 0) {
+         throw new PluginException("Plugin " + pluginFile +
+                                   " missing <plugin> element");
+      }
    }
 
 
    /**
-    * Load the VooDooDriver plugin
+    * Load a single VooDooDriver plugin.
     *
-    * @return  either a {@link JavaPlugin} or a {@link JsPlugin}
+    * @param pluginNode  plugin {@link Node} from plugin file
+    * @return either a {@link JavaPlugin} or a {@link JsPlugin}
     */
 
-   public Plugin load() throws PluginException {
+   private Plugin loadPlugin(Node pluginNode) throws PluginException {
       Plugin plugin;
       String classname = null;
       String classfile = null;
@@ -131,7 +135,7 @@ public class PluginLoader {
             continue;
          } else {
             System.out.println("(W)Unknown plugin tag '" + name + "' in " +
-                               pluginFilename);
+                               pluginFile);
             continue;
          }
       }
@@ -141,7 +145,7 @@ public class PluginLoader {
       } else if (jsfile != null) {
          plugin = new JsPlugin(jsfile);
       } else {
-         throw new PluginException("Plugin " + pluginFilename +
+         throw new PluginException("Plugin from " + this.pluginFile +
                                    " is neither a javascript plugin nor a" +
                                    " java plugin.");
       }
@@ -151,5 +155,22 @@ public class PluginLoader {
       plugin.setArgs(args);
 
       return plugin;
+   }
+
+
+   /**
+    * Load VooDooDriver plugins.
+    *
+    * @return all plugins from the plugin file
+    */
+
+   public ArrayList<Plugin> load() throws PluginException {
+      ArrayList<Plugin> plugins = new ArrayList<Plugin>();
+
+      for (Node pluginNode: this.pluginNodes) {
+         plugins.add(loadPlugin(pluginNode));
+      }
+
+      return plugins;
    }
 }
