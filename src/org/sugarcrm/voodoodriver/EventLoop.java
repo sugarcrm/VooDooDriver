@@ -263,10 +263,14 @@ public class EventLoop implements Runnable {
       int i = 0;
       int event_count = this.testEvents.size() - 1;
 
+      this.firePlugin(null, PluginEvent.BEFORETEST);
+
       while ((!this.threadStop) && (i <= event_count)) {
          handleSingleEvent(this.testEvents.get(i), null);
          i += 1;
       }
+
+      this.firePlugin(null, PluginEvent.AFTERTEST);
    }
 
    private void resetThreadTime() {
