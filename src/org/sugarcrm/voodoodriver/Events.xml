@@ -1003,6 +1003,7 @@
          <accessor type="string">assert</accessor>
          <accessor type="boolean">assertselected</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
          <accessor type="string">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>

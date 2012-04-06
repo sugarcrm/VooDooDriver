@@ -1684,6 +1684,13 @@ public class EventLoop implements Runnable {
 
             this.checkDisabled(event, element);
 
+            if (event.containsKey("clear") &&
+                this.clickToBool(event.get("clear").toString()) &&
+                sel.isMultiple()) {
+               this.report.Log("Clearing select element.");
+               sel.deselectAll();
+            }
+
             if (event.containsKey("set")) {
                setvalue = event.get("set").toString();
                setvalue = this.replaceString(setvalue);
