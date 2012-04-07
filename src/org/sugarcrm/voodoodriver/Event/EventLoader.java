@@ -14,11 +14,12 @@
  * governing permissions and limitations under the License.
  */
 
-package org.sugarcrm.voodoodriver;
+package org.sugarcrm.voodoodriver.Event;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -45,7 +46,7 @@ public class EventLoader {
     * Processed list of events from Events.xml.
     */
 
-   private ElementsList events;
+   private ArrayList<VDDHash> events;
 
    /**
     * Names of events.  Redundantly stored here to speed lookup in isValid.
@@ -102,7 +103,7 @@ public class EventLoader {
     */
 
    private void loadEvents(NodeList nodes) throws VDDException {
-      this.events = new ElementsList();
+      this.events = new ArrayList<VDDHash>();
       this.eventNames = new VDDHash();
 
       for (int k = 0; k < nodes.getLength(); k++) {
@@ -197,10 +198,10 @@ public class EventLoader {
    /**
     * Get the list of events processed from Events.xml.
     *
-    * @return {@link ElementsList} of processed events
+    * @return {@link ArrayList} of processed events
     */
 
-   public ElementsList getTypes() {
+   public ArrayList<VDDHash> getEvents() {
       return events;
    }
 

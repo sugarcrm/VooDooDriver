@@ -17,6 +17,7 @@
 package org.sugarcrm.voodoodriver.Event;
 
 import java.util.ArrayList;
+import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Element;
 
 
@@ -28,8 +29,19 @@ import org.w3c.dom.Element;
 
 public abstract class Event {
 
+   /**
+    * List of all allowed events and their attributes from Events.xml.
+    */
+
+   protected static ArrayList<VDDHash> allowedEvents;
+
+   /**
+    * Load allowed events list from Events.xml.
+    */
+
    static {
-      // Load Events.xml
+      EventLoader events = new EventLoader();
+      allowedEvents = events.getEvents();
       // XXX: Events.xml should contain event name => Event subclass xlat
    }
 
