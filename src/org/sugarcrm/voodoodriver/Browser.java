@@ -548,12 +548,11 @@ public abstract class Browser {
     * Load the page assert file.
     *
     * @param filename  the file of page asserts
-    * @param reporter  {@link Reporter} object to use
     */
 
-   public void setAssertPageFile(String filename, Reporter reporter) {
+   public void setAssertPageFile(String filename) {
       this.assertPageFile = filename;
-      this.asserter = new PageAsserter(filename, reporter, null);
+      this.asserter = new PageAsserter(filename, this.reporter, null);
    }
 
 

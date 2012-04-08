@@ -1,42 +1,90 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import org.sugarcrm.voodoodriver.Event.Event;
+import org.sugarcrm.voodoodriver.Event.UnknownEventException;
+
+
+/**
+ * Representation of a test script in VDD.
+ *
+ * @author Trampus
+ * @author Jon duSaint
+ */
 
 public class Test {
 
-   private Browser Browser = null;
-   private String testFile = "";
-   private EventLoop eventDriver = null;
-   private Events events = null;
-   private Reporter reporter = null;
-   private VDDHash GVars = null;
-   private VDDHash OldVars = null;
-   private VDDHash HiJacks = null;
-   private BlockList blocked = null;
-   private boolean WatchDog = false;
-   private ArrayList<Plugin> plugins = null;
-   private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
-   private String assertPage = null;
-   private int attachTimeout = 0;
+   /**
+    * VDD configuration information.
+    */
+
+   private VDDHash config;
+
+   /**
+    * The test file for this Test.
+    */
+
+   private File testFile;
+
+   /**
+    * This Test's {@link EventLoop}.
+    */
+
+   private EventLoop eventLoop;
+
+   /**
+    * List of events from the test script.
+    */
+
+   private ArrayList<Event> events;
+
+   /**
+    * This Test's {@link Reporter}.
+    */
+
+   private Reporter reporter;
+
+   /**
+    * Whether this Test is a restart test.
+    */
+
    private boolean isRestartTest = false;
+
+   /**
+    * GVars from the previous Test.
+    */
+
+   private VDDHash oldVars = null;
+
+   /**
+    * Amount of time allowed before this test times out.  Default is 5 minutes.
+    */
+
+   private static final int TIMEOUT = 60 * 5;
+
+   /**
+    * Milliseconds to sleep while waiting for test completion.
+    */
+
+   private static final long SLEEPYTIME = 9000;
 
 
    /**
@@ -57,175 +105,118 @@ public class Test {
     * @param config     VDD configuration
     * @param testFile   name of this test file
     * @param suitename  name of the current Soda suite or null
-    * @param oldvars    gvars from last test
+    * @param oldVars    gvars from last test
     */
 
    public Test(VDDHash config, String testFile, String suitename,
-               VDDHash oldvars) {
+               VDDHash oldVars) {
+      this.config = config;
+      this.testFile = new File(testFile);
+      this.oldVars = oldVars;
 
-      this.testFile = testFile;
-      this.OldVars = oldvars;
-      this.Browser = (Browser)config.get("browser");
-      this.HiJacks = (VDDHash)config.get("hijack");
-      this.GVars = (VDDHash)config.get("gvar");
-      this.blocked = (BlockList)config.get("blocklist");
-      @SuppressWarnings("unchecked")
-         ArrayList<Plugin> plugin = (ArrayList<Plugin>)config.get("plugin");
-
-      String saveHtml = (String)config.get("savehtml");
-      String screenshot = (String)config.get("screenshot");
-      String resultsdir = (String)config.get("resultdir");
-      String report_name = "";
-      File tmp_file = new File(testFile);
-
-      report_name = tmp_file.getName();
-      report_name = report_name.replaceAll(".xml$", "");
-
-      if (suitename != null) {
-         resultsdir = resultsdir + "/" + suitename;
-      }
-
-      this.reporter = new Reporter(report_name, resultsdir);
-      this.reporter.setTestName(testFile);
-      this.reporter.setBrowser((Browser)config.get("browser"));
-
-      if (saveHtml != null && saveHtml.length() > 0) {
-         this.reporter.setSaveHTML(saveHtml);
-      }
-
-      if (screenshot != null && screenshot.length() > 0) {
-         this.reporter.setScreenshot(screenshot);
-      }
-
-      this.Browser.setReporter(this.reporter);
-
-      if (config.get("assertpage") != null) {
-         this.setAssertPage((String)config.get("assertpage"));
-      }
-      this.setPlugins(plugin);
-      if (config.get("attachtimeout") != null) {
-         this.setAttachTimeout((Integer)config.get("attachtimeout"));
-      }
+      initializeReporter(suitename);
    }
 
+
+   /**
+    * Initialize this Test's {@link Reporter} object.
+    *
+    * @param suitename  name of the current suite, if any
+    */
+
+   private void initializeReporter(String suitename) {
+      String resultsDir = (String)this.config.get("resultsdir");
+      if (suitename != null) {
+         resultsDir = resultsDir + "/" + suitename;
+      }
+
+      String reportName = this.testFile.getName();
+      reportName = reportName.replaceAll(".xml$", "");
+
+      this.reporter = new Reporter(reportName, resultsDir);
+      this.reporter.setTestName(this.testFile.getName());
+      this.reporter.setBrowser((Browser)config.get("browser"));
+
+      if (this.config.containsKey("savehtml")) {
+         String saveHtml = (String)this.config.get("savehtml");
+         if (saveHtml.length() > 0) {
+            this.reporter.setSaveHTML(saveHtml);
+         }
+      }
+      if (this.config.containsKey("screenshot")) {
+         String screenshot = (String)config.get("screenshot");
+         if (screenshot.length() > 0) {
+            this.reporter.setScreenshot(screenshot);
+         }
+      }
+      Browser b = ((Browser)config.get("browser"));
+      b.setReporter(this.reporter);
+      b.setAssertPageFile((String)config.get("assertpage"));
+   }
+
+
+   /**
+    * Indicate whether this is a restart test.
+    *
+    * @param isRestart  true if this is a restart test
+    */
 
    public void setIsRestartTest(boolean isRestart) {
       this.isRestartTest = isRestart;
    }
 
-   public void setAttachTimeout(int timeout) {
-      this.attachTimeout = timeout;
-   }
 
-   public void setAssertPage(String assertPage) {
-      this.assertPage = assertPage;
-      this.Browser.setAssertPageFile(this.assertPage, this.reporter);
-   }
-
-   public void setPlugins(ArrayList<Plugin> plugins) {
-      this.plugins = plugins;
-   }
+   /**
+    * Retrieve this Test's EventLoop.
+    *
+    * @return this Test's {@link EventLoop}
+    */
 
    public EventLoop getEventLoop() {
-      return this.eventDriver;
+      return this.eventLoop;
    }
+
+
+   /**
+    * Retrieve this Test's Reporter object.
+    *
+    * @return this Test's {@link Reporter} object
+    */
 
    public Reporter getReporter() {
       return this.reporter;
    }
 
-   private boolean loadTestFile() {
-      boolean result = false;
-      TestLoader loader = null;
+
+   /**
+    * Load and compile this Test's test file.
+    *
+    * @return true if the file loaded successfully
+    */
+
+   private boolean loadTestFile() throws VDDException {
+      this.reporter.Log("Loading Test: " + this.testFile);
 
       try {
-         System.out.printf("Loading Soda Test: '%s'.\n", testFile);
-         loader = new TestLoader(testFile, this.reporter);
+         TestLoader loader = new TestLoader(this.testFile, this.reporter);
          this.events = loader.getEvents();
-         System.out.printf("Finished.\n");
-      } catch (Exception exp) {
-         this.reporter.ReportException(exp);
-         result = false;
+      } catch (Exception e) {
+         throw new VDDException(e); // XXX
       }
 
-      if (this.events == null) {
-         result = false;
-      } else {
-         result = true;
-      }
+      this.reporter.Log("Finished.");
 
-      return result;
+      return this.events != null;
    }
 
-   public boolean runTest(boolean isSuitetest) {
-      boolean result = false;
-      this.WatchDog = false;
 
-      if (this.isRestartTest) {
-         this.reporter.setIsRestTest(true);
-      }
-
-      result = this.loadTestFile();
-      if (!result) {
-         this.reporter.ReportError("Failed to parse test file!");
-         this.logResults();
-         this.reporter.closeLog();
-         return result;
-      }
-
-      result = CheckTestBlocked();
-      if (!result) {
-         long current = 0;
-         eventDriver = new EventLoop(this.Browser, events, this.reporter,
-                                     this.GVars, this.HiJacks, this.OldVars,
-                                     this.plugins, this.testFile);
-
-         if (this.attachTimeout > 0) {
-            eventDriver.setAttachTimeout(this.attachTimeout);
-         }
-
-         while (eventDriver.isAlive() && this.WatchDog != true) {
-            Date current_time = new Date();
-            Date thread_time = eventDriver.getThreadTime();
-            current = current_time.getTime();
-            long thread = thread_time.getTime();
-
-            current = current / 1000;
-            thread = thread / 1000;
-            long seconds = (current - thread);
-
-            if (seconds > ThreadTimeout) {
-               this.WatchDog = true;
-               eventDriver.stop();
-               String msg = String.format("Test watchdogged out after: '%d' seconds!\n", seconds);
-               this.reporter.ReportError(msg);
-               this.reporter.ReportWatchDog();
-               break;
-            }
-
-            try {
-               Thread.sleep(9000);
-            } catch (Exception exp) {
-               exp.printStackTrace();
-               System.exit(-1);
-            }
-         }
-      }
-
-      if (this.WatchDog) {
-         System.out.printf("Trying to close browser after watchdog!\n");
-         this.Browser.forceClose();
-         System.out.printf("Closed???!\n");
-      }
-
-      this.logResults();
-      this.reporter.closeLog();
-      return result;
-   }
+   /**
+    *
+    */
 
    private void logResults() {
       TestResults tmp = this.reporter.getResults();
-      int len = tmp.keySet().size() -1;
+      int len = tmp.keySet().size() - 1;
       String res = "Soda Test Report:";
 
       for (int i = 0; i<= len; i++) {
@@ -237,35 +228,124 @@ public class Test {
       this.reporter.Log(res);
    }
 
-   private boolean CheckTestBlocked() {
-      boolean result = false;
+
+   /**
+    * Determine whether this Test is on the blocked list.
+    *
+    * @return true if the test is on the blocked list
+    */
+
+   private boolean testBlocked() {
       File fd = null;
-      String test_file = this.testFile;
+      String test_file = this.testFile.toString();
 
-      fd = new File(test_file);
-      test_file = fd.getName();
-      test_file = test_file.substring(0, test_file.length() -4);
-
-      if (this.blocked == null) {
+      if (!this.config.containsKey("blocklist")) {
          return false;
       }
 
-      for (int i = 0; i <= this.blocked.size() -1; i++) {
-         String blocked_file = this.blocked.get(i).get("testfile").toString();
-         if (test_file.equals(blocked_file)) {
-            result = true;
-            String module_name = this.blocked.get(i).get("modulename").toString();
-            String bug_number = this.blocked.get(i).get("bugnumber").toString();
-            String reason = this.blocked.get(i).get("reason").toString();
-            String msg = String.format("Test is currently blocked, Bug Number: '%s', Module Name: '%s'"+
-                  ", Reason: '%s'", bug_number, module_name, reason);
-            this.reporter.Log(msg);
-            this.reporter.ReportBlocked();
-            break;
+      BlockList blockList = (BlockList)this.config.get("blocklist");
+
+      /* Chop off ".xml" */
+      String baseName = this.testFile.getName();
+      baseName = baseName.substring(0, baseName.length() - 4);
+
+      for (int i = 0; i < blockList.size(); i++) {
+         String blocked = String.valueOf(blockList.get(i).get("testfile"));
+
+         if (!baseName.equals(blocked)) {
+            continue;
+         }
+
+         String module = String.valueOf(blockList.get(i).get("modulename"));
+         String bug = String.valueOf(blockList.get(i).get("bugnumber"));
+         String reason = String.valueOf(blockList.get(i).get("reason"));
+
+         String msg = String.format("Test is currently blocked: " +
+                                    "Bug Number: '%s', " +
+                                    "Module Name: '%s', " +
+                                    "Reason: '%s'",
+                                    bug, module, reason);
+         this.reporter.Log(msg);
+         this.reporter.ReportBlocked();
+         return true;
+      }
+
+      return false;
+   }
+
+
+   /**
+    *
+    */
+
+   public boolean runTest(boolean isSuitetest) {
+      boolean watchDog = false;
+
+      if (this.isRestartTest) {
+         this.reporter.setIsRestTest(true);
+      }
+
+      if (!this.loadTestFile()) {
+         this.reporter.ReportError("Failed to parse test file!");
+         this.logResults();
+         this.reporter.closeLog();
+         return false;
+      }
+
+      if (testBlocked()) {
+         this.logResults();
+         this.reporter.closeLog();
+         return false;
+      }
+
+      //eventLoop = new EventLoop(this.events, this.config); //XXX
+      @SuppressWarnings("unchecked")
+         ArrayList<Plugin> plugins = (ArrayList<Plugin>)config.get("plugin");
+      this.eventLoop = new EventLoop((Browser)this.config.get("browser"),
+                                     this.events,
+                                     this.reporter,
+                                     (VDDHash)this.config.get("gvar"),
+                                     (VDDHash)this.config.get("hijack"),
+                                     this.oldVars,
+                                     plugins,
+                                     this.testFile.toString());
+
+      if (this.config.containsKey("attachtimeout")) {
+         int attachTimeout = (Integer)this.config.get("attachtimeout");
+         if (attachTimeout > 0) {
+            this.eventLoop.setAttachTimeout(attachTimeout);
          }
       }
 
-      return result;
+      while (this.eventLoop.isAlive() && watchDog != true) {
+         try {
+            Thread.sleep(SLEEPYTIME);
+         } catch (InterruptedException e) {
+            this.reporter.Warn("Thread interrupted.  Ignoring.");
+         }
+
+         long current = (new Date()).getTime();
+         long thread  = this.eventLoop.getThreadTime().getTime();
+         long seconds = (current - thread) / 1000;
+
+         if (seconds > TIMEOUT) {
+            watchDog = true;
+            this.eventLoop.stop();
+            String msg = String.format("Test watchdogged out after %d seconds!",
+                                       seconds);
+            this.reporter.ReportError(msg);
+            this.reporter.ReportWatchDog();
+         }
+      }
+
+      if (watchDog) {
+         this.reporter.Log("Trying to close browser after watchdog.");
+         ((Browser)this.config.get("browser")).forceClose();
+      }
+
+      this.logResults();
+      this.reporter.closeLog();
+      return true;
    }
 
 }
