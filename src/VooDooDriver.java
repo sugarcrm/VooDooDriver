@@ -585,7 +585,7 @@ public class VooDooDriver {
          }
 
          Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
-         t.runTest(false);
+         t.runTest();
 
          if (haltOnFailure &&
              (Integer)t.getReporter().getResults().get("result") != 0) {
@@ -741,7 +741,7 @@ public class VooDooDriver {
                                      vars);
                   testobj.setIsRestartTest(true);
 
-                  testobj.runTest(false);
+                  testobj.runTest();
                   now = new Date();
                   frac = String.format("%1$tN", now);
                   date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
@@ -811,7 +811,7 @@ public class VooDooDriver {
 
             testobj = new Test(config, current_test, suite_base_noext, vars);
 
-            testobj.runTest(false);
+            testobj.runTest();
 
             now = new Date();
             frac = String.format("%1$tN", now);

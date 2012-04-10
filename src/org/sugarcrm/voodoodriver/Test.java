@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import org.sugarcrm.voodoodriver.Event.Event;
-import org.sugarcrm.voodoodriver.Event.UnknownEventException;
 
 
 /**
@@ -201,7 +200,8 @@ public class Test {
          TestLoader loader = new TestLoader(this.testFile, this.reporter);
          this.events = loader.getEvents();
       } catch (Exception e) {
-         throw new VDDException(e); // XXX
+         // XXX -- this will need to be revisited
+         throw new VDDException("Exception loading " + this.testFile, e);
       }
 
       this.reporter.Log("Finished.");
@@ -211,7 +211,7 @@ public class Test {
 
 
    /**
-    *
+    * Log the results of running this Test.
     */
 
    private void logResults() {
@@ -275,10 +275,12 @@ public class Test {
 
 
    /**
+    * Run this Test.
     *
+    * @return true if the test ran, false otherwise
     */
 
-   public boolean runTest(boolean isSuitetest) {
+   public boolean runTest() {
       boolean watchDog = false;
 
       if (this.isRestartTest) {
@@ -298,17 +300,8 @@ public class Test {
          return false;
       }
 
-      //eventLoop = new EventLoop(this.events, this.config); //XXX
-      @SuppressWarnings("unchecked")
-         ArrayList<Plugin> plugins = (ArrayList<Plugin>)config.get("plugin");
-      this.eventLoop = new EventLoop((Browser)this.config.get("browser"),
-                                     this.events,
-                                     this.reporter,
-                                     (VDDHash)this.config.get("gvar"),
-                                     (VDDHash)this.config.get("hijack"),
-                                     this.oldVars,
-                                     plugins,
-                                     this.testFile.toString());
+      this.eventLoop = new EventLoop(this.events, this.config, this.reporter,
+                                     this.oldVars, this.testFile.toString());
 
       if (this.config.containsKey("attachtimeout")) {
          int attachTimeout = (Integer)this.config.get("attachtimeout");
@@ -347,5 +340,4 @@ public class Test {
       this.reporter.closeLog();
       return true;
    }
-
 }
