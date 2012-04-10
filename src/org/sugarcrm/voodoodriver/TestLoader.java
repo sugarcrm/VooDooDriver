@@ -17,315 +17,130 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
+import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.sugarcrm.voodoodriver.Event.Event;
+import org.sugarcrm.voodoodriver.Event.UnknownEventException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
 /**
- * This class reads a VooDooDriver/Soda test script and converts it
- * into a {@link Events} class.
+ * Read a VDD/Soda test script and convert it into an array of {@link Event}.
  *
  * @author trampus
+ * @author Jon duSaint
  */
 
 public class TestLoader {
 
-   private Document doc = null;
-   private ElementsList types = null;
-   private EventLoader sodaTypes = null;
-   private Events events = null;
-   private Reporter reporter = null;
-
    /**
-    * Initialize a TestLoader object using the provided soda test script.
-    *
-    * @param sodaTest full path to a soda test file
-    * @param reporter {@link Reporter} object for logging messages and errors
+    * This Test's {@link Reporter} object.
     */
 
-   public TestLoader(String sodaTest, Reporter reporter) {
-      File testFD = null;
-      DocumentBuilderFactory dbf = null;
-      DocumentBuilder db = null;
+   private Reporter reporter;
 
-      this.reporter = reporter;
+   /**
+    * The {@link Event} objects created from this test script.
+    */
 
-      try {
-         testFD = new File(sodaTest);
-         dbf = DocumentBuilderFactory.newInstance();
-         db = dbf.newDocumentBuilder();
-         doc = db.parse(testFD);
-         sodaTypes = new EventLoader();
-         types = sodaTypes.getTypes();
-         events = this.parse(doc.getDocumentElement().getChildNodes());
-      } catch (Exception exp) {
-         this.events = null;
-         if (this.reporter == null) {
-            exp.printStackTrace();
-         } else {
-            this.reporter.ReportException(exp);
-         }
-      }
+   private ArrayList<Event> events;
+
+
+   /**
+    * Initialize a TestLoader object using the provided test script.
+    *
+    * @param test  test script
+    * @param rpt   {@link Reporter} object for logging messages and errors
+    * @throws UnknownEventException
+    */
+
+   public TestLoader(File test, Reporter rpt) throws UnknownEventException {
+      this.reporter = rpt;
+
+      compileTestFile(test);
    }
 
+
    /**
-    * Accessor for the {@link Events} object created from the soda test script.
+    * Load the Nodes from the test script.
     *
-    * @return Events object
+    * @return {@link NodeList} of unprocessed events
     */
 
-   public Events getEvents() {
-      return this.events;
+   private NodeList loadNodes(File test) {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      Document doc = db.parse(test);
+      Element root = doc.getDocumentElement();
+
+      if (root.getTagName().toLowerCase() != "voodoo") {
+         /*
+          * The root element should be <voodoo>; <soda> is deprecated.
+          * This will eventually become a deprecation warning.
+          */
+         this.reporter.Log("Root elements other than <voodoo> are deprecated");
+      }
+
+      return root.getChildNodes();
    }
 
-   /**
-    * Get type information for the specified {@link Elements}
-    *
-    * @param elementType {@link Elements} type
-    * @return a {@link VDDHash} containing the type information requested
-    */
-
-   private VDDHash getSodaElement(Elements elementType) {
-      for (int k = 0; k < types.size(); k++) {
-         VDDHash type = types.get(k);
-         if (type.get("type") == elementType) {
-            return type;
-         }
-      }
-
-      assert false: "Not reached";
-      return null;
-   }
 
    /**
-    * Find an accessor for a {@link Elements} object.
+    * Process a list of Nodes into Events.
     *
-    * Verify that the accessor used in the Soda test script is
-    * valid for that Soda element.  If it is valid, the accessor
-    * is returned.  If it is not, null is returned.
-    *
-    * @param sodaElement element to search
-    * @param accessor    the accessor to search for
-    * @return The accessor if the element contains it, otherwise null.
+    * @param nodes  {@link NodeList} of nodes at this document level
+    * @return {@link ArrayList} of Events
+    * @throws UnknownEventException
     */
 
-   private String findElementAccessor(Elements sodaElement, String accessor) {
-      String result = null;
-      VDDHash foundType = null;
-      VDDHash accessors = null;
+   private ArrayList<Event> processNodes(NodeList nodes)
+      throws UnknownEventException {
+      ArrayList<Event> events = new ArrayList<Event>();
 
-      foundType = getSodaElement(sodaElement);
+      for (int n = 0; n < nodes.getLength(); n++) {
+         Node node = nodes.item(n);
 
-      if (!foundType.containsKey("accessor_attributes")) {
-         return null;
-      }
-
-      accessors = (VDDHash)foundType.get("accessor_attributes");
-      if (accessors.containsKey(accessor)) {
-         result = accessor;
-      }
-
-      return result;
-   }
-
-   /**
-    * Populate a {@link VDDHash} for a {@link Elements} with its attributes
-    *
-    * @param map soda element
-    * @param node {@link Node} from <code>Elements.xml</code>
-    * @return {@link VDDHash} object populated with that Node's attributes
-    */
-
-   private VDDHash processAttributes(VDDHash map, Node node) {
-      String found_index = null;
-      String accessor = null;
-
-      if (node.hasAttributes()) {
-         for (int i = 0; i < node.getAttributes().getLength(); i++) {
-            Node attr = node.getAttributes().item(i);
-            String name = attr.getNodeName();
-            String value = attr.getNodeValue();
-
-            if (name == "index") {
-               found_index = "index";
-            }
-
-            if (accessor == null || accessor == "index") {
-               accessor = findElementAccessor((Elements)map.get("type"), name);
-            }
-
-            map.put(name, value);
-         }
-
-         if (accessor != null) {
-            map.put("how", accessor);
-         } else if (accessor == null && found_index != null) {
-            map.put("how", found_index);
-         }
-      }
-
-      /*
-       * Fill out HTML tag/type information, if applicable.
-       */
-      VDDHash type = getSodaElement((Elements)map.get("type"));
-      String htmlAttrs[] = {"html_tag", "html_type"};
-      for (String attr: htmlAttrs) {
-         if (type.get(attr) != null) {
-            map.put(attr, type.get(attr));
-         }
-      }
-
-      return map;
-   }
-
-   /**
-    * Check whether the actions specified are valid for this event
-    *
-    * @param node  the event {@link Node} to check
-    * @return true if the actions are valid, false otherwise
-    */
-
-   private boolean checkActions(Node node) {
-      VDDHash type = getSodaElement(Elements.valueOf(node.getNodeName().toUpperCase()));
-      VDDHash sodaAttributes = (VDDHash)type.get("soda_attributes");
-      VDDHash accessorAttributes = (VDDHash)type.get("accessor_attributes");
-
-      if (node.hasAttributes()) {
-         for (int i = 0; i < node.getAttributes().getLength(); i++) {
-            String attr = node.getAttributes().item(i).getNodeName();
-            
-            if (!(sodaAttributes != null && sodaAttributes.containsKey(attr)) &&
-                !(accessorAttributes != null && accessorAttributes.containsKey(attr))) {
-               String err = String.format("Error: Invalid attribute for %s event: '%s'",
-                                          node.getNodeName().toUpperCase(), attr);
-               if (this.reporter == null) {
-                  System.out.println("(!)" + err);
-               } else {
-                  this.reporter.ReportError(err);
-               }
-               return false;
-            }
-
-         }
-      }
-
-      return true;
-   }
-
-   /**
-    * Parse XML Nodes from Soda test script.
-    *
-    * @param nodes  NodeList from the soda xml test.
-    * @return Events object with Soda test script events
-    */
-
-   private Events parse(NodeList nodes) {
-      VDDHash data = null;
-      Events dataList = null;
-
-      dataList = new Events();
-
-      for (int i = 0; i < nodes.getLength(); i++) {
-         Node child = nodes.item(i);
-         String name = child.getNodeName();
-
-         if (name.startsWith("#")) {
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
             continue;
          }
 
-         if (!sodaTypes.isValid(name)) {
-            if (this.reporter == null) {
-               System.err.printf("Error: Invalid Soda Element: '%s'!\n", name);
-            } else {
-               this.reporter.ReportError(String.format("Error: Invalid Soda Element: '%s'!", name));
-            }
-            return null;
+         Event event = Event.createEvent((Element)node);
+
+         if (node.hasChildNodes()) {
+            ArrayList<Event> children = processNodes(node.getChildNodes());
+            event.setChildren(children);
          }
 
-         data = new VDDHash();
-         data.put("do", name);
-         data.put("type", Elements.valueOf(name.toUpperCase()));
-
-         if (child.hasAttributes()) {
-            data = processAttributes(data, child);
-         }
-
-         if (!checkActions(child)) {
-            return null;
-         }
-
-         if (name.contains("javascript")) {
-            String tmp = child.getTextContent();
-            if (!tmp.isEmpty()) {
-               data.put("content", tmp);
-            }
-         }
-
-         if (name.contains("whitelist")) {
-            String tmp = child.getTextContent();
-            if (!tmp.isEmpty()) {
-               data.put("content", tmp);
-            }
-         }
-
-         if (child.hasChildNodes()) {
-            if (name.contains("execute") || name.contains("javaplugin")) {
-               String[] list = processArgs(child.getChildNodes());
-               data.put("args", list);
-            } else {
-               Events tmp = parse(child.getChildNodes());
-               if (tmp == null) {
-                  return null;
-               }
-               data.put("children", tmp);
-            }
-         }
-
-         if (!data.isEmpty()) {
-            dataList.add(data);
-         } else {
-            System.out.printf("Note: No data found.\n");
-         }
+         events.add(event);
       }
 
-      return dataList;
+      return events;
    }
+
 
    /**
-    * Process the argument list for &lt;execute&gt; and &lt;javaplugin&gt; event Nodes.
+    * Load and process the test script into a form suitable for execution.
     *
-    * @param nodes  the argument list as an XML NodeList
-    * @return String array of those arguments
+    * @throws UnknownEventException
     */
 
-   private String[] processArgs(NodeList nodes) {
-      int len = nodes.getLength() -1;
-      String[] list;
-      int arg_count = 0;
-      int current = 0;
-
-      for (int i = 0; i <= len; i++) {
-         String name = nodes.item(i).getNodeName();
-         if (name.contains("arg")) {
-            arg_count += 1;
-         }
-      }
-
-      list = new String[arg_count];
-
-      for (int i = 0; i <= len; i++) {
-         String name = nodes.item(i).getNodeName();
-         if (name.contains("arg")) {
-            String value = nodes.item(i).getTextContent();
-            list[current] = value;
-            current += 1;
-         }
-      }
-
-      return list;
+   private void compileTestFile(File test) throws UnknownEventException {
+      NodeList nodes = loadNodes(test);
+      this.events = processNodes(nodes);
    }
 
+
+   /**
+    * Retrieve the {@link ArrayList} of {@link Event} objects.
+    *
+    * @return list of Event objects
+    */
+
+   public ArrayList<Event> getEvents() {
+      return this.events;
+   }
 }
