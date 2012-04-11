@@ -33,17 +33,27 @@ public abstract class Event {
     * List of all allowed events and their attributes from Events.xml.
     */
 
-   protected static ArrayList<VDDHash> allowedEvents;
+   protected static VDDHash allowedEvents;
+
 
    /**
     * Load allowed events list from Events.xml.
     */
 
    static {
-      EventLoader events = new EventLoader();
-      allowedEvents = events.getEvents();
-      // XXX: Events.xml should contain event name => Event subclass xlat
+      EventLoader el = new EventLoader();
+
+      try {
+         // XXX: Events.xml should contain event name => Event subclass xlat
+         el.loadEvents();
+      } catch (org.sugarcrm.voodoodriver.VDDException e) {
+         System.err.println("(!)Exception loading Events.xml: " + e);
+         e.printStackTrace(System.err);
+      }
+
+      allowedEvents = el.getEvents();
    }
+
 
    /**
     * Factory method to create and return the appropriate Event subclass.
@@ -56,7 +66,23 @@ public abstract class Event {
 
    public static Event createEvent(Element element)
       throws UnknownEventException {
-      return new Event();  // XXX
+
+      String eventName = element.getTagName().toLowerCase();
+      if (!allowedEvents.containsKey(eventName)) {
+         throw new UnknownEventException("Unknown VooDoo Event '" +
+                                         eventName + "'");
+      }
+
+      ClassLoader cl = ClassLoader.getSystemClassLoader();
+      Object o = null;
+      try {
+         o = cl.loadClass("org.sugarcrm.voodoodriver.Event.TestEvent");
+      } catch (java.lang.ClassNotFoundException e) {
+         throw new UnknownEventException("Unknown VooDoo Event '" +
+                                         eventName + "'");
+      }
+
+      return (Event)o;
    }
 
 
@@ -82,6 +108,15 @@ public abstract class Event {
 
    public ArrayList<Event> getChildren() {
       return this.children;
+   }
+
+
+   /**
+    * Assign this Event's child Events.
+    */
+
+   public void setChildren(ArrayList<Event> children) {
+      this.children = children;
    }
 
 
@@ -167,5 +202,8 @@ public abstract class Event {
     *    url             string   attach,browser
     *    var             string   *
     *    vartext         string   span
+    *
     */
+
+
 }
