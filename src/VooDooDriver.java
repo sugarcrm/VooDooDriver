@@ -51,32 +51,71 @@ import org.sugarcrm.voodoodriver.VDDHash;
  */
 
 public class VooDooDriver {
+
+   /**
+    * Default name of the VooDooDriver configuration file.
+    */
+
    final static String defaultSodaConfigFile = "soda-config.xml";
 
    /**
-    * Dump JVM information to the console and warn if a non-Sun jvm is
-    * being used.
+    * Name of VooDooDriver's primary log file.
+    */
+
+   final static String vddLogFilename = "voodoo.log";
+
+
+   /**
+    * Dump key-value pairs from a {@link VDDHash}
+    *
+    * @param kvps  {@link VDDHash} to be dumped
+    */
+
+   private static void dumpKeys(VDDHash kvps) {
+      String[] keys = kvps.keySet().toArray(new String[0]);
+      int col = 0;
+      java.util.Arrays.sort(keys);
+      for (String key: keys) {
+         if (key.length() > col) {
+            col = key.length();
+         }
+      }
+      for (String key: keys) {
+         System.out.printf("--)%" + String.valueOf(col + 2) + "s: %s\n",
+                           key, kvps.get(key));
+      }
+   }
+
+
+   /**
+    * Dump JVM information to the console.
     */
 
    private static void dumpJavaInfo() {
-      HashMap<String, String> javainfo = null;
-      javainfo = Utils.getJavaInfo();
-
-      String[] jinfoKeys = javainfo.keySet().toArray(new String[0]);
-      Arrays.sort(jinfoKeys);
+      VDDHash javaInfo = Utils.getJavaInfo();
 
       System.out.printf("(*)Java RunTime Info:\n");
+      dumpKeys(javaInfo);
 
-      for (int i = 0; i <= jinfoKeys.length -1; i++) {
-         String value = javainfo.get(jinfoKeys[i]);
-         System.out.printf("--)'%s' => '%s'\n", jinfoKeys[i], value);
-      }
-
-      if (javainfo.containsKey("java.vendor") &&
-          !javainfo.get("java.vendor").contains("Sun Microsystems Inc")) {
-         System.out.printf("\n(!)Warning: This is not a 'Sun Microsystems Inc.' JRE/JDK and is not supported!\n");
+      if (javaInfo.containsKey("java.vendor") &&
+          !javaInfo.get("java.vendor").toString().contains("Sun Microsystems")) {
+         System.out.println("(!)Warning: This is not a 'Sun Microsystems' " +
+                            "JRE/JDK and is not supported.");
       }
    }
+
+
+   /**
+    * Dump VooDooDriver configuration.
+    *
+    * @param config  VooDooDriver configuration
+    */
+
+   private static void dumpConfig(VDDHash config) {
+      System.out.println("(*)VooDooDriver Configuration:");
+      dumpKeys(config);
+   }
+
 
    /**
     * Read the VoodDooDriver configuration file.
@@ -161,6 +200,21 @@ public class VooDooDriver {
                                           name, value);
                         System.exit(1);
                      }
+                  } else if (name.equals("plugin")) {
+                     /*
+                      * This is a hack.  This config file reading
+                      * really needs to be done in Config.java, and
+                      * that already has the means to handle array
+                      * options.
+                      */
+                     @SuppressWarnings("unchecked")
+                        ArrayList<String> plugins =
+                        (ArrayList<String>)configOpts.get(name);
+                     if (plugins == null) {
+                        plugins = new ArrayList<String>();
+                     }
+                     plugins.add(value);
+                     configOpts.put(name, plugins);
                   } else {
                      configOpts.put(s, value);
                   }
@@ -275,157 +329,53 @@ public class VooDooDriver {
          test.addAll((ArrayList<String>)cmdOpts.remove("test"));
       } catch (NullPointerException e) {}
 
+      /* Merge plugin */
+      ArrayList<String> plugin = new ArrayList<String>();
+      try {
+         plugin.addAll((ArrayList<String>)fileOpts.remove("plugin"));
+      } catch (NullPointerException e) {}
+      try {
+         plugin.addAll((ArrayList<String>)cmdOpts.remove("plugin"));
+      } catch (NullPointerException e) {}
+
       /* Merge all from the config file */
       opts.putAll(fileOpts);
 
       /* Merge all from the command line */
       opts.putAll(cmdOpts);
 
-      /* Store gvar, hijack, suite, and test */
+      /* Store gvar, hijack, suite, test, and plugin */
       opts.put("gvar", gvar);
       opts.put("hijack", hijack);
       opts.put("suite", suite);
       opts.put("test", test);
+      opts.put("plugin", plugin);
 
       return opts;
    }
 
 
    /**
-    * VooDooDriver entry point
+    * Load VDD's {@link Browser} object.
     *
-    * @param args  array of command line arguments
+    * @param config  VDD's config object
     */
 
-   public static void main(String[] args) {
-      Events plugins = null;
-      BlockList blockList = null;
-
-      Config opts = new Config();
-      opts.parse(args);
-      VDDHash cmdOpts = opts.getOptions();
-
-      System.out.println("(*)Starting VooDooDriver...");
-      VDDHash cfg = readConfigFile(cmdOpts.containsKey("config") ?
-                                    new File((String)cmdOpts.get("config")) :
-                                    null);
-
-      VDDHash config = mergeConfigs(cfg, cmdOpts);
-
-      // XXX: Implement dumpConfig(config);
-      dumpJavaInfo();
+   private static void loadBrowser(VDDHash config) {
+      SupportedBrowser browserType = null;
+      Browser browser = null;
 
       if (!config.containsKey("browser")) {
          System.out.println("(!)Error: Missing --browser argument!");
          System.exit(1);
       }
+
       try {
          String b = (String)config.get("browser");
-         config.put("browser", SupportedBrowser.valueOf(b.toUpperCase()));
+         browserType = SupportedBrowser.valueOf(b.toUpperCase());
       } catch (IllegalArgumentException e) {
          System.out.println("(!)Unsupported browser: " + config.get("browser"));
          System.exit(2);
-      }
-
-      if (config.containsKey("attachtimeout")) {
-         System.out.printf("(*)Setting attach timeout to %ss.\n",
-                           (Integer)config.get("attachtimeout"));
-      }
-
-      if (config.containsKey("restartcount")) {
-         System.out.printf("(*)Restart count => '%d'\n",
-                           (Integer)config.get("restartcount"));
-      }
-
-      if (config.containsKey("savehtml")) {
-         System.out.printf("(*)SaveHTML: %s\n", config.get("savehtml"));
-      }
-
-      if (config.containsKey("screenshot")) {
-         System.out.printf("(*)Screenshot: %s\n", config.get("screenshot"));
-      }
-
-      if (config.containsKey("plugin")) {
-         String p = (String)config.get("plugin");
-         System.out.println("(*)Loading plugins from " + p);
-         try {
-            PluginLoader loader = new PluginLoader(p);
-            config.put("plugin", loader.load());
-         } catch (org.sugarcrm.voodoodriver.PluginException e) {
-            System.err.println("(!)Failed to load plugin file:");
-            e.printStackTrace(System.err);
-            System.exit(1);
-         }
-      }
-
-      if (config.containsKey("blocklistfile")) {
-         String f = (String)config.get("blocklistfile");
-         BlockListParser sbp = new BlockListParser(f);
-         blockList = sbp.parse();
-      } else {
-         blockList = new BlockList();
-      }
-      config.put("blocklist", blockList);
-
-      if (config.containsKey("suite")) {
-         RunSuites(config);
-      }
-
-      if (config.containsKey("test")) {
-         RunTests(config);
-      }
-
-      System.out.printf("(*)VooDooDriver Finished.\n");
-      System.exit(0);
-   }
-
-
-   /**
-    * Run the tests specified on the command line with --test
-    *
-    * @param config  VooDooDriver configuration
-    */
-
-   private static void RunTests(VDDHash config) {
-      /* XXX Start block to be refactored. */
-      @SuppressWarnings("unchecked")
-         ArrayList<String> tests = (ArrayList<String>)config.get("test");
-      String resultdir = (String)config.get("resultdir");;
-      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
-      VDDHash gvars = (VDDHash)config.get("gvar");
-      VDDHash hijacks = (VDDHash)config.get("hijack");
-      Plugin plugins = (Plugin)config.get("plugin");
-      String savehtml = (String)config.get("savehtml");;
-      String screenshot = (String)config.get("screenshot");;
-      String downloaddir = (String)config.get("downloaddir");;
-      String assertpage = (String)config.get("assertpage");
-      int attachTimeout = (Integer)config.get("attachtimeout");;
-      Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
-      /* XXX End block to be refactored. */
-
-      File resultFD = null;
-      Browser browser = null;
-      int len = 0;
-      Test testobj = null;
-
-      if (tests.size() == 0) {
-         return;
-      }
-
-      System.out.printf("(*)Running Soda Tests now...\n");
-
-      resultFD = new File(resultdir);
-      if (!resultFD.exists()) {
-         System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n",
-                           resultdir);
-         try {
-            resultFD.mkdirs();
-         } catch (Exception exp) {
-            System.out.printf("(!)Error: Failed to create reportdir: '%s'!\n",
-                              resultdir);
-            System.out.printf("(!)Exception: %s\n", exp.getMessage());
-            System.exit(3);
-         }
       }
 
       switch (browserType) {
@@ -440,29 +390,207 @@ public class VooDooDriver {
          break;
       }
 
-      if (downloaddir != null) {
-         browser.setDownloadDirectory(downloaddir);
+      if (config.get("downloaddir") != null) {
+         browser.setDownloadDirectory((String)config.get("downloaddir"));
       }
 
-      browser.newBrowser();
+      config.put("browser", browser);
+   }
 
-      len = tests.size() -1;
-      for (int i = 0; i <= len; i++) {
-         String test_file = tests.get(i);
-         test_file = FilenameUtils.separatorsToSystem(test_file);
-         System.out.printf("Starting Test: '%s'.\n", test_file);
 
-         testobj = new Test(test_file, browser, gvars, hijacks, null,
-                            null, null, resultdir, savehtml, screenshot);
-         if (assertpage != null) {
-            testobj.setAssertPage(assertpage);
+   /**
+    * Load command-line specified VDD plugins.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void loadPlugins(VDDHash config) {
+      if (!config.containsKey("plugin")) {
+         return;
+      }
+
+      @SuppressWarnings("unchecked")
+         ArrayList<String> plugin = (ArrayList<String>)config.get("plugin");
+      ArrayList<Plugin> loadedPlugins = new ArrayList<Plugin>();
+
+      for (String p: plugin) {
+         System.out.println("(*)Loading plugins from " + p);
+
+         try {
+            PluginLoader loader = new PluginLoader(new File(p));
+            ArrayList<Plugin> pluginList = loader.load();
+            loadedPlugins.addAll(pluginList);
+         } catch (org.sugarcrm.voodoodriver.PluginException e) {
+            System.err.println("(!)Failed to load plugin file:");
+            e.printStackTrace(System.err);
+            System.exit(1);
          }
-         testobj.setPlugins(plugins);
-         testobj.runTest(false);
+      }
+      
+      config.put("plugin", loadedPlugins);
+   }
+
+
+   /**
+    * Load VDD's block list.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void loadBlocklist(VDDHash config) {
+      BlockList blockList;
+
+      if (!config.containsKey("blocklistfile")) {
+         blockList = new BlockList();
+      } else {
+         String f = (String)config.get("blocklistfile");
+         BlockListParser sbp = new BlockListParser(f);
+         blockList = sbp.parse();
+      }
+
+      config.put("blocklist", blockList);
+   }
+
+
+   /**
+    * Create VDD's output directory.
+    *
+    * @param config  VDD's config object
+    */
+
+   private static void createResultDir(VDDHash config) {
+      File rd = new File(config.get("resultdir").toString());
+
+      if (!rd.exists()) {
+         System.out.println("(*)Creating result directory: " +
+                            config.get("resultdir"));
+         if (rd.mkdirs() == false) {
+            System.err.println("(!)Failed to create result directory: " +
+                               config.get("resultdir"));
+            System.exit(3);
+         }
+      }
+   }
+
+
+   /**
+    * Start VDD logging.
+    *
+    * This method hijacks System.out and System.err with VDDLog objects.
+    */
+
+   private static void earlyLog() {
+      VDDLog out = new VDDLog(System.out);
+      System.setOut(out);
+      VDDLog err = new VDDLog(System.err);
+      System.setErr(err);
+   }
+
+
+   /**
+    * Create VDD log file and flush output queue to it.
+    *
+    * @param config  VDD configuration object
+    */
+
+   private static void lateLog(VDDHash config) {
+      String resultDir = (String)config.get("resultdir");
+      File vddLog = new File(resultDir + File.separator + vddLogFilename);
+      System.out.println("(*)Creating log file: " + vddLog);
+      FileOutputStream logStream = null;
+      try {
+         logStream = new FileOutputStream(vddLog);
+         ((VDDLog)System.out).openLog(logStream);
+         ((VDDLog)System.err).openLog(logStream);
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Failed to open VDD log. Continuing anyways.");
+      }
+   }
+
+
+   /**
+    * Close the VDD log file.
+    */
+
+   private static void closeLog() {
+      ((VDDLog)System.out).closeLog();
+   }
+
+
+   /**
+    * VooDooDriver entry point
+    *
+    * @param args  array of command line arguments
+    */
+
+   public static void main(String[] args) {
+
+      earlyLog();
+
+      Config opts = new Config();
+      opts.parse(args);
+      VDDHash cmdOpts = opts.getOptions();
+
+      System.out.println("(*)Starting VooDooDriver...");
+      VDDHash cfg = readConfigFile(cmdOpts.containsKey("config") ?
+                                    new File((String)cmdOpts.get("config")) :
+                                    null);
+      VDDHash config = mergeConfigs(cfg, cmdOpts);
+
+      createResultDir(config);
+      lateLog(config);
+      dumpJavaInfo();
+      dumpConfig(config);
+      loadBrowser(config);
+      loadPlugins(config);
+      loadBlocklist(config);
+
+      if (config.containsKey("suite")) {
+         RunSuites(config);
+      }
+
+      if (config.containsKey("test")) {
+         RunTests(config);
+      }
+
+      System.out.println("(*)VooDooDriver Finished.");
+      closeLog();
+      System.exit(0);
+   }
+
+
+   /**
+    * Run the tests specified on the command line with --test.
+    *
+    * @param config  VooDooDriver configuration
+    */
+
+   private static void RunTests(VDDHash config) {
+      @SuppressWarnings("unchecked")
+         ArrayList<String> tests = (ArrayList<String>)config.get("test");
+      Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
+      Browser browser = (Browser)config.get("browser");
+
+      if (tests.size() == 0) {
+         return;
+      }
+
+      System.out.printf("(*)Running Soda Tests...\n");
+
+      for (String test: tests) {
+         System.out.println("Starting Test " + test);
+
+         if (browser.isClosed()) {
+            browser.newBrowser();
+         }
+
+         Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
+         t.runTest(false);
 
          if (haltOnFailure &&
-             (Integer)testobj.getReporter().getResults().get("result") != 0) {
-            System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
+             (Integer)t.getReporter().getResults().get("result") != 0) {
+            System.out.println("(*)Test failed and --haltOnFailure is set. " +
+                               "Terminating run...");
             break;
          }
       }
@@ -470,7 +598,7 @@ public class VooDooDriver {
 
 
    /**
-    * Helper function to log summary data
+    * Helper function to log summary data.
     */
 
    private static void writeSummary(FileOutputStream in, String msg) {
@@ -483,37 +611,22 @@ public class VooDooDriver {
 
 
    /**
-    * Run all test suites
+    * Run test suites specified with --suite.
     *
     * @param config  VooDooDriver configuration
     */
 
    private static void RunSuites(VDDHash config) {
-      /* XXX Start block to be refactored. */
       @SuppressWarnings("unchecked")
          ArrayList<String> suites = (ArrayList<String>)config.get("suite");
-      String resultdir = (String)config.get("resultdir");;
-      SupportedBrowser browserType = (SupportedBrowser)config.get("browser");
-      VDDHash gvars = (VDDHash)config.get("gvar");
-      VDDHash hijacks = (VDDHash)config.get("hijack");
-      BlockList blockList = (BlockList)config.get("blocklist");
-      Plugin plugins = (Plugin)config.get("plugin");
-      String savehtml = (String)config.get("savehtml");;
-      String screenshot = (String)config.get("screenshot");;
-      String downloaddir = (String)config.get("downloaddir");;
-      String assertpage = (String)config.get("assertpage");
       String restartTest = (String)config.get("restarttest");
       int restartCount = (Integer)config.get("restartcount");
-      int attachTimeout = (Integer)config.get("attachtimeout");;
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
-      /* XXX End block to be refactored. */
-
       int len = suites.size() -1;
-      File resultFD = null;
-      String report_file_name = resultdir;
+      String report_file_name = (String)config.get("resultdir");
       String hostname = "";
       FileOutputStream suiteRptFD = null;
-      Browser browser = null;
+      Browser browser = (Browser)config.get("browser");
       Date now = null;
       Date suiteStartTime = null;
       Date suiteStopTime = null;
@@ -523,23 +636,7 @@ public class VooDooDriver {
          return;
       }
 
-      System.out.printf("(*)Running Suite files now...\n");
-      System.out.printf("(*)Timeout: %s\n", attachTimeout);
-
-      resultFD = new File(resultdir);
-      if (!resultFD.exists()) {
-         System.out.printf("(*)Result directory doesn't exist, trying to create dir: '%s'\n",
-                           resultdir);
-
-         try {
-            resultFD.mkdirs();
-         } catch (Exception exp) {
-            System.out.printf("(!)Error: Failed to create reportdir: '%s'!\n",
-                              resultdir);
-            System.out.printf("(!)Exception: %s\n", exp.getMessage());
-            System.exit(3);
-         }
-      }
+      System.out.println("(*)Running Suite files...");
 
       try {
          InetAddress addr = InetAddress.getLocalHost();
@@ -572,18 +669,6 @@ public class VooDooDriver {
          System.exit(5);
       }
 
-      switch (browserType) {
-      case FIREFOX:
-         browser = new Firefox();
-         break;
-      case CHROME:
-         browser = new Chrome();
-         break;
-      case IE:
-         browser = new IE();
-         break;
-      }
-
       browser.newBrowser();
 
       writeSummary(suiteRptFD, "<data>\n");
@@ -610,7 +695,8 @@ public class VooDooDriver {
          Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SuiteParser suiteP = new SuiteParser(suite_name, gvars);
+         SuiteParser suiteP = new SuiteParser(suite_name,
+                                              (VDDHash)config.get("gvar"));
          TestList suite_test_list = suiteP.getTests();
          VDDHash vars = null;
          TestResults test_results_hash = null;
@@ -651,20 +737,10 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new Test(restartTest, browser, gvars, hijacks,
-                                     blockList, vars, suite_base_noext,
-                                     resultdir, savehtml, screenshot);
+                  testobj = new Test(config, restartTest, suite_base_noext,
+                                     vars);
                   testobj.setIsRestartTest(true);
 
-                  if (assertpage != null) {
-                     testobj.setAssertPage(assertpage);
-                  }
-
-                  if (plugins != null) {
-                     testobj.setPlugins(plugins);
-                  }
-
-                  testobj.setAttachTimeout(attachTimeout);
                   testobj.runTest(false);
                   now = new Date();
                   frac = String.format("%1$tN", now);
@@ -733,18 +809,8 @@ public class VooDooDriver {
                System.out.printf("(*)New browser created.\n");
             }
 
-            testobj = new Test(current_test, browser, gvars, hijacks,
-                               blockList, vars, suite_base_noext,
-                               resultdir, savehtml, screenshot);
-            if (assertpage != null) {
-               testobj.setAssertPage(assertpage);
-            }
+            testobj = new Test(config, current_test, suite_base_noext, vars);
 
-            if (plugins != null) {
-               testobj.setPlugins(plugins);
-            }
-
-            testobj.setAttachTimeout(attachTimeout);
             testobj.runTest(false);
 
             now = new Date();

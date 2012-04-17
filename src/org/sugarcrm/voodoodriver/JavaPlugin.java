@@ -55,14 +55,17 @@ public class JavaPlugin extends Plugin {
       Throwable exc = null;
       String errm = null;
 
-      VDDClassLoader c = new VDDClassLoader(ClassLoader.getSystemClassLoader());
+      VDDClassLoader c = new VDDClassLoader();
       try {
          Class<PluginInterface> pluginClass = c.loadClass(className, classFile);
          this.plugin = pluginClass.newInstance();
-      } catch (java.lang.NoClassDefFoundError e) {
-         errm = "No class definition found for plugin class " + className;
+      } catch (java.io.FileNotFoundException e) {
+         errm = "Plugin file '" + classFile + "' not found";
          exc = e;
-      } catch (java.lang.ClassNotFoundException e) {
+      } catch (java.io.IOException e) {
+         errm = "Error reading plugin file '" + classFile + "'";
+         exc = e;
+      } catch (java.lang.NoClassDefFoundError e) {
          errm = "No class definition found for plugin class " + className;
          exc = e;
       } catch (java.lang.InstantiationException e) {

@@ -68,6 +68,7 @@
    <csv>
       <accessor_attributes>
          <accessor type="string">file</accessor>
+         <accessor type="string">override</accessor>
          <accessor type="string">var</accessor>
       </accessor_attributes> 
    </csv>
@@ -645,12 +646,13 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="boolean">alert</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -988,32 +990,34 @@
 
    <select html_tag="select">
       <accessor_attributes>
-         <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="string">set</accessor>
-         <accessor type="string">setreal</accessor>
          <accessor type="string">assert</accessor>
+         <accessor type="boolean">assertselected</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
          <accessor type="string">click</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="string">include</accessor>
-         <accessor type="string">noninclude</accessor>
-         <accessor type="boolean">disabled</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">included</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">notincluded</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">setreal</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
    </select>
@@ -1057,18 +1061,19 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="boolean">click</accessor>
-         <accessor type="string">set</accessor>
+         <accessor type="string">append</accessor>
          <accessor type="string">assert</accessor>
-         <accessor type="string">timeout</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="boolean">disabled</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
    </textarea>

@@ -80,7 +80,7 @@ public class EventLoop implements Runnable {
     */
    public EventLoop(Browser browser, Events events, Reporter reporter,
                     VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
-                    Plugin plugins, String testName) {
+                    ArrayList<Plugin> plugins, String testName) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
@@ -110,7 +110,7 @@ public class EventLoop implements Runnable {
 
       this.plugins = new ArrayList<Plugin>();
       if (plugins != null) {
-         this.plugins.add(plugins);
+         this.plugins.addAll(plugins);
       }
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
@@ -263,10 +263,14 @@ public class EventLoop implements Runnable {
       int i = 0;
       int event_count = this.testEvents.size() - 1;
 
+      this.firePlugin(null, PluginEvent.BEFORETEST);
+
       while ((!this.threadStop) && (i <= event_count)) {
          handleSingleEvent(this.testEvents.get(i), null);
          i += 1;
       }
+
+      this.firePlugin(null, PluginEvent.AFTERTEST);
    }
 
    private void resetThreadTime() {
@@ -1684,6 +1688,13 @@ public class EventLoop implements Runnable {
 
             this.checkDisabled(event, element);
 
+            if (event.containsKey("clear") &&
+                this.clickToBool(event.get("clear").toString()) &&
+                sel.isMultiple()) {
+               this.report.Log("Clearing select element.");
+               sel.deselectAll();
+            }
+
             if (event.containsKey("set")) {
                setvalue = event.get("set").toString();
                setvalue = this.replaceString(setvalue);
@@ -1744,6 +1755,7 @@ public class EventLoop implements Runnable {
                int opt_len = options.size() - 1;
                String opt_val = "";
 
+               /* Check that this option exists */
                for (int i = 0; i <= opt_len; i++) {
                   opt_val = options.get(i).getText();
                   if (opt_val.contains(assert_value)) {
@@ -1783,6 +1795,15 @@ public class EventLoop implements Runnable {
                }
             }
 
+            if (event.containsKey("assertselected")) {
+               boolean anySelected = sel.getAllSelectedOptions().size() > 0;
+               boolean shouldBeSelected =
+                  clickToBool(event.get("assertselected").toString());
+
+               report.Assert("Option " + (anySelected ? "":"not ") + "selected",
+                             anySelected, shouldBeSelected);
+            }
+
             if (event.containsKey("click")) {
                click = this.clickToBool(event.get("click").toString());
             }
@@ -1819,7 +1840,6 @@ public class EventLoop implements Runnable {
             }
 
             if (included) {
-               sel = new Select(element);
                List<WebElement> options = sel.getOptions();
                int sel_len = options.size() - 1;
                boolean found = false;
@@ -2549,7 +2569,8 @@ public class EventLoop implements Runnable {
          String csv_txt = event.get("override").toString();
          csv_txt = this.replaceString(csv_txt);
          this.csvOverrideFile = csv_txt;
-         msg = String.format("Setting CSV file override to file: '%s'.", this.csvOverrideFile);
+         msg = String.format("Setting CSV file override to file: '%s'.",
+                             this.csvOverrideFile);
          this.report.Log(msg);
          this.report.Log("CSV event finished.");
          return true;
@@ -3426,17 +3447,21 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
-         if (event.containsKey("clear")) {
-            if (this.clickToBool(event.get("clear").toString())) {
-               this.report.Log("Clearing textarea.");
-               element.clear();
-            }
-         }
-
          if (event.containsKey("set")) {
             value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
+            element.clear();
+            element.sendKeys(value);
+         } else if (event.containsKey("clear")) {
+            if (this.clickToBool(event.get("clear").toString())) {
+               this.report.Log("Clearing textarea.");
+               element.clear();
+            }
+         } else if (event.containsKey("append")) {
+            value = event.get("append").toString();
+            value = this.replaceString(value);
+            this.report.Log(String.format("Appending Value to: '%s'.", value));
             element.sendKeys(value);
          }
 
