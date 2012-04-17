@@ -1,3 +1,49 @@
+===============================================================================
+2012-04-16  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+This merge primarily consisted of bug fixes.  Some amount of cleanup
+was also done, primarily in the main VooDooDriver class.  The plugin
+feature had its major replumbing finished.
+
+= New Features =
+
+ * <textarea> event fixed with respect to setting, clearing, and
+   appending text
+ * <csv> event has override attribute
+ * <option> event has assertselected attribute
+ * <select> event has clear attribute
+ * <image> event has required attribute
+ * Multiple plugins can now be specified and run
+
+= Bugs Fixed =
+
+ * 49296: Need a way to assert nothing is selected in the select list box
+ * 50787: Override attribute no longer works in csv tag
+ * 51806: VDD - textarea accessor append text instead of overwritting
+          text via the 'set' attribute
+ * 51807: VDD - textarea accessor needs the 'clear' attribute
+ * 51920: Load multiple plugins from xml file
+ * 51994: The action for select lists "clear" is not available
+ * 52016: Voodoo fails on "required" attribute for image tag
+
+= All Changes =
+
+1b1d59d Add "required" attribute to <image> event
+6292a98 Add "clear" attribute to <select>
+7d5c021 Added before/aftertest plugin events
+a3295ac Allow multiple plugins in each plugin.xml file
+6c76351 Allow multiple plugins
+44c6815 Create VDD log file.
+551810f Clean up VooDooDriver.RunTests and .RunSuites
+38f13de More VooDooDriver.main cleanup
+a8d38c3 Cleanup VooDooDriver.main a little
+f754f72 Bug 49296: Add assertselected attribute to <option>
+277efc6 Bug 50787: Add override attribute back to csv
+2c5f2aa Rework VDDClassLoader
+8d7693e Bugs 51806 and 51807: Fix <textarea> attributes
+
+
+===============================================================================
 2012-03-30  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 This merge updates VooDooDriver's plugin interface.  Now, instead of
@@ -23,6 +69,7 @@ acbc071 Add plugin access to Soda Vars
 17c959a Change PluginInterface
 
 
+===============================================================================
 2012-03-23  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 The bulk of this merge consists of internal infrastructure changes to
