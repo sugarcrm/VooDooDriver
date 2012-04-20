@@ -103,8 +103,6 @@ public class EventLoader {
 
    /**
     * Load all events from the {@link NodeList} created from Events.xml.
-    *
-    * @param nodes  {@link NodeList} of event nodes
     */
 
    public void loadEvents() throws VDDException {
