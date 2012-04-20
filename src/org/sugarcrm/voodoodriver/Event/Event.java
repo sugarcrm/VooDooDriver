@@ -77,74 +77,6 @@ public abstract class Event {
 
 
    /**
-    * Enumeration of events
-    *
-    * Getting rid of big hardcoded lists like this is one of the aims
-    * of the current (2012-04-16) VDD code re-orgs.  Once more code
-    * elsewhere is in place, this will be revisited and this list will
-    * be replaced by annotations in Events.xml.
-    */
-
-   private enum EventToClass {
-      ARG,
-      ATTACH,
-      ASSERT,
-      BROWSER,
-      CSV,
-      DELETE,
-      DND,
-      EXECUTE,
-      JAVAPLUGIN,
-      JAVASCRIPT,
-      PLUGINLOADER,
-      PUTS,
-      SCREENSHOT,
-      SCRIPT,
-      TIMESTAMP,
-      VAR,
-      WAIT,
-      WHITELIST,
-      ALERT,
-      DIV,
-      SPAN,
-      H1,
-      H2,
-      H3,
-      H4,
-      H5,
-      H6,
-      P,
-      PRE,
-      UL,
-      OL,
-      LI,
-      TABLE,
-      THEAD,
-      TBODY,
-      TR,
-      TD,
-      LINK,
-      IMAGE,
-      MAP,
-      AREA,
-      FRAME,
-      FORM,
-      INPUT,
-      TEXTFIELD,
-      PASSWORD,
-      CHECKBOX,
-      RADIO,
-      BUTTON,
-      FILEFIELD,
-      HIDDEN,
-      SELECT,
-      SELECT_LIST,
-      TEXTAREA,
-      LABEL
-   }
-
-
-   /**
     * Factory method to create and return the appropriate Event subclass.
     *
     * @param element  the DOM Element from the test script for this event
@@ -156,129 +88,67 @@ public abstract class Event {
 
    public static Event createEvent(Element element)
       throws UnknownEventException, VDDException {
-      EventToClass eventClassName = null;
       Event event = new TestEvent(element); // XXX temporary
+      String tagName = element.getTagName().toLowerCase();
 
-      try {
-         eventClassName = Enum.valueOf(EventToClass.class,
-                                       element.getTagName().toUpperCase());
-      } catch (IllegalArgumentException e) {
+      if (tagName.equals("arg")) {
+      } else if (tagName.equals("attach")) {
+      } else if (tagName.equals("assert")) {
+      } else if (tagName.equals("browser")) {
+      } else if (tagName.equals("csv")) {
+      } else if (tagName.equals("delete")) {
+      } else if (tagName.equals("dnd")) {
+      } else if (tagName.equals("execute")) {
+      } else if (tagName.equals("javaplugin")) {
+      } else if (tagName.equals("javascript")) {
+      } else if (tagName.equals("pluginloader")) {
+      } else if (tagName.equals("puts")) {
+      } else if (tagName.equals("screenshot")) {
+      } else if (tagName.equals("script")) {
+      } else if (tagName.equals("timestamp")) {
+      } else if (tagName.equals("var")) {
+      } else if (tagName.equals("wait")) {
+      } else if (tagName.equals("whitelist")) {
+      } else if (tagName.equals("alert")) {
+      } else if (tagName.equals("div")) {
+      } else if (tagName.equals("span")) {
+      } else if (tagName.equals("h1")) {
+      } else if (tagName.equals("h2")) {
+      } else if (tagName.equals("h3")) {
+      } else if (tagName.equals("h4")) {
+      } else if (tagName.equals("h5")) {
+      } else if (tagName.equals("h6")) {
+      } else if (tagName.equals("p")) {
+      } else if (tagName.equals("pre")) {
+      } else if (tagName.equals("ul")) {
+      } else if (tagName.equals("ol")) {
+      } else if (tagName.equals("li")) {
+      } else if (tagName.equals("table")) {
+      } else if (tagName.equals("thead")) {
+      } else if (tagName.equals("tbody")) {
+      } else if (tagName.equals("tr")) {
+      } else if (tagName.equals("td")) {
+      } else if (tagName.equals("link")) {
+      } else if (tagName.equals("image")) {
+      } else if (tagName.equals("map")) {
+      } else if (tagName.equals("area")) {
+      } else if (tagName.equals("frame")) {
+      } else if (tagName.equals("form")) {
+      } else if (tagName.equals("input")) {
+      } else if (tagName.equals("textfield")) {
+      } else if (tagName.equals("password")) {
+      } else if (tagName.equals("checkbox")) {
+      } else if (tagName.equals("radio")) {
+      } else if (tagName.equals("button")) {
+      } else if (tagName.equals("filefield")) {
+      } else if (tagName.equals("hidden")) {
+      } else if (tagName.equals("select")) {
+      } else if (tagName.equals("select_list")) {
+      } else if (tagName.equals("textarea")) {
+      } else if (tagName.equals("label")) {
+      } else {
          throw new UnknownEventException("Unknown Event name '" +
                                          element.getTagName() + "'");
-      }
-
-      /* Yuck. See above comment. */
-      switch (eventClassName) {
-      case ARG:
-         break;
-      case ATTACH:
-         break;
-      case ASSERT:
-         break;
-      case BROWSER:
-         break;
-      case CSV:
-         break;
-      case DELETE:
-         break;
-      case DND:
-         break;
-      case EXECUTE:
-         break;
-      case JAVAPLUGIN:
-         break;
-      case JAVASCRIPT:
-         break;
-      case PLUGINLOADER:
-         break;
-      case PUTS:
-         break;
-      case SCREENSHOT:
-         break;
-      case SCRIPT:
-         break;
-      case TIMESTAMP:
-         break;
-      case VAR:
-         break;
-      case WAIT:
-         break;
-      case WHITELIST:
-         break;
-      case ALERT:
-         break;
-      case DIV:
-         break;
-      case SPAN:
-         break;
-      case H1:
-         break;
-      case H2:
-         break;
-      case H3:
-         break;
-      case H4:
-         break;
-      case H5:
-         break;
-      case H6:
-         break;
-      case P:
-         break;
-      case PRE:
-         break;
-      case UL:
-         break;
-      case OL:
-         break;
-      case LI:
-         break;
-      case TABLE:
-         break;
-      case THEAD:
-         break;
-      case TBODY:
-         break;
-      case TR:
-         break;
-      case TD:
-         break;
-      case LINK:
-         break;
-      case IMAGE:
-         break;
-      case MAP:
-         break;
-      case AREA:
-         break;
-      case FRAME:
-         break;
-      case FORM:
-         break;
-      case INPUT:
-         break;
-      case TEXTFIELD:
-         break;
-      case PASSWORD:
-         break;
-      case CHECKBOX:
-         break;
-      case RADIO:
-         break;
-      case BUTTON:
-         break;
-      case FILEFIELD:
-         break;
-      case HIDDEN:
-         break;
-      case SELECT:
-         break;
-      case SELECT_LIST:
-         break;
-      case TEXTAREA:
-         break;
-      case LABEL:
-         break;
       }
 
       return event;
