@@ -37,6 +37,7 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import org.sugarcrm.voodoodriver.Event.Event;
 
 
 /**
@@ -47,55 +48,57 @@ import org.openqa.selenium.support.ui.Select;
  *
  */
 
+@SuppressWarnings("unchecked")  //XXX
 public class EventLoop implements Runnable {
 
-   private Events testEvents = null;
+   private ArrayList<Event> testEvents;
+   //private Events testEvents = null;
    private Browser Browser = null;
-   private VDDHash sodaVars = null;
    private Reporter report = null;
    private VDDHash hijacks = null;
-   private Date threadTime = null;
-   private volatile Thread runner;
-   private volatile Boolean threadStop = false;
+   private String testName = "";
+   private VDDHash whitelist = null;
+   private VDDHash sodaVars = null;
    private VDDHash ElementStore = null;
+   private ArrayList<Plugin> plugins = null;
+
    private String currentHWnd = null;
    private int attachTimeout = 0;
    private String csvOverrideFile = null;
-   private VDDHash whitelist = null;
-   private ArrayList<Plugin> plugins = null;
-   private String testName = "";
+
+   private Date threadTime = null;
+   private volatile Thread runner;
+   private volatile Boolean threadStop = false;
 
 
    /**
-    * The class Constructor.
+    * Instantiate EventLoop.
     *
-    * @param browser  {@link Browser}
-    * @param events   {@link Events}
+    * @param events   list of events from the test file
+    * @param config   VDD config info
     * @param reporter {@link Reporter}
-    * @param gvars    {@link VDDHash}
-    * @param hijacks  {@link VDDHash}
-    * @param oldvars  {@link VDDHash}
-    * @param plugins  {@link Events}
+    * @param oldVars  {@link VDDHash}
     * @param testName the current running test
     */
-   public EventLoop(Browser browser, Events events, Reporter reporter,
-                    VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
-                    ArrayList<Plugin> plugins, String testName) {
-      testEvents = events;
-      this.Browser = browser;
+
+   public EventLoop(ArrayList<Event> events, VDDHash config, Reporter reporter,
+                    VDDHash oldVars, String testName) {
+      this.testEvents = events;
+      this.Browser = (Browser)config.get("browser");
       this.report = reporter;
-      this.hijacks = hijacks;
+      this.hijacks = (VDDHash)config.get("hijack");;
       this.testName = testName;
       this.whitelist = new VDDHash();
 
-      if (oldvars != null) {
-         sodaVars = oldvars;
+      if (oldVars != null) {
+         sodaVars = oldVars;
       } else {
          sodaVars = new VDDHash();
       }
 
       this.ElementStore = new VDDHash();
 
+      VDDHash gvars = (VDDHash)config.get("gvar");
       if (gvars != null) {
          int len = gvars.keySet().size();
 
@@ -109,9 +112,12 @@ public class EventLoop implements Runnable {
       }
 
       this.plugins = new ArrayList<Plugin>();
-      if (plugins != null) {
-         this.plugins.addAll(plugins);
+      @SuppressWarnings("unchecked")
+         ArrayList<Plugin> p = (ArrayList<Plugin>)config.get("plugin");
+      if (p != null) {
+         this.plugins.addAll(p);
       }
+
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
       this.sodaVars.put("currentdate", df.format(new Date()));
@@ -289,7 +295,7 @@ public class EventLoop implements Runnable {
       return tmp;
    }
 
-   private void processEvents(Events events, WebElement parent) {
+   private void processEvents(ArrayList<Event> events, WebElement parent) {
       int event_count = events.size() - 1;
 
       for (int i = 0; i <= event_count; i++) {
@@ -301,14 +307,19 @@ public class EventLoop implements Runnable {
       }
    }
 
-   public Events getElements() {
-      return testEvents;
-   }
+   private boolean handleSingleEvent(Event event, WebElement parent) {
+      event.execute();
 
-   private boolean handleSingleEvent(VDDHash event, WebElement parent) {
+
+
+
+
+
+
+      //private boolean handleSingleEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       WebElement element = null;
-      Elements type = (Elements)event.get("type");
+      //Elements type = Elements.valueOf(event.get("type").toString());
 
       if (isStopped()) {
          return result;
@@ -316,155 +327,156 @@ public class EventLoop implements Runnable {
 
       this.resetThreadTime();
 
-      switch (type) {
-      case BROWSER:
-         result = browserEvent(event, parent);
-         break;
-      case THEAD:
-         element = theadEvent(event, parent);
-         break;
-      case TBODY:
-         element = tbodyEvent(event, parent);
-         break;
-      case PUTS:
-         result = putsEvent(event);
-         break;
-      case WAIT:
-         result = waitEvent(event);
-         break;
-      case TEXTFIELD:
-         element = textfieldEvent(event, parent);
-         break;
-      case PASSWORD:
-         element = passwordEvent(event, parent);
-         break;
-      case BUTTON:
-         element = buttonEvent(event, parent);
-         break;
-      case CSV:
-         result = csvEvent(event);
-         break;
-      case LINK:
-         element = linkEvent(event, parent);
-         break;
-      case CHECKBOX:
-         element = checkboxEvent(event, parent);
-         break;
-      case VAR:
-         result = varEvent(event);
-         break;
-      case SCRIPT:
-         result = scriptEvent(event);
-         break;
-      case DIV:
-         element = divEvent(event, parent);
-         break;
-      case ATTACH:
-         result = attachEvent(event);
-         break;
-      case TABLE:
-         element = tableEvent(event, parent);
-         break;
-      case FORM:
-         element = formEvent(event, parent);
-         break;
-      case SELECT:
-         element = selectEvent(event, parent);
-         break;
-      case STAMP:
-         result = stampEvent();
-         break;
-      case TIMESTAMP:
-         result = stampEvent();
-         break;
-      case SPAN:
-         element = spanEvent(event, parent);
-         break;
-      case HIDDEN:
-         result = hiddenEvent(event, parent);
-         break;
-      case TR:
-         element = trEvent(event, parent);
-         break;
-      case TD:
-         element = tdEvent(event, parent);
-         break;
-      case FILEFIELD:
-         element = filefieldEvent(event, parent);
-         break;
-      case IMAGE:
-         element = imageEvent(event, parent);
-         break;
-      case DND:
-         result = dndEvent(event);
-         break;
-      case TEXTAREA:
-         element = textareaEvent(event, parent);
-         break;
-      case LI:
-         element = liEvent(event, parent);
-         break;
-      case RADIO:
-         element = radioEvent(event, parent);
-         break;
-      case EXECUTE:
-         result = executeEvent(event);
-         break;
-      case JAVASCRIPT:
-         result = javascriptEvent(event);
-         break;
-      case UL:
-         result = ulEvent(event);
-         break;
-      case OL:
-         result = olEvent(event);
-         break;
-      case MAP:
-         result = mapEvent(event);
-         break;
-      case AREA:
-         result = areaEvent(event);
-         break;
-      case PLUGINLOADER:
-         result = pluginloaderEvent(event);
-         break;
-      case JAVAPLUGIN:
-         result = javapluginEvent(event, parent);
-         break;
-      case DELETE:
-         result = deleteEvent(event);
-         break;
-      case ALERT:
-         result = alertEvent(event);
-         break;
-      case SCREENSHOT:
-         result = screenshotEvent(event);
-         break;
-      case FRAME:
-         result = frameEvent(event);
-         break;
-      case WHITELIST:
-         result = whitelistEvent(event);
-         break;
-      case INPUT:
-         element = inputEvent(event, parent);
-         break;
-      default:
-         System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
-         System.exit(1);
-      }
+      // switch (type) {
+      // case BROWSER:
+      //    result = browserEvent(event, parent);
+      //    break;
+      // case THEAD:
+      //    element = theadEvent(event, parent);
+      //    break;
+      // case TBODY:
+      //    element = tbodyEvent(event, parent);
+      //    break;
+      // case PUTS:
+      //    result = putsEvent(event);
+      //    break;
+      // case WAIT:
+      //    result = waitEvent(event);
+      //    break;
+      // case TEXTFIELD:
+      //    element = textfieldEvent(event, parent);
+      //    break;
+      // case PASSWORD:
+      //    element = passwordEvent(event, parent);
+      //    break;
+      // case BUTTON:
+      //    element = buttonEvent(event, parent);
+      //    break;
+      // case CSV:
+      //    result = csvEvent(event);
+      //    break;
+      // case LINK:
+      //    element = linkEvent(event, parent);
+      //    break;
+      // case CHECKBOX:
+      //    element = checkboxEvent(event, parent);
+      //    break;
+      // case VAR:
+      //    result = varEvent(event);
+      //    break;
+      // case SCRIPT:
+      //    result = scriptEvent(event);
+      //    break;
+      // case DIV:
+      //    element = divEvent(event, parent);
+      //    break;
+      // case ATTACH:
+      //    result = attachEvent(event);
+      //    break;
+      // case TABLE:
+      //    element = tableEvent(event, parent);
+      //    break;
+      // case FORM:
+      //    element = formEvent(event, parent);
+      //    break;
+      // case SELECT:
+      //    element = selectEvent(event, parent);
+      //    break;
+      // case STAMP:
+      //    result = stampEvent();
+      //    break;
+      // case TIMESTAMP:
+      //    result = stampEvent();
+      //    break;
+      // case SPAN:
+      //    element = spanEvent(event, parent);
+      //    break;
+      // case HIDDEN:
+      //    result = hiddenEvent(event, parent);
+      //    break;
+      // case TR:
+      //    element = trEvent(event, parent);
+      //    break;
+      // case TD:
+      //    element = tdEvent(event, parent);
+      //    break;
+      // case FILEFIELD:
+      //    element = filefieldEvent(event, parent);
+      //    break;
+      // case IMAGE:
+      //    element = imageEvent(event, parent);
+      //    break;
+      // case DND:
+      //    result = dndEvent(event);
+      //    break;
+      // case TEXTAREA:
+      //    element = textareaEvent(event, parent);
+      //    break;
+      // case LI:
+      //    element = liEvent(event, parent);
+      //    break;
+      // case RADIO:
+      //    element = radioEvent(event, parent);
+      //    break;
+      // case EXECUTE:
+      //    result = executeEvent(event);
+      //    break;
+      // case JAVASCRIPT:
+      //    result = javascriptEvent(event);
+      //    break;
+      // case UL:
+      //    result = ulEvent(event);
+      //    break;
+      // case OL:
+      //    result = olEvent(event);
+      //    break;
+      // case MAP:
+      //    result = mapEvent(event);
+      //    break;
+      // case AREA:
+      //    result = areaEvent(event);
+      //    break;
+      // case PLUGINLOADER:
+      //    result = pluginloaderEvent(event);
+      //    break;
+      // case JAVAPLUGIN:
+      //    result = javapluginEvent(event, parent);
+      //    break;
+      // case DELETE:
+      //    result = deleteEvent(event);
+      //    break;
+      // case ALERT:
+      //    result = alertEvent(event);
+      //    break;
+      // case SCREENSHOT:
+      //    result = screenshotEvent(event);
+      //    break;
+      // case FRAME:
+      //    result = frameEvent(event);
+      //    break;
+      // case WHITELIST:
+      //    result = whitelistEvent(event);
+      //    break;
+      // case INPUT:
+      //    element = inputEvent(event, parent);
+      //    break;
+      // default:
+      //    System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
+      //    System.exit(1);
+      // }
 
-      this.firePlugin(null, type, PluginEvent.AFTEREVENT);
+      // this.firePlugin(null, type, PluginEvent.AFTEREVENT);
       this.resetThreadTime();
 
-      if (element != null) {
-         this.saveElement(event, element);
-      }
+      // if (element != null) {
+      //    this.saveElement(event, element);
+      // }
 
-      this.assertPage(event);
+      // this.assertPage(event);
 
       return result;
    }
+
 
    /**
     * Log when an {@link ElementNotVisibleException} is caught
@@ -570,7 +582,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), null);
+            this.processEvents((ArrayList<Event>) event.get("children"), null);
          } else {
             this.report.Log("Switching back to default frame.");
             this.Browser.getDriver().switchTo().defaultContent();
@@ -875,7 +887,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -974,7 +986,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -1301,7 +1313,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((Events) event.get("children"), element);
+         this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
       this.report.Log("LI event finished.");
@@ -1350,7 +1362,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((Events) event.get("children"), element);
+         this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
       this.report.Log("TR event finished.");
@@ -1401,7 +1413,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event.containsKey("children")) {
-         this.processEvents((Events) event.get("children"), element);
+         this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
       this.report.Log("TD event finished.");
@@ -1509,7 +1521,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -1875,7 +1887,7 @@ public class EventLoop implements Runnable {
                }
 
                if (event.containsKey("children") && element != null) {
-                  this.processEvents((Events)event.get("children"), element);
+                  this.processEvents((ArrayList<Event>)event.get("children"), element);
                }
             }
 
@@ -1931,7 +1943,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2002,7 +2014,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2150,7 +2162,7 @@ public class EventLoop implements Runnable {
          msg = String.format("Switching to window handle: '%s'.", found_handle);
          this.report.Log(msg);
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), null);
+            this.processEvents((ArrayList<Event>) event.get("children"), null);
          }
 
          this.Browser.setBrowserOpened();
@@ -2270,7 +2282,7 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -2289,7 +2301,7 @@ public class EventLoop implements Runnable {
       TestLoader loader = null;
       String testfile = "";
       File fd = null;
-      Events newEvents = null;
+      ArrayList<Event> newEvents = null;
 
       testfile = event.get("file").toString();
       testfile = this.replaceString(testfile);
@@ -2303,7 +2315,7 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         loader = new TestLoader(testfile, null);
+         loader = new TestLoader(new File(testfile), null);
          newEvents = loader.getEvents();
          this.processEvents(newEvents, null);
 
@@ -2601,7 +2613,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children")) {
-            this.processEvents((Events) event.get("children"), null);
+            this.processEvents((ArrayList<Event>) event.get("children"), null);
          }
       }
 
@@ -2821,7 +2833,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
@@ -2899,7 +2911,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("children") && element != null) {
-            this.processEvents((Events) event.get("children"), element);
+            this.processEvents((ArrayList<Event>) event.get("children"), element);
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
