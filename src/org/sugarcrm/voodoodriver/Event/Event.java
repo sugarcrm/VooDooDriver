@@ -17,8 +17,10 @@
 package org.sugarcrm.voodoodriver.Event;
 
 import java.util.ArrayList;
+import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 /**
@@ -52,6 +54,19 @@ public abstract class Event {
 
       allowedEvents = el.getEvents();
    }
+
+
+   /**
+    * Event selector attributes from the test script.
+    */
+
+   protected VDDHash selectors;
+
+   /**
+    * Event action attributes from the test script.
+    */
+
+   protected VDDHash actions;
 
 
    /**
@@ -120,6 +135,7 @@ public abstract class Event {
       TEXTAREA,
       LABEL
    }
+
 
    /**
     * Factory method to create and return the appropriate Event subclass.
@@ -260,6 +276,169 @@ public abstract class Event {
       return event;
    }
 
+   /////////////////////////////////////////////////////
+   // XXX: This code will be used during element search:
+   // /* Fill out HTML tag/type information, if applicable. */
+   // VDDHash type = getSodaElement((Elements)map.get("type"));
+   // String htmlAttrs[] = {"html_tag", "html_type"};
+   // for (String attr: htmlAttrs) {
+   //    if (type.get(attr) != null) {
+   //       map.put(attr, type.get(attr));
+   //    }
+   // }
+   /////////////////////////////////////////////////////
+
+   /**
+    * Determine whether this attribute is valid for this event.
+    *
+    * @param type   type of attribute: "selectors" or "actions"
+    * @param event  current event name
+    * @param attr   attribute to check
+    * @return true if the attribute is valid
+    */
+
+   private boolean checkForAttribute(String type, String event, String attr) {
+      VDDHash thisEvent = (VDDHash)allowedEvents.get(event);
+      VDDHash thisSelector = (VDDHash)thisEvent.get(type);
+      return thisSelector.containsKey(attr);
+   }
+
+
+   /**
+    * Determine whether this attribute is a valid selector.
+    *
+    * Selectors are attributes used to find elements on an HTML page.
+    *
+    * @param event  name of this event
+    * @param attr  the attribute
+    * @return true if the attribute is a selector
+    */
+
+   private boolean isselector(String event, String attr) {
+      return checkForAttribute("selectors", event, attr);
+   }
+
+
+   /**
+    * Determine whether this attribute is a valid action.
+    *
+    * Action attributes are those that specify what to do with an HTML
+    * element once found, or, for VooDoo events, just specify what to
+    * do.
+    *
+    * @param event  name of this event
+    * @param attr  the attribute
+    * @return true if the attribute is an action
+    */
+
+   private boolean isaction(String event, String attr) {
+      return checkForAttribute("actions", event, attr);
+   }
+
+
+   /**
+    * Convert the event from the test file into event actions.
+    *
+    * @param tev  the event as specified in the test script
+    * @throws VDDException if event processing fails
+    */
+
+   private void compileEvent(Element tev) throws VDDException {
+      String nodeName = tev.getNodeName();
+
+      /* Process attributes */
+      for (int k = 0; k < tev.getAttributes().getLength(); k++) {
+         Node attr = tev.getAttributes().item(k);
+         String name = attr.getNodeName();
+         String value = attr.getNodeValue();
+
+         if (isselector(nodeName, name)) {
+            selectors.put(name, value);
+         } else if (isaction(nodeName, name)) {
+            actions.put(name, value);
+         } else {
+            throw new VDDException("Invalid attribute '" + name + "' " +
+                                   "for '" + tev.getNodeName() + "' event");
+         }
+      }
+
+      /////////////////////////////////////////////////////////////////
+      // ***** Events that need special handling  *****
+      //
+      // This code (originally from TestLoader.java) will go into
+      // individual subclasses.
+      //
+      // if (name.contains("javascript") || name.contains("whitelist")) {
+      //    String tmp = child.getTextContent();
+      //    if (!tmp.isEmpty()) {
+      //       data.put("content", tmp);
+      //    }
+      // }
+      //
+      // Check for "arg" children -- execute and javaplugin can have them
+      //
+      //String[] list = processArgs(child.getChildNodes());
+      //data.put("args", list);
+      //
+      // /**
+      //  * Process the argument list for &lt;execute&gt;
+      //  *  and &lt;javaplugin&gt; event Nodes.
+      //  *
+      //  * @param nodes  the argument list as an XML NodeList
+      //  * @return String array of those arguments
+      //  */
+      //
+      // private String[] processArgs(NodeList nodes) {
+      //    int len = nodes.getLength() -1;
+      //    String[] list;
+      //    int arg_count = 0;
+      //    int current = 0;
+      //
+      //    for (int i = 0; i <= len; i++) {
+      //       String name = nodes.item(i).getNodeName();
+      //       if (name.contains("arg")) {
+      //          arg_count += 1;
+      //       }
+      //    }
+      //
+      //    list = new String[arg_count];
+      //
+      //    for (int i = 0; i <= len; i++) {
+      //       String name = nodes.item(i).getNodeName();
+      //       if (name.contains("arg")) {
+      //          String value = nodes.item(i).getTextContent();
+      //          list[current] = value;
+      //          current += 1;
+      //       }
+      //    }
+      //
+      //    return list;
+      // }
+      //
+      /////////////////////////////////////////////////////////////////
+   }
+
+   /**
+    * This constructor, which will never be called, is needed to extend Event.
+    */
+
+   protected Event() {}
+
+
+   /**
+    * Constructor for (almost) all Event subclasses.
+    *
+    * @param testEvent  the event as specified in the test script
+    * @throws VDDException if event instantiation fails
+    */
+
+   protected Event(Element testEvent) throws VDDException {
+      this.selectors = new VDDHash();
+      this.actions = new VDDHash();
+
+      compileEvent(testEvent);
+   }
+
 
    /**
     * {@link ArrayList} of child events.
@@ -379,6 +558,5 @@ public abstract class Event {
     *    vartext         string   span
     *
     */
-
 
 }
