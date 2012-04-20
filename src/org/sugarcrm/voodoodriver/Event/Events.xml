@@ -28,25 +28,25 @@
    </arg>
 
    <attach>
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">var</accessor>
          <accessor type="string">title</accessor>
          <accessor type="string">url</accessor>
          <accessor type="integer">index</accessor>
-      </accessor_attributes>
+      </selectors>
    </attach>
 
    <assert>
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
-      </soda_attributes>
+      </actions>
    </assert>
 
    <browser>
-      <accessor_attributes>
-      </accessor_attributes>
+      <selectors>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <action type="selection">
             <name>close</name>
             <name>back</name>
@@ -62,103 +62,103 @@
          <accessor type="boolean">assertPage</accessor>
          <accessor type="boolean">exist</accessor>
          <accessor type="string">jscriptevent</accessor>
-      </soda_attributes>
+      </actions>
    </browser>
 
    <csv>
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">file</accessor>
          <accessor type="string">override</accessor>
          <accessor type="string">var</accessor>
-      </accessor_attributes> 
+      </selectors> 
    </csv>
 
    <delete>
-      <soda_attributes>
+      <actions>
          <accessor type="string">name</accessor>
-      </soda_attributes>
+      </actions>
    </delete>
 
    <dnd>
-      <soda_attributes>
+      <actions>
          <accessor type="string">src</accessor>
          <accessor type="string">dst</accessor>
-      </soda_attributes>
+      </actions>
    </dnd>
 
    <execute>
-      <soda_attributes>
+      <actions>
          <accessor type="string">name</accessor>
-      </soda_attributes>
+      </actions>
    </execute>
 
    <javaplugin>
-      <soda_attributes>
+      <actions>
          <accessor type="string">classname</accessor>
-      </soda_attributes>
+      </actions>
    </javaplugin>
 
    <javascript>
-      <soda_attributes>
+      <actions>
          <accessor type="string">content</accessor>
          <accessor type="string">file</accessor>
-      </soda_attributes>
+      </actions>
    </javascript>
 
    <pluginloader>
-      <soda_attributes>
+      <actions>
          <accessor type="string">classname</accessor>
          <accessor type="string">file</accessor>
-      </soda_attributes>
+      </actions>
    </pluginloader>
 
    <puts>
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">text</accessor>
          <accessor type="string">txt</accessor>
-      </accessor_attributes>
+      </selectors>
    </puts>
 
    <screenshot>
-      <soda_attributes>
+      <actions>
          <accessor type="string">file</accessor>
-      </soda_attributes>
+      </actions>
    </screenshot>
 
    <script>
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">file</accessor>
          <accessor type="string">fileset</accessor>
          <accessor type="string">csv</accessor>
-      </accessor_attributes> 
+      </selectors> 
    </script>
 
    <timestamp>
    </timestamp>
 
    <var>
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">set</accessor>
          <accessor type="string">var</accessor>
          <accessor type="string">unset</accessor>
-      </accessor_attributes> 
+      </selectors> 
    </var>
 
    <wait>
-       <accessor_attributes>
+       <selectors>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">condition</accessor>
-      </accessor_attributes>
+      </selectors>
    </wait>
 
    <whitelist>
-      <soda_attributes>
+      <actions>
          <accessor type="string">add</accessor>
          <accessor type="string">delete</accessor>
          <accessor type="string">name</accessor>
          <accessor type="string">content</accessor>
          <accessor type="string">action</accessor>
-      </soda_attributes>
+      </actions>
    </whitelist>
 
    <!-- HTML Events
@@ -174,18 +174,18 @@
         just to stick it here.
    -->
    <alert>
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">alert</accessor>
          <accessor type="boolean">exist</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-      </soda_attributes>
+      </actions>
    </alert>
 
    <!-- The global structure of an HTML document: The document body. -->
 
    <div html_tag="div">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -193,9 +193,9 @@
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
           <accessor type="string">index</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">exist</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">assert</accessor>
@@ -208,11 +208,11 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </div>
 
    <span html_tag="span">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -220,9 +220,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="string">vartext</accessor>
@@ -234,11 +234,11 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </span>
 
    <h1 html_tag="h1">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -246,17 +246,17 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h1>
 
    <h2 html_tag="h2">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -264,18 +264,18 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h2>
 
    <h3 html_tag="h3">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -283,17 +283,17 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h3>
 
    <h4 html_tag="h4">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -301,17 +301,17 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h4>
 
    <h5 html_tag="h5">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -319,19 +319,19 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h5>
 
    <h6 html_tag="h6">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -339,13 +339,13 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </h6>
 
    <!-- Missing ADDRESS event -->
@@ -356,7 +356,7 @@
                              ABBR, ACRONYM, BLOCKQUOTE, Q, SUB, SUP -->
 
    <p html_tag="p">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -364,19 +364,19 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </p>
 
    <!-- Missing BR event -->
 
    <pre html_tag="pre">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -384,13 +384,13 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </pre>
 
    <!-- Missing INS, DEL events -->
@@ -398,7 +398,7 @@
    <!-- Lists -->
 
    <ul html_tag="ul">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -406,17 +406,17 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </ul>
 
    <ol html_tag="ol">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -424,18 +424,18 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </ol>
 
    <li html_tag="li">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -443,9 +443,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">click</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
@@ -453,7 +453,7 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </li>
 
    <!-- Missing definition lists: DL, DT, DD -->
@@ -461,7 +461,7 @@
    <!-- Tables -->
 
    <table html_tag="table">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -469,9 +469,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="boolean">exist</accessor>
@@ -481,13 +481,13 @@
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </table>
 
    <!-- Missing CAPTION event -->
 
    <thead html_tag="thead">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">id</accessor>
@@ -497,9 +497,9 @@
          <accessor type="string">text</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">click</accessor>
@@ -509,13 +509,13 @@
          <accessor type="integer">timeout</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </thead>
 
    <!-- Missing TFOOT event -->
 
    <tbody html_tag="tbody">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">id</accessor>
@@ -525,9 +525,9 @@
          <accessor type="string">text</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">click</accessor>
@@ -537,13 +537,13 @@
          <accessor type="integer">timeout</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </tbody>
 
    <!-- Missing COLGROUP and COL events -->
 
    <tr html_tag="tr">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -551,9 +551,9 @@
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">index</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">click</accessor>
          <accessor type="boolean">exists</accessor>
@@ -561,13 +561,13 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </tr>
 
    <!-- Missing TH event -->
 
    <td html_tag="td">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -575,9 +575,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -587,7 +587,7 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </td>
 
    <!-- Links -->
@@ -597,7 +597,7 @@
         Unfortunately, changing this will be annoying at best.
    -->
    <link html_tag="a">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">href</accessor>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -606,9 +606,9 @@
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">index</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">alert</accessor>
          <accessor type="boolean">exist</accessor>
@@ -624,7 +624,7 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </link>
 
    <!-- Missing LINK and BASE events -->
@@ -632,7 +632,7 @@
    <!-- Objects, images, and applets -->
 
    <image html_tag="img">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">src</accessor>
@@ -643,9 +643,9 @@
          <accessor type="string">alt</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">alert</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
@@ -655,13 +655,13 @@
          <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </image>
 
    <!-- Missing OBJECT and APPLET events -->
 
    <map html_tag="map">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -670,19 +670,19 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </map>
 
    <area html_tag="area">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -690,15 +690,15 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </area>
 
    <!-- Alignment, font styles, and horizontal rules -->
@@ -715,7 +715,7 @@
    <!-- Missing FRAMESET and NOFRAMES events -->
 
    <frame html_tag="iframe">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">src</accessor>
          <accessor type="string">text</accessor>
@@ -723,29 +723,29 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </frame>
 
    <frame>
-      <soda_attributes>
+      <actions>
          <accessor type="string">name</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
-      </soda_attributes>
+      </actions>
    </frame>
 
    <!-- Forms -->
 
    <form html_tag="form">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">method</accessor>
@@ -754,19 +754,19 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">exist</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-      </soda_attributes>
+      </actions>
    </form>
 
    <input html_tag="input">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">id</accessor>
@@ -776,18 +776,18 @@
          <accessor type="string">text</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">var</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-      </soda_attributes>
+      </actions>
    </input>
 
    <textfield html_tag="input" html_type="text|password">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -796,9 +796,9 @@
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">index</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">var</accessor>
          <accessor type="string">set</accessor>
          <accessor type="string">append</accessor>
@@ -817,11 +817,11 @@
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </textfield>
 
    <password html_tag="input" html_type="password">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -830,9 +830,9 @@
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">index</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
       	<accessor type="string">var</accessor>
          <accessor type="string">set</accessor>
          <accessor type="string">append</accessor>
@@ -851,11 +851,11 @@
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
-      </soda_attributes>
+      </actions>
    </password>
 
    <checkbox html_tag="input" html_type="checkbox">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -864,9 +864,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">set</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">assert</accessor>
@@ -881,11 +881,11 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </checkbox>
 
    <radio html_tag="input" html_typ="radio">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -894,9 +894,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">set</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">disabled</accessor>
@@ -907,12 +907,12 @@
          <accessor type="string">save</accessor>
          <accessor type="boolean">checked</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </radio>
 
    <!-- N.B. there is, in fact, an HTML tag "button" -->
    <button html_tag="input|button" html_type="button|submit|reset">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">src</accessor>
@@ -922,9 +922,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="boolean">exist</accessor>
@@ -939,11 +939,11 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </button>
 
    <filefield html_tag="input" html_type="file">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">title</accessor>
          <accessor type="string">class</accessor>
@@ -952,9 +952,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">set</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">exists</accessor>
@@ -962,11 +962,11 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </filefield>
 
    <hidden html_tag="input" html_type="hidden">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">method</accessor>
@@ -976,20 +976,20 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">var</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-      </soda_attributes>
+      </actions>
    </hidden>
 
    <!-- Missing input type=image -->
 
    <select html_tag="select">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
          <accessor type="string">id</accessor>
@@ -998,9 +998,9 @@
          <accessor type="string">text</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">assert</accessor>
          <accessor type="boolean">assertselected</accessor>
          <accessor type="string">assertnot</accessor>
@@ -1019,11 +1019,11 @@
          <accessor type="string">setreal</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </select>
 
    <select_list html_tag="optgroup">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -1032,9 +1032,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">set</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -1043,13 +1043,13 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </select_list>
 
    <!-- Missing OPTION event -->
 
    <textarea html_tag="textarea">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -1058,9 +1058,9 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">append</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="boolean">clear</accessor>
@@ -1075,11 +1075,11 @@
          <accessor type="string">set</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </textarea>
 
    <label html_tag="label">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
          <accessor type="string">text</accessor>
@@ -1088,14 +1088,14 @@
          <accessor type="string">for</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
-      </accessor_attributes>
+      </selectors>
 
-      <soda_attributes>
+      <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
-      </soda_attributes>
+      </actions>
    </label>
 
    <!-- Missing FIELDSET and LEGEND events -->

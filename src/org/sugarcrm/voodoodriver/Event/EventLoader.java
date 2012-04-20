@@ -136,8 +136,8 @@ public class EventLoader {
                Node child = children.item(m);
                String childName = child.getNodeName();
 
-               if (childName.equals("soda_attributes") ||
-                   childName.equals("accessor_attributes")) {
+               if (childName.equals("selectors") ||
+                   childName.equals("actions")) {
                   event.put(childName, parseAccessors(child.getChildNodes()));
                }
             }
