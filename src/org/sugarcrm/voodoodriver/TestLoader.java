@@ -58,7 +58,8 @@ public class TestLoader {
     * @throws UnknownEventException
     */
 
-   public TestLoader(File test, Reporter rpt) throws UnknownEventException {
+   public TestLoader(File test, Reporter rpt)
+      throws UnknownEventException, VDDException {
       this.reporter = rpt;
 
       compileTestFile(test);
@@ -68,13 +69,27 @@ public class TestLoader {
    /**
     * Load the Nodes from the test script.
     *
+    * @param test  VooDoo test script
     * @return {@link NodeList} of unprocessed events
+    * @throws VDDException should there be any problem parsing the test XML
     */
 
-   private NodeList loadNodes(File test) {
+   private NodeList loadNodes(File test) throws VDDException {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
-      Document doc = db.parse(test);
+      DocumentBuilder db = null;
+      Document doc = null;
+      try {
+         db = dbf.newDocumentBuilder();
+      } catch (javax.xml.parsers.ParserConfigurationException e) {
+         throw new VDDException("Failed to load " + test, e);
+      }
+      try {
+         doc = db.parse(test);
+      } catch (java.io.IOException e) {
+         throw new VDDException("Unable to read " + test, e);
+      } catch (org.xml.sax.SAXException e) {
+         throw new VDDException("Invalid XML in " + test, e);
+      }
       Element root = doc.getDocumentElement();
 
       if (root.getTagName().toLowerCase() != "voodoo") {
@@ -98,7 +113,7 @@ public class TestLoader {
     */
 
    private ArrayList<Event> processNodes(NodeList nodes)
-      throws UnknownEventException {
+      throws UnknownEventException, VDDException {
       ArrayList<Event> events = new ArrayList<Event>();
 
       for (int n = 0; n < nodes.getLength(); n++) {
@@ -128,7 +143,8 @@ public class TestLoader {
     * @throws UnknownEventException
     */
 
-   private void compileTestFile(File test) throws UnknownEventException {
+   private void compileTestFile(File test)
+      throws UnknownEventException, VDDException {
       NodeList nodes = loadNodes(test);
       this.events = processNodes(nodes);
    }

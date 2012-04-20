@@ -206,7 +206,7 @@ public class Test {
 
       this.reporter.Log("Finished.");
 
-      return this.events != null;
+      return this.events != null; // ? Should be void with exception for error
    }
 
 
@@ -287,11 +287,19 @@ public class Test {
          this.reporter.setIsRestTest(true);
       }
 
-      if (!this.loadTestFile()) {
-         this.reporter.ReportError("Failed to parse test file!");
-         this.logResults();
-         this.reporter.closeLog();
-         return false;
+      try {
+         if (!this.loadTestFile()) {
+            this.reporter.ReportError("Failed to parse test file!");
+            this.logResults();
+            this.reporter.closeLog();
+            return false;
+         }
+      } catch (VDDException e) {
+            this.reporter.ReportError("Failed to parse test file!");
+            this.reporter.ReportException(e);
+            this.logResults();
+            this.reporter.closeLog();
+            return false;
       }
 
       if (testBlocked()) {
