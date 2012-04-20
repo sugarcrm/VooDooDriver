@@ -57,6 +57,13 @@ public abstract class Event {
 
 
    /**
+    * The event from the test file.
+    */
+
+   protected Element testEvent;
+
+
+   /**
     * Event selector attributes from the test script.
     */
 
@@ -144,10 +151,11 @@ public abstract class Event {
     * @return appropriate Event subclass
     * @throws UnknownEventException if <code>eventName</code> does not
     *         correspond to a VDD event
+    * @throws VDDException if event instantiation fails
     */
 
    public static Event createEvent(Element element)
-      throws UnknownEventException {
+      throws UnknownEventException, VDDException {
       EventToClass eventClassName = null;
       Event event = new TestEvent(element); // XXX temporary
 
@@ -433,6 +441,7 @@ public abstract class Event {
     */
 
    protected Event(Element testEvent) throws VDDException {
+      this.testEvent = testEvent;
       this.selectors = new VDDHash();
       this.actions = new VDDHash();
 
