@@ -43,25 +43,22 @@
    </assert>
 
    <browser>
-      <selectors>
-      </selectors>
-
       <actions>
          <action type="selection">
-            <name>close</name>
             <name>back</name>
-            <name>refresh</name>
+            <name>close</name>
             <name>forward</name>
+            <name>refresh</name>
          </action>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertPage</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">url</accessor>
-         <accessor type="string">send_keys</accessor>
-         <accessor type="boolean">assertPage</accessor>
          <accessor type="boolean">exist</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">send_keys</accessor>
+         <accessor type="string">url</accessor>
       </actions>
    </browser>
 

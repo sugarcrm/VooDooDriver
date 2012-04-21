@@ -41,12 +41,10 @@ public class Puts extends Event {
    /**
     * Run the puts event.
     *
-    * @return whether event execution was successful
+    * @throws VDDException if execution is unsuccessful
     */
 
-   public boolean execute() {
-      this.eventLoop.resetThreadTime();
-
+   public void execute() throws VDDException {
       String txt = (this.actions.containsKey("txt") ?
                     (String)this.actions.get("txt") :
                     (this.actions.containsKey("text") ?
@@ -54,13 +52,10 @@ public class Puts extends Event {
                      null));
 
       if (txt == null) {
-         return false;
+         throw new VDDException("Puts event missing 'txt' or 'text' attribute");
       }
 
       txt = this.replaceString(txt);
       this.eventLoop.report.Log(txt);
-
-      this.eventLoop.resetThreadTime();
-      return true;
    }
 }

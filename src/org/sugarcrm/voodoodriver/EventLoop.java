@@ -53,7 +53,7 @@ public class EventLoop implements Runnable {
 
    private ArrayList<Event> testEvents;
    //private Events testEvents = null;
-   private Browser Browser = null;
+   public Browser Browser = null;
    public Reporter report = null;
    public VDDHash hijacks = null;
    private String testName = "";
@@ -329,11 +329,24 @@ public class EventLoop implements Runnable {
     */
 
    private boolean handleSingleEvent(Event event, WebElement parent) {
-      boolean result;
+      boolean result = true;
+      String eventName = event.getName();
+
+      this.report.Log(eventName + " event started...");
       this.resetThreadTime();
       event.setEventLoop(this);
-      result = event.execute();
+      event.setParent(parent);
+
+      try {
+         event.execute();
+      } catch (VDDException e) {
+         this.report.ReportError("Exception during event execution");
+         this.report.ReportException(e);
+         result = false;
+      }
+
       this.resetThreadTime();
+      this.report.Log(eventName + " event finished.");
 
       return result;
 
@@ -2680,110 +2693,6 @@ public class EventLoop implements Runnable {
 
       this.resetThreadTime();
       this.report.Log("Wait event finished.");
-      return result;
-   }
-
-   private boolean browserEvent(VDDHash event, WebElement parent) {
-      boolean result = false;
-      boolean assertPage = true;
-      BrowserActions browser_action = null;
-
-      this.resetThreadTime();
-
-      this.report.Log("Browser event starting...");
-
-      try {
-         if (event.containsKey("action")) {
-            browser_action = BrowserActions.valueOf(event.get("action").toString().toUpperCase());
-            switch (browser_action) {
-            case REFRESH:
-               this.report.Log("Calling Browser event refresh.");
-               this.Browser.refresh();
-               break;
-            case CLOSE:
-               this.report.Log("Calling Browser event close.");
-               this.Browser.close();
-               break;
-            case BACK:
-               this.report.Log("Calling Browser event back.");
-               this.Browser.back();
-               break;
-            case FORWARD:
-               this.report.Log("Calling Browser event forward.");
-               this.Browser.forward();
-               break;
-            }
-         } else {
-            int event_count = event.keySet().size() - 1;
-            for (int i = 0; i <= event_count; i++) {
-               String key = event.keySet().toArray()[i].toString();
-               String key_id = "BROWSER_" + key;
-               BrowserMethods method = null;
-
-               if (BrowserMethods.isMember(key_id)) {
-                  method = BrowserMethods.valueOf(key_id);
-               } else {
-                  continue;
-               }
-
-               String value = "";
-               switch (method) {
-               case BROWSER_url:
-                  String url = event.get(key).toString();
-                  url = this.replaceString(url);
-                  this.report.Log(String.format("URL: '%s'", url));
-                  this.Browser.url(url);
-                  break;
-               case BROWSER_assert:
-                  value = event.get("assert").toString();
-                  value = this.replaceString(value);
-
-                  if (parent != null) {
-                     result = this.Browser.Assert(value, parent);
-                  } else {
-                     result = this.Browser.Assert(value);
-                  }
-
-                  if (!result) {
-                     String msg = String.format(
-                           "Browser Assert Failed to find this in page: '%s'",
-                           value);
-                     this.report.Log(msg);
-                  }
-                  break;
-               case BROWSER_assertnot:
-                  value = event.get("assertnot").toString();
-                  value = this.replaceString(value);
-
-                  if (parent != null) {
-                     result = this.Browser.AssertNot(value, parent);
-                  } else {
-                     result = this.Browser.AssertNot(value);
-                  }
-
-                  if (!result) {
-                     String msg = String.format("Browser AssertNot Found text in page: '%s'", value);
-                     this.report.Log(msg);
-                  }
-                  break;
-
-               case BROWSER_assertPage:
-                  assertPage = this.clickToBool(event.get("assertPage").toString());
-                  this.report.Log(String.format("Borwser assertPage => '%s'.",
-                        assertPage));
-                  break;
-               default:
-                  System.out.printf("(!)ERROR: Unknown browser method: '%s'!\n", key_id);
-                  System.exit(3);
-               }
-            }
-         }
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-      }
-
-      this.resetThreadTime();
-      this.report.Log("Browser Event finished.");
       return result;
    }
 

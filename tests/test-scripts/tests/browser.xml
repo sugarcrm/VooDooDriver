@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2011, SugarCRM, Inc.
+  Copyright (c) 2012, SugarCRM, Inc.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,17 +25,39 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<soda>     
-   <script file="tests/test-scripts/tests/browser.xml"/>
-   <script file="tests/test-scripts/tests/buttons-test.xml"/>
-   <script file="tests/test-scripts/tests/radio-test.xml"/>
-   <script file="tests/test-scripts/tests/field-test.xml"/>
-   <script file="tests/test-scripts/tests/misc-test.xml"/>
-   <script file="tests/test-scripts/tests/table-test.xml"/>
-   <script file="tests/test-scripts/tests/checkbox-test.xml"/>
-   <script file="tests/test-scripts/tests/select-test.xml"/>
-   <script file="tests/test-scripts/tests/list-test.xml"/>
-   <script file="tests/test-scripts/tests/image-test.xml"/>
-   <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
-   <script file="tests/test-scripts/tests/cleanup.xml"/>
-</soda>
+<voodoo>
+   <!-- url -->
+   <browser url="{@global.url}/tests/test-data/browser_1.html"/>
+
+   <!-- action="refresh" -->
+   <textfield id="text" set="one"/>
+   <browser action="refresh"/>
+   <textfield id="text" assertnot="one"/>
+
+   <!-- url -->
+   <browser url="{@global.url}/tests/test-data/browser_2.html"/>
+
+   <!-- assert -->
+   <browser assert="Page two"/>
+
+   <!-- action="back", assertnot, assert -->
+   <browser action="back"/>
+   <browser assertnot="Page two"/>
+   <browser assert="Page one"/>
+
+   <!-- action="forward" -->
+   <browser action="forward"/>
+   <browser assert="Page two"/>
+
+   <!--
+       Bug 52487: Unimplemented browser attributes:
+         * assertpage
+         * cssprop,cssvalue
+         * exist
+         * jscriptevent
+         * send_keys
+   -->
+
+   <!-- action="close" -->
+   <browser action="close"/>
+</voodoo>

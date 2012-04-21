@@ -19,6 +19,7 @@ package org.sugarcrm.voodoodriver.Event;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.openqa.selenium.WebElement;
 import org.sugarcrm.voodoodriver.EventLoop;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
@@ -86,6 +87,13 @@ public abstract class Event {
 
 
    /**
+    * Parent HTML element of the element used by this event.
+    */
+
+   protected WebElement parent;
+
+
+   /**
     * Factory method to create and return the appropriate Event subclass.
     *
     * @param element  the DOM Element from the test script for this event
@@ -104,6 +112,7 @@ public abstract class Event {
       } else if (tagName.equals("attach")) {
       } else if (tagName.equals("assert")) {
       } else if (tagName.equals("browser")) {
+         event = new Browser(element);
       } else if (tagName.equals("csv")) {
       } else if (tagName.equals("delete")) {
       } else if (tagName.equals("dnd")) {
@@ -375,14 +384,34 @@ public abstract class Event {
 
 
    /**
-    * Execute this Event.
+    * Assign this Event's parent WebElement.
     *
-    * @return whether execution was successful
+    * @param parent  the parent {@link WebElement}
     */
 
-   public boolean execute() {
-      return false;
+   public void setParent(WebElement parent) {
+      this.parent = parent;
    }
+
+
+   /**
+    * Retreive this Event's event name.
+    *
+    * @return the event name
+    */
+
+   public String getName() {
+      return this.testEvent.getNodeName();
+   }
+
+
+   /**
+    * Execute this Event.
+    *
+    * @throws VDDException if event execution is unsuccessful
+    */
+
+   public abstract void execute() throws VDDException;
 
 
    /**
