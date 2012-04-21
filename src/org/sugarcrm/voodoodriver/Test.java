@@ -204,6 +204,7 @@ public class Test {
          this.events = loader.getEvents();
       } catch (Exception e) {
          // XXX -- this will need to be revisited
+         e.printStackTrace(System.err);
          throw new VDDException("Exception loading " + this.testFile, e);
       }
 

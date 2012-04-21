@@ -113,10 +113,10 @@
    </pluginloader>
 
    <puts>
-      <selectors>
+      <actions>
          <accessor type="string">text</accessor>
          <accessor type="string">txt</accessor>
-      </selectors>
+      </actions>
    </puts>
 
    <screenshot>

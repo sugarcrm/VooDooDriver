@@ -17,6 +17,9 @@
 package org.sugarcrm.voodoodriver.Event;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.sugarcrm.voodoodriver.EventLoop;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Element;
@@ -75,6 +78,12 @@ public abstract class Event {
 
    protected VDDHash actions;
 
+   /**
+    * The {@link EventLoop} running this Event.
+    */
+
+   protected EventLoop eventLoop;
+
 
    /**
     * Factory method to create and return the appropriate Event subclass.
@@ -103,6 +112,7 @@ public abstract class Event {
       } else if (tagName.equals("javascript")) {
       } else if (tagName.equals("pluginloader")) {
       } else if (tagName.equals("puts")) {
+         event = new Puts(element);
       } else if (tagName.equals("screenshot")) {
       } else if (tagName.equals("script")) {
       } else if (tagName.equals("timestamp")) {
@@ -178,7 +188,7 @@ public abstract class Event {
    private boolean checkForAttribute(String type, String event, String attr) {
       VDDHash thisEvent = (VDDHash)allowedEvents.get(event);
       VDDHash thisSelector = (VDDHash)thisEvent.get(type);
-      return thisSelector.containsKey(attr);
+      return thisSelector != null && thisSelector.containsKey(attr);
    }
 
 
@@ -354,6 +364,17 @@ public abstract class Event {
 
 
    /**
+    * Assign this Event's parent EventLoop.
+    *
+    * @param el  the {@link EventLoop} running this event
+    */
+
+   public void setEventLoop(EventLoop el) {
+      this.eventLoop = el;
+   }
+
+
+   /**
     * Execute this Event.
     *
     * @return whether execution was successful
@@ -362,6 +383,43 @@ public abstract class Event {
    public boolean execute() {
       return false;
    }
+
+
+   /**
+    * Perform VDD string substitution.
+    *
+    * @param str  the raw string
+    * @return the input string with all sequences replaces appropriately
+    */
+
+   protected String replaceString(String str) {
+      String result = str;
+
+      Pattern patt = Pattern.compile("\\{@[\\w\\.]+\\}",
+                                     Pattern.CASE_INSENSITIVE);
+      Matcher matcher = patt.matcher(str);
+
+      while (matcher.find()) {
+         String m = matcher.group();
+         String tmp = m;
+         tmp = tmp.replace("{@", "");
+         tmp = tmp.replace("}", "");
+
+         if (this.eventLoop.hijacks.containsKey(tmp)) {
+            String value = this.eventLoop.hijacks.get(tmp).toString();
+            result = result.replace(m, value);
+         } else if (this.eventLoop.sodaVars.containsKey(tmp)) {
+            String value = this.eventLoop.sodaVars.get(tmp).toString();
+            result = result.replace(m, value);
+         }
+      }
+
+      result = result.replaceAll("\\\\n", "\n");
+
+      return result;
+   }
+
+
 
 
    /*

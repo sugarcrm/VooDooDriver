@@ -54,11 +54,11 @@ public class EventLoop implements Runnable {
    private ArrayList<Event> testEvents;
    //private Events testEvents = null;
    private Browser Browser = null;
-   private Reporter report = null;
-   private VDDHash hijacks = null;
+   public Reporter report = null;
+   public VDDHash hijacks = null;
    private String testName = "";
    private VDDHash whitelist = null;
-   private VDDHash sodaVars = null;
+   public VDDHash sodaVars = null;
    private VDDHash ElementStore = null;
    private ArrayList<Plugin> plugins = null;
 
@@ -128,22 +128,26 @@ public class EventLoop implements Runnable {
       runner.start();
    }
 
+
    /**
     * Sets the timeout in seconds for the Attach command to give up on retrying
     * to find the wanted window to attach to.
     *
     * @param timeout int
     */
+
    public void setAttachTimeout(int timeout) {
       this.attachTimeout = timeout;
    }
 
+
    /**
-    * Checks to see if a browser window exists.
+    * Check to see if a browser window exists.
     *
-    * @param hwnd {@link String}
-    * @return
+    * @param hwnd  window handle
+    * @return whether the window exists
     */
+
    private boolean windowExists(String hwnd) {
       boolean exists = false;
       int i = 0;
@@ -161,8 +165,9 @@ public class EventLoop implements Runnable {
       return exists;
    }
 
+
    /**
-    * Sets the active browser window for VDD to use.
+    * Set the active browser window for VDD to use.
     *
     * @param hwnd {@link String}
     */
@@ -170,19 +175,24 @@ public class EventLoop implements Runnable {
       this.currentHWnd = hwnd;
    }
 
+
    /**
-    * Gets the current browser window handle.
+    * Get the current browser window handle.
     *
     * @return {@link String}
     */
+
    private String getCurrentHWND() {
       return this.currentHWnd;
    }
 
+
    /**
+    * Set the browser assert page.
     *
     * @param event
     */
+
    private void assertPage(VDDHash event) {
       boolean assertpage = true;
 
@@ -194,6 +204,7 @@ public class EventLoop implements Runnable {
          this.Browser.assertPage(this.whitelist);
       }
    }
+
 
    private void saveElement(VDDHash event, WebElement element) {
       if (!event.containsKey("save")) {
@@ -222,6 +233,7 @@ public class EventLoop implements Runnable {
       return this.sodaVars;
    }
 
+
    public boolean isAlive() {
       return this.runner.isAlive();
    }
@@ -243,27 +255,23 @@ public class EventLoop implements Runnable {
       return result;
    }
 
-   public void run() {
-      System.out.printf("Thread Running...\n");
-      this.threadTime = new Date();
-      int i = 0;
-      int event_count = this.testEvents.size() - 1;
 
-      this.firePlugin(null, PluginEvent.BEFORETEST);
+   /**
+    * Update this EventLoop's thread time.
+    */
 
-      while ((!this.threadStop) && (i <= event_count)) {
-         handleSingleEvent(this.testEvents.get(i), null);
-         i += 1;
-      }
-
-      this.firePlugin(null, PluginEvent.AFTERTEST);
-   }
-
-   private void resetThreadTime() {
+   public void resetThreadTime() {
       synchronized (this.threadTime) {
          this.threadTime = new Date();
       }
    }
+
+
+   /**
+    * Return the current thread time.
+    *
+    * @return current thread time
+    */
 
    public Date getThreadTime() {
       Date tmp = null;
@@ -275,21 +283,59 @@ public class EventLoop implements Runnable {
       return tmp;
    }
 
-   private void processEvents(ArrayList<Event> events, WebElement parent) {
-      int event_count = events.size() - 1;
 
-      for (int i = 0; i <= event_count; i++) {
+   /**
+    * Run a sequence of events.
+    *
+    * @param events  {@link ArrayList} of {@link Event} from the test script
+    * @param parent  parent element if process child events
+    */
+
+   private void processEvents(ArrayList<Event> events, WebElement parent) {
+      for (Event event: events) {
          if (isStopped()) {
             break;
          }
 
-         handleSingleEvent(events.get(i), parent);
+         handleSingleEvent(event, parent);
       }
    }
 
-   private boolean handleSingleEvent(Event event, WebElement parent) {
-      event.execute();
 
+   /**
+    * Thread entry point.
+    *
+    * Initialize thread state and run the events of this test file.
+    */
+
+   public void run() {
+      System.out.printf("Thread Running...\n");
+      this.threadTime = new Date();
+
+      this.firePlugin(null, PluginEvent.BEFORETEST);
+
+      processEvents(this.testEvents, null);
+
+      this.firePlugin(null, PluginEvent.AFTERTEST);
+   }
+
+
+   /**
+    * Execute one {@link Event}.
+    *
+    * @param event   the {@link Event} to execute
+    * @param parent  parent element, if currently executing children
+    * @return whether the event was successful
+    */
+
+   private boolean handleSingleEvent(Event event, WebElement parent) {
+      boolean result;
+      this.resetThreadTime();
+      event.setEventLoop(this);
+      result = event.execute();
+      this.resetThreadTime();
+
+      return result;
 
 
 
@@ -297,15 +343,8 @@ public class EventLoop implements Runnable {
 
 
       //private boolean handleSingleEvent(VDDHash event, WebElement parent) {
-      boolean result = false;
-      WebElement element = null;
       //Elements type = Elements.valueOf(event.get("type").toString());
 
-      if (isStopped()) {
-         return result;
-      }
-
-      this.resetThreadTime();
 
       // switch (type) {
       // case BROWSER:
@@ -316,9 +355,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case TBODY:
       //    element = tbodyEvent(event, parent);
-      //    break;
-      // case PUTS:
-      //    result = putsEvent(event);
       //    break;
       // case WAIT:
       //    result = waitEvent(event);
@@ -446,15 +482,12 @@ public class EventLoop implements Runnable {
       // }
 
       // this.firePlugin(null, type, PluginEvent.AFTEREVENT);
-      this.resetThreadTime();
 
       // if (element != null) {
       //    this.saveElement(event, element);
       // }
 
       // this.assertPage(event);
-
-      return result;
    }
 
 
@@ -2170,6 +2203,9 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+
+   ////////////////////////////////////////////////////////////
+   // delete me
    private String replaceString(String str) {
       String result = str;
       Pattern patt = null;
@@ -2200,6 +2236,9 @@ public class EventLoop implements Runnable {
 
       return result;
    }
+   ////////////////////////////////////////////////////////////
+
+
 
    private WebElement divEvent(VDDHash event, WebElement parent) {
       boolean required = true;
@@ -3660,23 +3699,6 @@ public class EventLoop implements Runnable {
       this.resetThreadTime();
       this.report.Log("Finished password event.");
       return element;
-   }
-
-   private boolean putsEvent(VDDHash event) {
-      boolean result = false;
-      String msg = "";
-
-      if (event.containsKey("txt")) {
-         msg = this.replaceString(event.get("txt").toString());
-      } else {
-         msg = this.replaceString(event.get("text").toString());
-      }
-
-      this.resetThreadTime();
-      this.report.Log(msg);
-      result = true;
-      this.resetThreadTime();
-      return result;
    }
 
    private void checkDisabled(VDDHash event, WebElement element) {
