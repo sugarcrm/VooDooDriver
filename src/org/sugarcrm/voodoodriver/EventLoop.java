@@ -222,28 +222,8 @@ public class EventLoop implements Runnable {
       return this.sodaVars;
    }
 
-   public void appedSodaVars(VDDHash vars) {
-      int len = 0;
-
-      if (vars == null) {
-         return;
-      }
-
-      len = vars.keySet().size() - 1;
-      for (int i = 0; i <= len; i++) {
-         String name = vars.keySet().toArray()[i].toString();
-         String value = vars.get(name).toString();
-         this.sodaVars.put(name, value);
-      }
-
-   }
-
    public boolean isAlive() {
       return this.runner.isAlive();
-   }
-
-   public Thread getThread() {
-      return this.runner;
    }
 
    public void stop() {
