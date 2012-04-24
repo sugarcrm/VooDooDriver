@@ -360,17 +360,11 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
-      // case BROWSER:
-      //    result = browserEvent(event, parent);
-      //    break;
       // case THEAD:
       //    element = theadEvent(event, parent);
       //    break;
       // case TBODY:
       //    element = tbodyEvent(event, parent);
-      //    break;
-      // case WAIT:
-      //    result = waitEvent(event);
       //    break;
       // case TEXTFIELD:
       //    element = textfieldEvent(event, parent);
@@ -2652,47 +2646,6 @@ public class EventLoop implements Runnable {
       this.report.Log("CSV event finished.");
 
       this.resetThreadTime();
-      return result;
-   }
-
-   private boolean waitEvent(VDDHash event) {
-      boolean result = false;
-      int default_timeout = 5;
-
-      this.resetThreadTime();
-      this.report.Log("Starting Wait event.");
-
-      if (event.containsKey("timeout")) {
-         Integer int_out = new Integer(event.get("timeout").toString());
-         default_timeout = int_out.intValue();
-         this.report.Log(String.format("Setting timeout to: %d seconds.",
-               default_timeout));
-      } else {
-         this.report.Log(String.format("default timeout: %d seconds.",
-               default_timeout));
-      }
-
-      default_timeout = default_timeout * 1000;
-
-      try {
-         this.report.Log(String.format("waiting: '%d' seconds.",
-               (default_timeout / 1000)));
-         int wait_seconds = default_timeout / 1000;
-
-         for (int i = 0; i <= wait_seconds - 1; i++) {
-            if (isStopped()) {
-               break;
-            }
-            Thread.sleep(1000);
-         }
-
-         result = true;
-      } catch (InterruptedException exp) {
-         result = false;
-      }
-
-      this.resetThreadTime();
-      this.report.Log("Wait event finished.");
       return result;
    }
 

@@ -142,10 +142,10 @@
    </var>
 
    <wait>
-       <selectors>
+       <actions>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">condition</accessor>
-      </selectors>
+      </actions>
    </wait>
 
    <whitelist>

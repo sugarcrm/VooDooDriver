@@ -127,6 +127,7 @@ public abstract class Event {
       } else if (tagName.equals("timestamp")) {
       } else if (tagName.equals("var")) {
       } else if (tagName.equals("wait")) {
+         event = new Wait(element);
       } else if (tagName.equals("whitelist")) {
       } else if (tagName.equals("alert")) {
       } else if (tagName.equals("div")) {
