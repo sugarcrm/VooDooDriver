@@ -234,6 +234,7 @@
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
+         <accessor type="boolean">required</accessor>
       </soda_attributes>
    </span>
 
