@@ -1,4 +1,23 @@
 ===============================================================================
+2012-04-26  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+This merge consists of one change: adding the 'required' attribute to
+the <span> event.
+
+= New Features =
+
+ * <span> event now has the require attribute
+
+= Bugs Fixed =
+
+ * 52518: Please enable the required attribute for the span tag.
+
+= All Changes =
+
+600c578 Add 'required' attribute to <span> event
+
+
+===============================================================================
 2012-04-16  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 This merge primarily consisted of bug fixes.  Some amount of cleanup
