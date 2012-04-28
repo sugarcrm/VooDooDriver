@@ -94,6 +94,16 @@ public abstract class Event {
 
 
    /**
+    * The WebElement corresponding to this event.
+    *
+    * VDD-type events have no element, and not all HTML events will,
+    * either.  In those cases, element will be null.
+    */
+
+   protected WebElement element;
+
+
+   /**
     * Factory method to create and return the appropriate Event subclass.
     *
     * @param element  the DOM Element from the test script for this event
@@ -108,8 +118,8 @@ public abstract class Event {
       Event event = new TestEvent(element); // XXX temporary
       String tagName = element.getTagName().toLowerCase();
 
-      if (tagName.equals("arg")) {
-      } else if (tagName.equals("attach")) {
+      if (tagName.equals("attach")) {
+         event = new Attach(element);
       } else if (tagName.equals("assert")) {
       } else if (tagName.equals("browser")) {
          event = new Browser(element);
@@ -334,6 +344,7 @@ public abstract class Event {
       this.testEvent = testEvent;
       this.selectors = new VDDHash();
       this.actions = new VDDHash();
+      this.element = null;
 
       compileEvent(testEvent);
    }
@@ -407,12 +418,34 @@ public abstract class Event {
 
 
    /**
+    * Retreive this Event's WebElement.
+    *
+    * @return this Event's WebElement or null
+    */
+
+   public WebElement getElement() {
+      return this.element;
+   }
+
+
+   /**
     * Execute this Event.
     *
     * @throws VDDException if event execution is unsuccessful
     */
 
    public abstract void execute() throws VDDException;
+
+
+   /**
+    * Method to execute after all children have finished.
+    *
+    * This is used by EventLoop for those events with children.
+    *
+    * @throws VDDException if an error occurs
+    */
+
+   public void afterChildren() throws VDDException {}
 
 
    /**

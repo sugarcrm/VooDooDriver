@@ -130,14 +130,27 @@ public class EventLoop implements Runnable {
 
 
    /**
-    * Sets the timeout in seconds for the Attach command to give up on retrying
-    * to find the wanted window to attach to.
+    * Set the attach timeout.
+    *
+    * The attach timeout is the time in seconds after which the Attach
+    * event will give up retrying to find the window to attach to.
     *
     * @param timeout int
     */
 
    public void setAttachTimeout(int timeout) {
       this.attachTimeout = timeout;
+   }
+
+
+   /**
+    * Retrieve the attach timeout.
+    *
+    * @return the attach timeout
+    */
+
+   public int getAttachTimeout() {
+      return this.attachTimeout;
    }
 
 
@@ -171,7 +184,7 @@ public class EventLoop implements Runnable {
     *
     * @param hwnd {@link String}
     */
-   private void setCurrentHWND(String hwnd) {
+   public void setCurrentHWND(String hwnd) {
       this.currentHWnd = hwnd;
    }
 
@@ -339,6 +352,10 @@ public class EventLoop implements Runnable {
 
       try {
          event.execute();
+         if (event.hasChildren()) {
+            processEvents(event.getChildren(), event.getElement());
+         }
+         event.afterChildren();
       } catch (VDDException e) {
          this.report.ReportError("Exception during event execution");
          this.report.ReportException(e);
@@ -392,9 +409,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case DIV:
       //    element = divEvent(event, parent);
-      //    break;
-      // case ATTACH:
-      //    result = attachEvent(event);
       //    break;
       // case TABLE:
       //    element = tableEvent(event, parent);
@@ -2047,168 +2061,6 @@ public class EventLoop implements Runnable {
       return element;
    }
 
-   private boolean attachEvent(VDDHash event) {
-      boolean result = false;
-      Set<String> handles = null;
-      int len = 0;
-      boolean use_URL = false;
-      boolean is_REGEX = false;
-      String finder = "";
-      String found_handle = null;
-      String msg = "";
-      int timeout = 10;
-      int index = -1;
-
-      try {
-         this.report.Log("Attach event starting.");
-         String currentWindow = this.Browser.getDriver().getWindowHandle();
-         this.report.Log(String.format("Current Window Handle: '%s'.",
-               currentWindow));
-
-         if (event.containsKey("index")) {
-            use_URL = false;
-            String tmp_index = event.get("index").toString();
-            tmp_index = this.replaceString(tmp_index);
-            if (!Utils.isInt(tmp_index)) {
-               msg = String.format("Error: index is not an integer: '%s'!", tmp_index);
-               this.report.ReportError(msg);
-               this.report.Log("Attach event finished.");
-               return false;
-            }
-
-            timeout = 0; // causes the for loop to do nothing this is a hack. should make this method better later ... //
-            index = Integer.valueOf(tmp_index);
-            finder = tmp_index;
-         }else if (event.containsKey("url")) {
-            use_URL = true;
-            finder = event.get("url").toString();
-         } else {
-            use_URL = false;
-            finder = event.get("title").toString();
-         }
-
-         finder = this.replaceString(finder);
-
-         if (this.report.isRegex(finder)) {
-            is_REGEX = true;
-         }
-
-         for (int timer = 0; timer <= timeout; timer++) {
-            handles = this.Browser.getDriver().getWindowHandles();
-            len = handles.size() - 1;
-            for (int i = 0; i <= len; i++) {
-               String tmp_handle = handles.toArray()[i].toString();
-               String tmp_url = this.Browser.getDriver().switchTo()
-                     .window(tmp_handle).getCurrentUrl();
-               String tmp_title = this.Browser.getDriver().switchTo()
-                     .window(tmp_handle).getTitle();
-               this.report.Log(String.format("[%d]: Window Handle: '%s'", i,
-                     tmp_handle));
-               this.report.Log(String.format("[%d]: Window Title: '%s'", i,
-                     tmp_title));
-               this.report.Log(String.format("[%d]: Window URL: '%s'", i,
-                     tmp_url));
-
-               if (!is_REGEX) {
-                  if (!use_URL) {
-                     if (tmp_title.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format(
-                              "Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     if (tmp_url.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
-               } else {
-                  if (!use_URL) {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_title);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_url);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
-               }
-            } // end for loop //
-
-            if (found_handle != null) {
-               break;
-            }
-            Thread.sleep(1000);
-         } // end timer loop //
-
-
-         if (index != -1) {
-            handles = this.Browser.getDriver().getWindowHandles();
-            len = handles.size() -1;
-
-            if (index > len) {
-               msg = String.format("Error: index: '%d' is greater then the number of windows found: '%d'!",
-                     index, len);
-               found_handle = null;
-            } else {
-               found_handle = handles.toArray()[index].toString();
-            }
-         }
-
-         if (found_handle == null) {
-            msg = String.format("Failed to find window matching: '%s!'", finder);
-            this.report.ReportError(msg);
-            result = false;
-            this.Browser.getDriver().switchTo().window(currentWindow);
-            Thread.sleep(2000); // helps control when the page is loaded, might
-                                 // remove this later... //
-            return result;
-         }
-
-         this.Browser.getDriver().switchTo().window(found_handle);
-         this.setCurrentHWND(found_handle);
-         msg = String.format("Switching to window handle: '%s'.", found_handle);
-         this.report.Log(msg);
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), null);
-         }
-
-         this.Browser.setBrowserOpened();
-         this.Browser.getDriver().switchTo().window(currentWindow);
-         this.setCurrentHWND(currentWindow);
-         msg = String.format("Switching back to window handle: '%s'.",
-               currentWindow);
-         this.report.Log(msg);
-
-         if (this.attachTimeout > 0) {
-            long tout = this.attachTimeout * 1000;
-            Thread.currentThread();
-            msg = String.format(
-                  "Waiting '%s' seconds before executing next event.",
-                  this.attachTimeout);
-            this.report.Log(msg);
-            Thread.sleep(tout);
-         }
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
-
-      this.report.Log("Attach event finished.");
-
-      return result;
-   }
 
 
    ////////////////////////////////////////////////////////////
