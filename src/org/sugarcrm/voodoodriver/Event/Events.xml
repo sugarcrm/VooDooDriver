@@ -409,6 +409,7 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
       </actions>
    </ul>
