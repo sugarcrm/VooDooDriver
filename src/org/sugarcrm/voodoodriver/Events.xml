@@ -412,6 +412,7 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
       </soda_attributes>
    </ul>

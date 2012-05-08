@@ -860,6 +860,15 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: "
+                            + event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
          }
