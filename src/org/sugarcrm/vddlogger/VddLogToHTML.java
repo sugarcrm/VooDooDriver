@@ -552,7 +552,7 @@ public class VddLogToHTML {
       rowData[0] = generateDateTime (line);
       rowData[1] = "Log";
 
-      String[] msgData = message.split(":");
+      String[] msgData = message.split(":", 2);
       String temp = msgData[0].substring(msgData[0].indexOf("'"), msgData[0].indexOf("by")-1);
       msgData[0] = msgData[0].replaceFirst(temp, "<b>"+temp+"</b> ");
       msgData[1] = msgData[1].replaceFirst("'", "<b>'");
