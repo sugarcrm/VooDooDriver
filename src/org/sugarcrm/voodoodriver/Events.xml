@@ -179,6 +179,7 @@
          <accessor type="boolean">exist</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">required</accessor>
       </soda_attributes>
    </alert>
 

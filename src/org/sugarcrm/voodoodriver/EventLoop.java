@@ -611,6 +611,7 @@ public class EventLoop implements Runnable {
       boolean alert_var = false;
       boolean exists = true;
       boolean user_exists_true = false;
+      boolean required = true;
       String msg = "";
       String alert_text = "";
 
@@ -618,7 +619,7 @@ public class EventLoop implements Runnable {
 
       if (!event.containsKey("alert") && !event.containsKey("exists")) {
          result = false;
-         this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
+         this.report.ReportError("Alert event missing alert attribute!");
          return result;
       }
 
@@ -636,6 +637,11 @@ public class EventLoop implements Runnable {
          if (exists) {
             user_exists_true = true;
          }
+      }
+
+      if (event.containsKey("required")) {
+         String s = (String)event.get("required");
+         required = this.clickToBool(this.replaceString(s));
       }
 
       try {
@@ -668,7 +674,7 @@ public class EventLoop implements Runnable {
          }
 
          if (user_exists_true) {
-            this.report.Assert("Alert dialog does eixts.", true, true);
+            this.report.Assert("Alert dialog does exist.", true, true);
          }
 
          handleVars(alert_text, event);
@@ -679,11 +685,11 @@ public class EventLoop implements Runnable {
          result = true;
       } catch (NoAlertPresentException exp) {
          if (!exists) {
-            msg = String.format("Alert dialog does next exist as expected.",
+            msg = String.format("Expected alert dialog does not exist.",
                   exists);
             this.report.Assert(msg, false, false);
             result = true;
-         } else {
+         } else if (required) {
             this.report.ReportError("Error: No alert dialog found!");
             result = false;
          }
