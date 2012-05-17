@@ -157,20 +157,24 @@ public class EventLoader {
       VDDHash hash = new VDDHash();
 
       for (int i = 0; i < nodes.getLength(); i++) {
-         String node_name = nodes.item(i).getNodeName();
-         if (node_name == "#text") {
+         Node node = nodes.item(i);
+         String nodeName = node.getNodeName();
+
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
             continue;
          }
 
-         if (node_name != "action") {
-            String value = nodes.item(i).getTextContent();
+         if (nodeName.equals("accessor")) {
+            String value = node.getTextContent();
             if (value.isEmpty() || value.startsWith("\n")) {
                continue;
             }
-            hash.put(value, 0);
-         } else {
+            
+            hash.put(value,
+                     node.getAttributes().getNamedItem("type").getNodeValue());
+         } else if (nodeName.equals("action")) {
             VDDHash act_hash = new VDDHash();
-            NodeList actions = nodes.item(i).getChildNodes();
+            NodeList actions = node.getChildNodes();
             int actlen = actions.getLength() -1;
 
             for(int x = 0; x <= actlen; x++) {
@@ -181,7 +185,7 @@ public class EventLoader {
                   act_hash.put(act_name, act);
                }
             }
-            hash.put(node_name, act_hash);
+            hash.put(nodeName, act_hash);
          }
       }
 

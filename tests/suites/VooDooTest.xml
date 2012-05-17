@@ -27,6 +27,7 @@
 
 <soda>     
    <script file="tests/test-scripts/tests/browser.xml"/>
+   <script file="tests/test-scripts/tests/find-elements.xml"/>
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
    <script file="tests/test-scripts/tests/radio-test.xml"/>
    <script file="tests/test-scripts/tests/field-test.xml"/>

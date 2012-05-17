@@ -120,7 +120,6 @@ public abstract class Event {
 
       if (tagName.equals("attach")) {
          event = new Attach(element);
-      } else if (tagName.equals("assert")) {
       } else if (tagName.equals("browser")) {
          event = new Browser(element);
       } else if (tagName.equals("csv")) {
@@ -184,17 +183,6 @@ public abstract class Event {
       return event;
    }
 
-   /////////////////////////////////////////////////////
-   // XXX: This code will be used during element search:
-   // /* Fill out HTML tag/type information, if applicable. */
-   // VDDHash type = getSodaElement((Elements)map.get("type"));
-   // String htmlAttrs[] = {"html_tag", "html_type"};
-   // for (String attr: htmlAttrs) {
-   //    if (type.get(attr) != null) {
-   //       map.put(attr, type.get(attr));
-   //    }
-   // }
-   /////////////////////////////////////////////////////
 
    /**
     * Determine whether this attribute is valid for this event.
@@ -245,6 +233,25 @@ public abstract class Event {
 
 
    /**
+    * Determine whether a selector is a boolean value.
+    *
+    * @param event  name of this event
+    * @param sel    name of the selector
+    */
+
+   private boolean isBoolean(String event, String sel) {
+      VDDHash thisEvent = (VDDHash)allowedEvents.get(event);
+      VDDHash sels = (VDDHash)thisEvent.get("selectors");
+      if (sels == null || !sels.containsKey(sel)) {
+         return false;
+      }
+      String type = (String)sels.get(sel);
+
+      return type.equals("boolean");
+   }
+
+
+   /**
     * Convert the event from the test file into event actions.
     *
     * @param tev  the event as specified in the test script
@@ -258,7 +265,13 @@ public abstract class Event {
       for (int k = 0; k < tev.getAttributes().getLength(); k++) {
          Node attr = tev.getAttributes().item(k);
          String name = attr.getNodeName();
-         String value = attr.getNodeValue();
+         Object value = null;
+
+         if (isBoolean(nodeName, name)) {
+            value = toBoolean(attr.getNodeValue());
+         } else {
+            value = attr.getNodeValue();
+         }
 
          if (isselector(nodeName, name)) {
             selectors.put(name, value);
@@ -269,6 +282,16 @@ public abstract class Event {
                                    "for '" + tev.getNodeName() + "' event");
          }
       }
+
+      /* HTML tag/type for HTML events */
+      VDDHash e = (VDDHash)this.allowedEvents.get(nodeName);
+      String htmlAttrs[] = {"html_tag", "html_type"};
+      for (String attr: htmlAttrs) {
+         if (e.containsKey(attr)) {
+            selectors.put(attr, e.get(attr));
+         }
+      }
+
 
       /////////////////////////////////////////////////////////////////
       // ***** Events that need special handling  *****
@@ -483,6 +506,30 @@ public abstract class Event {
    }
 
 
+   /**
+    * Convert a string into a boolean.
+    *
+    * If the string is 'true' or 'false', it is converted to the
+    * corresponding boolean.  If the string is '0', it is converted to
+    * false; if it is a non-zero integer, it is converted to true.  If
+    * it doesn't fall into any of those categories, it is converted to
+    * false.
+    *
+    * @param s  the string to convert
+    * @return boolean representation of that string
+    */
+
+   protected boolean toBoolean(String s) {
+      if (s == null) {
+         return false;
+      }
+
+      try {
+         return Integer.valueOf(s) != 0;
+      } catch (NumberFormatException e) {}
+
+      return Boolean.valueOf(s);
+   }
 
 
    /*
@@ -507,6 +554,11 @@ public abstract class Event {
     *    title           string   attach,filefield
     *    value           string   * [missing from many]
     *    xpath           string   *
+    *
+    * Actions used during findElement:
+    *    required        boolean  *
+    *    exists          boolean  *
+    *    timeout         integer  *
     *
     * Actions:
     *
@@ -557,6 +609,10 @@ public abstract class Event {
     *    var             string   *
     *    vartext         string   span
     *
+    * Actions listed in Events.xml that aren't used by any event:
+    *
+    *    exist
+    *    jswait
     */
 
 }

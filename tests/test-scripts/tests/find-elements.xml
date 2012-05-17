@@ -1,0 +1,143 @@
+<!--
+  Copyright (c) 2012, SugarCRM, Inc.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  * Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  * Neither the name of SugarCRM, Inc. nor the
+  names of its contributors may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL SugarCRM, Inc. BE LIABLE FOR ANY
+  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<!-- Unit test for findElement
+
+     The possible combinations are:
+     Modifiers:
+        exists
+        required
+        index
+     Selenium selectors:
+        class
+        css
+        id
+        name
+        value
+        xpath
+     VDD selectors:
+        title  [filefield]
+        action [form]
+        method [form]
+        alt    [image]
+        for    [label]
+        href   [link]
+-->
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/find-elements.html"/>
+
+   <!-- positive tests, no modifier -->
+
+   <puts text="Find by class"/>
+   <link click="false" class="class_1"/>
+
+   <puts text="Find by css"/>
+   <link click="false" css="a[class=&quot;css_1&quot;]"/>
+
+   <puts text="Find by id"/>
+   <link click="false" id="id_1"/>
+
+   <puts text="Find by name"/>
+   <link click="false" name="name_1"/>
+
+   <!-- value -->
+
+   <puts text="Find by xpath"/>
+   <link click="false" xpath="/html/body/div/a"/>
+
+   <!-- title -->
+   <!-- action -->
+   <!-- method -->
+   <!-- alt -->
+   <!-- for -->
+
+   <puts text="Find by href"/>
+   <link click="false" href="{@global.url}/tests/test-data/find-elements.html"/>
+
+   <!-- positive tests, modifier -->
+
+   <puts text="Find by id, exists=true, element exists"/>
+   <link click="false" id="id_1" exists="true"/>
+
+   <puts text="Find by id, exists=false, required=false, element does not exist"/>
+   <link click="false" id="id_0" exists="false" required="false"/>
+
+   <puts text="Find by id, required=true, element exists"/>
+   <link click="false" id="id_1" required="true"/>
+
+   <puts text="Find by id, required=false, element exists"/>
+   <link click="false" id="id_1" required="false"/>
+
+   <puts text="Find by id, required=false, element does not exist"/>
+   <link click="false" id="id_0" required="false"/>
+
+   <puts text="Find by name, index=1"/>
+   <link click="false" name="name_2" index="1"/>
+
+   <!-- negative tests, no modifier -->
+
+   <puts text="Find by class, FAIL"/>
+   <link click="false" class="class_0"/>
+
+   <puts text="Find by css, FAIL"/>
+   <link click="false" css="a[class=&quot;css_0&quot;]"/>
+
+   <puts text="Find by id, FAIL"/>
+   <link click="false" id="id_0"/>
+
+   <puts text="Find by name, FAIL"/>
+   <link click="false" name="name_0"/>
+
+   <!-- value -->
+
+   <puts text="Find by xpath, FAIL"/>
+   <link click="false" xpath="/html/body/div/XXX"/>
+
+   <!-- title -->
+   <!-- action -->
+   <!-- method -->
+   <!-- alt -->
+   <!-- for -->
+
+   <puts text="Find by href, FAIL"/>
+   <link click="false" href="not here"/>
+
+   <!-- negative tests, modifier -->
+
+   <puts text="Find by id, exists=true, element does not exist, FAIL"/>
+   <link click="false" id="id_0" exists="true"/>
+
+   <puts text="Find by id, exists=false, element exists, FAIL"/>
+   <link click="false" id="id_1" exists="false"/>
+
+   <puts text="Find by id, required=true, FAIL"/>
+   <link click="false" id="id_0" required="true"/>
+
+   <puts text="Find by name, index=2, FAIL"/>
+   <link click="false" name="name_2" index="2"/>
+
+</voodoo>

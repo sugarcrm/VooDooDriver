@@ -17,6 +17,7 @@
 package org.sugarcrm.voodoodriver.Event;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.sugarcrm.voodoodriver.PluginEvent;
 import org.sugarcrm.voodoodriver.VDDException;
@@ -337,7 +338,16 @@ class HtmlEvent extends Event {
     */
 
    protected WebElement findElement() {
-      return null;
+      ElementFinder ef = new ElementFinder();
+      ef.setBrowser(this.eventLoop.Browser);
+      ef.setSelectors(this.selectors);
+      ef.setReporter(this.eventLoop.report);
+      if (this.parent != null) {
+         ef.setParentElement(this.parent);
+      }
+      ef.setEventName(this.testEvent.getNodeName().toLowerCase());
+
+      return ef.findElement();
    }
 
 
@@ -358,6 +368,16 @@ class HtmlEvent extends Event {
     */
 
    public void execute() throws VDDException {
+      /*
+       * Replace all var/hijack strings in the selectors.
+       */
+      for (String key: this.selectors.keySet()) {
+         Object val = this.selectors.get(key);
+         if (val instanceof String) {
+            this.selectors.put(key, replaceString((String)val));
+         }
+      }
+
       this.element = findElement();
       if (this.element == null) {
          return;
@@ -371,9 +391,9 @@ class HtmlEvent extends Event {
        * whether that action was specified.
        */
 
-      for (Pair<String,Action> action: this.actions) {
+      // for (Pair<String,Action> action: this.actions) {
          
-      }
+      // }
 
    }
 }

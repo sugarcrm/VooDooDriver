@@ -395,9 +395,6 @@ public class EventLoop implements Runnable {
       // case CSV:
       //    result = csvEvent(event);
       //    break;
-      // case LINK:
-      //    element = linkEvent(event, parent);
-      //    break;
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
       //    break;
@@ -2672,302 +2669,15 @@ public class EventLoop implements Runnable {
       return element;
    }
 
+
+   /////////////////////// delete me /////////////////////////////////////
+
    private WebElement findElement(VDDHash event, WebElement parent,
          boolean required) {
-      WebElement element = null;
-      By by = null;
-      boolean href = false;
-      boolean value = false;
-      boolean exists = true;
-      String how = "";
-      String what = "";
-      int index = -1;
-      int timeout = 5;
-      String msg = "";
-
-      if (event.containsKey("exists")) {
-         exists = this.clickToBool(event.get("exists").toString());
-      }
-
-      if (event.containsKey("timeout")) {
-         timeout = Integer.valueOf(event.get("timeout").toString());
-         msg = String.format("Resetting default element finding timeout to: '%d' seconds.",
-               timeout);
-         this.report.Log(msg);
-      }
-
-      if (event.containsKey("index")) {
-         String inx = event.get("index").toString();
-         inx = this.replaceString(inx);
-
-         if (!Utils.isInt(inx)) {
-            msg = String.format("Error: index value: '%s' is not an integer!",inx);
-            this.report.ReportError(msg);
-            return null;
-         }
-
-         index = Integer.valueOf(inx).intValue();
-      }
-
-      this.resetThreadTime();
-
-      try {
-         msg = "";
-         how = event.get("how").toString();
-         what = event.get(how).toString();
-         what = this.replaceString(what);
-         String dowhat = event.get("do").toString();
-
-         if (index > -1) {
-            msg = String.format("Trying to find page element '%s' by: '%s' => '%s' index => '%s'.",
-                        dowhat, how, what, index);
-         } else {
-            msg = String.format(
-                  "Trying to find page element '%s' by: '%s' => '%s'.", dowhat,
-                  how, what);
-         }
-         this.report.Log(msg);
-
-         if (how.matches("class") && what.matches(".*\\s+.*")) {
-            String elem_type = event.get("do").toString();
-            String old_how = how;
-            how = "css";
-            String css_sel = String.format("%s[%s=\"%s\"]", elem_type, old_how,
-                  what);
-            what = css_sel;
-         }
-
-         if (how.contains("index")) {
-            how = "tagname";
-            what = event.get("do").toString();
-
-            if (what.contains("link")) {
-               what = "a";
-            }
-
-            if (what.contains("image")) {
-               what = "img";
-            }
-         }
-
-         switch (ElementHow.valueOf(how.toUpperCase())) {
-         case ID:
-            by = By.id(what);
-            break;
-         case CLASS:
-            by = By.className(what);
-            break;
-         case CSS:
-            by = By.cssSelector(what);
-            break;
-         case LINK:
-            by = By.linkText(what);
-            break;
-         case HREF:
-            by = By.tagName("a");
-            href = true;
-            break;
-         case TEXT:
-            by = By.linkText(what);
-            break;
-         case NAME:
-            by = By.name(what);
-            break;
-         case PARLINK:
-            by = By.partialLinkText(what);
-            break;
-         case TAGNAME:
-            by = By.tagName(what);
-            break;
-         case XPATH:
-            by = By.xpath(what);
-            break;
-         case VALUE:
-            value = true;
-            break;
-         default:
-            this.report.ReportError(String.format("Error: findElement, unknown how: '%s'!\n", how));
-            System.exit(4);
-            break;
-         }
-
-         if (href) {
-            element = this.findElementByHref(event.get("href").toString(),
-                  parent);
-         } else if (value) {
-            element = this.slowFindElement(event.get("do").toString(), what,
-                  parent, index);
-         } else {
-            List<WebElement> elements;
-
-            if (parent == null) {
-               elements = this.Browser.findElements(by, timeout);
-            } else {
-               elements = parent.findElements(by);
-            }
-            elements = filterElements(elements, event);
-            index = (index < 0) ? 0 : index;
-            if (index >= elements.size()) {
-               String m = ((index > 0) ?
-                           "No elements found." :
-                           String.format("Index (%d) out of bounds.", index));
-               throw new NoSuchElementException(m);
-            }
-            element = elements.get(index);
-         }
-      } catch (NoSuchElementException exp) {
-         if (required && exists) {
-            this.report.ReportError("Failed to find element! " + exp);
-            element = null;
-         }
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         element = null;
-      }
-
-      this.resetThreadTime();
-
-      if (element == null && exists == true) {
-         if (required) {
-            msg = String.format("Failed to find element: '%s' => '%s'", how,
-                  what);
-            this.report.ReportError(msg);
-         } else {
-            msg = String.format("Failed to find element, but required => 'false' : '%s' => '%s'",
-                        how, what);
-            this.report.Log(msg);
-         }
-      } else if (element != null && exists != true) {
-         this.report.ReportError("Found element with exist => 'false'!");
-      } else if (element == null && exists != true) {
-         this.report.Log("Did not find element as exist => 'false'.");
-      } else {
-         this.report.Log("Found element.");
-      }
-
-      return element;
+      // Code moved to ElementFinder.java
+      return null;
    }
 
-   /**
-    * Determine whether tag is found in filter
-    *
-    * @param tag    HTML tag to search for
-    * @param filter list of acceptable HTML tags
-    * @return true if tag is in filter, false otherwise
-    */
-
-   private boolean checkMatch(String tag, String filter) {
-      if (filter == null) {
-         return true;
-      } else if (tag == null) {
-         return false;
-      }
-      String filters[] = filter.split("\\|");
-      for (int k = 0; k < filters.length; k++) {
-         if (tag.equals(filters[k])) {
-            return true;
-         }
-      }
-      return false;
-   }
-
-   /**
-    * Filter elements by HTML element type
-    *
-    * Take a list of {@link WebElement}s found using the event selection
-    * criteria and filter through by HTML tag type.
-    *
-    * @param elements  element list returned based on event
-    * @param event     current event
-    * @return list of elements filtered by HTML tag
-    */
-
-   private List<WebElement> filterElements(List<WebElement> elements,
-                                           VDDHash event) {
-      ArrayList<WebElement> filtered =
-         new ArrayList<WebElement>(elements.size());
-      String html_tag = (String)event.get("html_tag");
-      String html_type = (String)event.get("html_type");
-
-      for (int k = 0; k < elements.size(); k++) {
-         WebElement e = elements.get(k);
-         if (checkMatch(e.getTagName(), html_tag) &&
-             checkMatch(e.getAttribute("type"), html_type)) {
-            filtered.add(e);
-         }
-      }
-
-      return filtered;
-   }
-
-   @SuppressWarnings("unchecked")
-   private WebElement slowFindElement(String ele_type, String how,
-         WebElement parent, int index) {
-      WebElement element = null;
-      ArrayList<WebElement> list = new ArrayList<WebElement>();
-      String msg = "";
-      String js = "";
-
-      msg = String.format("Looking for elements by value is very very slow!  You should never do this!");
-      this.report.Log(msg);
-      msg = String.format("Looking for element: '%s' => '%s'.", ele_type, how);
-      this.report.Log(msg);
-
-      if (how.contains("OK")) {
-         System.out.print("");
-      }
-
-      if (ele_type.contains("button")) {
-         js = String.format(
-               "querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"
-               + "input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);",
-               how, how, how, how);
-      } else {
-         js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)",
-               ele_type, how, ele_type, how);
-      }
-
-      if (parent == null) {
-         js = "return document." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, null);
-      } else {
-         js = "return arguments[0]." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, parent);
-      }
-
-      if (index < 0) {
-         element = list.get(0);
-      } else {
-         element = list.get(index);
-      }
-
-      return element;
-   }
-
-   private WebElement findElementByHref(String href, WebElement parent) {
-      WebElement element = null;
-      List<WebElement> list = null;
-
-      href = this.replaceString(href);
-
-      if (parent != null) {
-         list = parent.findElements(By.tagName("a"));
-      } else {
-         list = this.Browser.getDriver().findElements(By.tagName("a"));
-      }
-
-      int len = list.size() - 1;
-      for (int i = 0; i <= len; i++) {
-         String value = list.get(i).getAttribute("href");
-
-         if (value != null && href.compareTo(value) == 0) {
-            element = list.get(i);
-            break;
-         }
-      }
-
-      return element;
-   }
 
    /*
     * clickToBool -- method This method converts a string into a boolean type.
@@ -2993,6 +2703,9 @@ public class EventLoop implements Runnable {
 
       return result;
    }
+
+
+   /////////////////////// stop deleting me /////////////////////////////
 
 
    /**
