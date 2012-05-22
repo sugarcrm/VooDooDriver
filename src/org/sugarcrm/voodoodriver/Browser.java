@@ -318,28 +318,6 @@ public abstract class Browser {
 
 
    /**
-    * Find an element in the browser's DOM.
-    *
-    * @param by         element selection criteria
-    * @param retryTime  time limit (in seconds) for retries
-    *
-    * @return the {@link WebElement} if found or null
-    */
-
-   public WebElement findElement(By by, int retryTime) {
-      long end = System.currentTimeMillis() + retryTime * 1000;
-
-      do {
-         try {
-            return this.Driver.findElement(by);
-         } catch (Exception exp) {}
-      } while (System.currentTimeMillis() < end);
-
-      return null;
-   }
-
-
-   /**
     * Find more then one element in the browser's DOM.
     *
     * @param by         element selection criteria
@@ -358,61 +336,6 @@ public abstract class Browser {
       } while (System.currentTimeMillis() < end);
 
       throw new NoSuchElementException("Failed to find element by " + by);
-   }
-
-
-   /**
-    * Find an element in the browser's DOM using expanded search criteria.
-    *
-    * @param by         element selection criteria
-    * @param retryTime  time limit (in seconds) for retries
-    * @param index      index into the list of elements found
-    * @param required   whether this element must be found
-    * @param exists     whether this element exists
-    * @return the {@link WebElement} found
-    */
-
-   public WebElement findElements(By by, int retryTime, int index,
-                                  boolean required, boolean exists) {
-      WebElement result = null;
-      List<WebElement> elements = null;
-      int len = 0;
-      String msg = "";
-
-      long end = System.currentTimeMillis() + retryTime * 1000;
-
-      while (System.currentTimeMillis() < end) {
-         try {
-            elements = this.Driver.findElements(by);
-            len = elements.size() -1;
-            if (len >= index) {
-               result = elements.get(index);
-            }
-         } catch (ElementNotFoundException expnot) {
-            if (exists) {
-               this.reporter.ReportError("Failed to find element!");
-            } else {
-               break;
-            }
-         } catch (Exception exp) {
-            result = null;
-            this.reporter.ReportException(exp);
-         }
-
-         if (result != null) {
-            break;
-         }
-      }
-
-      if (exists) {
-         if (len < index && result == null && required != false) {
-            msg = String.format("Failed to find element by index '%d', index is out of bounds!", index);
-            this.reporter.ReportError(msg);
-            result = null;
-         }
-      }
-
-      return result;
    }
 
 

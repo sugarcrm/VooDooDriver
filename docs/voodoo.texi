@@ -211,9 +211,6 @@ HTML element.
 @node jscriptevent,,,Action Attributes
 @subsection jscriptevent
 
-@node jswait,,,Action Attributes
-@subsection jswait
-
 @node required,,,Action Attributes
 @subsection required
 
