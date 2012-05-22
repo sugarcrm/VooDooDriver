@@ -266,22 +266,4 @@ public class Utils {
       return result;
    }
 
-   public static void isEnabled(WebElement element, Reporter reporter, boolean state) {
-      boolean eleState = false;
-      String msg = "";
-
-      if (element == null) {
-         return;
-      }
-
-      if (state) {
-         state = false;
-      } else {
-         state = true;
-      }
-
-      msg = String.format("Element Enabled => '%s' was expecting Enabled => '%s'!", eleState, state);
-      reporter.Assert(msg, eleState, state);
-   }
-
 }

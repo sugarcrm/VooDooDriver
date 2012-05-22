@@ -52,14 +52,13 @@ import org.sugarcrm.voodoodriver.Event.Event;
 public class EventLoop implements Runnable {
 
    private ArrayList<Event> testEvents;
-   //private Events testEvents = null;
    public Browser Browser = null;
    public Reporter report = null;
    public VDDHash hijacks = null;
    private String testName = "";
-   private VDDHash whitelist = null;
+   public VDDHash whitelist = null;
    public VDDHash sodaVars = null;
-   private VDDHash ElementStore = null;
+   public VDDHash elementStore = null;
    private ArrayList<Plugin> plugins = null;
 
    private String currentHWnd = null;
@@ -96,7 +95,7 @@ public class EventLoop implements Runnable {
          sodaVars = new VDDHash();
       }
 
-      this.ElementStore = new VDDHash();
+      this.elementStore = new VDDHash();
 
       VDDHash gvars = (VDDHash)config.get("gvar");
       if (gvars != null) {
@@ -200,46 +199,8 @@ public class EventLoop implements Runnable {
    }
 
 
-   /**
-    * Set the browser assert page.
-    *
-    * @param event
-    */
-
-   private void assertPage(VDDHash event) {
-      boolean assertpage = true;
-
-      if (event.containsKey("assertPage")) {
-         assertpage = this.clickToBool(event.get("assertPage").toString());
-      }
-
-      if (assertpage) {
-         this.Browser.assertPage(this.whitelist);
-      }
-   }
-
-
    private void saveElement(VDDHash event, WebElement element) {
-      if (!event.containsKey("save")) {
-         return;
-      }
-
-      String name = event.get("save").toString();
-      if (this.ElementStore.containsKey(name)) {
-         String msg = String.format("Found existing saved element var: '%s', Overwriting now.",
-                     name);
-         this.report.Warn(msg);
-      }
-
-      if (element == null) {
-         String msg = String.format(
-               "Element trying to be saved: '%s => 'NULL', not storing NULL element!", name);
-         this.report.ReportError(msg);
-      } else {
-         this.ElementStore.put(name, element);
-         String msg = String.format("Stored HTML element to be referenced by: '%s'.", name);
-         this.report.Log(msg);
-      }
+      /* Moved to HtmlEvent.SaveAction */
    }
 
    public VDDHash getSodaVars() {
@@ -500,12 +461,6 @@ public class EventLoop implements Runnable {
       // }
 
       // this.firePlugin(null, type, PluginEvent.AFTEREVENT);
-
-      // if (element != null) {
-      //    this.saveElement(event, element);
-      // }
-
-      // this.assertPage(event);
    }
 
 
@@ -754,8 +709,8 @@ public class EventLoop implements Runnable {
          String name = event.get("name").toString();
          name = this.replaceString(name);
 
-         if (this.ElementStore.containsKey(name)) {
-            this.ElementStore.remove(name);
+         if (this.elementStore.containsKey(name)) {
+            this.elementStore.remove(name);
             this.report.Log("Deleted stored var.");
             result = true;
          } else {
@@ -1202,8 +1157,8 @@ public class EventLoop implements Runnable {
       }
 
       if (result) {
-         WebElement Esrc = (WebElement) this.ElementStore.get(src);
-         WebElement Edst = (WebElement) this.ElementStore.get(dst);
+         WebElement Esrc = (WebElement) this.elementStore.get(src);
+         WebElement Edst = (WebElement) this.elementStore.get(dst);
          VDDMouse mouse = new VDDMouse(this.report);
          mouse.DnD(Esrc, Edst);
       }
@@ -2336,112 +2291,6 @@ public class EventLoop implements Runnable {
       return element;
    }
 
-   /**
-    * Handle a &lt;link&gt; event
-    *
-    * &quot;Link&quot; is a VDD-specific synonym for the HTML anchor (a) tag.
-    *
-    * @param event  the &lt;link&gt; event
-    * @param parent this element's parent
-    * @return the a {@link WebElement} or null
-    */
-
-   private WebElement linkEvent(VDDHash event, WebElement parent) {
-      boolean click = true;
-      boolean required = true;
-      boolean exists = true;
-      WebElement element = null;
-
-      this.resetThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      if (event.containsKey("exists")) {
-         String tmp = event.get("exists").toString();
-         tmp = this.replaceString(tmp);
-         exists = this.clickToBool(tmp);
-      }
-
-      try {
-         this.report.Log("Link Event Started.");
-         String how = event.get("how").toString();
-         how = this.replaceString(how);
-         String value = event.get(how).toString();
-         value = this.replaceString(value);
-         element = this.findElement(event, parent, required);
-
-         if (element == null) {
-            if (required && exists) {
-               String msg = String.format("Failed to find link: '%s' => '%s'!",
-                     how, value);
-               this.report.Log(msg);
-            }
-
-            if (exists != true) {
-               this.report.Assert("Link does not exist.", false, false);
-            }
-
-            element = null;
-            this.report.Log("Link Event Finished.");
-            return element;
-         }
-
-         value = element.getText();
-         handleVars(value, event);
-
-         this.firePlugin(element, Elements.LINK,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("alert")) {
-            boolean alert = this.clickToBool(event.get("alert").toString());
-            this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
-            this.Browser.alertHack(alert);
-            this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            value = this.replaceString(value);
-            this.report.Log(String.format("Clicking Link: '%s' => '%s'", how,
-                                          value));
-            this.firePlugin(element, Elements.LINK,
-                            PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.LINK,
-                  PluginEvent.AFTERCLICK);
-         } else {
-            String msg = String.format(
-                  "Found Link: '%s' but not clicking as click => '%s'.", value,
-                  click);
-            this.report.Log(msg);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
-                  + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         element = null;
-      }
-
-      this.resetThreadTime();
-      this.report.Log("Link Event Finished.");
-      return element;
-   }
-
    private boolean csvEvent(VDDHash event) {
       boolean result = false;
       CSV csv = null;
@@ -3144,20 +2993,7 @@ public class EventLoop implements Runnable {
    }
 
    private void checkDisabled(VDDHash event, WebElement element) {
-      String value = null;
-
-      if (!event.containsKey("disabled")) {
-         return;
-      }
-
-      value = event.get("disabled").toString();
-      value = this.replaceString(value);
-
-      try {
-         Utils.isEnabled(element, this.report, Boolean.valueOf(value));
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-      }
+      // Moved to HtmlEvent.DisabledAction
    }
 
    private void handleVars(String value, VDDHash event) {

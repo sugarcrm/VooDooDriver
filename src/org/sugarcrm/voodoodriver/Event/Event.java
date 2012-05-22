@@ -158,6 +158,7 @@ public abstract class Event {
       } else if (tagName.equals("tr")) {
       } else if (tagName.equals("td")) {
       } else if (tagName.equals("link")) {
+         event = new Link(element);
       } else if (tagName.equals("image")) {
       } else if (tagName.equals("map")) {
       } else if (tagName.equals("area")) {
@@ -233,21 +234,27 @@ public abstract class Event {
 
 
    /**
-    * Determine whether a selector is a boolean value.
+    * Determine whether a selector or action is a boolean value.
     *
     * @param event  name of this event
-    * @param sel    name of the selector
+    * @param acc    name of the accessor
     */
 
-   private boolean isBoolean(String event, String sel) {
+   private boolean isBoolean(String event, String acc) {
       VDDHash thisEvent = (VDDHash)allowedEvents.get(event);
-      VDDHash sels = (VDDHash)thisEvent.get("selectors");
-      if (sels == null || !sels.containsKey(sel)) {
-         return false;
+      String[] attrs = {"selectors", "actions"};
+      for (String attr: attrs) {
+         VDDHash a = (VDDHash)thisEvent.get(attr);
+         if (a != null && a.containsKey(acc)) {
+            Object t = a.get(acc);
+            if (t instanceof String) {
+               String type = (String)a.get(acc);
+               return type.equals("boolean");
+            }
+         }
       }
-      String type = (String)sels.get(sel);
 
-      return type.equals("boolean");
+      return false;
    }
 
 
@@ -547,12 +554,11 @@ public abstract class Event {
     *    href            string   link
     *    id              string   *
     *    index           integer  *
-    *    index           string   [?bug]
     *    method          string   *
     *    name            string   *
-    *    text            string   *
+    *    text            string   link
     *    title           string   attach,filefield
-    *    value           string   * [missing from many]
+    *    value           string   button,input
     *    xpath           string   *
     *
     * Actions used during findElement:
@@ -574,7 +580,6 @@ public abstract class Event {
     *    checked         boolean  radio
     *    classname       string   javaplugin,pluginloader
     *    clear           boolean  textfield,password,select,textarea
-    *    click           string   tr,td,select [bug]
     *    click           boolean  *
     *    condition       string   wait
     *    content         string   javasript,whitelist
@@ -586,17 +591,12 @@ public abstract class Event {
     *    disabled        boolean  link,textfield,password,checkbox,radio,
     *                             button,select,select_list,textarea
     *    dst             string   dnd
-    *    exist           boolean  browser,alert,div,table,link,form,textfield,
-    *                             password,button
-    *    exists          boolean  *
     *    file            string   csv,javascript,pluginloader,screenshot,script
     *    fileset         string   script
     *    included        string   select
     *    jscriptevent    string   *
-    *    jswait          boolean  * [?]
     *    notincluded     string   select
     *    override        string   csv
-    *    required        boolean  *
     *    save            string   *
     *    send_keys       string   browser
     *    set             string   *
@@ -608,11 +608,6 @@ public abstract class Event {
     *    url             string   attach,browser
     *    var             string   *
     *    vartext         string   span
-    *
-    * Actions listed in Events.xml that aren't used by any event:
-    *
-    *    exist
-    *    jswait
     */
 
 }

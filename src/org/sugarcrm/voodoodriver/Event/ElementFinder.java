@@ -364,7 +364,7 @@ class ElementFinder {
        *    class  => className
        *    css    => cssSelector
        *    id     => id
-       *    ???    => linkText
+       *    text   => linkText
        *    name   => name
        *    ???    => partialLinkText
        *    <none> => tagName
@@ -404,8 +404,8 @@ class ElementFinder {
          by = By.cssSelector((String)selectors.get("css"));
       } else if (this.selectors.containsKey("id")) {
          by = By.id((String)selectors.get("id"));
-      } else if (this.selectors.containsKey("link")) {
-         by = By.linkText((String)selectors.get("link"));
+      } else if (this.selectors.containsKey("text")) {
+         by = By.linkText((String)selectors.get("text"));
       } else if (this.selectors.containsKey("name")) {
          by = By.name((String)selectors.get("name"));
       } else if (this.selectors.containsKey("value")) {
@@ -481,6 +481,7 @@ class ElementFinder {
                     " required => false");
       } else if (exists == false) {
          this.r.ReportError("Elements exists and exists => false");
+         element = null;
       } else {
          this.r.Log("Found element");
       }

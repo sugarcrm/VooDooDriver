@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2011, SugarCRM, Inc.
+  Copyright (c) 2012, SugarCRM, Inc.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,19 +25,76 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<soda>     
-   <script file="tests/test-scripts/tests/browser.xml"/>
-   <script file="tests/test-scripts/tests/find-elements.xml"/>
-   <script file="tests/test-scripts/tests/link.xml"/>
-   <script file="tests/test-scripts/tests/buttons-test.xml"/>
-   <script file="tests/test-scripts/tests/radio-test.xml"/>
-   <script file="tests/test-scripts/tests/field-test.xml"/>
-   <script file="tests/test-scripts/tests/misc-test.xml"/>
-   <script file="tests/test-scripts/tests/table-test.xml"/>
-   <script file="tests/test-scripts/tests/checkbox-test.xml"/>
-   <script file="tests/test-scripts/tests/select-test.xml"/>
-   <script file="tests/test-scripts/tests/list-test.xml"/>
-   <script file="tests/test-scripts/tests/image-test.xml"/>
-   <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
-   <script file="tests/test-scripts/tests/cleanup.xml"/>
-</soda>
+<!-- Unit test for link
+
+-->
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/link.html"/>
+
+   <!-- Find by link-specific selectors -->
+
+   <!-- href, click -->
+
+   <link href="{@global.url}/tests/test-data/link-target.html"/>
+   <browser assert="link target"/>
+   <browser action="back"/>
+
+   <!-- text, click -->
+
+   <link text="click me"/>
+   <browser assert="link target"/>
+   <browser action="back"/>
+
+   <!-- Fail to find with link-specific selectors -->
+
+   <!-- href -->
+
+   <link href="no-such-link" required="false"/>
+   <browser assert="link source"/>
+
+   <!-- text -->
+
+   <link text="no such link" required="false"/>
+   <browser assert="link source"/>
+
+
+   <!-- All link actions -->
+
+   <!-- alert -->
+
+   <link alert="true" id="alert">alert</link>
+
+   <!-- assert -->
+
+   <link id="assert" assert="text"/>
+
+   <!-- assertnot -->
+
+   <link id="assert" assertnot="txt"/>
+
+   <!-- assertPage -->
+
+   <link id="assert" assertPage="false" click="false"/>
+
+   <!-- cssprop/cssvalue -->
+
+
+   <!-- disabled -->
+
+   <link id="disabled" disabled="true"/>
+
+   <!-- jscriptevent -->
+
+   <link id="jsevent" jscriptevent="onclick"/>
+   <browser assert="jsevent clicked"/>
+
+   <!-- save -->
+
+   <link id="link" save="mylink" click="false"/>
+
+   <!-- var -->
+
+   <link id="link" var="linkvar" click="false"/>
+
+   <browser action="close"/>
+</voodoo>

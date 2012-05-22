@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * @author Jon duSaint
  */
 
-class HtmlEvent extends Event {
+abstract class HtmlEvent extends Event {
 
 
    /**
@@ -46,7 +46,7 @@ class HtmlEvent extends Event {
        * Run the associated action.
        */
 
-      public void action();
+      public void action(Object val);
    }
 
 
@@ -77,7 +77,37 @@ class HtmlEvent extends Event {
        * Run the assert or assertnot action.
        */
 
-      public void action() {
+      public void action(Object val) {
+         String a = (String)actions.get(polarity ? "assert" : "assertnot");
+         String e = element.getText();
+
+         if (polarity) {
+            eventLoop.report.Assert(a, e);
+         } else {
+            eventLoop.report.AssertNot(a, e);
+         }
+      }
+   }
+
+
+   /**
+    * AssertPage action.
+    *
+    * @param event
+    */
+
+   protected class AssertPageAction implements Action {
+
+      /**
+       * Run the assertPage action.
+       */
+
+      public void action(Object val) {
+         boolean doAssertPage = (Boolean)val;
+
+         if (doAssertPage) {
+            eventLoop.Browser.assertPage(eventLoop.whitelist);
+         }
       }
    }
 
@@ -92,7 +122,17 @@ class HtmlEvent extends Event {
        * Run the click action.
        */
 
-      public void action() {
+      public void action(Object val) {
+         boolean click = (Boolean)val;
+
+         if (click) {
+            eventLoop.report.Log("Clicking element");
+            firePlugin(PluginEvent.BEFORECLICK);
+            element.click();
+            firePlugin(PluginEvent.AFTERCLICK);
+         } else {
+            eventLoop.report.Log("Not clicking element, click => false");
+         }
       }
    }
 
@@ -110,7 +150,8 @@ class HtmlEvent extends Event {
        * Run the cssprop/cssvalue action pair.
        */
 
-      public void action() {
+      public void action(Object val) {
+         eventLoop.report.Log("cssprop/cssvalue action");
       }
    }
 
@@ -125,9 +166,54 @@ class HtmlEvent extends Event {
        * Run the jscriptevent action.
        */
 
-      public void action() {
+      public void action(Object val) {
+         String jev = (String)val;
+
+         eventLoop.report.Log("Firing Javascript Event: " + jev);
+         eventLoop.Browser.fire_event(element, jev);
+         try {
+            Thread.sleep(1000);
+         } catch (InterruptedException e) {}
       }
    }
+
+
+   /**
+    * Save action.
+    *
+    * Store this element in the element cache so that it can be used
+    * for DnD.
+    */
+
+   protected class SaveAction implements Action {
+
+      /**
+       * Run the save action.
+       */
+
+      public void action(Object val) {
+         if (element == null) {
+            eventLoop.report.ReportError("Not saving null element");
+            return;
+         }
+
+         String key = (String)val;
+         if (eventLoop.elementStore.containsKey(key)) {
+            eventLoop.report.Warn("Clobbering existing saved element with " +
+                                  "same key '" + key + "'");
+         }
+
+         eventLoop.elementStore.put(key, element);
+         eventLoop.report.Log("Saved HTML element with key '" + key + "'");
+      }
+   }
+
+
+   /**
+    * Get the value to be used when storing to a var.
+    */
+
+   protected abstract String getVarValue();
 
 
    /**
@@ -141,7 +227,68 @@ class HtmlEvent extends Event {
        * Run the var action.
        */
 
-      public void action() {
+      public void action(Object val) {
+         String value = getVarValue();
+         String var = (String)val;
+
+         eventLoop.report.Log("Setting VDD variable: '" + var + "' => '" +
+                              value.replaceAll("\n", "\\n") + "'.");
+         eventLoop.sodaVars.put(var, value);
+      }
+   }
+
+
+   /*
+    **********************************************************************
+    * Event-specific actions follow
+    **********************************************************************
+    */
+
+   /**
+    * Alert action.
+    *
+    * Used by link.
+    */
+
+   protected class AlertAction implements Action {
+
+      /**
+       * Run the alert action.
+       */
+
+      public void action(Object val) {
+         boolean alertValue = (Boolean)val;
+
+         eventLoop.report.Log("Setting Alert Hack to: '" + alertValue + "'");
+         eventLoop.Browser.alertHack(alertValue);
+         eventLoop.report.Warn("You are using a deprecated alert hack, " +
+                               "please use the <alert> command!");
+      }
+   }
+
+
+   /**
+    * Disabled action.
+    *
+    * Used by link and all input elements
+    *
+    * N.b. A doesn't support the disabled attribute, so this should
+    * probably not be used by link.
+    */
+
+   protected class DisabledAction implements Action {
+
+      /**
+       * Run the disabled action.
+       */
+
+      public void action(Object val) {
+         boolean enabled = !(Boolean)val;
+         boolean elementEnabled = element.isEnabled();
+
+         String s = String.format("Element enabled=%s, expected enabled=%s",
+                                  elementEnabled, enabled);
+         eventLoop.report.Assert(s, elementEnabled, enabled);
       }
    }
 
@@ -294,7 +441,7 @@ class HtmlEvent extends Event {
     * action_code for each specified action.
     */
 
-   protected ActionList actions;
+   protected ActionList actionList;
 
 
    /**
@@ -314,16 +461,22 @@ class HtmlEvent extends Event {
        * sharing.
        */
 
-      this.actions = new ActionList();
-      this.actions.addLast(new Pair<String,Action>("var", new VarAction()));
-      this.actions.addLast(new Pair<String,Action>("assert",
-                                                   new AssertAction(true)));
-      this.actions.addLast(new Pair<String,Action>("assertnot",
-                                                   new AssertAction(false)));
-      this.actions.addLast(new Pair<String,Action>("cssprop", new CssAction()));
-      this.actions.addLast(new Pair<String,Action>("jscriptevent",
-                                                   new JsAction()));
-      this.actions.addLast(new Pair<String,Action>("click", new ClickAction()));
+      this.actionList = new ActionList();
+      this.actionList.addLast(new Pair<String,Action>("var", new VarAction()));
+      this.actionList.addLast(new Pair<String,Action>("assert",
+                                                      new AssertAction(true)));
+      this.actionList.addLast(new Pair<String,Action>("assertnot",
+                                                      new AssertAction(false)));
+      this.actionList.addLast(new Pair<String,Action>("cssprop",
+                                                      new CssAction()));
+      this.actionList.addLast(new Pair<String,Action>("jscriptevent",
+                                                      new JsAction()));
+      this.actionList.addLast(new Pair<String,Action>("click",
+                                                      new ClickAction()));
+      this.actionList.addLast(new Pair<String,Action>("assertPage",
+                                                      new AssertPageAction()));
+      this.actionList.addLast(new Pair<String,Action>("save",
+                                                      new SaveAction()));
    }
 
 
@@ -369,6 +522,13 @@ class HtmlEvent extends Event {
 
    public void execute() throws VDDException {
       /*
+       * Add default values for universal actions.
+       */
+      if (!this.actions.containsKey("assertPage")) {
+         this.actions.put("assertPage", true);
+      }
+
+      /*
        * Replace all var/hijack strings in the selectors.
        */
       for (String key: this.selectors.keySet()) {
@@ -391,9 +551,12 @@ class HtmlEvent extends Event {
        * whether that action was specified.
        */
 
-      // for (Pair<String,Action> action: this.actions) {
-         
-      // }
+      for (Pair action: this.actionList) {
+         String s = (String)action.string();
+         if (this.actions.containsKey(s)) {
+            ((Action)action.action()).action(this.actions.get(s));
+         }
+      }
 
    }
 }
