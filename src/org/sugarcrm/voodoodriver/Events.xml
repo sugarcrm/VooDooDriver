@@ -887,7 +887,7 @@
       </soda_attributes>
    </checkbox>
 
-   <radio html_tag="input" html_typ="radio">
+   <radio html_tag="input" html_type="radio">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -900,6 +900,7 @@
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">set</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">disabled</accessor>
@@ -955,6 +956,7 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">required</accessor>
       </accessor_attributes>
 
       <soda_attributes>
@@ -982,6 +984,7 @@
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">var</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>

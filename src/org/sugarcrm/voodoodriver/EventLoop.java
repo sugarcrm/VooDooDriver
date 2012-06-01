@@ -3050,8 +3050,9 @@ public class EventLoop implements Runnable {
             element = this.findElementByHref(event.get("href").toString(),
                   parent);
          } else if (value) {
-            element = this.slowFindElement(event.get("do").toString(), what,
-                  parent, index);
+            element = this.slowFindElement((String)event.get("html_tag"),
+                                           (String)event.get("html_type"),
+                                           what, parent, index);
          } else {
             List<WebElement> elements;
 
@@ -3155,9 +3156,24 @@ public class EventLoop implements Runnable {
       return filtered;
    }
 
+
+   /**
+    * Find an input element using its value attribute.
+    *
+    * This uses the Selectors API to search through the elements on
+    * the page for those with matching values.
+    *
+    * @param tag    the element's tag name
+    * @param type   the element's tag type
+    * @param how    the value being searched for
+    * @param parent root element of the search or null
+    * @param index  index into the list of found elements
+    * @return the element found or null
+    */
+
    @SuppressWarnings("unchecked")
-   private WebElement slowFindElement(String ele_type, String how,
-         WebElement parent, int index) {
+      private WebElement slowFindElement(String tag, String type, String how,
+                                         WebElement parent, int index) {
       WebElement element = null;
       ArrayList<WebElement> list = new ArrayList<WebElement>();
       String msg = "";
@@ -3165,35 +3181,74 @@ public class EventLoop implements Runnable {
 
       msg = String.format("Looking for elements by value is very very slow!  You should never do this!");
       this.report.Log(msg);
-      msg = String.format("Looking for element: '%s' => '%s'.", ele_type, how);
+      msg = String.format("Looking for element: '%s' => '%s'.", tag, how);
       this.report.Log(msg);
 
-      if (how.contains("OK")) {
-         System.out.print("");
+      String root = (parent == null) ? "document" : "arguments[0]";
+      String[] tags = tag.split("\\|");
+      String[] types = type.split("\\|");
+
+      if (this.Browser instanceof IE) {
+         /*
+          * IE only supports the Selectors API with versions 8 and
+          * greater, and then only when rendering the document in
+          * standards mode.  Given the special tags required for IE to
+          * enter standards mode, it is safe to assume that any page
+          * VDD is testing will probably be in quirks mode, making the
+          * Selectors API unavailable.  So in the case of IE, look for
+          * matching elements by iterating through all elements.
+          * Slow, but it'll at least work.
+          */
+
+         String tagFinder = "";
+         for (int k = 0; k < tags.length; k++) {
+            tagFinder += String.format("finder(%s.getElementsByTagName('%s'))%s",
+                                       root, tags[k],
+                                       (k == tags.length - 1) ? "" : ",");
+         }
+
+         String typeFilter = "";
+         for (int k = 0; k < types.length; k++) {
+            typeFilter += String.format("args[k].type == '%s'%s", types[k],
+                                        (k == types.length - 1) ? "" : " || ");
+         }
+
+         js = String.format("function finder(args) {\n" +
+                            "   var found = [];\n" +
+                            "   for (var k = 0; k < args.length; k++) {\n" +
+                            "      if (args[k].value == '%s' &&\n" +
+                            "          (%s)) {\n" +
+                            "         found.push(args[k]);\n" +
+                            "      }\n" +
+                            "   }\n" +
+                            "   return found;\n" +
+                            "}\n" +
+                            "return [].concat(%s);\n",
+                            how, typeFilter, tagFinder);
+      } else {
+         /*
+          * Not IE, use the Selectors API.
+          */
+         String selectors = "";
+
+         for (int i = 0; i < tags.length; i++) {
+            for (int j = 0; j < types.length; j++) {
+               selectors += String.format("%s[type=\"%s\"][value=\"%s\"]%s",
+                                          tags[i], types[j], how,
+                                          ((i == tags.length - 1) &&
+                                           (j == types.length - 1)) ?
+                                          "" : ",");
+            }
+         }
+
+         js = String.format("return %s.querySelectorAll('%s', true);",
+                            root, selectors);
       }
 
-      if (ele_type.contains("button")) {
-         js = String.format(
-               "querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"
-               + "input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);",
-               how, how, how, how);
-      } else {
-         js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)",
-               ele_type, how, ele_type, how);
-      }
+      list = (ArrayList<WebElement>)this.Browser.executeJS(js, parent);
 
-      if (parent == null) {
-         js = "return document." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, null);
-      } else {
-         js = "return arguments[0]." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, parent);
-      }
-
-      if (index < 0) {
-         element = list.get(0);
-      } else {
-         element = list.get(index);
+      if (list.size() > 0) {
+         element = list.get(index < 0 ? 0 : index);
       }
 
       return element;
