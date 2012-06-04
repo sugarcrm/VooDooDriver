@@ -142,24 +142,72 @@ class ElementFinder {
     */
 
    private List<WebElement> findElementsByValue(String value) {
+      String root = (this.parent == null) ? "document" : "arguments[0]";
+      String tag = (String)this.selectors.get("html_tag");
+      String type = (String)this.selectors.get("html_type");
       String js = null;
-      String type = (String)this.selectors.get("html_tag");
 
       this.r.Log("Searching all " + type + " elements for value='" +
                  value + "'. This could be take a while...");
 
-      if (this.event.equals("button")) {
-         js = ("querySelectorAll('" +
-                  "input[type=\"button\"][value=\"" + value + "\"]," +
-                  "button[value=\"" + value + "\"]," +
-                  "input[type=\"submit\"][value=\"" + value + "\"]," +
-                  "input[type=\"reset\"][value=\"" + value + "\"]" +
-               "', true);");
+      String[] tags = tag.split("\\|");
+      String[] types = type.split("\\|");
+
+      if (this.browser instanceof org.sugarcrm.voodoodriver.IE) {
+         /*
+          * IE only supports the Selectors API with versions 8 and
+          * greater, and then only when rendering the document in
+          * standards mode.  Given the special tags required for IE to
+          * enter standards mode, it is safe to assume that any page
+          * VDD is testing will probably be in quirks mode, making the
+          * Selectors API unavailable.  So in the case of IE, look for
+          * matching elements by iterating through all elements.
+          * Slow, but it'll at least work.
+          */
+
+         String tagFinder = "";
+         for (int k = 0; k < tags.length; k++) {
+            tagFinder += String.format("finder(%s.getElementsByTagName('%s'))%s",
+                                       root, tags[k],
+                                       (k == tags.length - 1) ? "" : ",");
+         }
+
+         String typeFilter = "";
+         for (int k = 0; k < types.length; k++) {
+            typeFilter += String.format("args[k].type == '%s'%s", types[k],
+                                        (k == types.length - 1) ? "" : " || ");
+         }
+
+         js = String.format("function finder(args) {\n" +
+                            "   var found = [];\n" +
+                            "   for (var k = 0; k < args.length; k++) {\n" +
+                            "      if (args[k].value == '%s' &&\n" +
+                            "          (%s)) {\n" +
+                            "         found.push(args[k]);\n" +
+                            "      }\n" +
+                            "   }\n" +
+                            "   return found;\n" +
+                            "}\n" +
+                            "return [].concat(%s);\n",
+                            value, typeFilter, tagFinder);
       } else {
-         js = ("querySelectorAll('" +
-                  "input[type=\"" + type + "\"][value=\"" + value + "\"]," +
-                  type + "[value=\"" + value + "\"]" +
-               "', true);");
+         /*
+          * Not IE, use the Selectors API.
+          */
+         String selectors = "";
+
+         for (int i = 0; i < tags.length; i++) {
+            for (int j = 0; j < types.length; j++) {
+               selectors += String.format("%s[type=\"%s\"][value=\"%s\"]%s",
+                                          tags[i], types[j], value,
+                                          ((i == tags.length - 1) &&
+                                           (j == types.length - 1)) ?
+                                          "" : ",");
+            }
+         }
+
+         js = String.format("return %s.querySelectorAll('%s', true);",
+                            root, selectors);
       }
 
       @SuppressWarnings("unchecked")
