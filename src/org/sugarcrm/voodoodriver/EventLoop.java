@@ -649,17 +649,8 @@ public class EventLoop implements Runnable {
          alert_text = alert.getText();
          msg = String.format("Found Alert dialog: '%s'.", alert_text);
          this.report.Log(msg);
-         if (alert_var) {
-            this.report.Log("Alert is being Accepted.");
-            alert.accept();
-         } else {
-            this.report.Log("Alert is being Dismissed.");
-            alert.dismiss();
-         }
 
-         this.Browser.getDriver().switchTo().defaultContent();
-         Thread.currentThread();
-         Thread.sleep(1000);
+         handleVars(alert_text, event);
 
          if (event.containsKey("assert")) {
             String ass = event.get("assert").toString();
@@ -673,11 +664,34 @@ public class EventLoop implements Runnable {
             this.report.AssertNot(ass, alert_text);
          }
 
+         if (alert_var) {
+            this.report.Log("Alert is being Accepted.");
+            alert.accept();
+         } else {
+            this.report.Log("Alert is being Dismissed.");
+            alert.dismiss();
+         }
+
+         try {
+            this.Browser.getDriver().switchTo().defaultContent();
+         } catch (Exception e) {
+            /*
+             * Bug 53577: if this alert is put up in response to a
+             * window.close, switching back to the default content
+             * will throw an exception.  Curiously, it's a javascript
+             * exception rather than NoSuchFrameException or
+             * NoSuchWindowException that would be expected.  Catch
+             * generic "Exception" in case the Selenium folks fix the
+             * Javascript error.
+             */
+            this.report.Log("Unable to switch back to window. Is it closed?");
+         }
+         Thread.currentThread();
+         Thread.sleep(1000);
+
          if (user_exists_true) {
             this.report.Assert("Alert dialog does exist.", true, true);
          }
-
-         handleVars(alert_text, event);
 
          this.firePlugin(null, Elements.ALERT,
                PluginEvent.AFTERDIALOGCLOSED);
