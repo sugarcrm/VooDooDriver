@@ -1,7 +1,8 @@
-VooDooDriver:
-   This is a java based replacement for SODA: https://github.com/sugarcrm/SODA
+Voodoo Driver
 
-This project is currently under dev and isn't ready for use yet.
+Voodoo Driver is a web software testing automation framework.  It is coded in Java and based on Selenium WebDriver.  It is designed to allow non-programmers to write automated tests without having to learn to program.  It uses an simple XML-based syntax which closely mirrors the HTML elements with which it interacts.
+
+Voodoo Driver is a replacement for the now-deprecated Soda testing framework.  https://github.com/sugarcrm/SODA
 
 (*)Things that are different from Ruby Soda:
 1.) The row soda element is no longer supported, you need to use "tr" now.  It just makes more sense.
