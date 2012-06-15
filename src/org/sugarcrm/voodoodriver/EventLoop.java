@@ -161,20 +161,25 @@ public class EventLoop implements Runnable {
     */
 
    private boolean windowExists(String hwnd) {
-      boolean exists = false;
-      int i = 0;
-      Set<String> windows = this.Browser.getDriver().getWindowHandles();
+      Set<String> windows = null;
 
-      for (i = 0; i <= windows.size() - 1; i++) {
-         String tmp = windows.toArray()[i].toString();
+      try {
+         windows = this.Browser.getDriver().getWindowHandles();
+      } catch (org.openqa.selenium.WebDriverException e) {
+         /*
+          * When running the IE driver, if the window is closed, an
+          * exception is thrown.
+          */
+         return false;
+      }
 
-         if (hwnd.equals(tmp)) {
-            exists = true;
-            break;
+      for (int i = 0; i < windows.size(); i++) {
+         if (hwnd.equals(windows.toArray()[i].toString())) {
+            return true;
          }
       }
 
-      return exists;
+      return false;
    }
 
 
