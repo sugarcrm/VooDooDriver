@@ -188,10 +188,11 @@ class Attach extends Event {
    /**
     * Run the attach event.
     *
+    * @throws StopEventException if child event execution is to be skipped
     * @throws VDDException if execution is unsuccessful
     */
 
-   public void execute() throws VDDException {
+   public void execute() throws StopEventException, VDDException {
       org.sugarcrm.voodoodriver.Browser b = this.eventLoop.Browser;
       org.sugarcrm.voodoodriver.Reporter r = this.eventLoop.report;
 
@@ -220,34 +221,29 @@ class Attach extends Event {
          try {
             if (this.actions.containsKey("title")) {
                String t = this.replaceString((String)this.actions.get("title"));
+               r.Log("Search for window with title " + t);
                attachWindow = getWindowByTitle(b, t, index);
             } else if (this.actions.containsKey("url")) {
                String u = this.replaceString((String)this.actions.get("url"));
+               r.Log("Search for window with url " + u);
                attachWindow = getWindowByUrl(b, u, index);
             } else {
+               r.Log("Search for window with index " + index);
                attachWindow = getWindowByIndex(b, index);
             }
 
             break;
          } catch (VDDException e) {
-            if (nRetries-- == 0) {
-               b.getDriver().switchTo().window(this.parentWindow);
-               /*
-                * XXX: Comment from the original code.  Needs to be verified.
-                *    // helps control when the page is loaded, might
-                *    // remove this later... //
-                */
+            if (nRetries-- > 0) {
                try {
-                  Thread.sleep(2000);
+                  Thread.sleep(1000);
                } catch (InterruptedException i) {
                   // Ignore
                }
-               throw e;
-            }
-            try {
-               Thread.sleep(1000);
-            } catch (InterruptedException i) {
-               // Ignore
+            } else {
+               b.getDriver().switchTo().window(this.parentWindow);
+               r.ReportError(e.getMessage());
+               throw new StopEventException();
             }
          }
       }

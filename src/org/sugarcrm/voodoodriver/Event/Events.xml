@@ -28,12 +28,12 @@
    </arg>
 
    <attach>
-      <selectors>
+      <actions>
          <accessor type="string">var</accessor>
          <accessor type="string">title</accessor>
          <accessor type="string">url</accessor>
          <accessor type="integer">index</accessor>
-      </selectors>
+      </actions>
    </attach>
 
    <browser>

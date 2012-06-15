@@ -461,10 +461,11 @@ public abstract class Event {
    /**
     * Execute this Event.
     *
+    * @throws StopEventException if child event execution is to be skipped
     * @throws VDDException if event execution is unsuccessful
     */
 
-   public abstract void execute() throws VDDException;
+   public abstract void execute() throws StopEventException, VDDException;
 
 
    /**

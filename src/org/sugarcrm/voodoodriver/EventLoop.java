@@ -317,6 +317,8 @@ public class EventLoop implements Runnable {
             processEvents(event.getChildren(), event.getElement());
          }
          event.afterChildren();
+      } catch (org.sugarcrm.voodoodriver.Event.StopEventException e) {
+         result = false;
       } catch (VDDException e) {
          this.report.ReportError("Exception during event execution");
          this.report.ReportException(e);

@@ -19,7 +19,7 @@ package org.sugarcrm.voodoodriver.Event;
 import org.sugarcrm.voodoodriver.VDDException;
 
 /**
- * Class for miscellaneous VDD-specific exceptions.
+ * Exception thrown during event compilation if an unknown event was specified.
  *
  * @author Jon duSaint
  */
