@@ -184,15 +184,18 @@ public class VooDooDriver {
                                  name, value);
             }
          } else if (type.contains("cmdopt")) {
-            String validCmdopts[] = {"browser", "attachtimeout", "resultdir",
-                                     "savehtml", "screenshot", "plugin"};
+            String validCmdopts[] = {"attachtimeout", "blocklistfile",
+                                     "browser", "plugin", "restartcount",
+                                     "restarttest", "resultdir", "savehtml",
+                                     "screenshot"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
 
             for (String s: validCmdopts) {
                if (name.contains(s)) {
-                  if (name.equals("attachtimeout")) {
-                     /* The only integer cmdopt */
+                  if (name.equals("attachtimeout") ||
+                      name.equals("restartcount")) {
+                     /* Integer cmdopts */
                      try {
                         configOpts.put(s, Integer.valueOf(value));
                      } catch (java.lang.NumberFormatException e) {
