@@ -57,11 +57,11 @@
    </browser>
 
    <csv>
-      <selectors>
+      <actions>
          <accessor type="string">file</accessor>
          <accessor type="string">override</accessor>
          <accessor type="string">var</accessor>
-      </selectors> 
+      </actions> 
    </csv>
 
    <delete>

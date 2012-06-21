@@ -63,7 +63,12 @@ public class EventLoop implements Runnable {
 
    private String currentHWnd = null;
    private int attachTimeout = 0;
-   private String csvOverrideFile = null;
+
+   /**
+    * File specified by a <csv override=""/> event.
+    */
+
+   public File csvOverrideFile = null;
 
    private Date threadTime = null;
    private volatile Thread runner;
@@ -323,7 +328,7 @@ public class EventLoop implements Runnable {
          }
          event.afterChildren();
       } catch (org.sugarcrm.voodoodriver.Event.StopEventException e) {
-         result = false;
+         /* Not an error */
       } catch (VDDException e) {
          this.report.ReportError("Exception during event execution");
          this.report.ReportException(e);
@@ -359,9 +364,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case BUTTON:
       //    element = buttonEvent(event, parent);
-      //    break;
-      // case CSV:
-      //    result = csvEvent(event);
       //    break;
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
@@ -2310,77 +2312,6 @@ public class EventLoop implements Runnable {
 
       this.resetThreadTime();
       return element;
-   }
-
-   private boolean csvEvent(VDDHash event) {
-      boolean result = false;
-      CSV csv = null;
-      CSVData csv_data = null;
-      String var_name = null;
-      String csv_filename = "";
-      String msg = "";
-
-      if (event.containsKey("var")) {
-         var_name = event.get("var").toString();
-      }
-
-      this.resetThreadTime();
-      this.report.Log("CSV event starting...");
-
-      if (this.csvOverrideFile != null) {
-         csv_filename = event.get("file").toString();
-         csv_filename = this.replaceString(csv_filename);
-         msg = String.format("Found existing csv override file: '%s', replacing expected file: '%s'.",
-               this.csvOverrideFile, csv_filename);
-         event.put("file", this.csvOverrideFile);
-         event.remove("csv"); // just in cause someone wanted to override and override. //
-         this.csvOverrideFile = null;
-      }
-
-      if (event.containsKey("override")) {
-         String csv_txt = event.get("override").toString();
-         csv_txt = this.replaceString(csv_txt);
-         this.csvOverrideFile = csv_txt;
-         msg = String.format("Setting CSV file override to file: '%s'.",
-                             this.csvOverrideFile);
-         this.report.Log(msg);
-         this.report.Log("CSV event finished.");
-         return true;
-      }
-
-      csv_filename = event.get("file").toString();
-      csv_filename = replaceString(csv_filename);
-      msg = String.format("Processing CSV file: '%s'...", csv_filename);
-      this.report.Log(msg);
-
-      csv = new CSV(csv_filename, this.report);
-      csv_data = csv.getData();
-
-      for (int i = 0; i <= csv_data.size() - 1; i++) {
-         int keys_len = csv_data.get(i).keySet().size() - 1;
-
-         for (int key_index = 0; key_index <= keys_len; key_index++) {
-            String key = csv_data.get(i).keySet().toArray()[key_index].toString();
-            String sodavar_name = var_name + "." + key;
-            String sodavar_value = csv_data.get(i).get(key).toString();
-
-            if (this.hijacks.containsKey(sodavar_name)) {
-               sodavar_value = this.hijacks.get(sodavar_name).toString();
-               this.report.Log("Hijacking SodaVar: '" + sodavar_name + "' => '"
-                     + sodavar_value + "'.");
-            }
-            this.sodaVars.put(sodavar_name, sodavar_value);
-         }
-
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), null);
-         }
-      }
-
-      this.report.Log("CSV event finished.");
-
-      this.resetThreadTime();
-      return result;
    }
 
    /**

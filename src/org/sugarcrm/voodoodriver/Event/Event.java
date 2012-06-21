@@ -123,6 +123,7 @@ public abstract class Event {
       } else if (tagName.equals("browser")) {
          event = new Browser(element);
       } else if (tagName.equals("csv")) {
+         event = new CSV(element);
       } else if (tagName.equals("delete")) {
       } else if (tagName.equals("dnd")) {
       } else if (tagName.equals("execute")) {
