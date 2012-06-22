@@ -35,14 +35,18 @@
 	<browser assert="sugarcrm-logo.jpg" />
 	<image id="image" jscriptevent="onmouseout" />
 	<browser assert="status message" />
+        <image alt="sugarcrm-logo" jscriptevent="onmouseover"/>
+	<browser assert="sugarcrm-logo.jpg" />
 	
 	<!-- test map -->
 	<map name="logomap"> 
 		<area id="area1" jscriptevent="onmouseover" />
-		<browser assert="cube" />
+        </map>
+        <browser assert="cube" />
+	<map name="logomap"> 
 		<area id="area1" jscriptevent="onmouseout" />
-		<browser assert="status message" />
 	</map>
+        <browser assert="status message" />
 	
 	<puts text="image-test.xml finished." />
 	
