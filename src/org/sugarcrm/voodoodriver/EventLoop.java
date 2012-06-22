@@ -2951,6 +2951,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
       By by = null;
       boolean href = false;
+      boolean alt = false;
       boolean value = false;
       boolean exists = true;
       String how = "";
@@ -3059,7 +3060,11 @@ public class EventLoop implements Runnable {
          case VALUE:
             value = true;
             break;
+         case ALT:
+            alt = true;
+            break;
          default:
+            /* not reached */
             this.report.ReportError(String.format("Error: findElement, unknown how: '%s'!\n", how));
             System.exit(4);
             break;
@@ -3067,7 +3072,10 @@ public class EventLoop implements Runnable {
 
          if (href) {
             element = this.findElementByHref(event.get("href").toString(),
-                  parent);
+                                             parent);
+         } else if (alt) {
+            element = this.findElementByAlt(event.get("alt").toString(),
+                                            parent);
          } else if (value) {
             element = this.slowFindElement((String)event.get("html_tag"),
                                            (String)event.get("html_type"),
@@ -3297,6 +3305,40 @@ public class EventLoop implements Runnable {
 
       return element;
    }
+
+
+   /**
+    * Find an image element based on its alt text.
+    *
+    * This routine returns the first image encountered with matching
+    * alt text.
+    *
+    * @param alt     alt text to search for
+    * @param parent  parent element or null
+    * @return matching {@link WebElement} or null
+    */
+
+   private WebElement findElementByAlt(String alt, WebElement parent) {
+      By by = By.tagName("img");
+      List<WebElement> elementList = null;
+      alt = this.replaceString(alt);
+
+      if (parent != null) {
+         elementList = parent.findElements(by);
+      } else {
+         elementList = this.Browser.getDriver().findElements(by);
+      }
+
+      for (WebElement element: elementList) {
+         String elementAlt = element.getAttribute("alt");
+         if (elementAlt != null && elementAlt.equals(alt)) {
+            return element;
+         }
+      }
+
+      return null;
+   }
+
 
    /*
     * clickToBool -- method This method converts a string into a boolean type.
