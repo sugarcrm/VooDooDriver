@@ -1,4 +1,45 @@
 ===============================================================================
+2012-06-27  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+The merge is mostly bug fixes, with a few minor enhancements.  Support
+for IE is progressing, and some tests now work with it.  An attempt
+was made to upgrade to a more recent Selenium, but issue 3392 causes
+many test scripts to fail.
+
+= New Features =
+
+ * <image> event has alt attribute
+ * blocklistfile, restartcount, and restarttest are now cmdopts
+ * <table> event has assert and assertnot attributes
+ * <ul> event has jscriptevent attribute
+
+= Bugs Fixed =
+
+ * 52867: Need support jscriptevent for ul tag
+ * 52893: voodoo driver dropping everything after delimiter in css selections
+ * 52978: Please add the required attribute functionality for the <alert> tag
+ * 53444: Voodoo's table tag does not support the assert attribute
+ * 53577: Got an exception after the alert is being accepted
+ * 53655: Please add support for the following options in soda-config.xml
+ * 53946: VoodDoo can't see image tag
+
+= All Changes =
+
+88261b8 Bug 53946: Allow images to be searched for by ALT
+1362c46 Updating README with a better description and to introduce the string "V
+b4e5cc3 Fix exception in windowExists
+94d87cb Bug 53655: Add cmdopts to VDD
+b8beb24 Bug 53577: allow window closing alerts
+ec8b502 Revert VDD back to Selenium 2.16.1
+91a2e32 Make search by value work with IE
+cfe5102 Bug 53444: Add missing attributes to table event
+454a8fb Update selenium libs to 2.21.0
+0092884 Bug 52978 - add required attribute to alert
+a34b563 Bug 52893 - Fix formatting error in VDDReporter
+cb92484 Bug 52867 - Add jscriptevent to ul event
+
+
+===============================================================================
 2012-04-26  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 This merge consists of one change: adding the 'required' attribute to
