@@ -28,5 +28,6 @@ public enum ElementHow {
    XPATH,
    HREF,
    VALUE,
-   INDEX;
+   INDEX,
+   ALT;
 }

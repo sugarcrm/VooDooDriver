@@ -179,6 +179,7 @@
          <accessor type="boolean">exist</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">required</accessor>
       </soda_attributes>
    </alert>
 
@@ -412,6 +413,7 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
       </soda_attributes>
    </ul>
@@ -473,6 +475,8 @@
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="boolean">exist</accessor>
@@ -885,7 +889,7 @@
       </soda_attributes>
    </checkbox>
 
-   <radio html_tag="input" html_typ="radio">
+   <radio html_tag="input" html_type="radio">
       <accessor_attributes>
          <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
@@ -898,6 +902,7 @@
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">set</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">disabled</accessor>
@@ -953,6 +958,7 @@
          <accessor type="string">index</accessor>
          <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">required</accessor>
       </accessor_attributes>
 
       <soda_attributes>
@@ -980,6 +986,7 @@
       </accessor_attributes>
 
       <soda_attributes>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">var</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>

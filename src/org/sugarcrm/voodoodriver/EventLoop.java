@@ -139,20 +139,25 @@ public class EventLoop implements Runnable {
     * @return
     */
    private boolean windowExists(String hwnd) {
-      boolean exists = false;
-      int i = 0;
-      Set<String> windows = this.Browser.getDriver().getWindowHandles();
+      Set<String> windows = null;
 
-      for (i = 0; i <= windows.size() - 1; i++) {
-         String tmp = windows.toArray()[i].toString();
+      try {
+         windows = this.Browser.getDriver().getWindowHandles();
+      } catch (org.openqa.selenium.WebDriverException e) {
+         /*
+          * When running the IE driver, if the window is closed, an
+          * exception is thrown.
+          */
+         return false;
+      }
 
-         if (hwnd.equals(tmp)) {
-            exists = true;
-            break;
+      for (int i = 0; i < windows.size(); i++) {
+         if (hwnd.equals(windows.toArray()[i].toString())) {
+            return true;
          }
       }
 
-      return exists;
+      return false;
    }
 
    /**
@@ -611,6 +616,7 @@ public class EventLoop implements Runnable {
       boolean alert_var = false;
       boolean exists = true;
       boolean user_exists_true = false;
+      boolean required = true;
       String msg = "";
       String alert_text = "";
 
@@ -618,7 +624,7 @@ public class EventLoop implements Runnable {
 
       if (!event.containsKey("alert") && !event.containsKey("exists")) {
          result = false;
-         this.report.ReportError("Alert command is missing alert=\"true\\false\" attribute!");
+         this.report.ReportError("Alert event missing alert attribute!");
          return result;
       }
 
@@ -638,22 +644,18 @@ public class EventLoop implements Runnable {
          }
       }
 
+      if (event.containsKey("required")) {
+         String s = (String)event.get("required");
+         required = this.clickToBool(this.replaceString(s));
+      }
+
       try {
          Alert alert = this.Browser.getDriver().switchTo().alert();
          alert_text = alert.getText();
          msg = String.format("Found Alert dialog: '%s'.", alert_text);
          this.report.Log(msg);
-         if (alert_var) {
-            this.report.Log("Alert is being Accepted.");
-            alert.accept();
-         } else {
-            this.report.Log("Alert is being Dismissed.");
-            alert.dismiss();
-         }
 
-         this.Browser.getDriver().switchTo().defaultContent();
-         Thread.currentThread();
-         Thread.sleep(1000);
+         handleVars(alert_text, event);
 
          if (event.containsKey("assert")) {
             String ass = event.get("assert").toString();
@@ -667,11 +669,34 @@ public class EventLoop implements Runnable {
             this.report.AssertNot(ass, alert_text);
          }
 
-         if (user_exists_true) {
-            this.report.Assert("Alert dialog does eixts.", true, true);
+         if (alert_var) {
+            this.report.Log("Alert is being Accepted.");
+            alert.accept();
+         } else {
+            this.report.Log("Alert is being Dismissed.");
+            alert.dismiss();
          }
 
-         handleVars(alert_text, event);
+         try {
+            this.Browser.getDriver().switchTo().defaultContent();
+         } catch (Exception e) {
+            /*
+             * Bug 53577: if this alert is put up in response to a
+             * window.close, switching back to the default content
+             * will throw an exception.  Curiously, it's a javascript
+             * exception rather than NoSuchFrameException or
+             * NoSuchWindowException that would be expected.  Catch
+             * generic "Exception" in case the Selenium folks fix the
+             * Javascript error.
+             */
+            this.report.Log("Unable to switch back to window. Is it closed?");
+         }
+         Thread.currentThread();
+         Thread.sleep(1000);
+
+         if (user_exists_true) {
+            this.report.Assert("Alert dialog does exist.", true, true);
+         }
 
          this.firePlugin(null, Elements.ALERT,
                PluginEvent.AFTERDIALOGCLOSED);
@@ -679,11 +704,11 @@ public class EventLoop implements Runnable {
          result = true;
       } catch (NoAlertPresentException exp) {
          if (!exists) {
-            msg = String.format("Alert dialog does next exist as expected.",
+            msg = String.format("Expected alert dialog does not exist.",
                   exists);
             this.report.Assert(msg, false, false);
             result = true;
-         } else {
+         } else if (required) {
             this.report.ReportError("Error: No alert dialog found!");
             result = false;
          }
@@ -859,6 +884,15 @@ public class EventLoop implements Runnable {
          }
 
          this.checkDisabled(event, element);
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: "
+                            + event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
 
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
@@ -2917,6 +2951,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
       By by = null;
       boolean href = false;
+      boolean alt = false;
       boolean value = false;
       boolean exists = true;
       String how = "";
@@ -3025,7 +3060,11 @@ public class EventLoop implements Runnable {
          case VALUE:
             value = true;
             break;
+         case ALT:
+            alt = true;
+            break;
          default:
+            /* not reached */
             this.report.ReportError(String.format("Error: findElement, unknown how: '%s'!\n", how));
             System.exit(4);
             break;
@@ -3033,10 +3072,14 @@ public class EventLoop implements Runnable {
 
          if (href) {
             element = this.findElementByHref(event.get("href").toString(),
-                  parent);
+                                             parent);
+         } else if (alt) {
+            element = this.findElementByAlt(event.get("alt").toString(),
+                                            parent);
          } else if (value) {
-            element = this.slowFindElement(event.get("do").toString(), what,
-                  parent, index);
+            element = this.slowFindElement((String)event.get("html_tag"),
+                                           (String)event.get("html_type"),
+                                           what, parent, index);
          } else {
             List<WebElement> elements;
 
@@ -3140,9 +3183,24 @@ public class EventLoop implements Runnable {
       return filtered;
    }
 
+
+   /**
+    * Find an input element using its value attribute.
+    *
+    * This uses the Selectors API to search through the elements on
+    * the page for those with matching values.
+    *
+    * @param tag    the element's tag name
+    * @param type   the element's tag type
+    * @param how    the value being searched for
+    * @param parent root element of the search or null
+    * @param index  index into the list of found elements
+    * @return the element found or null
+    */
+
    @SuppressWarnings("unchecked")
-   private WebElement slowFindElement(String ele_type, String how,
-         WebElement parent, int index) {
+      private WebElement slowFindElement(String tag, String type, String how,
+                                         WebElement parent, int index) {
       WebElement element = null;
       ArrayList<WebElement> list = new ArrayList<WebElement>();
       String msg = "";
@@ -3150,35 +3208,74 @@ public class EventLoop implements Runnable {
 
       msg = String.format("Looking for elements by value is very very slow!  You should never do this!");
       this.report.Log(msg);
-      msg = String.format("Looking for element: '%s' => '%s'.", ele_type, how);
+      msg = String.format("Looking for element: '%s' => '%s'.", tag, how);
       this.report.Log(msg);
 
-      if (how.contains("OK")) {
-         System.out.print("");
+      String root = (parent == null) ? "document" : "arguments[0]";
+      String[] tags = tag.split("\\|");
+      String[] types = type.split("\\|");
+
+      if (this.Browser instanceof IE) {
+         /*
+          * IE only supports the Selectors API with versions 8 and
+          * greater, and then only when rendering the document in
+          * standards mode.  Given the special tags required for IE to
+          * enter standards mode, it is safe to assume that any page
+          * VDD is testing will probably be in quirks mode, making the
+          * Selectors API unavailable.  So in the case of IE, look for
+          * matching elements by iterating through all elements.
+          * Slow, but it'll at least work.
+          */
+
+         String tagFinder = "";
+         for (int k = 0; k < tags.length; k++) {
+            tagFinder += String.format("finder(%s.getElementsByTagName('%s'))%s",
+                                       root, tags[k],
+                                       (k == tags.length - 1) ? "" : ",");
+         }
+
+         String typeFilter = "";
+         for (int k = 0; k < types.length; k++) {
+            typeFilter += String.format("args[k].type == '%s'%s", types[k],
+                                        (k == types.length - 1) ? "" : " || ");
+         }
+
+         js = String.format("function finder(args) {\n" +
+                            "   var found = [];\n" +
+                            "   for (var k = 0; k < args.length; k++) {\n" +
+                            "      if (args[k].value == '%s' &&\n" +
+                            "          (%s)) {\n" +
+                            "         found.push(args[k]);\n" +
+                            "      }\n" +
+                            "   }\n" +
+                            "   return found;\n" +
+                            "}\n" +
+                            "return [].concat(%s);\n",
+                            how, typeFilter, tagFinder);
+      } else {
+         /*
+          * Not IE, use the Selectors API.
+          */
+         String selectors = "";
+
+         for (int i = 0; i < tags.length; i++) {
+            for (int j = 0; j < types.length; j++) {
+               selectors += String.format("%s[type=\"%s\"][value=\"%s\"]%s",
+                                          tags[i], types[j], how,
+                                          ((i == tags.length - 1) &&
+                                           (j == types.length - 1)) ?
+                                          "" : ",");
+            }
+         }
+
+         js = String.format("return %s.querySelectorAll('%s', true);",
+                            root, selectors);
       }
 
-      if (ele_type.contains("button")) {
-         js = String.format(
-               "querySelectorAll('input[type=\"button\"][value=\"%s\"],button[value=\"%s\"],"
-               + "input[type=\"submit\"][value=\"%s\"], input[type=\"reset\"][vaue=\"%s\"]', true);",
-               how, how, how, how);
-      } else {
-         js = String.format("querySelectorAll('input[type=\"%s\"][value=\"%s\"],%s[value=\"%s\"]', true)",
-               ele_type, how, ele_type, how);
-      }
+      list = (ArrayList<WebElement>)this.Browser.executeJS(js, parent);
 
-      if (parent == null) {
-         js = "return document." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, null);
-      } else {
-         js = "return arguments[0]." + js;
-         list = (ArrayList<WebElement>) this.Browser.executeJS(js, parent);
-      }
-
-      if (index < 0) {
-         element = list.get(0);
-      } else {
-         element = list.get(index);
+      if (list.size() > 0) {
+         element = list.get(index < 0 ? 0 : index);
       }
 
       return element;
@@ -3208,6 +3305,40 @@ public class EventLoop implements Runnable {
 
       return element;
    }
+
+
+   /**
+    * Find an image element based on its alt text.
+    *
+    * This routine returns the first image encountered with matching
+    * alt text.
+    *
+    * @param alt     alt text to search for
+    * @param parent  parent element or null
+    * @return matching {@link WebElement} or null
+    */
+
+   private WebElement findElementByAlt(String alt, WebElement parent) {
+      By by = By.tagName("img");
+      List<WebElement> elementList = null;
+      alt = this.replaceString(alt);
+
+      if (parent != null) {
+         elementList = parent.findElements(by);
+      } else {
+         elementList = this.Browser.getDriver().findElements(by);
+      }
+
+      for (WebElement element: elementList) {
+         String elementAlt = element.getAttribute("alt");
+         if (elementAlt != null && elementAlt.equals(alt)) {
+            return element;
+         }
+      }
+
+      return null;
+   }
+
 
    /*
     * clickToBool -- method This method converts a string into a boolean type.
