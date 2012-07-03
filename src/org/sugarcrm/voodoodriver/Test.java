@@ -99,8 +99,8 @@ public class Test {
 
       this.Browser.setReporter(this.reporter);
 
-      if (config.get("assertpage") != null) {
-         this.setAssertPage((String)config.get("assertpage"));
+      if (config.get("assertpagefile") != null) {
+         this.setAssertPage((String)config.get("assertpagefile"));
       }
       this.setPlugins(plugin);
       if (config.get("attachtimeout") != null) {
@@ -139,10 +139,9 @@ public class Test {
       TestLoader loader = null;
 
       try {
-         System.out.printf("Loading Soda Test: '%s'.\n", testFile);
+         this.reporter.Log("Loading Soda Test: '" + testFile + "'");
          loader = new TestLoader(testFile, this.reporter);
          this.events = loader.getEvents();
-         System.out.printf("Finished.\n");
       } catch (Exception exp) {
          this.reporter.ReportException(exp);
          result = false;

@@ -2772,7 +2772,7 @@ public class EventLoop implements Runnable {
 
                case BROWSER_assertPage:
                   assertPage = this.clickToBool(event.get("assertPage").toString());
-                  this.report.Log(String.format("Borwser assertPage => '%s'.",
+                  this.report.Log(String.format("Browser assertPage => '%s'.",
                         assertPage));
                   break;
                default:
