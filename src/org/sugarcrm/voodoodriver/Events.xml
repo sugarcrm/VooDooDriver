@@ -1054,7 +1054,32 @@
       </soda_attributes>
    </select_list>
 
-   <!-- Missing OPTION event -->
+   <option html_tag="option">
+      <accessor_attributes>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </accessor_attributes>
+
+      <soda_attributes>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </soda_attributes>
+   </option>
 
    <textarea html_tag="textarea">
       <accessor_attributes>

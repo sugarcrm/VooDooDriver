@@ -376,6 +376,9 @@ public class EventLoop implements Runnable {
       case SELECT:
          element = selectEvent(event, parent);
          break;
+      case OPTION:
+         element = optionEvent(event, parent);
+         break;
       case STAMP:
          result = stampEvent();
          break;
@@ -1714,209 +1717,211 @@ public class EventLoop implements Runnable {
       }
 
       try {
+         Select sel = null;
          element = this.findElement(event, parent, required);
-         if (element != null) {
-            Select sel = new Select(element);
+         if (element == null) {
+            this.report.Log("Select event finished.");
+            return null;
+         }
+
+         sel = new Select(element);
+         this.firePlugin(element, Elements.SELECT,
+                         PluginEvent.AFTERFOUND);
+
+         this.checkDisabled(event, element);
+
+         if (event.containsKey("clear") &&
+             this.clickToBool(event.get("clear").toString()) &&
+             sel.isMultiple()) {
+            this.report.Log("Clearing select element.");
+            sel.deselectAll();
+         }
+
+         if (event.containsKey("set")) {
+            setvalue = event.get("set").toString();
+            setvalue = this.replaceString(setvalue);
+         }
+
+         if (event.containsKey("setreal")) {
+            setvalue = event.get("setreal").toString();
+            setvalue = this.replaceString(setvalue);
+            real = true;
+         }
+
+         if (setvalue != null) {
+            if (real) {
+               sel.selectByValue(setvalue);
+               this.report.Log("Setting option by value: '" +
+                               setvalue + "'.");
+
+            } else {
+               sel.selectByVisibleText(setvalue);
+               this.report.Log("Setting option by visible text: '" +
+                               setvalue + "'.");
+            }
+
+            try {
+               /*
+                * Selecting a value has the potential to refresh
+                * the page.  Check for a stale element and refresh
+                * it if needed (Bug 49533).
+                */
+               element.isDisplayed();
+            } catch (StaleElementReferenceException e) {
+               this.report.Log("Page updated. Refreshing stale select element.");
+               element = this.findElement(event, null, required);
+               sel = new Select(element);
+            }
+
             this.firePlugin(element, Elements.SELECT,
-                  PluginEvent.AFTERFOUND);
+                            PluginEvent.AFTERSET);
+         }
 
-            this.checkDisabled(event, element);
+         if (event.containsKey("assert")) {
+            do_assert = true;
+            assert_direction = true;
+            assert_value = event.get("assert").toString();
+            assert_value = this.replaceString(assert_value);
+         }
 
-            if (event.containsKey("clear") &&
-                this.clickToBool(event.get("clear").toString()) &&
-                sel.isMultiple()) {
-               this.report.Log("Clearing select element.");
-               sel.deselectAll();
-            }
+         if (event.containsKey("assertnot")) {
+            do_assert = true;
+            assert_direction = false;
+            assert_value = event.get("assertnot").toString();
+            assert_value = this.replaceString(assert_value);
+         }
 
-            if (event.containsKey("set")) {
-               setvalue = event.get("set").toString();
-               setvalue = this.replaceString(setvalue);
-            }
+         if (do_assert) {
+            int found = -1;
+            List<WebElement> options = sel.getOptions();
+            int opt_len = options.size() - 1;
+            String opt_val = "";
 
-            if (event.containsKey("setreal")) {
-               setvalue = event.get("setreal").toString();
-               setvalue = this.replaceString(setvalue);
-               real = true;
-            }
-
-            if (setvalue != null) {
-               if (real) {
-                  sel.selectByValue(setvalue);
-                  this.report.Log("Setting option by value: '" +
-                                  setvalue + "'.");
-
-               } else {
-                  sel.selectByVisibleText(setvalue);
-                  this.report.Log("Setting option by visible text: '" +
-                                  setvalue + "'.");
-               }
-
-               try {
-                  /*
-                   * Selecting a value has the potential to refresh
-                   * the page.  Check for a stale element and refresh
-                   * it if needed (Bug 49533).
-                   */
-                  element.isDisplayed();
-               } catch (StaleElementReferenceException e) {
-                  this.report.Log("Page updated. Refreshing stale select element.");
-                  element = this.findElement(event, null, required);
-                  sel = new Select(element);
-               }
-
-               this.firePlugin(element, Elements.SELECT,
-                     PluginEvent.AFTERSET);
-            }
-
-            if (event.containsKey("assert")) {
-               do_assert = true;
-               assert_direction = true;
-               assert_value = event.get("assert").toString();
-               assert_value = this.replaceString(assert_value);
-            }
-
-            if (event.containsKey("assertnot")) {
-               do_assert = true;
-               assert_direction = false;
-               assert_value = event.get("assertnot").toString();
-               assert_value = this.replaceString(assert_value);
-            }
-
-            if (do_assert) {
-               int found = -1;
-               List<WebElement> options = sel.getOptions();
-               int opt_len = options.size() - 1;
-               String opt_val = "";
-
-               /* Check that this option exists */
-               for (int i = 0; i <= opt_len; i++) {
-                  opt_val = options.get(i).getText();
-                  if (opt_val.contains(assert_value)) {
-                     found = i;
-                     break;
-                  }
-               }
-
-               if (found < 0) {
-                  msg = String.format("Failed to find select option: '%s'!",
-                        assert_value);
-                  this.report.ReportError(msg);
-               } else {
-                  if (assert_direction) {
-                     if (options.get(found).isSelected()) {
-                        msg = String.format("Select option: '%s' is selected.",
-                              assert_value);
-                        this.report.Assert(msg, true, true);
-                     } else {
-                        msg = String.format(
-                              "Select option: '%s' is not selected.",
-                              assert_value);
-                        this.report.Assert(msg, false, true);
-                     }
-                  } else {
-                     if (options.get(found).isSelected()) {
-                        msg = String.format("Select option: '%s' is selected.",
-                              assert_value);
-                        this.report.Assert(msg, false, true);
-                     } else {
-                        msg = String.format(
-                              "Select option: '%s' is not selected.",
-                              assert_value);
-                        this.report.Assert(msg, true, true);
-                     }
-                  }
+            /* Check that this option exists */
+            for (int i = 0; i <= opt_len; i++) {
+               opt_val = options.get(i).getText();
+               if (opt_val.contains(assert_value)) {
+                  found = i;
+                  break;
                }
             }
 
-            if (event.containsKey("assertselected")) {
-               boolean anySelected = sel.getAllSelectedOptions().size() > 0;
-               boolean shouldBeSelected =
-                  clickToBool(event.get("assertselected").toString());
-
-               report.Assert("Option " + (anySelected ? "":"not ") + "selected",
-                             anySelected, shouldBeSelected);
-            }
-
-            if (event.containsKey("click")) {
-               click = this.clickToBool(event.get("click").toString());
-            }
-
-            if (click) {
-               this.firePlugin(element, Elements.FORM,
-                               PluginEvent.BEFORECLICK);
-               element.click();
-               this.firePlugin(element, Elements.FORM,
-                               PluginEvent.AFTERCLICK);
-            }
-
-            if (event.containsKey("jscriptevent")) {
-               this.report.Log("Firing Javascript Event: " +
-                               event.get("jscriptevent").toString());
-               this.Browser.fire_event(element,
-                                       event.get("jscriptevent").toString());
-               Thread.sleep(1000);
-               this.report.Log("Javascript event finished.");
-            }
-
-            if (event.containsKey("included")) {
-               included = true;
-               included_direction = true;
-               included_value = event.get("included").toString();
-               included_value = this.replaceString(included_value);
-            }
-
-            if (event.containsKey("notincluded")) {
-               included = true;
-               included_direction = false;
-               included_value = event.get("notincluded").toString();
-               included_value = this.replaceString(included_value);
-            }
-
-            if (included) {
-               List<WebElement> options = sel.getOptions();
-               int sel_len = options.size() - 1;
-               boolean found = false;
-
-               for (int i = 0; i <= sel_len; i++) {
-                  String opt_value = options.get(i).getText();
-                  if (opt_value.contains(included_value)) {
-                     found = true;
-                     break;
-                  }
-               }
-
-               if (included_direction) {
-                  if (found) {
-                     msg = String.format("Found Select list option: '%s'.",
-                           included_value);
+            if (found < 0) {
+               msg = String.format("Failed to find select option: '%s'!",
+                                   assert_value);
+               this.report.ReportError(msg);
+            } else {
+               if (assert_direction) {
+                  if (options.get(found).isSelected()) {
+                     msg = String.format("Select option: '%s' is selected.",
+                                         assert_value);
                      this.report.Assert(msg, true, true);
                   } else {
-                     msg = String.format("Failed to find Select list option: '%s'.",
-                           included_value);
+                     msg = String.format(
+                                         "Select option: '%s' is not selected.",
+                                         assert_value);
                      this.report.Assert(msg, false, true);
                   }
                } else {
-                  if (found) {
-                     msg = String.format("Found Select list option: '%s', when it wasn't expected!",
-                           included_value);
-                     this.report.Assert(msg, false, false);
+                  if (options.get(found).isSelected()) {
+                     msg = String.format("Select option: '%s' is selected.",
+                                         assert_value);
+                     this.report.Assert(msg, false, true);
                   } else {
-                     msg = String.format("Failed to find Select list option: '%s', as expected.",
-                           included_value);
+                     msg = String.format(
+                                         "Select option: '%s' is not selected.",
+                                         assert_value);
                      this.report.Assert(msg, true, true);
                   }
                }
+            }
+         }
 
-               if (event.containsKey("children") && element != null) {
-                  this.processEvents((Events)event.get("children"), element);
+         if (event.containsKey("assertselected")) {
+            boolean anySelected = sel.getAllSelectedOptions().size() > 0;
+            boolean shouldBeSelected =
+               clickToBool(event.get("assertselected").toString());
+
+            report.Assert("Option " + (anySelected ? "":"not ") + "selected",
+                          anySelected, shouldBeSelected);
+         }
+
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         if (click) {
+            this.firePlugin(element, Elements.FORM,
+                            PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.FORM,
+                            PluginEvent.AFTERCLICK);
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("included")) {
+            included = true;
+            included_direction = true;
+            included_value = event.get("included").toString();
+            included_value = this.replaceString(included_value);
+         }
+
+         if (event.containsKey("notincluded")) {
+            included = true;
+            included_direction = false;
+            included_value = event.get("notincluded").toString();
+            included_value = this.replaceString(included_value);
+         }
+
+         if (included) {
+            List<WebElement> options = sel.getOptions();
+            int sel_len = options.size() - 1;
+            boolean found = false;
+
+            for (int i = 0; i <= sel_len; i++) {
+               String opt_value = options.get(i).getText();
+               if (opt_value.contains(included_value)) {
+                  found = true;
+                  break;
                }
             }
 
+            if (included_direction) {
+               if (found) {
+                  msg = String.format("Found Select list option: '%s'.",
+                                      included_value);
+                  this.report.Assert(msg, true, true);
+               } else {
+                  msg = String.format("Failed to find Select list option: '%s'.",
+                                      included_value);
+                  this.report.Assert(msg, false, true);
+               }
+            } else {
+               if (found) {
+                  msg = String.format("Found Select list option: '%s', when it wasn't expected!",
+                                      included_value);
+                  this.report.Assert(msg, false, false);
+               } else {
+                  msg = String.format("Failed to find Select list option: '%s', as expected.",
+                                      included_value);
+                  this.report.Assert(msg, true, true);
+               }
+            }
+         }
 
-            String value = element.getAttribute("value");
-            handleVars(value, event);
+         String value = element.getAttribute("value");
+         handleVars(value, event);
 
+         if (event.containsKey("children")) {
+            this.processEvents((Events)event.get("children"), element);
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -1928,6 +1933,76 @@ public class EventLoop implements Runnable {
       this.report.Log("Select event finished.");
       return element;
    }
+
+
+   /**
+    * Handle an &lt;option&gt; event
+    *
+    * @param event  the &lt;link&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
+   private WebElement optionEvent(VDDHash event, WebElement parent) {
+      boolean click = true;
+      boolean required = true;
+      WebElement element = null;
+
+      this.report.Log("Option event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log("Option event finished.");
+            return element;
+         }
+
+         this.firePlugin(element, Elements.OPTION, PluginEvent.AFTERFOUND);
+
+         this.checkDisabled(event, element);
+
+         if (event.containsKey("assert")) {
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, element.getText());
+         }
+
+         if (event.containsKey("assertnot")) {
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, element.getText());
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            String ev = (String)event.get("jscriptevent");
+            this.report.Log("Firing Javascript Event: " + ev);
+            this.Browser.fire_event(element, ev);
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         if (click) {
+            this.firePlugin(element, Elements.OPTION, PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.OPTION, PluginEvent.AFTERCLICK);
+         }
+
+      } catch (ElementNotVisibleException e) {
+         logElementNotVisible(required, event);
+      } catch (Exception e) {
+         this.report.ReportException(e);
+      }
+
+      this.report.Log("Option event finished.");
+      return element;
+   }
+
 
    private WebElement formEvent(VDDHash event, WebElement parent) {
       boolean required = true;
@@ -3213,9 +3288,9 @@ public class EventLoop implements Runnable {
 
       String root = (parent == null) ? "document" : "arguments[0]";
       String[] tags = tag.split("\\|");
-      String[] types = type.split("\\|");
+      String[] types = (type == null) ? new String[0] : type.split("\\|");
 
-      if (this.Browser instanceof IE) {
+      if (types.length == 0 || this.Browser instanceof IE) {
          /*
           * IE only supports the Selectors API with versions 8 and
           * greater, and then only when rendering the document in
@@ -3238,6 +3313,9 @@ public class EventLoop implements Runnable {
          for (int k = 0; k < types.length; k++) {
             typeFilter += String.format("args[k].type == '%s'%s", types[k],
                                         (k == types.length - 1) ? "" : " || ");
+         }
+         if (typeFilter.length() == 0) {
+            typeFilter = "true"; // Accept all types if none was specified
          }
 
          js = String.format("function finder(args) {\n" +
