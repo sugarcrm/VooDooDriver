@@ -75,6 +75,7 @@ public enum Elements {
    HIDDEN,
    SELECT,
    SELECT_LIST,
+   OPTION,
    TEXTAREA,
    LABEL,
 

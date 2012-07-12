@@ -118,7 +118,8 @@ public abstract class Event {
       Event event = new TestEvent(element); // XXX temporary
       String tagName = element.getTagName().toLowerCase();
 
-      if (tagName.equals("attach")) {
+      if (tagName.equals("arg")) {
+      } else if (tagName.equals("attach")) {
          event = new Attach(element);
       } else if (tagName.equals("browser")) {
          event = new Browser(element);
@@ -175,6 +176,7 @@ public abstract class Event {
       } else if (tagName.equals("hidden")) {
       } else if (tagName.equals("select")) {
       } else if (tagName.equals("select_list")) {
+      } else if (tagName.equals("option")) {
       } else if (tagName.equals("textarea")) {
       } else if (tagName.equals("label")) {
       } else {

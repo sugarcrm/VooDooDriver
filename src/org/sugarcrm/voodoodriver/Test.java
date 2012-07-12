@@ -150,7 +150,7 @@ public class Test {
       }
       Browser b = ((Browser)config.get("browser"));
       b.setReporter(this.reporter);
-      String apf = (String)config.get("assertpage");
+      String apf = (String)config.get("assertpagefile");
       if (apf != null) {
          b.setAssertPageFile(apf);
       }

@@ -132,6 +132,34 @@ class ElementFinder {
 
 
    /**
+    * Find images element based on alt text.
+    *
+    * @param alt     alt text to search for
+    * @return matching {@link WebElement} or null
+    */
+
+   private List<WebElement> findElementsByAlt(String alt) {
+      By by = By.tagName("img");
+      List<WebElement> allImgs = null, elements = new ArrayList<WebElement>();
+
+      if (this.parent != null) {
+         allImgs = this.parent.findElements(by);
+      } else {
+         allImgs = this.browser.getDriver().findElements(by);
+      }
+
+      for (WebElement element: allImgs) {
+         String elementAlt = element.getAttribute("alt");
+         if (elementAlt != null && elementAlt.equals(alt)) {
+            elements.add(element);
+         }
+      }
+
+      return elements;
+   }
+
+
+   /**
     * Search through input elements using their value attribute.
     *
     * This kind of search is done using a snippet of javascript
@@ -151,9 +179,10 @@ class ElementFinder {
                  value + "'. This could be take a while...");
 
       String[] tags = tag.split("\\|");
-      String[] types = type.split("\\|");
+      String[] types = (type == null) ? new String[0] : type.split("\\|");
 
-      if (this.browser instanceof org.sugarcrm.voodoodriver.IE) {
+      if (types.length == 0 ||
+          this.browser instanceof org.sugarcrm.voodoodriver.IE) {
          /*
           * IE only supports the Selectors API with versions 8 and
           * greater, and then only when rendering the document in
@@ -176,6 +205,9 @@ class ElementFinder {
          for (int k = 0; k < types.length; k++) {
             typeFilter += String.format("args[k].type == '%s'%s", types[k],
                                         (k == types.length - 1) ? "" : " || ");
+         }
+         if (typeFilter.length() == 0) {
+            typeFilter = "true"; // Accept all types if none was specified
          }
 
          js = String.format("function finder(args) {\n" +
@@ -206,7 +238,7 @@ class ElementFinder {
             }
          }
 
-         js = String.format("return %s.querySelectorAll('%s', true);",
+         js = String.format("return %s.querySelectorAll('%s');",
                             root, selectors);
       }
 
@@ -367,6 +399,7 @@ class ElementFinder {
       boolean requiredModified = false;
       int timeout = 5;
       By by = null;
+      boolean searchByAlt = false;
       boolean searchByValue = false;
       List<WebElement> elements;
       WebElement element = null;
@@ -422,7 +455,9 @@ class ElementFinder {
        * and so is handled here.
        */
 
-      if (this.selectors.containsKey("class")) {
+      if (this.selectors.containsKey("alt")) {
+         searchByAlt = true;
+      } else if (this.selectors.containsKey("class")) {
          /*
           * If the class name contains whitespace, the search is done
           * using ByCssSelector rather than ByClassName.
@@ -470,6 +505,8 @@ class ElementFinder {
 
       if (searchByValue) {
          elements = findElementsByValue((String)this.selectors.get("value"));
+      } else if (searchByAlt) {
+         elements = findElementsByAlt((String)this.selectors.get("alt"));
       } else if (this.parent == null) {
          elements = this.browser.findElements(by, timeout);
       } else {
