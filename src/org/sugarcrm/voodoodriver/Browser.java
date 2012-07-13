@@ -303,16 +303,23 @@ public abstract class Browser {
 
    public String generateUIEvent(UIEvents type) {
       if (type == UIEvents.FOCUS) {
-         return ("var ele = arguments[0];\n" +
-                 "ele.focus();\nreturn 0;\n");
+         return ("arguments[0].focus();\n" +
+                 "return 0;\n");
       }
 
+      String e = type.toString().toLowerCase();
+
       return ("var ele = arguments[0];\n" +
-              "var evObj = document.createEvent('MouseEvents');\n" +
-              "evObj.initMouseEvent('" + type.toString().toLowerCase() + "'," +
-                                   " true, true, window, 1, 12, 345, 7, 220," +
-                                   " false, false, true, false, 0, null);\n" +
-              "ele.dispatchEvent(evObj);\n" +
+              "if (document.createEvent) {\n" +
+              "   var eo = document.createEvent('MouseEvents');\n" +
+              "   eo.initMouseEvent('" + e + "',\n" +
+              "                     true, true, window, 1, 12, 345, 7, 220,\n" +
+              "                     false, false, true, false, 0, null);\n" +
+              "   ele.dispatchEvent(eo);\n" +
+              "} else if (document.createEventObject) {" +
+              "   var eo = document.createEventObject();\n" +
+              "   ele.fireEvent('on" + e + "', eo);\n" +
+              "}\n" +
               "return 0;\n");
    }
 
