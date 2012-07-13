@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class VddSuiteReporter {
 
    private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
-   private File[] filesList = null;
+   private ArrayList<File> filesList = null;
    private int count = 0;
    private String suiteName = null;
    private FileReader input = null;
@@ -41,7 +41,7 @@ public class VddSuiteReporter {
       this.suiteName = suitename;
       String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
       System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
-      ArrayList<File> tmpFiles = new ArrayList<File>();
+      this.filesList = new ArrayList<File>();
       this.issues = new VddLogIssues();
 
       for (int i = 0; i <= logfiles.size() -1; i++) {
@@ -49,11 +49,9 @@ public class VddSuiteReporter {
          if (!Boolean.valueOf(log.get("isrestart"))) {
             File tfile = new File(log.get("testlog"));
             String logfilename = String.format("%s%s%s",outputDir, File.separatorChar, tfile.getName());
-            tmpFiles.add(new File(logfilename));
+            filesList.add(new File(logfilename));
          }
       }
-
-      filesList = tmpFiles.toArray(new File[0]);
 
       /**
        * set up file output
@@ -79,49 +77,59 @@ public class VddSuiteReporter {
       }
    }
 
+
    /**
-    * generates a html report file
+    * Generate an HTML report file.
     */
+
    public void generateReport() {
       generateHTMLHeader();
 
-      /**
-       * find files in folder that ends with .log, and process them
-       */
-      for (int i = 0; i < filesList.length; i++) {
-         //ignores nonfiles and hidden files
-         if (filesList[i].isFile() && !filesList[i].isHidden()) {
-            //read if is .log file
-            if (filesList[i].getName().endsWith("log")) {
-               readNextLog(filesList[i]);
-               //remove the .log extention
-               String temp = filesList[i].getName().substring(0, filesList[i].getName().indexOf("."));
-               //get last line
-               try {
-                  while ((tmp = br.readLine()) != null) {
-                     strLine = tmp;
-                  }
-               } catch (IOException e) {
-                  e.printStackTrace();
-               }
-               //find log status, generate table row
 
-               if (strLine.contains("blocked:1")) {
-                  generateTableRow(temp, 2, null);
-               } else if (strLine.contains("result:-1")) {
-                  generateTableRow(temp, 0, strLine);
-               } else {
-                  generateTableRow(temp, 1, null);
-               }
+      for (File file: this.filesList) {
+         /*
+          * Skip directories, hidden files, and files without .log extensions.
+          */
+         if (!file.isFile() ||
+             file.isHidden() ||
+             !file.getName().endsWith(".log")) {
+            continue;
+         }
 
-               String logname = String.format("%s%s%s", this.suiteDir, File.separatorChar, filesList[i].getName());
-               System.out.printf("(*)Log File: %s\n", logname);
-               VddLogToHTML log2html = new VddLogToHTML(logname);
-               log2html.generateReport();
-               VddLogIssues tmpissues = log2html.getIssues();
-               this.issues.appendIssues(tmpissues);
-               tmpissues = null;
+         readNextLog(file);
+
+         String baseName = file.getName().replaceAll(".log$", "");
+
+         /* XXX: Wow. Just wow. */
+         //get last line
+         try {
+            while ((tmp = br.readLine()) != null) {
+               strLine = tmp;
             }
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+         //find log status, generate table row
+
+         if (strLine.contains("blocked:1")) {
+            generateTableRow(baseName, 2, null);
+         } else if (strLine.contains("result:-1")) {
+            generateTableRow(baseName, 0, strLine);
+         } else {
+            generateTableRow(baseName, 1, null);
+         }
+
+         try {
+            String log = this.suiteDir + File.separatorChar + file.getName();
+            System.out.println("(*)Log File: " + log);
+            VddLogToHTML log2html = new VddLogToHTML(log);
+            log2html.generateReport();
+            VddLogIssues tmpissues = log2html.getIssues();
+            this.issues.appendIssues(tmpissues);
+            tmpissues = null;
+         } catch (VDDLogException e) {
+            System.err.println("Failed to process " + file + ": " +
+                               e.getMessage());
          }
       }
 
