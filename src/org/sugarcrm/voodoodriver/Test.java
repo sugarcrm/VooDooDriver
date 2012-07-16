@@ -23,7 +23,7 @@ import java.util.Date;
 public class Test {
 
    private Browser Browser = null;
-   private String testFile = "";
+   private File testFile;
    private EventLoop eventDriver = null;
    private Events events = null;
    private Reporter reporter = null;
@@ -46,7 +46,7 @@ public class Test {
     * @param testFile   name of this test file
     */
 
-   public Test(VDDHash config, String testFile) {
+   public Test(VDDHash config, File testFile) {
       this(config, testFile, null, null);
    }
 
@@ -60,7 +60,7 @@ public class Test {
     * @param oldvars    gvars from last test
     */
 
-   public Test(VDDHash config, String testFile, String suitename,
+   public Test(VDDHash config, File testFile, String suitename,
                VDDHash oldvars) {
 
       this.testFile = testFile;
@@ -76,9 +76,8 @@ public class Test {
       String screenshot = (String)config.get("screenshot");
       String resultsdir = (String)config.get("resultdir");
       String report_name = "";
-      File tmp_file = new File(testFile);
 
-      report_name = tmp_file.getName();
+      report_name = testFile.getName();
       report_name = report_name.replaceAll(".xml$", "");
 
       if (suitename != null) {
@@ -86,7 +85,7 @@ public class Test {
       }
 
       this.reporter = new Reporter(report_name, resultsdir);
-      this.reporter.setTestName(testFile);
+      this.reporter.setTestName(testFile.getName());
       this.reporter.setBrowser((Browser)config.get("browser"));
 
       if (saveHtml != null && saveHtml.length() > 0) {
@@ -177,7 +176,7 @@ public class Test {
          long current = 0;
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
                                      this.GVars, this.HiJacks, this.OldVars,
-                                     this.plugins, this.testFile);
+                                     this.plugins, this.testFile.getName());
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);
@@ -238,12 +237,9 @@ public class Test {
 
    private boolean CheckTestBlocked() {
       boolean result = false;
-      File fd = null;
-      String test_file = this.testFile;
+      String test_file = this.testFile.getName();
 
-      fd = new File(test_file);
-      test_file = fd.getName();
-      test_file = test_file.substring(0, test_file.length() -4);
+      test_file = test_file.substring(0, test_file.length() - 4);
 
       if (this.blocked == null) {
          return false;

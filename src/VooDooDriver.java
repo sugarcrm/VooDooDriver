@@ -38,9 +38,9 @@ import org.sugarcrm.voodoodriver.PluginLoader;
 import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
-import org.sugarcrm.voodoodriver.TestList;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 
 
@@ -580,14 +580,15 @@ public class VooDooDriver {
 
       System.out.printf("(*)Running Soda Tests...\n");
 
-      for (String test: tests) {
+      for (String testn: tests) {
+         File test = new File(testn);
          System.out.println("Starting Test " + test);
 
          if (browser.isClosed()) {
             browser.newBrowser();
          }
 
-         Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
+         Test t = new Test(config, test);
          t.runTest(false);
 
          if (haltOnFailure &&
@@ -680,9 +681,8 @@ public class VooDooDriver {
       for (int i = 0; i <= len; i++) {
          String suite_base_noext = "";
          String suite_name = suites.get(i);
-         String suite_base_name = "";
-         File suite_fd = new File(suite_name);
-         suite_base_name = suite_fd.getName();
+         File suite = new File(suite_name);
+         String suite_base_name = suite.getName();
          int testRanCount = 0;
 
          writeSummary(suiteRptFD, "\t<suite>\n\n");
@@ -694,13 +694,17 @@ public class VooDooDriver {
          Matcher m = p.matcher(suite_base_name);
          suite_base_noext = m.replaceAll("");
 
-         suite_fd = null;
          Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SuiteParser suiteP = new SuiteParser(suite_name,
-                                              (VDDHash)config.get("gvar"));
-         TestList suite_test_list = suiteP.getTests();
+         ArrayList<File> suite_test_list;
+         try {
+            SuiteParser s = new SuiteParser(suite, (VDDHash)config.get("gvar"));
+            suite_test_list = s.getTests();
+         } catch (VDDException e) {
+            System.err.println("Failed to load " + suite + ": " + e);
+            continue;
+         }
          VDDHash vars = null;
          TestResults test_results_hash = null;
          ArrayList<TestResults> test_resultsStore =
@@ -740,8 +744,8 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new Test(config, restartTest, suite_base_noext,
-                                     vars);
+                  testobj = new Test(config, new File(restartTest),
+                                     suite_base_noext, vars);
                   testobj.setIsRestartTest(true);
 
                   testobj.runTest(false);
@@ -789,7 +793,7 @@ public class VooDooDriver {
             }
 
             writeSummary(suiteRptFD, "\t\t<test>\n");
-            String current_test = suite_test_list.get(test_index);
+            File current_test = suite_test_list.get(test_index);
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<testfile>%s</testfile>\n",
                                        current_test));
@@ -856,8 +860,7 @@ public class VooDooDriver {
             writeSummary(suiteRptFD, "\t\t</test>\n\n");
 
             if (restartCount > 0) {
-               File tmpF = new File(current_test);
-               File pF = tmpF.getParentFile();
+               File pF = current_test.getParentFile();
 
                if (pF != null) {
                   String path = pF.getAbsolutePath();

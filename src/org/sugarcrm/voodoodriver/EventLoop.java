@@ -2412,7 +2412,7 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         loader = new TestLoader(testfile, null);
+         loader = new TestLoader(new File(testfile), null);
          newEvents = loader.getEvents();
          this.processEvents(newEvents, null);
 
