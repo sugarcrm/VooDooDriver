@@ -109,8 +109,14 @@ public class SuiteParser {
     */
 
    private File absoluteFile(File parent, String child) throws VDDException {
+      File f = new File(child);
+
+      if (!f.isAbsolute()) {
+         f = new File(parent, child);
+      }
+
       try {
-         return (new File(parent, child)).getCanonicalFile();
+         return f.getCanonicalFile();
       } catch (java.io.IOException e) {
          throw new VDDException("Failed to get path to test", e);
       }
@@ -141,7 +147,7 @@ public class SuiteParser {
 
          if ((attr = attrs.getNamedItem("file")) != null) {
             String relFile = Utils.replaceString(attr.getNodeValue(), gvars);
-            File file = this.absoluteFile(baseDir, attr.getNodeValue());
+            File file = this.absoluteFile(baseDir, relFile);
             System.out.println("file => " + file);
             this.tests.add(file);
          } else if ((attr = attrs.getNamedItem("fileset")) != null) {
