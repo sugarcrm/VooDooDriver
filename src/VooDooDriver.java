@@ -185,9 +185,9 @@ public class VooDooDriver {
             }
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"attachtimeout", "blocklistfile",
-                                     "browser", "plugin", "restartcount",
-                                     "restarttest", "resultdir", "savehtml",
-                                     "screenshot"};
+                                     "browser", "haltOnFailure", "plugin",
+                                     "restartcount", "restarttest",
+                                     "resultdir", "savehtml", "screenshot"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
 
@@ -203,6 +203,8 @@ public class VooDooDriver {
                                           name, value);
                         System.exit(1);
                      }
+                  } else if (name.equals("haltOnFailure")) {
+                     configOpts.put(s, Boolean.valueOf(value));
                   } else if (name.equals("plugin")) {
                      /*
                       * This is a hack.  This config file reading

@@ -84,7 +84,7 @@ public class Test {
          resultsdir = resultsdir + "/" + suitename;
       }
 
-      this.reporter = new Reporter(report_name, resultsdir);
+      this.reporter = new Reporter(report_name, resultsdir, config);
       this.reporter.setTestName(testFile.getName());
       this.reporter.setBrowser((Browser)config.get("browser"));
 
