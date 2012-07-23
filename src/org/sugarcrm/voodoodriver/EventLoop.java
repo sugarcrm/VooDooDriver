@@ -3027,6 +3027,7 @@ public class EventLoop implements Runnable {
       By by = null;
       boolean href = false;
       boolean alt = false;
+      boolean text = false;
       boolean value = false;
       boolean exists = true;
       String how = "";
@@ -3118,7 +3119,7 @@ public class EventLoop implements Runnable {
             href = true;
             break;
          case TEXT:
-            by = By.linkText(what);
+            text = true;
             break;
          case NAME:
             by = By.name(what);
@@ -3155,6 +3156,10 @@ public class EventLoop implements Runnable {
             element = this.slowFindElement((String)event.get("html_tag"),
                                            (String)event.get("html_type"),
                                            what, parent, index);
+         } else if (text) {
+            element = this.findElementByText((String)event.get("html_tag"),
+                                             (String)event.get("text"),
+                                             parent, index);
          } else {
             List<WebElement> elements;
 
@@ -3415,6 +3420,52 @@ public class EventLoop implements Runnable {
       }
 
       return null;
+   }
+
+
+   /**
+    * Find an element by its innerText attribute.
+    *
+    * @param tag   the HTML tag of the element
+    * @param text  the text to search for
+    * @return matching {@link WebElement} or null
+    */
+
+   private WebElement findElementByText(String tag, String text,
+                                        WebElement parent, int index) {
+      By by = null;
+      List<WebElement> elements = null;
+
+      if (tag.equals("a")) {
+         by = By.linkText(text);
+      } else {
+         by = By.tagName(tag);
+      }
+
+      if (parent == null) {
+         elements = this.Browser.getDriver().findElements(by);
+      } else {
+         elements = parent.findElements(by);
+      }
+
+      if (!tag.equals("a")) {
+         ArrayList<WebElement> discard = new ArrayList<WebElement>();
+
+         for (WebElement e: elements) {
+            if (!e.getText().contains(text)) {
+               discard.add(e); // Can't delete elements while iterating
+            }
+         }
+
+         elements.removeAll(discard);
+      }
+
+      index = (index < 0) ? 0 : index; // -1 is default value
+      if (index >= elements.size()) {
+         return null;
+      }
+
+      return elements.get(index);
    }
 
 
