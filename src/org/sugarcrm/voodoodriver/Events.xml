@@ -590,6 +590,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
