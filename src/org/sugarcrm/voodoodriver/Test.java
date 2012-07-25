@@ -107,10 +107,10 @@ public class Test {
     * @param oldVars    gvars from last test
     */
 
-   public Test(VDDHash config, String testFile, String suitename,
+   public Test(VDDHash config, File testFile, String suitename,
                VDDHash oldVars) {
       this.config = config;
-      this.testFile = new File(testFile);
+      this.testFile = testFile;
       this.oldVars = oldVars;
 
       initializeReporter(suitename);
@@ -132,7 +132,7 @@ public class Test {
       String reportName = this.testFile.getName();
       reportName = reportName.replaceAll(".xml$", "");
 
-      this.reporter = new Reporter(reportName, resultsDir);
+      this.reporter = new Reporter(reportName, resultsDir, this.config);
       this.reporter.setTestName(this.testFile.getName());
       this.reporter.setBrowser((Browser)config.get("browser"));
 

@@ -169,6 +169,7 @@ class ElementFinder {
    private List<WebElement> findElementByText(String text) {
       By by = null;
       List<WebElement> elements = null;
+      String tag = (String)this.selectors.get("html_tag");
 
       if (tag.equals("a")) {
          by = By.linkText(text);

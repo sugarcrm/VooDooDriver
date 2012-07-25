@@ -590,13 +590,8 @@ public class VooDooDriver {
             browser.newBrowser();
          }
 
-<<<<<<< HEAD
-         Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
-         t.runTest();
-=======
          Test t = new Test(config, test);
-         t.runTest(false);
->>>>>>> dev
+         t.runTest();
 
          if (haltOnFailure &&
              (Integer)t.getReporter().getResults().get("result") != 0) {
