@@ -2552,6 +2552,7 @@ public class EventLoop implements Runnable {
       return null;
    }
 
+
    /*
     * clickToBool -- method This method converts a string into a boolean type.
     *
@@ -2797,12 +2798,12 @@ public class EventLoop implements Runnable {
             value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          } else if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing textarea.");
-               element.clear();
+               clearText(element);
             }
          } else if (event.containsKey("append")) {
             value = event.get("append").toString();
@@ -2854,6 +2855,33 @@ public class EventLoop implements Runnable {
       return element;
    }
 
+
+   /**
+    * Clear a text or a password input or a textfield element.
+    *
+    * Using javascript on IE instead of WebElement.clear() is needed
+    * due to Selenium issue 3402.
+    *
+    * @param e  the text element to clear
+    */
+
+   void clearText(WebElement e) {
+      if (this.Browser instanceof IE) {
+         this.Browser.executeJS("arguments[0].value = '';", e);
+      } else {
+         e.clear();
+      }
+   }
+
+
+   /**
+    * &lt;textfield&gt; event
+    *
+    * @param event   the &lt;textfield&gt; event
+    * @param parent  this element's parent
+    * @return the &lt;textfield&gt; {@link WebElement} or null
+    */
+
    private WebElement textfieldEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       WebElement element = null;
@@ -2880,7 +2908,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing textfield.");
-               element.clear();
+               clearText(element);
             }
          }
 
@@ -2888,7 +2916,7 @@ public class EventLoop implements Runnable {
             String value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          }
 
@@ -2965,7 +2993,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing password field.");
-               element.clear();
+               clearText(element);
             }
          }
 
@@ -2973,7 +3001,7 @@ public class EventLoop implements Runnable {
             String value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          }
 

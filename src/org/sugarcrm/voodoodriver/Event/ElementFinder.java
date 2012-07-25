@@ -160,6 +160,45 @@ class ElementFinder {
 
 
    /**
+    * Find an element by its innerText attribute.
+    *
+    * @param text  element text to search for
+    * @return matching {@link WebElement} or null
+    */
+
+   private List<WebElement> findElementByText(String text) {
+      By by = null;
+      List<WebElement> elements = null;
+
+      if (tag.equals("a")) {
+         by = By.linkText(text);
+      } else {
+         by = By.tagName(tag);
+      }
+
+      if (this.parent != null) {
+         elements = this.parent.findElements(by);
+      } else {
+         elements = this.browser.getDriver().findElements(by);
+      }
+
+      if (!tag.equals("a")) {
+         ArrayList<WebElement> discard = new ArrayList<WebElement>();
+
+         for (WebElement e: elements) {
+            if (!e.getText().contains(text)) {
+               discard.add(e); // Can't delete elements while iterating
+            }
+         }
+
+         elements.removeAll(discard);
+      }
+
+      return elements;
+   }
+
+
+   /**
     * Search through input elements using their value attribute.
     *
     * This kind of search is done using a snippet of javascript
@@ -400,6 +439,7 @@ class ElementFinder {
       int timeout = 5;
       By by = null;
       boolean searchByAlt = false;
+      boolean searchByText = false;
       boolean searchByValue = false;
       List<WebElement> elements;
       WebElement element = null;
@@ -488,7 +528,7 @@ class ElementFinder {
       } else if (this.selectors.containsKey("id")) {
          by = By.id((String)selectors.get("id"));
       } else if (this.selectors.containsKey("text")) {
-         by = By.linkText((String)selectors.get("text"));
+         searchByText = true;
       } else if (this.selectors.containsKey("name")) {
          by = By.name((String)selectors.get("name"));
       } else if (this.selectors.containsKey("value")) {
@@ -507,6 +547,8 @@ class ElementFinder {
          elements = findElementsByValue((String)this.selectors.get("value"));
       } else if (searchByAlt) {
          elements = findElementsByAlt((String)this.selectors.get("alt"));
+      } else if (searchByText) {
+         elements = findElementsByAlt((String)this.selectors.get("text"));
       } else if (this.parent == null) {
          elements = this.browser.findElements(by, timeout);
       } else {

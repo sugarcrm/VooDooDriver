@@ -53,7 +53,7 @@ public class VddSummaryReporter {
    private VddLogIssues issues = null;
    private String issuesHtmlFile = null;
 
-   public VddSummaryReporter(ArrayList<File> xmlFiles, String path) {
+   public VddSummaryReporter(ArrayList<File> xmlFiles, File path) {
       this.count = 0;
       this.xmlFiles = xmlFiles;
       passedTests = 0;
@@ -67,9 +67,11 @@ public class VddSummaryReporter {
       hours = 0;
       minutes = 0;
       seconds = 0;
+
+
       String summaryFile = String.format("%s%s%s", path, File.separatorChar, "summary.html");
       this.issuesHtmlFile = String.format("%s%s%s", path, File.separatorChar, "issues.html");
-      this.basedir = path;
+      this.basedir = path.toString();
 
       this.issues = new VddLogIssues();
 

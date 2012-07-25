@@ -93,7 +93,7 @@ public class Test {
     * @param testFile   name of this test file
     */
 
-   public Test(VDDHash config, String testFile) {
+   public Test(VDDHash config, File testFile) {
       this(config, testFile, null, null);
    }
 
@@ -240,8 +240,9 @@ public class Test {
     */
 
    private boolean testBlocked() {
-      File fd = null;
-      String test_file = this.testFile.toString();
+      String test_file = this.testFile.getName();
+
+      test_file = test_file.substring(0, test_file.length() - 4);
 
       if (!this.config.containsKey("blocklist")) {
          return false;

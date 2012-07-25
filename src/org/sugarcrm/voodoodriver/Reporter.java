@@ -69,13 +69,20 @@ public class Reporter {
 
 
    /**
+    * Whether to terminate the current thread on error.
+    */
+
+   private boolean haltOnFailure = false;
+
+
+   /**
     * Instantiate a Reporter object.
     *
     * @param reportName
     * @param resultDir
     */
 
-   public Reporter(String reportName, String resultDir) {
+   public Reporter(String reportName, String resultDir, VDDHash config) {
       Date now = new Date();
       String frac = String.format("%1$tN", now);
       String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
@@ -114,6 +121,8 @@ public class Reporter {
          this.saveHtmlOn.put(ssEvent, false);
          this.screenshotOn.put(ssEvent, false);
       }
+
+      this.haltOnFailure = (Boolean)config.get("haltOnFailure");
    }
 
    public void setTestName(String name) {
@@ -222,6 +231,26 @@ public class Reporter {
       return result;
    }
 
+
+   /**
+    * Terminate the current thread.
+    *
+    * There's a long discussion in the Java documentation about why
+    * using Thread.stop() is a terrible, terrible thing.  However, the
+    * alternate offered, in combination with the klunky way Java
+    * handles exception means that any program wanting to terminate a
+    * thread abnormally must design this ability in from the ground up
+    * -- not the case with VDD.  Consequently, despite the "dangers"
+    * involved in stopping a running thread, it's done here.  It won't
+    * matter anyways as VDD will be terminating itself shortly.
+    */
+
+   private void killTestThread() {
+      System.err.println("(!)Error seen and haltOnFailure set: terminating.");
+      Thread.currentThread().stop();
+   }
+
+
    private String replaceLineFeed(String str) {
       str = str.replaceAll("\n", "\\\\n");
       return str;
@@ -283,6 +312,10 @@ public class Reporter {
       }
       if ((Boolean)this.screenshotOn.get("error")) {
          this.screenshot();
+      }
+
+      if (this.haltOnFailure) {
+         killTestThread();
       }
    }
 
@@ -356,6 +389,10 @@ public class Reporter {
       if ((Boolean)this.screenshotOn.get("exception")) {
          this.screenshot();
       }
+
+      if (this.haltOnFailure) {
+         killTestThread();
+      }
    }
 
 
@@ -409,6 +446,9 @@ public class Reporter {
       if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
+      if (result == false && this.haltOnFailure) {
+         killTestThread();
+      }
 
       return result;
    }
@@ -452,6 +492,9 @@ public class Reporter {
       if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
+      if (result == false && this.haltOnFailure) {
+         killTestThread();
+      }
 
       return result;
    }
@@ -492,6 +535,9 @@ public class Reporter {
       }
       if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
+      }
+      if (result == false && this.haltOnFailure) {
+         killTestThread();
       }
 
       return result;
