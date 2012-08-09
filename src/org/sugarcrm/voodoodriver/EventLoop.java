@@ -579,10 +579,10 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("children")) {
             this.processEvents((Events) event.get("children"), null);
-         } else {
-            this.report.Log("Switching back to default frame.");
-            this.Browser.getDriver().switchTo().defaultContent();
          }
+
+         this.report.Log("Switching back to default frame.");
+         this.Browser.getDriver().switchTo().defaultContent();
       } catch (NoSuchFrameException exp) {
          this.report.ReportError("Failed to find frame!");
       } catch (Exception exp) {
