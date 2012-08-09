@@ -3435,6 +3435,7 @@ public class EventLoop implements Runnable {
                                         WebElement parent, int index) {
       By by = null;
       List<WebElement> elements = null;
+      text = this.replaceString(text);
 
       if (tag.equals("a")) {
          by = By.linkText(text);
