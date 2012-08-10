@@ -17,8 +17,10 @@
 package org.sugarcrm.voodoodriver;
 
 import org.openqa.selenium.Mouse;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 
 /**
@@ -53,6 +55,7 @@ public class Firefox extends Browser {
     */
 
    public void newBrowser() {
+      FirefoxBinary b = new FirefoxBinary();
       FirefoxProfile p = new FirefoxProfile();
 
       if (this.downloadDirectory != null) {
@@ -75,8 +78,11 @@ public class Firefox extends Browser {
          p.setPreference("browser.download.useDownloadDir", true);
       }
 
-      FirefoxDriver fd = new FirefoxDriver(p);
-      this.setDriver(fd);
+      DesiredCapabilities c = new DesiredCapabilities();
+      c.setCapability("unexpectedAlertBehaviour", "ignore");
+
+      FirefoxDriver ff = new FirefoxDriver(b, p, c);
+      this.setDriver(ff);
       this.setBrowserOpened();
    }
 
