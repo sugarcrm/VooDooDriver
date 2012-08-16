@@ -78,6 +78,11 @@ public enum Elements {
    OPTION,
    TEXTAREA,
    LABEL,
+   I,
+   B,
+   STRIKE,
+   S,
+   U,
 
    /* Events not found in Events.xml -- shouldn't these be deleted? */
    ACTION,

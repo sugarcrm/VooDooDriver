@@ -457,6 +457,39 @@ public class EventLoop implements Runnable {
       case INPUT:
          element = inputEvent(event, parent);
          break;
+      case H1:
+         element = miscEvent(event, parent);
+         break;
+      case H2:
+         element = miscEvent(event, parent);
+         break;
+      case H3:
+         element = miscEvent(event, parent);
+         break;
+      case H4:
+         element = miscEvent(event, parent);
+         break;
+      case H5:
+         element = miscEvent(event, parent);
+         break;
+      case H6:
+         element = miscEvent(event, parent);
+         break;
+      case I:
+         element = miscEvent(event, parent);
+         break;
+      case B:
+         element = miscEvent(event, parent);
+         break;
+      case STRIKE:
+         element = miscEvent(event, parent);
+         break;
+      case S:
+         element = miscEvent(event, parent);
+         break;
+      case U:
+         element = miscEvent(event, parent);
+         break;
       default:
          System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
          System.exit(1);
@@ -3020,6 +3053,87 @@ public class EventLoop implements Runnable {
       this.report.Log("tbody event finished.");
       return element;
    }
+
+
+   /**
+    * Miscellaneous events.
+    *
+    * This meta-event is for elements that don't have any features
+    * that distinguish themselves from other elements.  Currently,
+    * H1..H6, I, B, STRIKE, S, and U elements are handled here.
+    *
+    * @param event  the event
+    * @param parent this element's parent
+    * @return the matching {@link WebElement} or null
+    */
+
+   private WebElement miscEvent(VDDHash event, WebElement parent) {
+      Elements type = (Elements)event.get("type");
+      String eventName = type.toString().toLowerCase();
+      boolean required = true;
+      WebElement element = null;
+
+      this.report.Log(eventName + " event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log(eventName + " event finished.");
+            return null;
+         }
+
+         this.firePlugin(element, type, PluginEvent.AFTERFOUND);
+         this.checkDisabled(event, element);
+
+         String value = element.getText();
+         handleVars(value, event);
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, type, PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, type, PluginEvent.AFTERCLICK);
+         }
+
+         if (event.containsKey("children") && element != null) {
+            this.processEvents((Events)event.get("children"), element);
+         }
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.ReportException(exp);
+         element = null;
+      }
+
+      this.report.Log(eventName + " event finished.");
+      return element;
+   }
+
 
    private WebElement findElement(VDDHash event, WebElement parent,
          boolean required) {
