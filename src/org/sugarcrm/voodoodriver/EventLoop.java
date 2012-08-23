@@ -394,6 +394,9 @@ public class EventLoop implements Runnable {
       case TR:
          element = trEvent(event, parent);
          break;
+      case TH:
+         element = thEvent(event, parent);
+         break;
       case TD:
          element = tdEvent(event, parent);
          break;
@@ -1426,6 +1429,86 @@ public class EventLoop implements Runnable {
       this.report.Log("TR event finished.");
       return element;
    }
+
+
+   /**
+    * Handle a &lt;th&gt; event
+    *
+    * @param event  the &lt;th&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
+   private WebElement thEvent(VDDHash event, WebElement parent) {
+      boolean required = true;
+      boolean click = false;
+      WebElement element = null;
+
+      this.report.Log("TH event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log("TH event finished.");
+            return element;
+         }
+
+         this.firePlugin(element, Elements.TH, PluginEvent.AFTERFOUND);
+
+         this.checkDisabled(event, element);
+
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         String value = element.getText();
+         handleVars(value, event);
+
+         if (click) {
+            this.firePlugin(element, Elements.TH, PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.TH, PluginEvent.AFTERCLICK);
+         }
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("children") && element != null) {
+            this.processEvents((Events) event.get("children"), element);
+         }
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.ReportException(exp);
+         element = null;
+      }
+
+      this.report.Log("TH event finished.");
+      return element;
+   }
+
 
    private WebElement tdEvent(VDDHash event, WebElement parent) {
       boolean required = true;

@@ -58,6 +58,7 @@ public enum Elements {
    THEAD,
    TBODY,
    TR,
+   TH,
    TD,
    LINK,
    IMAGE,
