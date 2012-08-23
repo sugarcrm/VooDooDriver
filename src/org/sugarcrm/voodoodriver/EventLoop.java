@@ -1228,6 +1228,15 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+
+   /**
+    * Handle an &lt;image&gt; event.
+    *
+    * @param event  the &image;th&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
    private WebElement imageEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
@@ -1254,6 +1263,15 @@ public class EventLoop implements Runnable {
          this.checkDisabled(event, element);
 
          handleVars(element.getAttribute("src"), event);
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
 
          if (click) {
             this.report.Log("Image click started.");
