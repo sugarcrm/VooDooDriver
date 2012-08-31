@@ -166,7 +166,7 @@ class ElementFinder {
     * @return matching {@link WebElement} or null
     */
 
-   private List<WebElement> findElementByText(String text) {
+   private List<WebElement> findElementsByText(String text) {
       By by = null;
       List<WebElement> elements = null;
       String tag = (String)this.selectors.get("html_tag");
@@ -549,7 +549,7 @@ class ElementFinder {
       } else if (searchByAlt) {
          elements = findElementsByAlt((String)this.selectors.get("alt"));
       } else if (searchByText) {
-         elements = findElementsByAlt((String)this.selectors.get("text"));
+         elements = findElementsByText((String)this.selectors.get("text"));
       } else if (this.parent == null) {
          elements = this.browser.findElements(by, timeout);
       } else {

@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2011, SugarCRM, Inc.
+  Copyright (c) 2011-2012, SugarCRM, Inc.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,28 +26,77 @@
 -->
 
 <soda>
-	<puts text="select-test.xml starting." />
-	<browser url="{@global.url}/tests/test-data/selections.html" />
-	<puts text="Test: select-test.xml starting." />
-	
-	<browser assert="status message" />
-	<select id="list" set="zero" />
-	<button id="button" />
-	<browser assert="selected zero" />
-	
-	<select id="list" set="one" />
-	<button id="button" />
-	<browser assert="selected one" />
-	
-	<select id="list" set="two" />
-	<button id="button" />
-	<browser assert="selected two" />
-	
-	<select id="list" set="please select something" />
-	<button id="button" />
-	<browser assert="selected nothing" />
-	
-	
-	<puts text="select-test.xml finished." />
-	
+   <puts text="select-test.xml starting." />
+   <browser url="{@global.url}/tests/test-data/selections.html" />
+   <puts text="Test: select-test.xml starting." />
+   
+   <!-- included -->
+   <puts text="==> Testing included"/>
+   <select id="single" included="zero"/>
+   <select id="multi" included="alpha"/>
+
+   <!-- notincluded -->
+   <puts text="==> Testing notincluded"/>
+   <select id="single" notincluded="twenty"/>
+   <select id="multi" notincluded="zulu"/>
+
+   <!-- set -->
+   <puts text="==> Testing set"/>
+   <select id="single" set="one"/>
+   <select id="multi" set="bravo"/>
+   <select id="multi" set="charlie"/>
+   <button id="b"/>
+   <b id="singlestatus" assert="selected one"/>
+   <b id="multistatus" assert="selected bravocharlie"/>
+
+   <!-- clear -->
+   <puts text="==> Testing clear"/>
+   <select id="multi" clear="true"/>
+   <button id="b"/>
+   <b id="multistatus" assert="selected nothing"/>
+
+   <!-- setreal -->
+   <puts text="==> Testing setreal"/>
+   <select id="single" setreal="0"/>
+   <select id="multi" setreal="a"/>
+   <select id="multi" setreal="d"/>
+   <button id="b"/>
+   <b id="singlestatus" assert="selected zero"/>
+   <b id="multistatus" assert="selected alphadelta"/>
+
+   <!-- assertselected -->
+   <puts text="==> Testing assertselected"/>
+   <select id="single" set="one"/>
+   <select id="single" assertselected="true"/>
+   <select id="multi" clear="true"/>
+   <select id="multi" assertselected="false"/>
+   <select id="multi" set="bravo"/>
+   <select id="multi" assertselected="true"/>
+
+   <!-- assert -->
+   <puts text="==> Testing assert"/>
+   <select id="single" set="two"/>
+   <select id="single" assert="two"/>
+   <select id="multi" set="charlie"/>  <!-- exception when no matching opt -->
+   <select id="multi" assert="charlie"/>
+
+   <!-- assertnot -->
+   <puts text="==> Testing assertnot"/>
+   <select id="single" assertnot="one"/>
+   <select id="multi" clear="true"/>
+   <select id="multi" assertnot="alpha"/>
+
+   <!-- jscriptevent -->
+   <puts text="==> Testing jscriptevent"/>
+   <select id="jumper" jscriptevent="mouseover"/>
+   <b id="js" assert="over"/>
+
+   <!-- click -->
+   <puts text="==> Testing click"/>
+   <select id="jumper" click="true"/>
+   <browser action="back"/>
+
+   <puts text="select-test.xml finished." />
+
+   <browser action="close"/>
 </soda>

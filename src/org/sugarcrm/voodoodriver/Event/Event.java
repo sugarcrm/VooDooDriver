@@ -158,12 +158,18 @@ public abstract class Event {
       } else if (tagName.equals("thead")) {
       } else if (tagName.equals("tbody")) {
       } else if (tagName.equals("tr")) {
+      } else if (tagName.equals("th")) {
       } else if (tagName.equals("td")) {
       } else if (tagName.equals("link")) {
          event = new Link(element);
       } else if (tagName.equals("image")) {
       } else if (tagName.equals("map")) {
       } else if (tagName.equals("area")) {
+      } else if (tagName.equals("i")) {
+      } else if (tagName.equals("b")) {
+      } else if (tagName.equals("strike")) {
+      } else if (tagName.equals("s")) {
+      } else if (tagName.equals("u")) {
       } else if (tagName.equals("frame")) {
       } else if (tagName.equals("form")) {
       } else if (tagName.equals("input")) {
