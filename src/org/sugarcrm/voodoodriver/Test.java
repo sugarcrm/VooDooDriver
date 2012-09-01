@@ -124,7 +124,7 @@ public class Test {
     */
 
    private void initializeReporter(String suitename) {
-      String resultsDir = (String)this.config.get("resultsdir");
+      String resultsDir = (String)this.config.get("resultdir");
       if (suitename != null) {
          resultsDir = resultsDir + "/" + suitename;
       }
