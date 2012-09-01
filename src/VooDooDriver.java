@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -63,6 +63,12 @@ public class VooDooDriver {
     */
 
    final static String vddLogFilename = "voodoo.log";
+
+   /**
+    * VDD summary file.
+    */
+
+   private static VDDSummary summary;
 
 
    /**
@@ -550,6 +556,14 @@ public class VooDooDriver {
       loadPlugins(config);
       loadBlocklist(config);
 
+      try {
+         summary = new VDDSummary(config);
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Failed to create summary file: " + e);
+         System.exit(1);
+      }
+      System.out.println("(*)Report: " + summary.getFilename());
+
       if (config.containsKey("suite")) {
          RunSuites(config);
       }
@@ -557,6 +571,8 @@ public class VooDooDriver {
       if (config.containsKey("test")) {
          RunTests(config);
       }
+
+      summary.close();
 
       System.out.println("(*)VooDooDriver Finished.");
       closeLog();
@@ -580,11 +596,13 @@ public class VooDooDriver {
          return;
       }
 
-      System.out.printf("(*)Running Soda Tests...\n");
+      System.out.println("(*)Running Soda Tests...");
+
+      summary.openTag("suite");
 
       for (String testn: tests) {
          File test = new File(testn);
-         System.out.println("Starting Test " + test);
+         System.out.println("(*)Starting Test " + test);
 
          if (browser.isClosed()) {
             browser.newBrowser();
@@ -600,19 +618,8 @@ public class VooDooDriver {
             break;
          }
       }
-   }
 
-
-   /**
-    * Helper function to log summary data.
-    */
-
-   private static void writeSummary(FileOutputStream in, String msg) {
-      try {
-         in.write(msg.getBytes());
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+      summary.closeTag();
    }
 
 
@@ -629,14 +636,13 @@ public class VooDooDriver {
       int restartCount = (Integer)config.get("restartcount");
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
       int len = suites.size() -1;
-      String report_file_name = (String)config.get("resultdir");
-      String hostname = "";
-      FileOutputStream suiteRptFD = null;
       Browser browser = (Browser)config.get("browser");
       Date now = null;
       Date suiteStartTime = null;
       Date suiteStopTime = null;
       Boolean terminateRun = false;
+      String frac;
+      String date_str;
 
       if (suites.size() == 0) {
          return;
@@ -644,40 +650,7 @@ public class VooDooDriver {
 
       System.out.println("(*)Running Suite files...");
 
-      try {
-         InetAddress addr = InetAddress.getLocalHost();
-         hostname = addr.getHostName();
-         addr.getHostAddress();
-
-         if (hostname.isEmpty()) {
-            hostname = addr.getHostAddress();
-         }
-      } catch (Exception exp) {
-         System.out.printf("(!)Error: %s!\n", exp.getMessage());
-         System.exit(4);
-      }
-
-      now = new Date();
-      String frac = String.format("%1$tN", now);
-      String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                      now);
-      frac = frac.subSequence(0, 3).toString();
-      date_str += String.format(".%s", frac);
-
-      report_file_name += "/"+ hostname + "-" + date_str + ".xml";
-      report_file_name = FilenameUtils.separatorsToSystem(report_file_name);
-
-      try {
-         suiteRptFD = new FileOutputStream(report_file_name);
-         System.out.printf("(*)Report: %s\n", report_file_name);
-      } catch (Exception exp) {
-         System.out.printf("(!)Error: %s!\n", exp.getMessage());
-         System.exit(5);
-      }
-
       browser.newBrowser();
-
-      writeSummary(suiteRptFD, "<data>\n");
 
       /* Loop over suites */
       for (int i = 0; i <= len; i++) {
@@ -687,10 +660,8 @@ public class VooDooDriver {
          String suite_base_name = suite.getName();
          int testRanCount = 0;
 
-         writeSummary(suiteRptFD, "\t<suite>\n\n");
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<suitefile>%s</suitefile>\n",
-                                    suite_base_name));
+         summary.openTag("suite");
+         summary.writeData("suitefile", suite_base_name);
 
          Pattern p = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
          Matcher m = p.matcher(suite_base_name);
@@ -730,10 +701,8 @@ public class VooDooDriver {
                if (restartTest != null) {
                   System.out.printf("(*)Executing Restart Test: '%s'\n",
                                     restartTest);
-                  writeSummary(suiteRptFD, "\t\t<test>\n");
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<testfile>%s</testfile>\n",
-                                             restartTest));
+                  summary.openTag("test");
+                  summary.writeData("testfile", restartTest);
                   now = new Date();
                   test_start_time = now;
                   frac = String.format("%1$tN", now);
@@ -742,9 +711,7 @@ public class VooDooDriver {
                   frac = frac.subSequence(0, 3).toString();
                   date_str += String.format(".%s", frac);
 
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<starttime>%s</starttime>\n",
-                                             date_str));
+                  summary.writeData("starttime", date_str);
 
                   testobj = new Test(config, new File(restartTest),
                                      suite_base_noext, vars);
@@ -758,12 +725,9 @@ public class VooDooDriver {
                   frac = frac.subSequence(0, 3).toString();
                   date_str += String.format(".%s", frac);
 
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<stoptime>%s</stoptime>\n",
-                                             date_str));
+                  summary.writeData("stoptime", date_str);
                   String msg = Utils.GetRunTime(test_start_time, now);
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
+                  summary.writeData("totaltesttime", msg);
 
                   if (testobj.getEventLoop() != null) {
                      vars = testobj.getEventLoop().getSodaVars();
@@ -784,21 +748,17 @@ public class VooDooDriver {
                            value = "Passed";
                         }
                      }
-                     writeSummary(suiteRptFD,
-                                  String.format("\t\t\t<%s>%s</%s>\n",
-                                                key, value, key));
+                     summary.writeData(key, value);
                   }
-                  writeSummary(suiteRptFD, "\t\t</test>\n\n");
+                  summary.closeTag();
                }
 
                testRanCount = 0;
             }
 
-            writeSummary(suiteRptFD, "\t\t<test>\n");
+            summary.openTag("test");
             File current_test = suite_test_list.get(test_index);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<testfile>%s</testfile>\n",
-                                       current_test));
+            summary.writeData("testfile", current_test.toString());
             System.out.printf("(*)Executing Test: '%s'\n", current_test);
             now = new Date();
             test_start_time = now;
@@ -808,9 +768,7 @@ public class VooDooDriver {
             frac = frac.subSequence(0, 3).toString();
             date_str += String.format(".%s", frac);
 
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<starttime>%s</starttime>\n",
-                                       date_str));
+            summary.writeData("starttime", date_str);
 
             if (browser.isClosed()) {
                System.out.printf("(*)Browser was closed by another suite, creating new browser...\n");
@@ -828,12 +786,9 @@ public class VooDooDriver {
                                      now);
             frac = frac.subSequence(0, 3).toString();
             date_str += String.format(".%s", frac);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<stoptime>%s</stoptime>\n",
-                                       date_str));
+            summary.writeData("stoptime", date_str);
             String msg = Utils.GetRunTime(test_start_time, now);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
+            summary.writeData("totaltesttime", msg);
 
             if (testobj.getEventLoop() != null) {
                vars = testobj.getEventLoop().getSodaVars();
@@ -856,10 +811,9 @@ public class VooDooDriver {
                      testPassed = true;
                   }
                }
-               writeSummary(suiteRptFD, String.format("\t\t\t<%s>%s</%s>\n",
-                                                      key, value, key));
+               summary.writeData(key, value);
             }
-            writeSummary(suiteRptFD, "\t\t</test>\n\n");
+            summary.closeTag();
 
             if (restartCount > 0) {
                File pF = current_test.getParentFile();
@@ -901,22 +855,16 @@ public class VooDooDriver {
          startTimeStr += String.format(".%s", frac);
 
 
-         String msg = String.format("\t\t<runtime>%s</runtime>\n",
-                                    Utils.GetRunTime(suiteStartTime,
-                                                     suiteStopTime));
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<starttime>%s</starttime>\n",
-                                    startTimeStr));
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<stoptime>%s</stoptime>\n",
-                                    stopTimeStr));
-         writeSummary(suiteRptFD, msg);
-         writeSummary(suiteRptFD, "\t</suite>\n");
+         summary.writeData("starttime", startTimeStr);
+         summary.writeData("stoptime", stopTimeStr);
+         summary.writeData("runtime", Utils.GetRunTime(suiteStartTime,
+                                                       suiteStopTime));
+         summary.closeTag();
 
          if (terminateRun) {
             break;
          }
       }
-      writeSummary(suiteRptFD, "</data>\n\n");
+
    }
 }
