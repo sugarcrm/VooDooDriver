@@ -82,7 +82,7 @@ public class VDDSummary {
          // Unlikely and harmless.
       }
 
-      String date = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS.%1$tL",
+      String date = String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS.%1$tL",
                                   new Date());
 
       this.filename = new File((String)config.get("resultdir"),
