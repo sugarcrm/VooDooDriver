@@ -31,6 +31,7 @@
    <script file="tests/test-scripts/tests/link.xml"/>
    <script file="tests/test-scripts/tests/csv.xml"/>
    <script file="tests/test-scripts/tests/timestamp.xml"/>
+   <script file="tests/test-scripts/tests/screenshot.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>

@@ -65,15 +65,14 @@ public class EventLoop implements Runnable {
 
    public Vars vars;
 
-   private String currentHWnd = null;
-   private int attachTimeout = 0;
-
    /**
     * File specified by a <csv override=""/> event.
     */
 
    public File csvOverrideFile = null;
 
+   private String currentHWnd = null;
+   private int attachTimeout = 0;
    private Date threadTime = null;
    private volatile Thread runner;
    private volatile Boolean threadStop = false;
@@ -431,9 +430,6 @@ public class EventLoop implements Runnable {
       // case ALERT:
       //    result = alertEvent(event);
       //    break;
-      // case SCREENSHOT:
-      //    result = screenshotEvent(event);
-      //    break;
       // case FRAME:
       //    result = frameEvent(event);
       //    break;
@@ -568,27 +564,6 @@ public class EventLoop implements Runnable {
       }
       this.report.Log("Frame event finished.");
 
-      return result;
-   }
-
-   private boolean screenshotEvent(VDDHash event) {
-      boolean result = false;
-      String filename = "";
-
-      this.report.Log("Screenshot event starting.");
-
-      if (!event.containsKey("file")) {
-         result = false;
-         this.report.ReportError("Error: screenshot command missing 'file' attribute!");
-         this.report.Log("Screenshot event finished.");
-         return result;
-      } else {
-         filename = event.get("file").toString();
-         filename = this.replaceString(filename);
-         Utils.takeScreenShot(filename, this.report);
-      }
-
-      this.report.Log("Screenshot event finished.");
       return result;
    }
 

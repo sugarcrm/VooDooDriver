@@ -134,6 +134,7 @@ public abstract class Event {
       } else if (tagName.equals("puts")) {
          event = new Puts(element);
       } else if (tagName.equals("screenshot")) {
+         event = new Screenshot(element);
       } else if (tagName.equals("script")) {
       } else if (tagName.equals("timestamp")) {
          event = new Timestamp(element);
