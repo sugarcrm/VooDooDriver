@@ -57,9 +57,14 @@ public class EventLoop implements Runnable {
    public VDDHash hijacks = null;
    private String testName = "";
    public VDDHash whitelist = null;
-   public VDDHash sodaVars = null;
    public VDDHash elementStore = null;
    private ArrayList<Plugin> plugins = null;
+
+   /**
+    * VDD variables.
+    */
+
+   public Vars vars;
 
    private String currentHWnd = null;
    private int attachTimeout = 0;
@@ -81,39 +86,20 @@ public class EventLoop implements Runnable {
     * @param events   list of events from the test file
     * @param config   VDD config info
     * @param reporter {@link Reporter}
-    * @param oldVars  {@link VDDHash}
+    * @param vars  {@link Vars}
     * @param testName the current running test
     */
 
    public EventLoop(ArrayList<Event> events, VDDHash config, Reporter reporter,
-                    VDDHash oldVars, String testName) {
+                    Vars vars, String testName) {
       this.testEvents = events;
       this.Browser = (Browser)config.get("browser");
       this.report = reporter;
       this.hijacks = (VDDHash)config.get("hijack");;
       this.testName = testName;
       this.whitelist = new VDDHash();
-
-      if (oldVars != null) {
-         sodaVars = oldVars;
-      } else {
-         sodaVars = new VDDHash();
-      }
-
+      this.vars = vars;
       this.elementStore = new VDDHash();
-
-      VDDHash gvars = (VDDHash)config.get("gvar");
-      if (gvars != null) {
-         int len = gvars.keySet().size();
-
-         for (int i = 0; i <= len - 1; i++) {
-            String key = gvars.keySet().toArray()[i].toString();
-            String value = gvars.get(key).toString();
-            System.out.printf("--)'%s' => '%s'\n", key, value);
-
-            this.sodaVars.put(key, value);
-         }
-      }
 
       this.plugins = new ArrayList<Plugin>();
       @SuppressWarnings("unchecked")
@@ -124,7 +110,7 @@ public class EventLoop implements Runnable {
 
       this.stampEvent();
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-      this.sodaVars.put("currentdate", df.format(new Date()));
+      this.vars.put("currentdate", df.format(new Date()));
       this.threadTime = new Date();
       String hwnd = this.Browser.getDriver().getWindowHandle();
       this.setCurrentHWND(hwnd);
@@ -211,10 +197,6 @@ public class EventLoop implements Runnable {
 
    private void saveElement(VDDHash event, WebElement element) {
       /* Moved to HtmlEvent.SaveAction */
-   }
-
-   public VDDHash getSodaVars() {
-      return this.sodaVars;
    }
 
 
@@ -803,7 +785,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(parent);
       data.setBrowser(this.Browser);
-      data.setSodaVars(this.sodaVars);
+      data.setVars(this.vars);
       data.setHijacks(this.hijacks);
       data.setTestName(this.testName);
 
@@ -1580,7 +1562,7 @@ public class EventLoop implements Runnable {
       String date_str = df.format(now);
 
       this.report.Log(String.format("Setting STAMP => '%s'.", date_str));
-      this.sodaVars.put("stamp", date_str);
+      this.vars.put("stamp", date_str);
       return result;
    }
 
@@ -2167,9 +2149,12 @@ public class EventLoop implements Runnable {
          if (this.hijacks.containsKey(tmp)) {
             String value = this.hijacks.get(tmp).toString();
             result = result.replace(m, value);
-         } else if (this.sodaVars.containsKey(tmp)) {
-            String value = this.sodaVars.get(tmp).toString();
-            result = result.replace(m, value);
+         } else {
+            try {
+               String value = this.vars.get(tmp).toString();
+               result = result.replace(m, value);
+            } catch (NoSuchFieldException e) {
+            }
          }
       }
 
@@ -2307,24 +2292,24 @@ public class EventLoop implements Runnable {
             var_name = this.replaceString(var_name);
             var_value = event.get("set").toString();
             var_value = this.replaceString(var_value);
-            this.sodaVars.put(var_name, var_value);
+            this.vars.put(var_name, var_value);
 
             String tmp_value = var_value;
             tmp_value = tmp_value.replaceAll("\n", "\\\n");
 
-            this.report.Log("Setting SODA variable: '" + var_name + "' => '"
-                  + tmp_value + "'.");
+            this.report.Log("Setting variable: '" + var_name + "' => '" +
+                            tmp_value + "'.");
          }
 
          if (event.containsKey("unset")) {
             var_name = event.get("var").toString();
             var_name = this.replaceString(var_name);
-            this.report.Log("Unsetting SODA variable: '" + var_name + "'.");
-            if (!this.sodaVars.containsKey(var_name)) {
-               this.report.Log("SODA variable: '" + var_name
-                     + "' not found, nothing to unset.");
-            } else {
-               this.sodaVars.remove(var_name);
+            this.report.Log("Unsetting variable: '" + var_name + "'.");
+            try {
+               this.vars.remove(var_name);
+            } catch (NoSuchElementException e) {
+               this.report.Log("Variable: '" + var_name +
+                               "' not found, nothing to unset.");
             }
          }
       } catch (Exception exp) {
@@ -2641,7 +2626,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
-      data.setSodaVars(this.sodaVars);
+      data.setVars(this.vars);
       data.setHijacks(this.hijacks);
       data.setTestName(this.testName);
 
@@ -2671,7 +2656,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
-      data.setSodaVars(this.sodaVars);
+      data.setVars(this.vars);
       data.setHijacks(this.hijacks);
       data.setTestName(this.testName);
 
@@ -2705,7 +2690,7 @@ public class EventLoop implements Runnable {
 
       data.setElement(element);
       data.setBrowser(this.Browser);
-      data.setSodaVars(this.sodaVars);
+      data.setVars(this.vars);
       data.setHijacks(this.hijacks);
       data.setTestName(this.testName);
 

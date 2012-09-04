@@ -279,7 +279,7 @@ class CSV extends Event {
                                  val + "'.");
          }
 
-         eventLoop.sodaVars.put(key, val);
+         eventLoop.vars.put(key, val);
       }
 
       return true;
@@ -345,6 +345,13 @@ class CSV extends Event {
          this.prefix = (String)this.actions.get("var");
       }
 
-      loadCSVKeys();
+      try {
+         this.eventLoop.vars.pushContext();
+         loadCSVKeys();
+      } catch (VDDException e) {
+         /* Don't leave dangling contexts around. */
+         this.eventLoop.vars.popContext();
+         throw e;
+      }
    }
 }

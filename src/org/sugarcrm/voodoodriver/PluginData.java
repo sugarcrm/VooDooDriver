@@ -47,7 +47,7 @@ public class PluginData {
     */
 
    private final String[] methods = {"args", "browser", "element", "hijacks",
-                                     "sodavars", "testname"};
+                                     "vars", "testname"};
 
 
    /**
@@ -79,7 +79,7 @@ public class PluginData {
     *
     * @param method  name of methods to check for. Current methods are
     *                <ul><li>args</li><li>browser</li><li>element</li>
-    *                <li>hijacks</li><li>sodavars</li><li>testname</li></ul>
+    *                <li>hijacks</li><li>vars</li><li>testname</li></ul>
     * @return true if the methods exist, false otherwise
     */
 
@@ -171,13 +171,13 @@ public class PluginData {
 
 
    /**
-    * Set the current Soda Vars.
+    * Store a copy of the VDD vars.
     *
-    * @param sodaVars  {@link VDDHash} of Soda Vars
+    * @param vars  VDD {@link Vars}
     */
 
-   public void setSodaVars(VDDHash sodaVars) {
-      this.d.put("sodavars", new VDDHash(sodaVars));
+   public void setVars(Vars vars) {
+      this.d.put("vars", new Vars(vars));
    }
 
 
@@ -187,8 +187,8 @@ public class PluginData {
     * @return {@link VDDHash} of current Soda Vars
     */
 
-   public VDDHash getSodaVars() {
-      return (VDDHash)this.d.get("sodavars");
+   public Vars getVars() {
+      return (Vars)this.d.get("vars");
    }
 
 

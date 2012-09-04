@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.io.FilenameUtils;
 import org.sugarcrm.voodoodriver.BlockList;
 import org.sugarcrm.voodoodriver.BlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
@@ -40,6 +37,7 @@ import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.Vars;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 
@@ -581,6 +579,29 @@ public class VooDooDriver {
 
 
    /**
+    * Create a vars object and populate its base context.
+    *
+    * @param config  VDD config object
+    * @return populated Vars object
+    */
+
+   private static Vars createVars(VDDHash config) {
+      Vars v = new Vars();
+
+      VDDHash gvars = (VDDHash)config.get("gvar");
+      if (gvars == null) {
+         return v;
+      }
+
+      for (String key: gvars.keySet()) {
+         v.put(key, gvars.get(key).toString());
+      }
+
+      return v;
+   }
+
+
+   /**
     * Format a date into a string.
     *
     * @param d  Date to be formatted
@@ -600,7 +621,7 @@ public class VooDooDriver {
     */
 
    private static boolean runOneTest(File test, String suite, VDDHash config,
-                                     VDDHash vars, boolean isRestart) {
+                                     Vars vars, boolean isRestart) {
       Date startTime, stopTime;
       boolean result = true;
 
@@ -672,6 +693,8 @@ public class VooDooDriver {
       startTime = new Date();
 
       for (String test: tests) {
+         Vars v = createVars(config);
+
          if (browser.isClosed()) {
             browser.newBrowser();
          }
@@ -728,9 +751,9 @@ public class VooDooDriver {
          File suite = new File(suiteStr);
          String baseName = suite.getName().replaceAll("\\.xml$", "");
          int testsRan = 0;
-         VDDHash vars = new VDDHash();
          Date suiteStartTime, suiteStopTime;
          SuiteParser sp = null;
+         Vars vars = createVars(config);
 
          System.out.println("(*)Executing Suite: " + baseName);
 

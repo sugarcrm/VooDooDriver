@@ -70,13 +70,34 @@ public class Vars {
 
 
    /**
+    * Create a Vars object out of an existing Vars object.
+    *
+    * All the contexts in the source Vars object will be flattened
+    * into one context.
+    *
+    * @param v  Vars object to copy
+    */
+
+   public Vars(Vars v) {
+      this.context = new LinkedList<HashMap<String,String>>();
+      this.pushContext();
+
+      for (HashMap<String,String> h: v.context) {
+         for (String key: h.keySet()) {
+            this.put(key, h.get(key));
+         }
+      }
+   }
+
+
+   /**
     * Assign a value to a variable.
     *
     * @param var    the name of the variable
     * @param value  the value to assign to the variable
     */
 
-   public void set(String var, String value) {
+   public void put(String var, String value) {
       HashMap<String,String> context = this.context.peek();
 
       for (HashMap<String,String> search: this.context) {
@@ -93,20 +114,19 @@ public class Vars {
    /**
     * Get the value of the specified variable.
     *
-    * If the variable exists in no context, an empty string is returned.
-    *
     * @param var  the name of the variable
     * @return the value of the variable or an empty string
+    * @throws NoSuchFieldException if the variable does not exist
     */
 
-   public String get(String var) {
+   public String get(String var) throws NoSuchFieldException {
       for (HashMap<String,String> search: this.context) {
          if (search.containsKey(var)) {
             return search.get(var);
          }
       }
 
-      return "";
+      throw new NoSuchFieldException("Var '" + var + "' does not exist");
    }
 
 
@@ -116,7 +136,7 @@ public class Vars {
     * @param var  the name of the variable
     */
 
-   public void delete(String var) {
+   public void remove(String var) {
       for (HashMap<String,String> search: this.context) {
          if (search.containsKey(var)) {
             search.remove(var);

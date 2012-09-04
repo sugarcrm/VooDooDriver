@@ -44,6 +44,12 @@ public class Test {
    private File testFile;
 
    /**
+    * The Vars object for this test.
+    */
+
+   private Vars vars;
+
+   /**
     * This Test's {@link EventLoop}.
     */
 
@@ -68,12 +74,6 @@ public class Test {
    private boolean isRestartTest = false;
 
    /**
-    * GVars from the previous Test.
-    */
-
-   private VDDHash oldVars = null;
-
-   /**
     * Amount of time allowed before this test times out.  Default is 5 minutes.
     */
 
@@ -91,27 +91,14 @@ public class Test {
     *
     * @param config     VDD configuration
     * @param testFile   name of this test file
+    * @param suitename  name of the current suite or null
+    * @param vars       the Vars object for this test
     */
 
-   public Test(VDDHash config, File testFile) {
-      this(config, testFile, null, null);
-   }
-
-
-   /**
-    * Initialize a Test object.
-    *
-    * @param config     VDD configuration
-    * @param testFile   name of this test file
-    * @param suitename  name of the current Soda suite or null
-    * @param oldVars    gvars from last test
-    */
-
-   public Test(VDDHash config, File testFile, String suitename,
-               VDDHash oldVars) {
+   public Test(VDDHash config, File testFile, String suitename, Vars vars) {
       this.config = config;
       this.testFile = testFile;
-      this.oldVars = oldVars;
+      this.vars = vars;
 
       initializeReporter(suitename);
    }
@@ -314,7 +301,7 @@ public class Test {
       }
 
       this.eventLoop = new EventLoop(this.events, this.config, this.reporter,
-                                     this.oldVars, this.testFile.toString());
+                                     this.vars, this.testFile.toString());
 
       if (this.config.containsKey("attachtimeout")) {
          int attachTimeout = (Integer)this.config.get("attachtimeout");

@@ -511,9 +511,12 @@ public abstract class Event {
          if (this.eventLoop.hijacks.containsKey(tmp)) {
             String value = this.eventLoop.hijacks.get(tmp).toString();
             result = result.replace(m, value);
-         } else if (this.eventLoop.sodaVars.containsKey(tmp)) {
-            String value = this.eventLoop.sodaVars.get(tmp).toString();
-            result = result.replace(m, value);
+         } else {
+            try {
+               String value = this.eventLoop.vars.get(tmp);
+               result = result.replace(m, value);
+            } catch (NoSuchFieldException e) {
+            }
          }
       }
 

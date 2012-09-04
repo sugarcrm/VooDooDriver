@@ -233,7 +233,7 @@ abstract class HtmlEvent extends Event {
 
          eventLoop.report.Log("Setting VDD variable: '" + var + "' => '" +
                               value.replaceAll("\n", "\\n") + "'.");
-         eventLoop.sodaVars.put(var, value);
+         eventLoop.vars.put(var, value);
       }
    }
 
