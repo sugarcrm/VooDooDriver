@@ -136,6 +136,7 @@ public abstract class Event {
       } else if (tagName.equals("screenshot")) {
       } else if (tagName.equals("script")) {
       } else if (tagName.equals("timestamp")) {
+         event = new Timestamp(element);
       } else if (tagName.equals("var")) {
       } else if (tagName.equals("wait")) {
          event = new Wait(element);

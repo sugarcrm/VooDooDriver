@@ -19,7 +19,6 @@ package org.sugarcrm.voodoodriver;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,12 +107,16 @@ public class EventLoop implements Runnable {
          this.plugins.addAll(p);
       }
 
-      this.stampEvent();
+      /* Create an initial timestamp. */
+      this.vars.put("stamp",
+                    new SimpleDateFormat("yyMMdd_hhmmss").format(new Date()));
+
       SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
       this.vars.put("currentdate", df.format(new Date()));
+
+      this.setCurrentHWND(this.Browser.getDriver().getWindowHandle());
+
       this.threadTime = new Date();
-      String hwnd = this.Browser.getDriver().getWindowHandle();
-      this.setCurrentHWND(hwnd);
       this.runner = new Thread(this, "EventLoop-Thread");
       runner.start();
    }
@@ -367,12 +370,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case SELECT:
       //    element = selectEvent(event, parent);
-      //    break;
-      // case STAMP:
-      //    result = stampEvent();
-      //    break;
-      // case TIMESTAMP:
-      //    result = stampEvent();
       //    break;
       // case SPAN:
       //    element = spanEvent(event, parent);
@@ -1552,17 +1549,6 @@ public class EventLoop implements Runnable {
       }
 
       this.report.Log("Hidden event finished.");
-      return result;
-   }
-
-   private boolean stampEvent() {
-      boolean result = false;
-      Date now = new Date();
-      DateFormat df = new SimpleDateFormat("yyMMdd_hhmmss");
-      String date_str = df.format(now);
-
-      this.report.Log(String.format("Setting STAMP => '%s'.", date_str));
-      this.vars.put("stamp", date_str);
       return result;
    }
 

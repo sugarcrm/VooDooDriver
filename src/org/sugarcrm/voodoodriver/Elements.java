@@ -95,7 +95,6 @@ public enum Elements {
    PLUGIN,
    PLUGINCONTROL,
    RUBY,
-   STAMP,
    TEXT_FIELD;
 
    static public boolean isMember(String aName) {

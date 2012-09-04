@@ -29,6 +29,10 @@
    <script file="tests/test-scripts/tests/browser.xml"/>
    <script file="tests/test-scripts/tests/find-elements.xml"/>
    <script file="tests/test-scripts/tests/link.xml"/>
+   <script file="tests/test-scripts/tests/csv.xml"/>
+   <script file="tests/test-scripts/tests/timestamp.xml"/>
+
+   <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
    <script file="tests/test-scripts/tests/radio-test.xml"/>
    <script file="tests/test-scripts/tests/field-test.xml"/>
@@ -39,5 +43,6 @@
    <script file="tests/test-scripts/tests/list-test.xml"/>
    <script file="tests/test-scripts/tests/image-test.xml"/>
    <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
+   -->
    <script file="tests/test-scripts/tests/cleanup.xml"/>
 </soda>
