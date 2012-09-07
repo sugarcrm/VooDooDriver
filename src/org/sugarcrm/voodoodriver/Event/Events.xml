@@ -128,11 +128,11 @@
    </timestamp>
 
    <var>
-      <selectors>
+      <actions>
          <accessor type="string">set</accessor>
          <accessor type="string">var</accessor>
          <accessor type="string">unset</accessor>
-      </selectors> 
+      </actions> 
    </var>
 
    <wait>

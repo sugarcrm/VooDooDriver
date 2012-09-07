@@ -334,6 +334,28 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
+      // case DELETE:
+      //    result = deleteEvent(event);
+      //    break;
+      // case EXECUTE:
+      //    result = executeEvent(event);
+      //    break;
+      // case JAVASCRIPT:
+      //    result = javascriptEvent(event);
+      //    break;
+      // case PLUGINLOADER:
+      //    result = pluginloaderEvent(event);
+      //    break;
+      // case JAVAPLUGIN:
+      //    result = javapluginEvent(event, parent);
+      //    break;
+      // case WHITELIST:
+      //    result = whitelistEvent(event);
+      //    break;
+      // case DND:
+      //    result = dndEvent(event);
+      //    break;
+
       // case THEAD:
       //    element = theadEvent(event, parent);
       //    break;
@@ -351,9 +373,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
-      //    break;
-      // case VAR:
-      //    result = varEvent(event);
       //    break;
       // case SCRIPT:
       //    result = scriptEvent(event);
@@ -388,9 +407,6 @@ public class EventLoop implements Runnable {
       // case IMAGE:
       //    element = imageEvent(event, parent);
       //    break;
-      // case DND:
-      //    result = dndEvent(event);
-      //    break;
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
@@ -399,12 +415,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case RADIO:
       //    element = radioEvent(event, parent);
-      //    break;
-      // case EXECUTE:
-      //    result = executeEvent(event);
-      //    break;
-      // case JAVASCRIPT:
-      //    result = javascriptEvent(event);
       //    break;
       // case UL:
       //    result = ulEvent(event);
@@ -418,23 +428,11 @@ public class EventLoop implements Runnable {
       // case AREA:
       //    result = areaEvent(event);
       //    break;
-      // case PLUGINLOADER:
-      //    result = pluginloaderEvent(event);
-      //    break;
-      // case JAVAPLUGIN:
-      //    result = javapluginEvent(event, parent);
-      //    break;
-      // case DELETE:
-      //    result = deleteEvent(event);
-      //    break;
       // case ALERT:
       //    result = alertEvent(event);
       //    break;
       // case FRAME:
       //    result = frameEvent(event);
-      //    break;
-      // case WHITELIST:
-      //    result = whitelistEvent(event);
       //    break;
       // case INPUT:
       //    element = inputEvent(event, parent);
@@ -2234,53 +2232,6 @@ public class EventLoop implements Runnable {
       return result;
    }
 
-   /*
-    * varEvent -- method This method sets a SODA var that can then be used in
-    * the follow script.
-    *
-    * Input: event: A Soda event.
-    *
-    * Output: returns true on success or false on fail.
-    */
-   private boolean varEvent(VDDHash event) {
-      boolean result = false;
-      String var_name = "";
-      String var_value = "";
-
-      try {
-         if (event.containsKey("set")) {
-            var_name = event.get("var").toString();
-            var_name = this.replaceString(var_name);
-            var_value = event.get("set").toString();
-            var_value = this.replaceString(var_value);
-            this.vars.put(var_name, var_value);
-
-            String tmp_value = var_value;
-            tmp_value = tmp_value.replaceAll("\n", "\\\n");
-
-            this.report.Log("Setting variable: '" + var_name + "' => '" +
-                            tmp_value + "'.");
-         }
-
-         if (event.containsKey("unset")) {
-            var_name = event.get("var").toString();
-            var_name = this.replaceString(var_name);
-            this.report.Log("Unsetting variable: '" + var_name + "'.");
-            try {
-               this.vars.remove(var_name);
-            } catch (NoSuchElementException e) {
-               this.report.Log("Variable: '" + var_name +
-                               "' not found, nothing to unset.");
-            }
-         }
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         result = false;
-      }
-
-      return result;
-   }
-
    private WebElement checkboxEvent(VDDHash event, WebElement parent) {
       boolean click = false;
       boolean required = true;
@@ -3015,12 +2966,6 @@ public class EventLoop implements Runnable {
    }
 
    private void handleVars(String value, VDDHash event) {
-      if (event.containsKey("var")) {
-         String name = event.get("var").toString();
-         VDDHash tmp = new VDDHash();
-         tmp.put("set", value);
-         tmp.put("var", name);
-         this.varEvent(tmp);
-      }
+      // Moved to HtmlEvent.VarAction
    }
 }
