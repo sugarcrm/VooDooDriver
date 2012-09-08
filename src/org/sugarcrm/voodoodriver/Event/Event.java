@@ -126,6 +126,7 @@ public abstract class Event {
       } else if (tagName.equals("csv")) {
          event = new CSV(element);
       } else if (tagName.equals("delete")) {
+         event = new Delete(element);
       } else if (tagName.equals("dnd")) {
       } else if (tagName.equals("execute")) {
       } else if (tagName.equals("javaplugin")) {

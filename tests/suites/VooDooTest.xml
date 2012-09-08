@@ -33,6 +33,7 @@
    <script file="tests/test-scripts/tests/timestamp.xml"/>
    <script file="tests/test-scripts/tests/screenshot.xml"/>
    <script file="tests/test-scripts/tests/var.xml"/>
+   <script file="tests/test-scripts/tests/delete.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>

@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -56,7 +57,13 @@ public class EventLoop implements Runnable {
    public VDDHash hijacks = null;
    private String testName = "";
    public VDDHash whitelist = null;
-   public VDDHash elementStore = null;
+
+   /**
+    * Stored, named HTML elements for use with DnD.
+    */
+
+   public HashMap<String,WebElement> elementStore;
+
    private ArrayList<Plugin> plugins = null;
 
    /**
@@ -91,13 +98,14 @@ public class EventLoop implements Runnable {
    public EventLoop(ArrayList<Event> events, VDDHash config, Reporter reporter,
                     Vars vars, String testName) {
       this.testEvents = events;
-      this.Browser = (Browser)config.get("browser");
       this.report = reporter;
-      this.hijacks = (VDDHash)config.get("hijack");;
-      this.testName = testName;
-      this.whitelist = new VDDHash();
       this.vars = vars;
-      this.elementStore = new VDDHash();
+      this.testName = testName;
+
+      this.Browser = (Browser)config.get("browser");
+      this.hijacks = (VDDHash)config.get("hijack");;
+      this.whitelist = new VDDHash();
+      this.elementStore = new HashMap<String,WebElement>();
 
       this.plugins = new ArrayList<Plugin>();
       @SuppressWarnings("unchecked")
@@ -334,9 +342,6 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
-      // case DELETE:
-      //    result = deleteEvent(event);
-      //    break;
       // case EXECUTE:
       //    result = executeEvent(event);
       //    break;
@@ -675,34 +680,6 @@ public class EventLoop implements Runnable {
 
       return result;
    }
-
-   private boolean deleteEvent(VDDHash event) {
-      boolean result = false;
-
-      this.report.Log("Delete event starting.");
-      if (event.containsKey("name")) {
-         String name = event.get("name").toString();
-         name = this.replaceString(name);
-
-         if (this.elementStore.containsKey(name)) {
-            this.elementStore.remove(name);
-            this.report.Log("Deleted stored var.");
-            result = true;
-         } else {
-            result = false;
-            String msg = String.format("Error: failed to find variable to delete by name: '%s'!",
-                  name);
-            this.report.ReportError(msg);
-         }
-      } else {
-         this.report.ReportError("Error: delete command missing name attribute!");
-         result = false;
-      }
-
-      this.report.Log("Finsihed Delete event.");
-      return result;
-   }
-
 
    /**
     * Execute a <javaplugin> event.
@@ -1132,8 +1109,8 @@ public class EventLoop implements Runnable {
       }
 
       if (result) {
-         WebElement Esrc = (WebElement) this.elementStore.get(src);
-         WebElement Edst = (WebElement) this.elementStore.get(dst);
+         WebElement Esrc = this.elementStore.get(src);
+         WebElement Edst = this.elementStore.get(dst);
          VDDMouse mouse = new VDDMouse(this.report);
          mouse.DnD(Esrc, Edst);
       }

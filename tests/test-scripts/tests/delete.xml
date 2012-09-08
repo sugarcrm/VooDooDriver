@@ -1,0 +1,7 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/delete.html"/>
+   <link id="a" save="a"/>
+   <link id="b" save="b"/>
+   <delete name="b"/>
+   <delete name="a"/>
+</voodoo>
