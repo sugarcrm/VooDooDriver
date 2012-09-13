@@ -349,9 +349,6 @@ public class EventLoop implements Runnable {
       // case EXECUTE:
       //    result = executeEvent(event);
       //    break;
-      // case JAVASCRIPT:
-      //    result = javascriptEvent(event);
-      //    break;
       // case PLUGINLOADER:
       //    result = pluginloaderEvent(event);
       //    break;
@@ -950,43 +947,6 @@ public class EventLoop implements Runnable {
 
       this.report.Log("OL event Finished.");
 
-      return result;
-   }
-
-   private boolean javascriptEvent(VDDHash event) {
-      boolean result = false;
-      String scriptdata = "";
-
-      this.report.Log("Javascript event starting.");
-
-      if (event.containsKey("content")) {
-         this.report.Warn("Using javascript contents is deprecated, please use the file attribute!");
-         scriptdata = event.get("content").toString();
-      }
-
-      if (event.containsKey("file")) {
-         scriptdata = "";
-         String filename = event.get("file").toString();
-         filename = this.replaceString(filename);
-
-         File fd = new File(filename);
-         try {
-            BufferedReader reader = new BufferedReader(new FileReader(fd));
-            String tmp;
-
-            while ((tmp = reader.readLine()) != null) {
-               scriptdata = scriptdata.concat(tmp);
-            }
-            result = true;
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-            result = false;
-         }
-      }
-
-      this.Browser.executeJS(scriptdata, null);
-
-      this.report.Log("Javascript event finished.");
       return result;
    }
 

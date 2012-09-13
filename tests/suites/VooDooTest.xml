@@ -25,7 +25,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<soda>     
+<voodoo>     
    <script file="tests/test-scripts/tests/browser.xml"/>
    <script file="tests/test-scripts/tests/find-elements.xml"/>
    <script file="tests/test-scripts/tests/link.xml"/>
@@ -35,6 +35,7 @@
    <script file="tests/test-scripts/tests/var.xml"/>
    <script file="tests/test-scripts/tests/delete.xml"/>
    <script file="tests/test-scripts/tests/whitelist.xml"/>
+   <script file="tests/test-scripts/tests/javascript.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
@@ -49,4 +50,4 @@
    <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
    -->
    <script file="tests/test-scripts/tests/cleanup.xml"/>
-</soda>
+</voodoo>

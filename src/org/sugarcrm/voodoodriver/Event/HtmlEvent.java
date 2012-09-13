@@ -524,8 +524,8 @@ abstract class HtmlEvent extends Event {
       /*
        * Add default values for universal actions.
        */
-      if (!this.actions.containsKey("assertPage")) {
-         this.actions.put("assertPage", true);
+      if (!this.actions.containsKey("assertpage")) {
+         this.actions.put("assertpage", true);
       }
 
       /*
