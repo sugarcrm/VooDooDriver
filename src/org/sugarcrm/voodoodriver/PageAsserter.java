@@ -18,6 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,9 +33,10 @@ public class PageAsserter {
    private ArrayList<String> checkes = null;
    private File fd = null;
    private Reporter reporter = null;
-   private VDDHash whiteList = null;
+   private HashMap<String,String> whiteList = null;
 
-   public PageAsserter(String assertFile, Reporter reporter, VDDHash whitelist) {
+   public PageAsserter(String assertFile, Reporter reporter,
+                       HashMap<String,String> whitelist) {
       this.reporter = reporter;
       this.ignores = new ArrayList<String>();
       this.checkes = new ArrayList<String>();
@@ -45,7 +47,7 @@ public class PageAsserter {
       if (whitelist != null) {
          this.whiteList = whitelist;
       } else {
-         this.whiteList = new VDDHash();
+         this.whiteList = new HashMap<String,String>();
       }
 
       fd = new File(assertFile);
@@ -64,7 +66,7 @@ public class PageAsserter {
       }
    }
 
-   public void assertPage(String pagesrc, VDDHash whitelist) {
+   public void assertPage(String pagesrc, HashMap<String,String> whitelist) {
       this.whiteList.putAll(whitelist);
       assertPage(pagesrc);
    }

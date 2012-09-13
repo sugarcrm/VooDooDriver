@@ -46,7 +46,7 @@
          </action>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-         <accessor type="boolean">assertPage</accessor>
+         <accessor type="boolean">assertpage</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="boolean">exist</accessor>
@@ -144,11 +144,9 @@
 
    <whitelist>
       <actions>
-         <accessor type="string">add</accessor>
-         <accessor type="string">delete</accessor>
-         <accessor type="string">name</accessor>
-         <accessor type="string">content</accessor>
          <accessor type="string">action</accessor>
+         <accessor type="string">content</accessor>
+         <accessor type="string">name</accessor>
       </actions>
    </whitelist>
 
@@ -686,7 +684,7 @@
          <accessor type="boolean">alert</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-         <accessor type="boolean">assertPage</accessor>
+         <accessor type="boolean">assertpage</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>

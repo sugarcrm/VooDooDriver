@@ -56,7 +56,12 @@ public class EventLoop implements Runnable {
    public Reporter report = null;
    public VDDHash hijacks = null;
    private String testName = "";
-   public VDDHash whitelist = null;
+
+   /**
+    * Strings to ignore during page assertion processing.
+    */
+
+   public HashMap<String,String> whitelist;
 
    /**
     * Stored, named HTML elements for use with DnD.
@@ -104,7 +109,7 @@ public class EventLoop implements Runnable {
 
       this.Browser = (Browser)config.get("browser");
       this.hijacks = (VDDHash)config.get("hijack");;
-      this.whitelist = new VDDHash();
+      this.whitelist = new HashMap<String,String>();
       this.elementStore = new HashMap<String,WebElement>();
 
       this.plugins = new ArrayList<Plugin>();
@@ -336,7 +341,6 @@ public class EventLoop implements Runnable {
 
 
 
-
       //private boolean handleSingleEvent(VDDHash event, WebElement parent) {
       //Elements type = Elements.valueOf(event.get("type").toString());
 
@@ -353,9 +357,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case JAVAPLUGIN:
       //    result = javapluginEvent(event, parent);
-      //    break;
-      // case WHITELIST:
-      //    result = whitelistEvent(event);
       //    break;
       // case DND:
       //    result = dndEvent(event);
@@ -471,55 +472,6 @@ public class EventLoop implements Runnable {
       } else {
          this.report.Log(msg + ", but required = false.");
       }
-   }
-
-   private boolean whitelistEvent(VDDHash event) {
-      boolean result = false;
-      String action = null;
-      String name = null;
-      String msg = "";
-
-      this.report.Log("Whitelist event starting...");
-
-      if (event.containsKey("name")) {
-         name = event.get("name").toString();
-         name = this.replaceString(name);
-      }
-
-      if (name == null) {
-         this.report.ReportError("Error: Missing 'name' attribute!");
-         this.report.Log("Whitelist event finished.");
-         return false;
-      }
-
-      if (event.containsKey("action")) {
-         action = event.get("action").toString();
-         action = this.replaceString(action);
-         action = action.toLowerCase();
-      }
-
-      if ((action == null) || (!action.contains("add") && !action.contains("delete"))) {
-         msg = String.format("Error: action is an unknow type: '%s'!", action);
-         this.report.ReportError(msg);
-         this.report.Log("Whitelist event finished.");
-         return false;
-      }
-
-      if (action.contains("add")) {
-         String tmp = event.get("content").toString();
-         tmp = this.replaceString(tmp);
-         this.whitelist.put(name, tmp);
-         msg = String.format("Added whitelist item: '%s' => '%s'.", name, tmp);
-         this.report.Log(msg);
-      } else {
-         this.whitelist.remove(name);
-         msg = String.format("Deleted whitelist item: '%s'.", name);
-         this.report.Log(msg);
-      }
-
-      this.report.Log("Whitelist event finished.");
-
-      return result;
    }
 
    private boolean frameEvent(VDDHash event) {

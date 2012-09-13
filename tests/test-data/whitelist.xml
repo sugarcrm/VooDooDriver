@@ -1,0 +1,5 @@
+<voodoo>
+   <checks>
+      <regex>one</regex>
+   </checks>
+</voodoo>

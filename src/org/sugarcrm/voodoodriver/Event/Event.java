@@ -144,6 +144,7 @@ public abstract class Event {
       } else if (tagName.equals("wait")) {
          event = new Wait(element);
       } else if (tagName.equals("whitelist")) {
+         event = new Whitelist(element);
       } else if (tagName.equals("alert")) {
       } else if (tagName.equals("div")) {
       } else if (tagName.equals("span")) {

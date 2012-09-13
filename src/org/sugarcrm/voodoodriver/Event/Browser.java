@@ -97,10 +97,11 @@ public class Browser extends Event {
                b.AssertNot(assertion);
             }
          } else if (attr.equals("assertpage")) {
-            // assertPage = this.clickToBool(event.get("assertPage").toString());
-            // this.report.Log(String.format("Borwser assertPage => '%s'.",
-            //                               assertPage));
-            this.eventLoop.report.Warn("browser attribute assertpage unimplemented");
+            boolean doAssertPage = (Boolean)this.actions.get(attr);
+
+            if (doAssertPage) {
+               this.eventLoop.Browser.assertPage(this.eventLoop.whitelist);
+            }
          } else if (attr.equals("cssprop")) {
             this.eventLoop.report.Warn("browser attribute cssprop unimplemented");
          } else if (attr.equals("cssvalue")) {

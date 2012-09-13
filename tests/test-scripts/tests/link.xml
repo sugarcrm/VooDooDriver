@@ -74,7 +74,7 @@
 
    <!-- assertPage -->
 
-   <link id="assert" assertPage="false" click="false"/>
+   <link id="assert" assertpage="false" click="false"/>
 
    <!-- cssprop/cssvalue -->
 

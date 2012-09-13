@@ -16,6 +16,7 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.util.HashMap;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Mouse;
@@ -454,7 +455,7 @@ public abstract class Browser {
     * @param whitelist  {@link VDDHash} with values to ignore
     */
 
-   public boolean assertPage(VDDHash whitelist) {
+   public boolean assertPage(HashMap<String,String> whitelist) {
       boolean result = false;
 
       if (this.asserter == null && this.assertPageFile != null) {
