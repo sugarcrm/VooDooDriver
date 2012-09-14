@@ -50,13 +50,18 @@ public class JavaPluginTest implements PluginInterface {
 
       if (args == null && element == null) {
          return 1;
-      } else if (args == null || args.length < 1) {
+      } else if ((args == null || args.length < 1) && element != null) {
          element.findElement(By.id("text1")).clear();
          element.findElement(By.id("text1")).sendKeys("voodoo");
-      } else {
+      } else if (element != null) {
          System.out.printf("(*)Plugin: arg size: %d\n", args.length);
          element.findElement(By.id("text1")).clear();
          element.findElement(By.id("text1")).sendKeys(args[0]);
+      } else {
+         System.out.printf("(*)Plugin: arg size: %d\n", args.length);
+         for (String arg: args) {
+            System.out.println("  => arg: " + arg);
+         }
       }
 
       if (hijacks != null) {

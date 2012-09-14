@@ -55,7 +55,12 @@ public class EventLoop implements Runnable {
    public Browser Browser = null;
    public Reporter report = null;
    public VDDHash hijacks = null;
-   private String testName = "";
+
+   /**
+    * Name of the current running test.
+    */
+
+   public String testName;
 
    /**
     * Strings to ignore during page assertion processing.
@@ -360,9 +365,6 @@ public class EventLoop implements Runnable {
       // case EXECUTE:
       //    result = executeEvent(event);
       //    break;
-      // case JAVAPLUGIN:
-      //    result = javapluginEvent(event, parent);
-      //    break;
       // case DND:
       //    result = dndEvent(event);
       //    break;
@@ -637,73 +639,6 @@ public class EventLoop implements Runnable {
 
       return result;
    }
-
-   /**
-    * Execute a <javaplugin> event.
-    *
-    * @param event   the <javaplugin> event
-    * @param parent  the parent HTML element
-    * @return whether plugin execution succeeded
-    */
-
-   private boolean javapluginEvent(VDDHash event, WebElement parent) {
-      String classname;
-      Plugin plugin = null;
-      PluginData data = new PluginData();
-      boolean result;
-
-      this.report.Log("Javaplugin event started.");
-
-      if (!event.containsKey("classname")) {
-         report.ReportError("Javaplugin event missing attribute 'classname'!");
-         report.Log("Javaplugin event finished.");
-         return false;
-      }
-
-      classname = (String)event.get("classname");
-      
-      for (Plugin p: this.plugins) {
-         if (p.matches(classname)) {
-            plugin = p;
-            break;
-         }
-      }
-      if (plugin == null) {
-         report.ReportError("Failed to find a loaded plugin with classname " +
-                            classname);
-         report.Log("Javaplugin event finished.");
-         return false;
-      }
-
-      if (event.containsKey("args")) {
-         String[] args = (String[])event.get("args");
-
-         if (args != null) {
-            for (int k = 0; k < args.length; k++) {
-               args[k] = replaceString(args[k]);
-            }
-         }
-
-         data.setArgs(args);
-      }
-
-      data.setElement(parent);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      result = plugin.execute(data, report);
-
-      if (result == false) {
-         report.ReportError("Javaplugin failed");
-      }
-
-      report.Log("Javaplugin event finished.");
-
-      return result;
-   }
-
 
    private boolean ulEvent(VDDHash event) {
       boolean required = true;

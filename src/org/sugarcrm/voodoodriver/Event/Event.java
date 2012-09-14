@@ -25,6 +25,7 @@ import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -119,6 +120,7 @@ public abstract class Event {
       String tagName = element.getTagName().toLowerCase();
 
       if (tagName.equals("arg")) {
+         event = new Arg(element);
       } else if (tagName.equals("attach")) {
          event = new Attach(element);
       } else if (tagName.equals("browser")) {
@@ -130,6 +132,7 @@ public abstract class Event {
       } else if (tagName.equals("dnd")) {
       } else if (tagName.equals("execute")) {
       } else if (tagName.equals("javaplugin")) {
+         event = new Javaplugin(element);
       } else if (tagName.equals("javascript")) {
          event = new Javascript(element);
       } else if (tagName.equals("pluginloader")) {
@@ -282,12 +285,17 @@ public abstract class Event {
     */
 
    private void compileEvent(Element tev) throws VDDException {
-      String nodeName = tev.getNodeName();
+      String nodeName = tev.getNodeName().toLowerCase();
+
+      if (!this.allowedEvents.containsKey(nodeName)) {
+         throw new VDDException("Unknown event name '" +
+                                tev.getNodeName() + "'");
+      }
 
       /* Process attributes */
       for (int k = 0; k < tev.getAttributes().getLength(); k++) {
          Node attr = tev.getAttributes().item(k);
-         String name = attr.getNodeName();
+         String name = attr.getNodeName().toLowerCase();
          Object value = null;
 
          if (isBoolean(nodeName, name)) {
@@ -315,6 +323,13 @@ public abstract class Event {
          }
       }
 
+      /* Process any "arg" children. */
+      if (nodeName.equals("execute") || nodeName.equals("javaplugin")) {
+         NodeList children = tev.getChildNodes();
+         if (children.getLength() > 0) {
+            actions.put("args", processArgs(children));
+         }
+      }
 
       /////////////////////////////////////////////////////////////////
       // ***** Events that need special handling  *****
@@ -328,49 +343,29 @@ public abstract class Event {
       //       data.put("content", tmp);
       //    }
       // }
-      //
-      // Check for "arg" children -- execute and javaplugin can have them
-      //
-      //String[] list = processArgs(child.getChildNodes());
-      //data.put("args", list);
-      //
-      // /**
-      //  * Process the argument list for &lt;execute&gt;
-      //  *  and &lt;javaplugin&gt; event Nodes.
-      //  *
-      //  * @param nodes  the argument list as an XML NodeList
-      //  * @return String array of those arguments
-      //  */
-      //
-      // private String[] processArgs(NodeList nodes) {
-      //    int len = nodes.getLength() -1;
-      //    String[] list;
-      //    int arg_count = 0;
-      //    int current = 0;
-      //
-      //    for (int i = 0; i <= len; i++) {
-      //       String name = nodes.item(i).getNodeName();
-      //       if (name.contains("arg")) {
-      //          arg_count += 1;
-      //       }
-      //    }
-      //
-      //    list = new String[arg_count];
-      //
-      //    for (int i = 0; i <= len; i++) {
-      //       String name = nodes.item(i).getNodeName();
-      //       if (name.contains("arg")) {
-      //          String value = nodes.item(i).getTextContent();
-      //          list[current] = value;
-      //          current += 1;
-      //       }
-      //    }
-      //
-      //    return list;
-      // }
-      //
       /////////////////////////////////////////////////////////////////
    }
+
+
+   /**
+    * Create an array of arg children.
+    *
+    * @param children  child nodes, possibly arg, of the current event
+    * @return array of arg children
+    */
+
+   private String[] processArgs(NodeList children) {
+      ArrayList<String> args = new ArrayList<String>();
+
+      for (int n = 0; n < children.getLength(); n++) {
+         if (children.item(n).getNodeName().toLowerCase().equals("arg")) {
+            args.add(children.item(n).getTextContent());
+         }
+      }
+
+      return args.toArray(new String[0]);
+   }
+
 
    /**
     * This constructor, which will never be called, is needed to extend Event.

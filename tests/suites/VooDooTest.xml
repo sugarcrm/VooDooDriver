@@ -37,6 +37,7 @@
    <script file="tests/test-scripts/tests/whitelist.xml"/>
    <script file="tests/test-scripts/tests/javascript.xml"/>
    <script file="tests/test-scripts/tests/pluginloader.xml"/>
+   <script file="tests/test-scripts/tests/javaplugin.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>

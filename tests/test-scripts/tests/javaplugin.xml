@@ -1,0 +1,10 @@
+<voodoo>
+   <pluginloader file="{@global.scriptsdir}/plugins/java/JavaPluginTest.class"
+                 classname="javaplugins.JavaPluginTest"/>
+
+   <javaplugin classname="javaplugins.JavaPluginTest">
+      <arg>foo</arg>
+      <arg>bar</arg>
+      <arg>baz</arg>
+   </javaplugin>
+</voodoo>
