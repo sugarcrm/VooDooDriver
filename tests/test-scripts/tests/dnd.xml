@@ -1,0 +1,6 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/dnd.html"/>
+   <div id="source" save="source"/>
+   <textfield id="dest" save="dest"/>
+   <dnd src="source" dst="dest"/>
+</voodoo>

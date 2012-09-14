@@ -362,9 +362,6 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
-      // case DND:
-      //    result = dndEvent(event);
-      //    break;
       // case SCRIPT:
       //    result = scriptEvent(event);
       //    break;
@@ -844,42 +841,6 @@ public class EventLoop implements Runnable {
 
       return result;
    }
-
-   private boolean dndEvent(VDDHash event) {
-      boolean result = true;
-      String src = null;
-      String dst = null;
-
-      if (event.containsKey("src")) {
-         src = event.get("src").toString();
-      }
-
-      if (event.containsKey("dst")) {
-         dst = event.get("dst").toString();
-      }
-
-      if (src == null) {
-         this.report.ReportError("DnD command is missing 'src' attribute!");
-         result = false;
-      }
-
-      if (dst == null) {
-         this.report.ReportError("DnD command is missing 'dst' attribute!");
-         result = false;
-      }
-
-      if (result) {
-         WebElement Esrc = this.elementStore.get(src);
-         WebElement Edst = this.elementStore.get(dst);
-         VDDMouse mouse = new VDDMouse(this.report);
-         mouse.DnD(Esrc, Edst);
-      }
-
-      this.report.Log("DND event finished.");
-
-      return result;
-   }
-
 
    /**
     * Handle an &lt;image&gt; event.

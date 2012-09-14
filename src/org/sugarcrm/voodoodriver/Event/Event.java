@@ -130,6 +130,7 @@ public abstract class Event {
       } else if (tagName.equals("delete")) {
          event = new Delete(element);
       } else if (tagName.equals("dnd")) {
+         event = new DnD(element);
       } else if (tagName.equals("execute")) {
          event = new Execute(element);
       } else if (tagName.equals("javaplugin")) {
