@@ -362,11 +362,11 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
-      // case EXECUTE:
-      //    result = executeEvent(event);
-      //    break;
       // case DND:
       //    result = dndEvent(event);
+      //    break;
+      // case SCRIPT:
+      //    result = scriptEvent(event);
       //    break;
 
       // case THEAD:
@@ -386,9 +386,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
-      //    break;
-      // case SCRIPT:
-      //    result = scriptEvent(event);
       //    break;
       // case DIV:
       //    element = divEvent(event, parent);
@@ -844,53 +841,6 @@ public class EventLoop implements Runnable {
       }
 
       this.report.Log("OL event Finished.");
-
-      return result;
-   }
-
-   private boolean executeEvent(VDDHash event) {
-      boolean result = false;
-      Process proc = null;
-      int proc_ret = 0;
-
-      this.report.Log("Execute event starting...\n");
-      this.resetThreadTime();
-
-      if (event.containsKey("args")) {
-         String[] list = (String[]) event.get("args");
-         int len = list.length - 1;
-
-         for (int i = 0; i <= len; i++) {
-            System.out.printf("(%s) => '%s'\n", i, list[i]);
-         }
-
-         try {
-            this.report.Log("Executing process now...");
-            proc = Runtime.getRuntime().exec(list);
-            this.resetThreadTime();
-            proc.waitFor();
-            this.resetThreadTime();
-            this.report.Log("Process finished executing.");
-            proc_ret = proc.exitValue();
-            if (proc_ret != 0) {
-               String msg = String.format(
-                     "Error the command being executed returned a non-zero value: '%s'!",
-                     proc_ret);
-               this.report.ReportError(msg);
-            } else {
-               this.report.Log("Execute was successful.");
-               result = true;
-            }
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-            result = false;
-         }
-      } else {
-         this.report.ReportError("Error no args for Execute Event!");
-         result = false;
-         this.report.Log("Execute event finished.");
-         return result;
-      }
 
       return result;
    }

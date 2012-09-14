@@ -131,6 +131,7 @@ public abstract class Event {
          event = new Delete(element);
       } else if (tagName.equals("dnd")) {
       } else if (tagName.equals("execute")) {
+         event = new Execute(element);
       } else if (tagName.equals("javaplugin")) {
          event = new Javaplugin(element);
       } else if (tagName.equals("javascript")) {
