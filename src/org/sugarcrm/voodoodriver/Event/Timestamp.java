@@ -33,7 +33,7 @@ public class Timestamp extends Event {
    /**
     * Instantiate a timestamp event.
     *
-    * @param event  the event as specified in the test script
+    * @param e  the event as specified in the test script
     * @throws VDDException if event instantiation fails
     */
 

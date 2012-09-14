@@ -31,7 +31,7 @@ class TestEvent extends Event {
    /**
     * Instantiate a test event.
     *
-    * @param event  the event as specified in the test script
+    * @param e  the event as specified in the test script
     * @throws VDDException if event instantiation fails
     */
 

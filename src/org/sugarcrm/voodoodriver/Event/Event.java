@@ -133,6 +133,7 @@ public abstract class Event {
       } else if (tagName.equals("javascript")) {
          event = new Javascript(element);
       } else if (tagName.equals("pluginloader")) {
+         event = new Pluginloader(element);
       } else if (tagName.equals("puts")) {
          event = new Puts(element);
       } else if (tagName.equals("screenshot")) {

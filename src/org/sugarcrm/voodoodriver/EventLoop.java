@@ -69,7 +69,11 @@ public class EventLoop implements Runnable {
 
    public HashMap<String,WebElement> elementStore;
 
-   private ArrayList<Plugin> plugins = null;
+   /**
+    * List of loaded plugins.
+    */
+
+   public ArrayList<Plugin> plugins;
 
    /**
     * VDD variables.
@@ -78,7 +82,7 @@ public class EventLoop implements Runnable {
    public Vars vars;
 
    /**
-    * File specified by a <csv override=""/> event.
+    * File specified by a &lt;csv override=&quot;&quot;/&rt; event.
     */
 
    public File csvOverrideFile = null;
@@ -327,8 +331,15 @@ public class EventLoop implements Runnable {
       } catch (org.sugarcrm.voodoodriver.Event.StopEventException e) {
          /* Not an error */
       } catch (VDDException e) {
+         Throwable cause = e.getCause();
+
+         if (cause == null) {
+            cause = e;
+         }
+
          this.report.ReportError("Exception during event execution");
-         this.report.ReportException(e);
+         this.report.ReportException(cause);
+
          result = false;
       }
 
@@ -348,9 +359,6 @@ public class EventLoop implements Runnable {
       // switch (type) {
       // case EXECUTE:
       //    result = executeEvent(event);
-      //    break;
-      // case PLUGINLOADER:
-      //    result = pluginloaderEvent(event);
       //    break;
       // case JAVAPLUGIN:
       //    result = javapluginEvent(event, parent);
@@ -692,51 +700,6 @@ public class EventLoop implements Runnable {
       }
 
       report.Log("Javaplugin event finished.");
-
-      return result;
-   }
-
-
-   /**
-    * Execute a <pluginloader> event
-    *
-    * @param event  the <pluginloader> event
-    * @return whether loading the new plugin succeeded
-    */
-
-   private boolean pluginloaderEvent(VDDHash event) {
-      String classname;
-      String classfile;
-      boolean result = true;
-
-      report.Log("PluginLoader event started.");
-
-      if (!event.containsKey("file")) {
-         report.ReportError("Missing 'file' attribute for <pluginloader>");
-         report.Log("PluginLoader event finished.");
-         return false;
-      }
-
-      if (!event.containsKey("classname")) {
-         report.ReportError("Missing 'classname' attribute for <pluginloader>");
-         report.Log("PluginLoader event finished.");
-         return false;
-      }
-
-      classfile = (String)event.get("file");
-      classname = (String)event.get("classname");
-
-      report.Log("Loading plugin with classname=" + classname);
-
-      try {
-         this.plugins.add(new JavaPlugin(classname, classfile));
-      } catch (PluginException e) {
-         report.ReportError("Failed to load plugin " + classname);
-         report.ReportException(e);
-         result = false;
-      }
-
-      report.Log("PluginLoader event finished.");
 
       return result;
    }

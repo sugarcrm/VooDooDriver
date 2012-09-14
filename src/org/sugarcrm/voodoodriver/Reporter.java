@@ -343,7 +343,7 @@ public class Reporter {
     *
     */
 
-   private void justReportTheException(Exception e) {
+   private void justReportTheException(Throwable e) {
       this.Exceptions += 1;
       String msg = "--Exception Backtrace: ";
       StackTraceElement[] trace = e.getStackTrace();
@@ -380,7 +380,7 @@ public class Reporter {
     * @param e  the exception to report
     */
 
-   public void ReportException(Exception e) {
+   public void ReportException(Throwable e) {
       justReportTheException(e);
 
       if ((Boolean)this.saveHtmlOn.get("exception")) {
