@@ -94,6 +94,6 @@ class Javascript extends Event {
          throw new VDDException("Missing either content or file attributes");
       }
 
-      this.eventLoop.Browser.executeJS(js, null);
+      this.eventLoop.Browser.executeJS(this.replaceString(js), null);
    }
 }

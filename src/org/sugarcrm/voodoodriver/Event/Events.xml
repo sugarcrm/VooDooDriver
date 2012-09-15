@@ -117,11 +117,10 @@
    </screenshot>
 
    <script>
-      <selectors>
+      <actions>
          <accessor type="string">file</accessor>
          <accessor type="string">fileset</accessor>
-         <accessor type="string">csv</accessor>
-      </selectors> 
+      </actions>
    </script>
 
    <timestamp>

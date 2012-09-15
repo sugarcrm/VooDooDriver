@@ -281,7 +281,7 @@ public class EventLoop implements Runnable {
     * @param parent  parent element if process child events
     */
 
-   private void processEvents(ArrayList<Event> events, WebElement parent) {
+   public void processEvents(ArrayList<Event> events, WebElement parent) {
       for (Event event: events) {
          if (isStopped()) {
             break;
@@ -362,10 +362,6 @@ public class EventLoop implements Runnable {
 
 
       // switch (type) {
-      // case SCRIPT:
-      //    result = scriptEvent(event);
-      //    break;
-
       // case THEAD:
       //    element = theadEvent(event, parent);
       //    break;
@@ -1897,37 +1893,6 @@ public class EventLoop implements Runnable {
 
       this.report.Log("Div event finished.");
       return element;
-   }
-
-   private boolean scriptEvent(VDDHash event) {
-      boolean result = false;
-      TestLoader loader = null;
-      String testfile = "";
-      File fd = null;
-      ArrayList<Event> newEvents = null;
-
-      testfile = event.get("file").toString();
-      testfile = this.replaceString(testfile);
-
-      try {
-         fd = new File(testfile);
-         if (!fd.exists()) {
-            String msg = String.format("Failed to find file: '%s'!", testfile);
-            this.report.ReportError(msg);
-            return false;
-         }
-         fd = null;
-
-         loader = new TestLoader(new File(testfile), null);
-         newEvents = loader.getEvents();
-         this.processEvents(newEvents, null);
-
-      } catch (Exception exp) {
-         exp.printStackTrace();
-         result = false;
-      }
-
-      return result;
    }
 
    private WebElement checkboxEvent(VDDHash event, WebElement parent) {

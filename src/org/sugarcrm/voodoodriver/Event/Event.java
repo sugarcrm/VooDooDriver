@@ -144,6 +144,7 @@ public abstract class Event {
       } else if (tagName.equals("screenshot")) {
          event = new Screenshot(element);
       } else if (tagName.equals("script")) {
+         event = new Script(element);
       } else if (tagName.equals("timestamp")) {
          event = new Timestamp(element);
       } else if (tagName.equals("var")) {
@@ -333,19 +334,13 @@ public abstract class Event {
          }
       }
 
-      /////////////////////////////////////////////////////////////////
-      // ***** Events that need special handling  *****
-      //
-      // This code (originally from TestLoader.java) will go into
-      // individual subclasses.
-      //
-      // if (name.contains("javascript") || name.contains("whitelist")) {
-      //    String tmp = child.getTextContent();
-      //    if (!tmp.isEmpty()) {
-      //       data.put("content", tmp);
-      //    }
-      // }
-      /////////////////////////////////////////////////////////////////
+      /* Process text content of certain events. */
+      if (nodeName.equals("javascript") || nodeName.equals("whitelist")) {
+         String txt = tev.getTextContent();
+         if (!txt.isEmpty()) {
+            actions.put("content", txt);
+         }
+      }
    }
 
 

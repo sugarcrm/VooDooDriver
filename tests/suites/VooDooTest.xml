@@ -40,6 +40,7 @@
    <script file="tests/test-scripts/tests/javaplugin.xml"/>
    <script file="tests/test-scripts/tests/execute.xml"/>
    <script file="tests/test-scripts/tests/dnd.xml"/>
+   <script file="tests/test-scripts/tests/script.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
