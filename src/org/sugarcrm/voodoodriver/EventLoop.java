@@ -3175,7 +3175,7 @@ public class EventLoop implements Runnable {
       String msg = "";
 
       if (event.containsKey("exists")) {
-         exists = this.clickToBool(event.get("exists").toString());
+         exists = this.clickToBool(replaceString((String)event.get("exists")));
       }
 
       if (event.containsKey("timeout")) {
