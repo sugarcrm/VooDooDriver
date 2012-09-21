@@ -1780,7 +1780,6 @@ public class EventLoop implements Runnable {
    }
 
 
-
    ////////////////////////////////////////////////////////////
    // delete me
    private String replaceString(String str) {

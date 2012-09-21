@@ -68,6 +68,7 @@ public class ConfigFileParser {
          db = dbf.newDocumentBuilder();
          doc = db.parse(this.configFile);
       } catch (Exception exp) {
+         System.err.println("(!)Failed to load config file:");
          exp.printStackTrace();
          System.exit(2);
       }

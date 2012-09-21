@@ -81,34 +81,30 @@ public class VDDMouse {
       int x_count = 0;
       int y_count = 0;
 
-      try {
-         Thread.currentThread();
+      Thread.currentThread();
 
-         if (cur_x < x) {
-            for (x_count = cur_x; x_count <= x; x_count++) {
-               this.robo.mouseMove(x_count, cur_y);
-               this.robo.delay(3);
-            }
-         } else {
-            for (x_count = cur_x; x <= x_count; x_count--) {
-               this.robo.mouseMove(x_count, cur_y);
-               this.robo.delay(3);
-            }
+      if (cur_x < x) {
+         for (x_count = cur_x; x_count <= x; x_count++) {
+            this.robo.mouseMove(x_count, cur_y);
+            this.robo.delay(3);
          }
+      } else {
+         for (x_count = cur_x; x <= x_count; x_count--) {
+            this.robo.mouseMove(x_count, cur_y);
+            this.robo.delay(3);
+         }
+      }
 
-         if (cur_y < y) {
-            for (y_count = cur_y; y_count <= y; y_count++) {
-               this.robo.mouseMove(x_count, y_count);
-               this.robo.delay(3);
-            }
-         } else {
-            for (y_count = cur_y; y <= y_count; y_count--) {
-               this.robo.mouseMove(x_count, y_count);
-               this.robo.delay(3);
-            }
+      if (cur_y < y) {
+         for (y_count = cur_y; y_count <= y; y_count++) {
+            this.robo.mouseMove(x_count, y_count);
+            this.robo.delay(3);
          }
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } else {
+         for (y_count = cur_y; y <= y_count; y_count--) {
+            this.robo.mouseMove(x_count, y_count);
+            this.robo.delay(3);
+         }
       }
    }
 }

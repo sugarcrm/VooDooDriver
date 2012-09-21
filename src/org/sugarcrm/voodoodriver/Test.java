@@ -324,10 +324,7 @@ public class Test {
          if (seconds > TIMEOUT) {
             watchDog = true;
             this.eventLoop.stop();
-            String msg = String.format("Test watchdogged out after %d seconds!",
-                                       seconds);
-            this.reporter.ReportError(msg);
-            this.reporter.ReportWatchDog();
+            this.reporter.ReportWatchDog(seconds);
          }
       }
 

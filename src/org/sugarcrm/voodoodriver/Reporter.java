@@ -108,8 +108,8 @@ public class Reporter {
 
       try {
          reportFD = new FileOutputStream(reportLog);
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Unable to create report file: " + e);
       }
 
       /* Initialize screenshot and savehtml events */
@@ -271,21 +271,22 @@ public class Reporter {
          msg = "Found empty message!";
       }
 
+      System.out.printf("%s\n", msg);
+
       try {
          this.reportFD.write(logstr.getBytes());
-         System.out.printf("%s\n", msg);
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error writing to report file: " + e);
       }
    }
 
    public void closeLog() {
       try {
          this.reportFD.close();
-         this.reportFD = null;
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error closing report file: " + e);
       }
+      this.reportFD = null;
    }
 
    public void Log(String msg) {
@@ -319,7 +320,10 @@ public class Reporter {
       }
    }
 
-   public void ReportWatchDog() {
+   public void ReportWatchDog(long seconds) {
+      this._log(String.format("(!)Test watchdogged out after: '%d' seconds!",
+                              seconds));
+
       this.WatchDog = 1;
 
       if ((Boolean)this.saveHtmlOn.get("watchdog")) {
@@ -345,28 +349,19 @@ public class Reporter {
 
    private void justReportTheException(Throwable e) {
       this.Exceptions += 1;
-      String msg = "--Exception Backtrace: ";
-      StackTraceElement[] trace = e.getStackTrace();
-      String message = "";
 
-      if (e.getMessage() != null) {
-         String[] msg_lines = e.getMessage().split("\\n");
-         for (int i = 0; i <= msg_lines.length -1; i++) {
-            message += msg_lines[i] + "  ";
-         }
-
-         this._log("(!)Exception raised: " + message);
-
-         for (int i = 0; i <= trace.length -1; i++) {
-            String tmp = trace[i].toString();
-            msg += "--" + tmp;
-         }
+      if (e.getMessage() == null) {
+         this._log("(!)ReportException: Exception message is null!");
       } else {
-         msg = "ReportException: Exception message is null!!!";
-         e.printStackTrace();
+         this._log("(!)" + e.getMessage().replaceAll("\\n", "  "));
       }
 
-      this._log("(!)" + msg);
+      String bt = "--Exception Backtrace: ";
+      for (StackTraceElement el: e.getStackTrace()) {
+         bt += "--" + el.toString();
+      }
+
+      this._log("(!)" + bt);
    }
 
 

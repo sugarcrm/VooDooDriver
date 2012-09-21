@@ -126,11 +126,7 @@ public abstract class Browser {
     */
 
    public void url(String url) {
-      try {
-         this.Driver.navigate().to(url);
-      } catch (Exception exp) {
-         exp.printStackTrace();  // XXX
-      }
+      this.Driver.navigate().to(url);
    }
 
 

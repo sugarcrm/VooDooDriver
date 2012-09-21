@@ -409,6 +409,8 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </p>
@@ -429,6 +431,9 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </pre>
@@ -451,8 +456,11 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </ul>
 
@@ -470,6 +478,9 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
@@ -492,6 +503,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
@@ -597,11 +609,12 @@
       </selectors>
 
       <actions>
-         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">click</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
@@ -741,9 +754,10 @@
 
       <actions>
          <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </actions>
    </map>
@@ -764,6 +778,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </actions>
    </area>
@@ -921,10 +936,11 @@
       </selectors>
 
       <actions>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </actions>
    </frame>
@@ -952,11 +968,11 @@
       </selectors>
 
       <actions>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
       </actions>
    </form>
 
@@ -974,10 +990,11 @@
       </selectors>
 
       <actions>
-         <accessor type="string">var</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </input>
 
@@ -1002,7 +1019,6 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">default</accessor>
          <accessor type="boolean">clear</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -1035,7 +1051,6 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">default</accessor>
          <accessor type="boolean">clear</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -1121,7 +1136,6 @@
       <actions>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">exists</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="boolean">alert</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
@@ -1154,6 +1168,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
@@ -1236,6 +1251,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
@@ -1262,7 +1278,9 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -1313,6 +1331,8 @@
       <actions>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>

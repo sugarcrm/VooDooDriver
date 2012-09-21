@@ -46,33 +46,6 @@ import org.openqa.selenium.WebElement;
  */
 public class Utils {
 
-   /**
-    * Creates an MD5 sum of your string data.
-    *
-    * @param data   a string that you want to get the MD5 sum of.
-    *
-    * @return The MD5 sum of your data string.
-    */
-   public static String MD5(String data) {
-      String res = "";
-      int len = 0;
-
-      try {
-         MessageDigest md = MessageDigest.getInstance("MD5");
-         md.update(data.getBytes());
-         byte[] bytes = md.digest();
-
-         len = bytes.length -1;
-         for (int i = 0; i <= len; i++) {
-            res += Integer.toString((bytes[i] & 0xff ) + 0x100, 16).substring( 1 );
-         }
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
-
-      return res;
-   }
-
    public static void PrintSuiteReportToConsole(String suitename,
                                                 ArrayList<TestResults> list) {
       String linemarker = StringUtils.repeat("#", 80);
