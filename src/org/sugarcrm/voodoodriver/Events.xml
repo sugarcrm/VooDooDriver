@@ -416,6 +416,8 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
    </p>
@@ -436,6 +438,9 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
    </pre>
@@ -458,8 +463,11 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </soda_attributes>
    </ul>
 
@@ -477,6 +485,9 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -499,6 +510,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -604,11 +616,12 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">click</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -749,9 +762,10 @@
 
       <soda_attributes>
          <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </soda_attributes>
    </map>
@@ -772,6 +786,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </soda_attributes>
    </area>
@@ -929,10 +944,11 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
       </soda_attributes>
    </frame>
@@ -960,11 +976,11 @@
       </accessor_attributes>
 
       <soda_attributes>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
       </soda_attributes>
    </form>
 
@@ -986,6 +1002,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
       </soda_attributes>
    </input>
 
@@ -1010,7 +1027,6 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">default</accessor>
          <accessor type="boolean">clear</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -1044,7 +1060,6 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">default</accessor>
          <accessor type="boolean">clear</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="integer">timeout</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="string">jscriptevent</accessor>
@@ -1131,7 +1146,6 @@
       <soda_attributes>
          <accessor type="boolean">click</accessor>
          <accessor type="boolean">exists</accessor>
-         <accessor type="boolean">exist</accessor>
          <accessor type="boolean">alert</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="integer">timeout</accessor>
@@ -1165,6 +1179,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -1247,6 +1262,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -1273,7 +1289,9 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
@@ -1324,6 +1342,8 @@
       <soda_attributes>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </soda_attributes>
