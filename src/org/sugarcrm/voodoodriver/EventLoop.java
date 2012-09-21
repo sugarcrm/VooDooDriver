@@ -2472,6 +2472,10 @@ public class EventLoop implements Runnable {
 
          loader = new TestLoader(new File(testfile), null);
          newEvents = loader.getEvents();
+         if (newEvents == null) {
+            this.report.ReportError("Failed to load script '" + testfile + "'");
+            return false;
+         }
          this.processEvents(newEvents, null);
 
       } catch (Exception exp) {
