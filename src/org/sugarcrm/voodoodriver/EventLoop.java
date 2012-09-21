@@ -342,8 +342,7 @@ public class EventLoop implements Runnable {
             cause = e;
          }
 
-         this.report.ReportError("Exception during event execution");
-         this.report.ReportException(cause);
+         this.report.ReportException("Exception during event execution", cause);
 
          result = false;
       }

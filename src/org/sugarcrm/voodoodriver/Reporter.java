@@ -347,14 +347,23 @@ public class Reporter {
     *
     */
 
-   private void justReportTheException(Throwable e) {
-      this.Exceptions += 1;
+   private void justReportTheException(String msg, Throwable e) {
+      String em = e.getMessage();
+      String estr = "ReportException: Exception message is null!";
 
-      if (e.getMessage() == null) {
-         this._log("(!)ReportException: Exception message is null!");
-      } else {
-         this._log("(!)" + e.getMessage().replaceAll("\\n", "  "));
+      if (em != null) {
+         em = em.replaceAll("\\n", "  ");
+
+         if (msg == null) {
+            estr = em;
+         } else {
+            estr = msg + ": " + em;
+         }
+      } else if (msg != null) {
+         estr = msg;
       }
+
+      this._log("(!)" + estr);
 
       String bt = "--Exception Backtrace: ";
       for (StackTraceElement el: e.getStackTrace()) {
@@ -362,6 +371,7 @@ public class Reporter {
       }
 
       this._log("(!)" + bt);
+      this.Exceptions += 1;
    }
 
 
@@ -376,7 +386,23 @@ public class Reporter {
     */
 
    public void ReportException(Throwable e) {
-      justReportTheException(e);
+      this.ReportException(null, e);
+   }
+
+
+   /**
+    * Log an exception and additional information.
+    *
+    * This method formats a java exception into a log entry.  Both the
+    * message and the stack trace are reformatted and printed to the
+    * SODA log file and the console.
+    *
+    * @param msg  additional information about the exception
+    * @param e    the exception to report
+    */
+
+   public void ReportException(String msg, Throwable e) {
+      justReportTheException(msg, e);
 
       if ((Boolean)this.saveHtmlOn.get("exception")) {
          this.SavePage();
@@ -593,7 +619,7 @@ public class Reporter {
          bw.close();
          this.Log(String.format("HTML Saved: %s", htmlFile));
       } catch (java.io.IOException e) {
-         this.justReportTheException(e);
+         this.justReportTheException("Failed to save HTML", e);
       }
    }
 
