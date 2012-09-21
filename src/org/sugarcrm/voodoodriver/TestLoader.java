@@ -62,6 +62,7 @@ public class TestLoader {
       } catch (Exception exp) {
          this.events = null;
          if (this.reporter == null) {
+            System.err.println("(!)Error initializing TestLoader:");
             exp.printStackTrace();
          } else {
             this.reporter.ReportException(exp);

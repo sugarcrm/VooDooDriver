@@ -2336,7 +2336,8 @@ public class EventLoop implements Runnable {
             Thread.sleep(tout);
          }
       } catch (Exception exp) {
-         exp.printStackTrace();
+         this.report.ReportException(exp);
+         result = false;
       }
 
       this.report.Log("Attach event finished.");
@@ -2474,7 +2475,7 @@ public class EventLoop implements Runnable {
          this.processEvents(newEvents, null);
 
       } catch (Exception exp) {
-         exp.printStackTrace();
+         this.report.ReportException(exp);
          result = false;
       }
 

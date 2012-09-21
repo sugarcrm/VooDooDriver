@@ -195,17 +195,14 @@ public class Test {
             if (seconds > ThreadTimeout) {
                this.WatchDog = true;
                eventDriver.stop();
-               String msg = String.format("Test watchdogged out after: '%d' seconds!\n", seconds);
-               this.reporter.ReportError(msg);
-               this.reporter.ReportWatchDog();
+               this.reporter.ReportWatchDog(seconds);
                break;
             }
 
             try {
                Thread.sleep(9000);
-            } catch (Exception exp) {
-               exp.printStackTrace();
-               System.exit(-1);
+            } catch (InterruptedException e) {
+               // ignore
             }
          }
       }

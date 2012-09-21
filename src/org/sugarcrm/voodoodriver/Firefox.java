@@ -117,11 +117,7 @@ public class Firefox extends Browser {
     */
 
    public void forceClose() {
-      try {
-         OSInfo.killProcesses(OSInfo.getProcessIDs("firefox"));
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+      OSInfo.killProcesses(OSInfo.getProcessIDs("firefox"));
       this.setBrowserClosed();
    }
 
