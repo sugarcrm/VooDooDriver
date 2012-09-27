@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Alert test</title>
+
+    <script type="text/javascript">
+      function doalert() {
+         var z = confirm("alert");
+         var text = "";
+
+         if (z == true) {
+            text = "OK";
+         } else {
+            text = "Cancel";
+         }
+
+         document.getElementById("div").innerHTML = text;
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <a href="#" id="a" onmousedown="doalert();">Click me</a>
+
+    <div id="div">empty</div>
+
+  </body>
+</html>

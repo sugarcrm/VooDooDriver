@@ -166,7 +166,7 @@
          <accessor type="boolean">alert</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-         <accessor type="boolean">exist</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="boolean">required</accessor>
       </actions>
    </alert>

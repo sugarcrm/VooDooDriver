@@ -28,10 +28,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -430,9 +428,6 @@ public class EventLoop implements Runnable {
       // case AREA:
       //    result = areaEvent(event);
       //    break;
-      // case ALERT:
-      //    result = alertEvent(event);
-      //    break;
       // case FRAME:
       //    result = frameEvent(event);
       //    break;
@@ -514,117 +509,6 @@ public class EventLoop implements Runnable {
          this.report.ReportException(exp);
       }
       this.report.Log("Frame event finished.");
-
-      return result;
-   }
-
-   private boolean alertEvent(VDDHash event) {
-      boolean result = false;
-      boolean alert_var = false;
-      boolean exists = true;
-      boolean user_exists_true = false;
-      boolean required = true;
-      String msg = "";
-      String alert_text = "";
-
-      this.report.Log("Alert event starting.");
-
-      if (!event.containsKey("alert") && !event.containsKey("exists")) {
-         result = false;
-         this.report.ReportError("Alert event missing alert attribute!");
-         return result;
-      }
-
-      if (event.containsKey("alert")) {
-         String tmp = event.get("alert").toString();
-         tmp = this.replaceString(tmp);
-         alert_var = this.clickToBool(tmp);
-      }
-
-      if (event.containsKey("exists")) {
-         String tmp = event.get("exists").toString();
-         tmp = this.replaceString(tmp);
-         exists = this.clickToBool(tmp);
-
-         if (exists) {
-            user_exists_true = true;
-         }
-      }
-
-      if (event.containsKey("required")) {
-         String s = (String)event.get("required");
-         required = this.clickToBool(this.replaceString(s));
-      }
-
-      try {
-         Alert alert = this.Browser.getDriver().switchTo().alert();
-         alert_text = alert.getText();
-         msg = String.format("Found Alert dialog: '%s'.", alert_text);
-         this.report.Log(msg);
-
-         handleVars(alert_text, event);
-
-         if (event.containsKey("assert")) {
-            String ass = event.get("assert").toString();
-            ass = this.replaceString(ass);
-            this.report.Assert(ass, alert_text);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String ass = event.get("assertnot").toString();
-            ass = this.replaceString(ass);
-            this.report.AssertNot(ass, alert_text);
-         }
-
-         if (alert_var) {
-            this.report.Log("Alert is being Accepted.");
-            alert.accept();
-         } else {
-            this.report.Log("Alert is being Dismissed.");
-            alert.dismiss();
-         }
-
-         try {
-            this.Browser.getDriver().switchTo().defaultContent();
-         } catch (Exception e) {
-            /*
-             * Bug 53577: if this alert is put up in response to a
-             * window.close, switching back to the default content
-             * will throw an exception.  Curiously, it's a javascript
-             * exception rather than NoSuchFrameException or
-             * NoSuchWindowException that would be expected.  Catch
-             * generic "Exception" in case the Selenium folks fix the
-             * Javascript error.
-             */
-            this.report.Log("Unable to switch back to window. Is it closed?");
-         }
-         Thread.currentThread();
-         Thread.sleep(1000);
-
-         if (user_exists_true) {
-            this.report.Assert("Alert dialog does exist.", true, true);
-         }
-
-         this.firePlugin(null, Elements.ALERT,
-               PluginEvent.AFTERDIALOGCLOSED);
-
-         result = true;
-      } catch (NoAlertPresentException exp) {
-         if (!exists) {
-            msg = String.format("Expected alert dialog does not exist.",
-                  exists);
-            this.report.Assert(msg, false, false);
-            result = true;
-         } else if (required) {
-            this.report.ReportError("Error: No alert dialog found!");
-            result = false;
-         }
-      } catch (Exception exp) {
-         this.report.ReportException(exp);
-         result = false;
-      }
-
-      this.report.Log("Alert event finished.");
 
       return result;
    }

@@ -26,21 +26,28 @@
 -->
 
 <voodoo>     
+   <!-- VDD events -->
+
    <script file="tests/test-scripts/tests/browser.xml"/>
-   <script file="tests/test-scripts/tests/find-elements.xml"/>
-   <script file="tests/test-scripts/tests/link.xml"/>
    <script file="tests/test-scripts/tests/csv.xml"/>
-   <script file="tests/test-scripts/tests/timestamp.xml"/>
-   <script file="tests/test-scripts/tests/screenshot.xml"/>
-   <script file="tests/test-scripts/tests/var.xml"/>
    <script file="tests/test-scripts/tests/delete.xml"/>
-   <script file="tests/test-scripts/tests/whitelist.xml"/>
+   <script file="tests/test-scripts/tests/dnd.xml"/>
+   <script file="tests/test-scripts/tests/execute.xml"/>
+   <script file="tests/test-scripts/tests/javaplugin.xml"/>
    <script file="tests/test-scripts/tests/javascript.xml"/>
    <script file="tests/test-scripts/tests/pluginloader.xml"/>
-   <script file="tests/test-scripts/tests/javaplugin.xml"/>
-   <script file="tests/test-scripts/tests/execute.xml"/>
-   <script file="tests/test-scripts/tests/dnd.xml"/>
+   <script file="tests/test-scripts/tests/screenshot.xml"/>
    <script file="tests/test-scripts/tests/script.xml"/>
+   <script file="tests/test-scripts/tests/timestamp.xml"/>
+   <script file="tests/test-scripts/tests/var.xml"/>
+   <script file="tests/test-scripts/tests/whitelist.xml"/>
+
+   <!-- HTML events -->
+
+   <script file="tests/test-scripts/tests/find-elements.xml"/>
+
+   <script file="tests/test-scripts/tests/link.xml"/>
+   <script file="tests/test-scripts/tests/alert.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
