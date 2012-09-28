@@ -43,16 +43,40 @@ import org.sugarcrm.voodoodriver.Event.Event;
  * executing all of the SODA language commands in the web browser.
  *
  * @author trampus
- *
+ * @author Jon duSaint
  */
 
 @SuppressWarnings("unchecked")  //XXX
 public class EventLoop implements Runnable {
 
+   /**
+    * List of events in this test.
+    */
+
    private ArrayList<Event> testEvents;
-   public Browser Browser = null;
-   public Reporter report = null;
-   public VDDHash hijacks = null;
+
+   /**
+    * Browser object for use by this test.
+    */
+
+   public Browser Browser;
+
+   /**
+    * Reporter object for use by this test.
+    */
+
+   public Reporter report;
+
+   /**
+    * VDD variables can have their values overridden by values passed
+    * in on the command line or in the configuration file.  These are
+    * referred to as &quot;hijacks&quot;.  This is a structure of
+    * hijack key value pairs.
+    *
+    * XXX: Should probably be typed, e.g. HashMap<String,Object> or something.
+    */
+
+   public VDDHash hijacks;
 
    /**
     * Name of the current running test.
@@ -88,12 +112,39 @@ public class EventLoop implements Runnable {
     * File specified by a &lt;csv override=&quot;&quot;/&rt; event.
     */
 
-   public File csvOverrideFile = null;
+   public File csvOverrideFile;
+
+   /**
+    * Handle to the browser window.
+    */
 
    private String currentHWnd = null;
+
+   /**
+    * Amount of time, in seconds, to wait after switching windows.
+    */
+
    private int attachTimeout = 0;
+
+   /**
+    * Timestamp that indicates to Test.runTest that this thread is
+    * still alive.  If this is not updated before the expiry of the
+    * watchdog timer, the test is considered a failure and this thread
+    * is terminated.
+    */
+
    private Date threadTime = null;
+
+   /**
+    * This thread.
+    */
+
    private volatile Thread runner;
+
+   /**
+    * If true, this thread is to terminate.
+    */
+
    private volatile Boolean threadStop = false;
 
 
@@ -147,7 +198,7 @@ public class EventLoop implements Runnable {
     * The attach timeout is the time in seconds after which the Attach
     * event will give up retrying to find the window to attach to.
     *
-    * @param timeout int
+    * @param timeout  number of seconds to wait after window switch
     */
 
    public void setAttachTimeout(int timeout) {
@@ -201,30 +252,26 @@ public class EventLoop implements Runnable {
     *
     * @param hwnd {@link String}
     */
+
    public void setCurrentHWND(String hwnd) {
       this.currentHWnd = hwnd;
    }
 
 
    /**
-    * Get the current browser window handle.
+    * Return whether this thread is still active.
     *
-    * @return {@link String}
+    * @return true if the thread is alive
     */
-
-   private String getCurrentHWND() {
-      return this.currentHWnd;
-   }
-
-
-   private void saveElement(VDDHash event, WebElement element) {
-      /* Moved to HtmlEvent.SaveAction */
-   }
-
 
    public boolean isAlive() {
       return this.runner.isAlive();
    }
+
+
+   /**
+    * Indicate that this thread should terminate.
+    */
 
    public void stop() {
       synchronized (this.threadStop) {
@@ -232,6 +279,13 @@ public class EventLoop implements Runnable {
          this.runner.interrupt();
       }
    }
+
+
+   /**
+    * Return whether the thread has been told to stop.
+    *
+    * @return whether the thread has been told to stop
+    */
 
    public boolean isStopped() {
       boolean result = false;
@@ -248,7 +302,7 @@ public class EventLoop implements Runnable {
     * Update this EventLoop's thread time.
     */
 
-   public void resetThreadTime() {
+   public void updateThreadTime() {
       synchronized (this.threadTime) {
          this.threadTime = new Date();
       }
@@ -273,6 +327,24 @@ public class EventLoop implements Runnable {
 
 
    /**
+    * Thread entry point.
+    *
+    * Initialize thread state and run the events in this test file.
+    */
+
+   public void run() {
+      this.report.log("Thread Running...");
+      this.threadTime = new Date();
+
+      this.firePlugin(null, PluginEvent.BEFORETEST);
+
+      processEvents(this.testEvents, null);
+
+      this.firePlugin(null, PluginEvent.AFTERTEST);
+   }
+
+
+   /**
     * Run a sequence of events.
     *
     * @param events  {@link ArrayList} of {@link Event} from the test script
@@ -291,37 +363,17 @@ public class EventLoop implements Runnable {
 
 
    /**
-    * Thread entry point.
-    *
-    * Initialize thread state and run the events of this test file.
-    */
-
-   public void run() {
-      System.out.printf("Thread Running...\n");
-      this.threadTime = new Date();
-
-      this.firePlugin(null, PluginEvent.BEFORETEST);
-
-      processEvents(this.testEvents, null);
-
-      this.firePlugin(null, PluginEvent.AFTERTEST);
-   }
-
-
-   /**
     * Execute one {@link Event}.
     *
     * @param event   the {@link Event} to execute
     * @param parent  parent element, if currently executing children
-    * @return whether the event was successful
     */
 
-   private boolean handleSingleEvent(Event event, WebElement parent) {
-      boolean result = true;
+   private void handleSingleEvent(Event event, WebElement parent) {
       String eventName = event.getName();
 
       this.report.log(eventName + " event started...");
-      this.resetThreadTime();
+      this.updateThreadTime();
       event.setEventLoop(this);
       event.setParent(parent);
 
@@ -348,16 +400,10 @@ public class EventLoop implements Runnable {
          }
 
          this.report.exception("Exception during event execution", cause);
-
-         result = false;
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log(eventName + " event finished.");
-
-      return result;
-
-
 
 
 
@@ -444,24 +490,159 @@ public class EventLoop implements Runnable {
    }
 
 
-   /******* delete me *********/
-
-   /**
-    * Log when an {@link ElementNotVisibleException} is caught
-    *
-    * If this exception is caught for a required element, the
-    * message is reported as an error.  Otherwise it is logged
-    * normally.
-    *
-    * @param required  whether the element was required
-    */
+   ////////////////////////////////////////////////////////////
+   // delete me
 
    private void logElementNotVisible(boolean required, VDDHash event) {
       // implemented above //
    }
 
-   /******* stop deleting me *********/
+   private String replaceString(String str) {
+      // Moved to Event.replaceString
+      return "";
+   }
 
+   private WebElement findElement(VDDHash event, WebElement parent,
+                                  boolean required) {
+      // Moved to ElementFinder.java
+      return null;
+   }
+
+   private boolean clickToBool(String clickstr) {
+      // Moved to Event.toBoolean
+      return false;
+   }
+
+   private void checkDisabled(VDDHash event, WebElement element) {
+      // Moved to HtmlEvent.DisabledAction
+   }
+
+   private void handleVars(String value, VDDHash event) {
+      // Moved to HtmlEvent.VarAction
+   }
+
+
+   /**
+    * Perform pre-fire checks for plugin execution.
+    *
+    * If this routine returns false, plugin execution will be skipped.
+    *
+    * @return true if plugins can execute, false otherwise
+    */
+
+   private boolean pluginPrefireCheck() {
+      if (this.plugins.size() == 0) {
+         return false;
+      }
+
+      if (!this.windowExists(this.currentHWnd)) {
+         this.report.log("Browser window closed. Skipping plugin execution.");
+         return false;
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Execute all plugins.
+    *
+    * @param element    the element on the current HTML page
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element) {
+      boolean result = true;
+      PluginData data = new PluginData();
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
+
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setVars(this.vars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
+      for (Plugin plugin: this.plugins) {
+         result &= plugin.execute(data, this.report);
+      }
+
+      return result;
+   }
+
+
+   /**
+    * Execute all plugins that match a plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, PluginEvent eventType) {
+      boolean result = true;
+      PluginData data = new PluginData();
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
+
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setVars(this.vars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(eventType)) {
+            result &= plugin.execute(data, this.report);
+         }
+      }
+
+      return result;
+   }
+
+
+   /**
+    * Execute a plugin that matches the current element and plugin event.
+    *
+    * @param element    the element on the current HTML page
+    * @param type       the element's type
+    * @param eventType  the type of plugin event
+    * @return true if all plugins succeeded, false otherwise
+    */
+
+   private boolean firePlugin(WebElement element, Elements elementType,
+                              PluginEvent eventType) {
+      boolean result = true;
+      PluginData data = new PluginData();
+
+      if (!pluginPrefireCheck()) {
+         return true;
+      }
+
+      data.setElement(element);
+      data.setBrowser(this.Browser);
+      data.setVars(this.vars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
+      for (Plugin plugin: this.plugins) {
+         if (plugin.matches(elementType, eventType)) {
+            result &= plugin.execute(data, this.report);
+         }
+      }
+
+      return result;
+   }
+
+   // stop deleting me
+   ////////////////////////////////////////////////////////////
+
+
+   // All below will be moved into events...
 
    private boolean frameEvent(VDDHash event) {
       boolean result = false;
@@ -518,7 +699,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("UL event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -579,7 +760,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("Area event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -626,7 +807,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("Map event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -678,7 +859,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("OL event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -733,7 +914,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("Image event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -788,7 +969,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.report.log("FileField event Started.");
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -828,7 +1009,7 @@ public class EventLoop implements Runnable {
       }
 
       this.report.log("FileField event finished..");
-      this.resetThreadTime();
+      this.updateThreadTime();
       return element;
    }
 
@@ -1588,51 +1769,12 @@ public class EventLoop implements Runnable {
    }
 
 
-   ////////////////////////////////////////////////////////////
-   // delete me
-   private String replaceString(String str) {
-      String result = str;
-      Pattern patt = null;
-      Matcher matcher = null;
-
-      this.resetThreadTime();
-
-      patt = Pattern.compile("\\{@[\\w\\.]+\\}", Pattern.CASE_INSENSITIVE);
-      matcher = patt.matcher(str);
-
-      while (matcher.find()) {
-         String m = matcher.group();
-         String tmp = m;
-         tmp = tmp.replace("{@", "");
-         tmp = tmp.replace("}", "");
-
-         if (this.hijacks.containsKey(tmp)) {
-            String value = this.hijacks.get(tmp).toString();
-            result = result.replace(m, value);
-         } else {
-            try {
-               String value = this.vars.get(tmp).toString();
-               result = result.replace(m, value);
-            } catch (NoSuchFieldException e) {
-            }
-         }
-      }
-
-      result = result.replaceAll("\\\\n", "\n");
-      this.resetThreadTime();
-
-      return result;
-   }
-   ////////////////////////////////////////////////////////////
-
-
-
    private WebElement checkboxEvent(VDDHash event, WebElement parent) {
       boolean click = false;
       boolean required = true;
       WebElement element = null;
 
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1695,7 +1837,7 @@ public class EventLoop implements Runnable {
          this.report.exception(exp);
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       return element;
    }
 
@@ -1856,167 +1998,12 @@ public class EventLoop implements Runnable {
    }
 
 
-   /////////////////////// delete me /////////////////////////////////////
-
-   private WebElement findElement(VDDHash event, WebElement parent,
-         boolean required) {
-      // Code moved to ElementFinder.java
-      return null;
-   }
-
-
-   /*
-    * clickToBool -- method This method converts a string into a boolean type.
-    *
-    * Input: clickstr: a string containing "true" or "false". Case doesn't
-    * matter.
-    *
-    * Output: returns a boolean type.
-    */
-   private boolean clickToBool(String clickstr) {
-      boolean result = false;
-
-      if (clickstr.toLowerCase().contains("true")
-            || clickstr.toLowerCase().contains("false")) {
-         result = Boolean.valueOf(clickstr).booleanValue();
-      } else {
-         if (clickstr.contains("0")) {
-            result = false;
-         } else {
-            result = true;
-         }
-      }
-
-      return result;
-   }
-
-
-   /////////////////////// stop deleting me /////////////////////////////
-
-
-   /**
-    * Perform pre-fire checks for plugin execution.
-    *
-    * If this routine returns false, plugin execution will be skipped.
-    *
-    * @return true if plugins can execute, false otherwise
-    */
-
-   private boolean pluginPrefireCheck() {
-      if (this.plugins.size() == 0) {
-         return false;
-      }
-
-      if (!this.windowExists(this.getCurrentHWND())) {
-         this.report.log("Browser window closed. Skipping plugin execution.");
-         return false;
-      }
-
-      return true;
-   }
-
-
-   /**
-    * Execute all plugins.
-    *
-    * @param element    the element on the current HTML page
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         result &= plugin.execute(data, this.report);
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Execute all plugins that match a plugin event.
-    *
-    * @param element    the element on the current HTML page
-    * @param eventType  the type of plugin event
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element, PluginEvent eventType) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         if (plugin.matches(eventType)) {
-            result &= plugin.execute(data, this.report);
-         }
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Execute a plugin that matches the current element and plugin event.
-    *
-    * @param element    the element on the current HTML page
-    * @param type       the element's type
-    * @param eventType  the type of plugin event
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element, Elements elementType,
-                              PluginEvent eventType) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         if (plugin.matches(elementType, eventType)) {
-            result &= plugin.execute(data, this.report);
-         }
-      }
-
-      return result;
-   }
-
-
    private WebElement buttonEvent(VDDHash event, WebElement parent) {
       boolean click = true;
       boolean required = true;
       WebElement element = null;
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Starting button event.");
 
       if (event.containsKey("required")) {
@@ -2073,7 +2060,7 @@ public class EventLoop implements Runnable {
          element = null;
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Finished button event.");
 
       return element;
@@ -2083,7 +2070,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.resetThreadTime();
+      this.updateThreadTime();
 
       this.report.log("Starting textarea event.");
 
@@ -2162,7 +2149,7 @@ public class EventLoop implements Runnable {
          element = null;
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Finished textarea event.");
       return element;
    }
@@ -2198,7 +2185,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Starting textfield event.");
 
       if (event.containsKey("required")) {
@@ -2267,7 +2254,7 @@ public class EventLoop implements Runnable {
          element = null;
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Finished textfield event.");
       return element;
    }
@@ -2284,7 +2271,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Starting password event.");
 
       if (event.containsKey("required")) {
@@ -2351,16 +2338,8 @@ public class EventLoop implements Runnable {
          element = null;
       }
 
-      this.resetThreadTime();
+      this.updateThreadTime();
       this.report.log("Finished password event.");
       return element;
-   }
-
-   private void checkDisabled(VDDHash event, WebElement element) {
-      // Moved to HtmlEvent.DisabledAction
-   }
-
-   private void handleVars(String value, VDDHash event) {
-      // Moved to HtmlEvent.VarAction
    }
 }

@@ -65,7 +65,7 @@ class Execute extends Event {
          log("  => " + arg);
       }
       
-      this.eventLoop.resetThreadTime();
+      this.eventLoop.updateThreadTime();
       try {
          p = Runtime.getRuntime().exec(args);
       } catch (java.io.IOException e) {
@@ -81,7 +81,7 @@ class Execute extends Event {
          }
       }
 
-      this.eventLoop.resetThreadTime();
+      this.eventLoop.updateThreadTime();
       log("Child process finished.");
 
       if (rv != 0) {
