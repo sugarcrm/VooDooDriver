@@ -481,6 +481,26 @@ abstract class HtmlEvent extends Event {
 
 
    /**
+    * Whether an element is required.
+    */
+
+   protected boolean isRequired = true;
+
+   /**
+    * Return whether an element is required.
+    *
+    * <p>Only useful for HTML events</p>
+    *
+    * @return true
+    */
+
+   @Override
+   public boolean required() {
+      return this.isRequired;
+   }
+
+
+   /**
     * Find the specified HTML element.
     *
     * The selector attributes specified in the event in the test
@@ -500,7 +520,15 @@ abstract class HtmlEvent extends Event {
       }
       ef.setEventName(this.testEvent.getNodeName().toLowerCase());
 
-      return ef.findElement();
+      WebElement element = ef.findElement();
+
+      /*
+       * N.b. findElement must be called before isRequired is -- the
+       * required attribute isn't looked at until findElement.
+       */
+      this.isRequired = ef.isRequired();
+
+      return element;
    }
 
 
@@ -511,6 +539,7 @@ abstract class HtmlEvent extends Event {
     */
 
    protected void firePlugin(PluginEvent ev) {
+      System.err.println("*** firePlugin: Implement me!");
    }
 
 

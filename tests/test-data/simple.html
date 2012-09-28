@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Test page full of simple HTML elements</title>
+
+    <script type="text/javascript">
+      function divClick() {
+         document.getElementById("div").innerHTML = "clicked";
+      }
+      function divMouse() {
+         document.getElementById("div").innerHTML = "mousedown";
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <div id="div" onclick="divClick();" onmousedown="divMouse();">div text</div>
+    <div id="InvisibleDiv" style="display:none;">div text</div>
+
+  </body>
+</html>

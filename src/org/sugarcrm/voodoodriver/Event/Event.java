@@ -156,6 +156,7 @@ public abstract class Event {
       } else if (tagName.equals("alert")) {
          event = new Alert(element);
       } else if (tagName.equals("div")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("span")) {
       } else if (tagName.equals("h1")) {
       } else if (tagName.equals("h2")) {
@@ -274,6 +275,19 @@ public abstract class Event {
 
    protected void exception(String msg, Throwable e) {
       this.eventLoop.report.exception(msg, e);
+   }
+
+
+   /**
+    * Return whether an element is required.
+    *
+    * <p>Only useful for HTML events</p>
+    *
+    * @return true
+    */
+
+   public boolean required() {
+      return true;
    }
 
 

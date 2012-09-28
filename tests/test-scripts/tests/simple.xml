@@ -1,0 +1,20 @@
+<voodoo>
+   <!-- This script tests all "simple" HTML events, which is most of them -->
+
+   <browser url="{@global.url}/tests/test-data/simple.html"/>
+
+   <!-- All the div attributes -->
+   <div id="div" assert="div text"/>
+   <div id="div" assertnot="foobar"/>
+   <div id="div" click="true"/>
+   <div id="div" assert="clicked"/>
+   <div id="div" jscriptevent="onmousedown"/>
+   <div id="div" assert="mousedown"/>
+   <div id="div" save="mydiv"/>
+   <div id="div" var="mydiv"/>
+
+   <!-- This div is not visible, but required is true - shouldn't be an error-->
+   <div id="InvisibleDiv" click="true" required="false"/>
+
+
+</voodoo>

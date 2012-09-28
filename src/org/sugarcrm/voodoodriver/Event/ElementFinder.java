@@ -426,6 +426,24 @@ class ElementFinder {
 
 
    /**
+    * Cached value of the required attribute.
+    */
+
+   private boolean required = true;
+
+
+   /**
+    * Return whether the required attribute is true.
+    *
+    * @return the value of the required attribute
+    */
+
+   public boolean isRequired() {
+      return this.required;
+   }
+
+
+   /**
     * Find the HTML element that corresponds to the current selectors.
     *
     * @return the matching {@link WebElement} or null if none was found
@@ -435,7 +453,6 @@ class ElementFinder {
       boolean exists = true;
       boolean existsModified = false;
       int index = 0;
-      boolean required = true;
       boolean requiredModified = false;
       int timeout = 5;
       By by = null;
@@ -464,7 +481,7 @@ class ElementFinder {
       }
 
       if (this.selectors.containsKey("required")) {
-         required = (Boolean)this.selectors.get("required");
+         this.required = (Boolean)this.selectors.get("required");
          requiredModified = true;
       }
 
@@ -597,7 +614,7 @@ class ElementFinder {
        *    required => false: ok
        */
 
-      if (element == null && (required == true ||
+      if (element == null && (this.required == true ||
                               (existsModified && exists == true))) {
          this.r.error("Failed to find element" +
                             (requiredModified ? " and required => true" :

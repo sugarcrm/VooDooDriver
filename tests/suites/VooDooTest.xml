@@ -49,6 +49,14 @@
    <script file="tests/test-scripts/tests/link.xml"/>
    <script file="tests/test-scripts/tests/alert.xml"/>
 
+   <!-- simple.xml covers the following HTML events:
+
+           * div
+
+   -->
+   <script file="tests/test-scripts/tests/simple.xml"/>
+
+
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
    <script file="tests/test-scripts/tests/radio-test.xml"/>

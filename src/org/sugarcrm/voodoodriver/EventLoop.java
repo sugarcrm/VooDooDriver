@@ -333,6 +333,13 @@ public class EventLoop implements Runnable {
          event.afterChildren();
       } catch (org.sugarcrm.voodoodriver.Event.StopEventException e) {
          /* Not an error */
+      } catch (ElementNotVisibleException e) {
+         String s = "Element is not visible";
+         if (event.required()) {
+            this.report.error(s);
+         } else {
+            this.report.log(s + ", but required = false");
+         }
       } catch (VDDException e) {
          Throwable cause = e.getCause();
 
@@ -376,9 +383,6 @@ public class EventLoop implements Runnable {
       //    break;
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
-      //    break;
-      // case DIV:
-      //    element = divEvent(event, parent);
       //    break;
       // case TABLE:
       //    element = tableEvent(event, parent);
@@ -443,6 +447,8 @@ public class EventLoop implements Runnable {
    }
 
 
+   /******* delete me *********/
+
    /**
     * Log when an {@link ElementNotVisibleException} is caught
     *
@@ -454,16 +460,11 @@ public class EventLoop implements Runnable {
     */
 
    private void logElementNotVisible(boolean required, VDDHash event) {
-      String how = event.get("how").toString();
-      String what = this.replaceString(event.get(how).toString());
-      String msg = ("The element you are trying to access (" +
-                    how + " = " + what + ") is not visible");
-      if (required) {
-         this.report.error("Error: " + msg + "!");
-      } else {
-         this.report.log(msg + ", but required = false.");
-      }
+      // implemented above //
    }
+
+   /******* stop deleting me *********/
+
 
    private boolean frameEvent(VDDHash event) {
       boolean result = false;
@@ -1700,81 +1701,6 @@ public class EventLoop implements Runnable {
    ////////////////////////////////////////////////////////////
 
 
-
-   private WebElement divEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("Div event starting.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Div event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.DIV,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.AFTERCLICK);
-         }
-
-         if (event.containsKey("assert")) {
-            String src = element.getText();
-            String value = event.get("assert").toString();
-            value = this.replaceString(value);
-            this.report.Assert(value, src);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String src = element.getText();
-            String value = event.get("assertnot").toString();
-            value = this.replaceString(value);
-            this.report.AssertNot(value, src);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                  + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         String value = element.getText();
-         handleVars(value, event);
-
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), element);
-         }
-
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         element = null;
-      }
-
-      this.report.log("Div event finished.");
-      return element;
-   }
 
    private WebElement checkboxEvent(VDDHash event, WebElement parent) {
       boolean click = false;
