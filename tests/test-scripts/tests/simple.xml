@@ -3,7 +3,7 @@
 
    <browser url="{@global.url}/tests/test-data/simple.html"/>
 
-   <!-- All the div attributes -->
+   <!-- DIV -->
    <div id="div" assert="div text"/>
    <div id="div" assertnot="foobar"/>
    <div id="div" click="true"/>
@@ -12,9 +12,17 @@
    <div id="div" assert="mousedown"/>
    <div id="div" save="mydiv"/>
    <div id="div" var="mydiv"/>
-
    <!-- This div is not visible, but required is true - shouldn't be an error-->
    <div id="InvisibleDiv" click="true" required="false"/>
 
+   <!-- SPAN -->
+   <span id="span" assert="span text"/>
+   <span id="span" assertnot="foobar"/>
+   <span id="span" click="true"/>
+   <span id="span" assert="clicked"/>
+   <span id="span" jscriptevent="onmousedown"/>
+   <span id="span" assert="mousedown"/>
+   <span id="span" save="myspan"/>
+   <span id="span" var="myspan"/>
 
 </voodoo>

@@ -393,9 +393,6 @@ public class EventLoop implements Runnable {
       // case SELECT:
       //    element = selectEvent(event, parent);
       //    break;
-      // case SPAN:
-      //    element = spanEvent(event, parent);
-      //    break;
       // case HIDDEN:
       //    result = hiddenEvent(event, parent);
       //    break;
@@ -1101,78 +1098,6 @@ public class EventLoop implements Runnable {
 
       this.report.log("Hidden event finished.");
       return result;
-   }
-
-   private WebElement spanEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("span event starting.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Span event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.SPAN,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         String value = element.getText();
-         handleVars(value, event);
-
-         if (click) {
-            this.firePlugin(element, Elements.SPAN,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.SPAN,
-                  PluginEvent.AFTERCLICK);
-         }
-
-         if (event.containsKey("assert")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assert").toString());
-            this.report.Assert(val, src);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assertnot").toString());
-            this.report.AssertNot(val, src);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                  + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         if (event.containsKey("children") && element != null) {
-            this.processEvents((ArrayList<Event>) event.get("children"), element);
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         element = null;
-      }
-
-      this.report.log("Span event finished.");
-      return element;
    }
 
    private WebElement inputEvent(VDDHash event, WebElement parent) {

@@ -158,6 +158,7 @@ public abstract class Event {
       } else if (tagName.equals("div")) {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("span")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("h1")) {
       } else if (tagName.equals("h2")) {
       } else if (tagName.equals("h3")) {
