@@ -84,9 +84,9 @@ class Attach extends Event {
                             org.sugarcrm.voodoodriver.Browser b) {
       int n = 0;
       for (String h: b.getDriver().getWindowHandles()) {
-         r.Log(String.format("[%d] Handle: %s", n, h));
-         r.Log(String.format("[%d] Title:  %s", n, getTitle(b, h)));
-         r.Log(String.format("[%d] URL:    %s", n, getUrl(b, h)));
+         r.log(String.format("[%d] Handle: %s", n, h));
+         r.log(String.format("[%d] Title:  %s", n, getTitle(b, h)));
+         r.log(String.format("[%d] URL:    %s", n, getUrl(b, h)));
          n++;
       }
    }
@@ -202,16 +202,16 @@ class Attach extends Event {
 
       listWindows(r, b);
 
-      r.Log("Current Window Handle: " + this.parentWindow);
+      r.log("Current Window Handle: " + this.parentWindow);
 
       if (this.actions.containsKey("index")) {
          String si = this.replaceString((String)this.actions.get("index"));
          try {
             index = Integer.valueOf(si);
          } catch (NumberFormatException e) {
-            r.ReportError("Specified attach index '" +
-                          (String)this.actions.get("index") + "' " +
-                          "is not a valid integer. Using 0.");
+            r.error("Specified attach index '" +
+                    (String)this.actions.get("index") + "' " +
+                    "is not a valid integer. Using 0.");
          }
       }
 
@@ -221,14 +221,14 @@ class Attach extends Event {
          try {
             if (this.actions.containsKey("title")) {
                String t = this.replaceString((String)this.actions.get("title"));
-               r.Log("Search for window with title " + t);
+               r.log("Search for window with title " + t);
                attachWindow = getWindowByTitle(b, t, index);
             } else if (this.actions.containsKey("url")) {
                String u = this.replaceString((String)this.actions.get("url"));
-               r.Log("Search for window with url " + u);
+               r.log("Search for window with url " + u);
                attachWindow = getWindowByUrl(b, u, index);
             } else {
-               r.Log("Search for window with index " + index);
+               r.log("Search for window with index " + index);
                attachWindow = getWindowByIndex(b, index);
             }
 
@@ -242,16 +242,16 @@ class Attach extends Event {
                }
             } else {
                b.getDriver().switchTo().window(this.parentWindow);
-               r.ReportError(e.getMessage());
+               r.error(e.getMessage());
                throw new StopEventException();
             }
          }
       }
 
-      r.Log("Switching to matching window:");
-      r.Log("Handle: " + attachWindow);
-      r.Log("Title: " + getTitle(b, attachWindow));
-      r.Log("URL: " + getUrl(b, attachWindow));
+      r.log("Switching to matching window:");
+      r.log("Handle: " + attachWindow);
+      r.log("Title: " + getTitle(b, attachWindow));
+      r.log("URL: " + getUrl(b, attachWindow));
 
       this.eventLoop.setCurrentHWND(attachWindow);
       b.getDriver().switchTo().window(attachWindow);
@@ -267,14 +267,14 @@ class Attach extends Event {
    public void afterChildren() throws VDDException {
       int timeout = this.eventLoop.getAttachTimeout();
 
-      this.eventLoop.report.Log("Switching back to window handle: " +
+      this.eventLoop.report.log("Switching back to window handle: " +
                                 this.parentWindow);
       this.eventLoop.Browser.setBrowserOpened();
       this.eventLoop.Browser.getDriver().switchTo().window(this.parentWindow);
       this.eventLoop.setCurrentHWND(this.parentWindow);
 
       if (timeout > 0) {
-            this.eventLoop.report.Log("Waiting " + timeout + " seconds " +
+            this.eventLoop.report.log("Waiting " + timeout + " seconds " +
                                       "before executing next event.");
             try {
                Thread.sleep(timeout * 1000);

@@ -264,8 +264,8 @@ class CSV extends Event {
       }
 
       if (data.length != keys.length) {
-         eventLoop.report.ReportError("Number of elements on line " + line +
-                                      " differs from key count. Skipping.");
+         eventLoop.report.error("Number of elements on line " + line +
+                                " differs from key count. Skipping.");
          return false;
       }
 
@@ -275,7 +275,7 @@ class CSV extends Event {
 
          if (eventLoop.hijacks.containsKey(key)) {
             val = String.valueOf(eventLoop.hijacks.get(key));
-            eventLoop.report.Log("Hijacking SodaVar: '" + key + "' => '" +
+            eventLoop.report.log("Hijacking SodaVar: '" + key + "' => '" +
                                  val + "'.");
          }
 
@@ -326,13 +326,13 @@ class CSV extends Event {
       if (this.actions.containsKey("override")) {
          String of = (String)this.actions.get("override");
          this.eventLoop.csvOverrideFile = new File(this.replaceString(of));
-         r.Log("Setting CSV override to " + this.eventLoop.csvOverrideFile);
+         r.log("Setting CSV override to " + this.eventLoop.csvOverrideFile);
          throw new StopEventException();
       }
 
       if (this.eventLoop.csvOverrideFile != null) {
          this.csv = this.eventLoop.csvOverrideFile;
-         r.Log("Using CSV override file " + this.csv);
+         r.log("Using CSV override file " + this.csv);
          this.eventLoop.csvOverrideFile = null;
       } else if (this.actions.containsKey("file")) {
          String f = (String)this.actions.get("file");

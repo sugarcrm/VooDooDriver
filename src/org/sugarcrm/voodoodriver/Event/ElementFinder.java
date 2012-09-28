@@ -215,7 +215,7 @@ class ElementFinder {
       String type = (String)this.selectors.get("html_type");
       String js = null;
 
-      this.r.Log("Searching all " + type + " elements for value='" +
+      this.r.log("Searching all " + type + " elements for value='" +
                  value + "'. This could be take a while...");
 
       String[] tags = tag.split("\\|");
@@ -458,7 +458,7 @@ class ElementFinder {
          try {
             index = Integer.valueOf((String)selectors.get("index"));
          } catch (NumberFormatException e) {
-            this.r.ReportError("Invalid value for 'index': " + e);
+            this.r.error("Invalid value for 'index': " + e);
             return null;
          }
       }
@@ -472,7 +472,7 @@ class ElementFinder {
          try {
             timeout = Integer.valueOf((String)selectors.get("timeout"));
          } catch (NumberFormatException e) {
-            this.r.ReportError("Invalid value for 'timeout': " + e);
+            this.r.error("Invalid value for 'timeout': " + e);
             return null;
          }
       }
@@ -576,9 +576,8 @@ class ElementFinder {
          element = elements.get(index);
       } catch (IndexOutOfBoundsException e) {
          if (index > 0) {
-            this.r.ReportError("Failed to find element: " +
-                               String.format("Index (%d) out of bounds.",
-                                             index));
+            this.r.error("Failed to find element: " +
+                         String.format("Index (%d) out of bounds.", index));
             return null;
          }
       }
@@ -600,18 +599,18 @@ class ElementFinder {
 
       if (element == null && (required == true ||
                               (existsModified && exists == true))) {
-         this.r.ReportError("Failed to find element" +
+         this.r.error("Failed to find element" +
                             (requiredModified ? " and required => true" :
                              (existsModified ? " and exists => true" : "")));
       } else if (element == null) {
-         this.r.Log("Element not found but" +
+         this.r.log("Element not found but" +
                     (existsModified ? " exists and" : "") +
                     " required => false");
       } else if (exists == false) {
-         this.r.ReportError("Elements exists and exists => false");
+         this.r.error("Elements exists and exists => false");
          element = null;
       } else {
-         this.r.Log("Found element");
+         this.r.log("Found element");
       }
 
       return element;

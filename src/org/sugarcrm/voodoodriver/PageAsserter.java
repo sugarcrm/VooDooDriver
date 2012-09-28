@@ -53,7 +53,7 @@ public class PageAsserter {
       fd = new File(assertFile);
       if (!fd.exists()) {
          String msg = String.format("Error failed to find assertpage file: '%s'!", assertFile);
-         this.reporter.ReportError(msg);
+         this.reporter.error(msg);
       }
 
       try {
@@ -62,7 +62,7 @@ public class PageAsserter {
          doc = db.parse(fd);
          this.parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {
-         this.reporter.ReportException(exp);
+         this.reporter.exception(exp);
       }
    }
 
@@ -100,13 +100,13 @@ public class PageAsserter {
             Matcher m = p.matcher(pagesrc);
             if (m.find()) {
                String msg = String.format("Page Assert Found Match for: '%s'!", this.checkes.get(i));
-               this.reporter.ReportError(msg);
+               this.reporter.error(msg);
                this.reporter.SavePage();
             }
          } else {
             if (pagesrc.contains(this.checkes.get(i))) {
                String msg = String.format("Page Assert Found Match for: '%s'!", this.checkes.get(i));
-               this.reporter.ReportError(msg);
+               this.reporter.error(msg);
                this.reporter.SavePage();
             }
          }

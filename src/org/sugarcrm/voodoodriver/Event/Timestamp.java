@@ -52,7 +52,7 @@ public class Timestamp extends Event {
       DateFormat df = new SimpleDateFormat("yyMMdd_hhmmss");
       String date = df.format(new Date());
 
-      this.eventLoop.report.Log("Setting STAMP => '" + date + "'.");
+      this.eventLoop.report.log("Setting STAMP => '" + date + "'.");
       this.eventLoop.vars.put("stamp", date);
    }
 

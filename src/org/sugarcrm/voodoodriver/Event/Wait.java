@@ -60,26 +60,26 @@ public class Wait extends Event {
          try {
             timeout = new Integer((String)this.actions.get("timeout"));
             if (timeout < 0) {
-               this.eventLoop.report.Warn("wait timeout < 0, using 0");
+               this.eventLoop.report.warning("wait timeout < 0, using 0");
                timeout = 0;
             } else {
-               this.eventLoop.report.Log("Setting timeout to " + timeout + "s");
+               this.eventLoop.report.log("Setting timeout to " + timeout + "s");
             }
             useDefault = false;
          } catch (NullPointerException e) {
-            this.eventLoop.report.ReportError("Null timeout value???");
+            this.eventLoop.report.error("Null timeout value???");
          } catch (NumberFormatException e) {
-            this.eventLoop.report.ReportError("Specified wait timeout '" +
-                                              this.actions.get("timeout") +
-                                              "' is not a valid integer");
+            this.eventLoop.report.error("Specified wait timeout '" +
+                                        this.actions.get("timeout") +
+                                        "' is not a valid integer");
          }
       } else if (this.actions.containsKey("condition")) {
-         this.eventLoop.report.Warn("Bug 52537: condition attribute is not " +
-                                    "implemented.");
+         this.eventLoop.report.warning("Bug 52537: condition attribute is " +
+                                       "not implemented.");
       }
 
       if (useDefault) {
-         this.eventLoop.report.Log("Using default timeout of " + timeout + "s");
+         this.eventLoop.report.log("Using default timeout of " + timeout + "s");
       }
 
 
@@ -87,7 +87,7 @@ public class Wait extends Event {
          try {
             Thread.sleep(1000);
          } catch (InterruptedException e) {
-            this.eventLoop.report.Log("wait interrupted");
+            this.eventLoop.report.log("wait interrupted");
             break;
          }
       }

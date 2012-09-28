@@ -91,7 +91,7 @@ class Javaplugin extends Event {
       data.setTestName(this.eventLoop.testName);
 
       if (!plugin.execute(data, this.eventLoop.report)) {
-         this.eventLoop.report.ReportError("Java plugin failed");
+         this.eventLoop.report.error("Java plugin failed");
       }
    }
 }

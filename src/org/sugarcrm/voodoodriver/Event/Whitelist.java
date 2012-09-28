@@ -67,11 +67,11 @@ class Whitelist extends Event {
             throw new VDDException("Missing attribute 'content'");
          }
          String content = (String)this.actions.get("content");
-         this.eventLoop.report.Log("Adding whitelist item '" + name +
+         this.eventLoop.report.log("Adding whitelist item '" + name +
                                    "' => '" + content + "'");
          this.eventLoop.whitelist.put(name, content);
       } else if (action.equals("delete")) {
-         this.eventLoop.report.Log("Removing whitelist item '" + name + "'");
+         this.eventLoop.report.log("Removing whitelist item '" + name + "'");
          this.eventLoop.whitelist.remove(name);
       } else {
          throw new VDDException("Invalid action '" + action +

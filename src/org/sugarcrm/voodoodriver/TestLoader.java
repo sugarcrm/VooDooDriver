@@ -97,7 +97,7 @@ public class TestLoader {
           * The root element should be <voodoo>; <soda> is deprecated.
           * This will eventually become a deprecation warning.
           */
-         this.reporter.Log("Root elements other than <voodoo> are deprecated");
+         this.reporter.log("Root elements other than <voodoo> are deprecated");
       }
 
       return root.getChildNodes();

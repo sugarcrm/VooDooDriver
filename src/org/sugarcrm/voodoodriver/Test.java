@@ -184,7 +184,7 @@ public class Test {
     */
 
    private boolean loadTestFile() throws VDDException {
-      this.reporter.Log("Loading Test: " + this.testFile);
+      this.reporter.log("Loading Test: " + this.testFile);
 
       try {
          TestLoader loader = new TestLoader(this.testFile, this.reporter);
@@ -195,7 +195,7 @@ public class Test {
          throw new VDDException("Exception loading " + this.testFile, e);
       }
 
-      this.reporter.Log("Finished.");
+      this.reporter.log("Finished.");
 
       return this.events != null; // ? Should be void with exception for error
    }
@@ -216,7 +216,7 @@ public class Test {
          res = res.concat(String.format("--%s:%s", key, value));
       }
 
-      this.reporter.Log(res);
+      this.reporter.log(res);
    }
 
 
@@ -257,8 +257,8 @@ public class Test {
                                     "Module Name: '%s', " +
                                     "Reason: '%s'",
                                     bug, module, reason);
-         this.reporter.Log(msg);
-         this.reporter.ReportBlocked();
+         this.reporter.log(msg);
+         this.reporter.setBlocked();
          return true;
       }
 
@@ -281,14 +281,13 @@ public class Test {
 
       try {
          if (!this.loadTestFile()) {
-            this.reporter.ReportError("Failed to parse test file!");
+            this.reporter.error("Failed to parse test file!");
             this.logResults();
             this.reporter.closeLog();
             return false;
          }
       } catch (VDDException e) {
-            this.reporter.ReportError("Failed to parse test file!");
-            this.reporter.ReportException(e);
+            this.reporter.exception("Failed to parse test file!", e);
             this.logResults();
             this.reporter.closeLog();
             return false;
@@ -314,7 +313,7 @@ public class Test {
          try {
             Thread.sleep(SLEEPYTIME);
          } catch (InterruptedException e) {
-            this.reporter.Warn("Thread interrupted.  Ignoring.");
+            this.reporter.warning("Thread interrupted.  Ignoring.");
          }
 
          long current = (new Date()).getTime();
@@ -324,12 +323,12 @@ public class Test {
          if (seconds > TIMEOUT) {
             watchDog = true;
             this.eventLoop.stop();
-            this.reporter.ReportWatchDog(seconds);
+            this.reporter.watchdog(seconds);
          }
       }
 
       if (watchDog) {
-         this.reporter.Log("Trying to close browser after watchdog.");
+         this.reporter.log("Trying to close browser after watchdog.");
          ((Browser)this.config.get("browser")).forceClose();
       }
 

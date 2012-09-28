@@ -34,7 +34,7 @@ public class VDDMouse {
       try {
          this.robo = new Robot();
       } catch (Exception exp) {
-         this.reporter.ReportException(exp);
+         this.reporter.exception(exp);
          this.robo = null;
       }
    }
@@ -44,7 +44,7 @@ public class VDDMouse {
       Dimension srcDim = null;
       Dimension dstDim = null;
       String msg = "";
-      this.reporter.Log("Starting DnD.");
+      this.reporter.log("Starting DnD.");
 
       if (this.robo == null) {
          return;
@@ -61,9 +61,9 @@ public class VDDMouse {
       dst_y = dstPoint.getY() + (dstDim.getHeight() / 2);
 
       msg = String.format("DnD Source Screen Coordinates: X => '%d' Y => '%d'", src_x, src_y);
-      this.reporter.Log(msg);
+      this.reporter.log(msg);
       msg = String.format("DnD Dest Screen Coordinates: X => '%d' Y => '%d'", dst_x, dst_y);
-      this.reporter.Log(msg);
+      this.reporter.log(msg);
 
       this.robo.mouseMove(srcPoint.x / 2, srcPoint.y / 2);
       this.robo.delay(800);
@@ -74,7 +74,7 @@ public class VDDMouse {
       this.robo.mouseRelease(InputEvent.BUTTON1_MASK);
       this.robo.delay(500);
       msg = "DnD Finished.";
-      this.reporter.Log(msg);
+      this.reporter.log(msg);
    }
 
    private void Move(int cur_x, int cur_y, int x, int y) {

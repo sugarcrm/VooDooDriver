@@ -459,7 +459,7 @@ public abstract class Browser {
             this.asserter = new PageAsserter(this.assertPageFile,
                                              this.reporter, whitelist);
          } catch (Exception exp) {
-            this.reporter.ReportException(exp);
+            this.reporter.exception(exp);
          }
       }
 

@@ -74,7 +74,7 @@ public class Alert extends Event {
           * generic "Exception" in case the Selenium folks fix the
           * Javascript error.
           */
-         this.eventLoop.report.Log("Unable to switch back to window. " +
+         this.eventLoop.report.log("Unable to switch back to window. " +
                                    "Is it closed?");
       }
    }
@@ -132,22 +132,22 @@ public class Alert extends Event {
          alert = this.eventLoop.Browser.getDriver().switchTo().alert();
       } catch (NoAlertPresentException e) {
          if (exists != null && exists == false) {
-            this.eventLoop.report.Log("Alert not found and exists is false.");
+            this.eventLoop.report.log("Alert not found and exists is false.");
          } else if (required == false) {
-            this.eventLoop.report.Log("Alert not found and required is false.");
+            this.eventLoop.report.log("Alert not found and required is false.");
          } else {
-            this.eventLoop.report.ReportError("Alert not found");
+            this.eventLoop.report.error("Alert not found");
          }
          return;
       }
 
       if (exists != null && exists == false) {
-         this.eventLoop.report.ReportError("Alert found but exists is false");
+         this.eventLoop.report.error("Alert found but exists is false");
          switchBack();
          return;
       }
 
-      this.eventLoop.report.Log("Found alert with text '" +
+      this.eventLoop.report.log("Found alert with text '" +
                                 alert.getText() + "'");
 
       if (assertStr != null) {
@@ -158,10 +158,10 @@ public class Alert extends Event {
       }
 
       if (accept) {
-         this.eventLoop.report.Log("Alert is being accepted.");
+         this.eventLoop.report.log("Alert is being accepted.");
          alert.accept();
       } else {
-         this.eventLoop.report.Log("Alert is being dismissed.");
+         this.eventLoop.report.log("Alert is being dismissed.");
          alert.dismiss();
       }
 

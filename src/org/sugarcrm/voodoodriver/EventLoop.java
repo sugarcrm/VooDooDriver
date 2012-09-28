@@ -320,7 +320,7 @@ public class EventLoop implements Runnable {
       boolean result = true;
       String eventName = event.getName();
 
-      this.report.Log(eventName + " event started...");
+      this.report.log(eventName + " event started...");
       this.resetThreadTime();
       event.setEventLoop(this);
       event.setParent(parent);
@@ -340,13 +340,13 @@ public class EventLoop implements Runnable {
             cause = e;
          }
 
-         this.report.ReportException("Exception during event execution", cause);
+         this.report.exception("Exception during event execution", cause);
 
          result = false;
       }
 
       this.resetThreadTime();
-      this.report.Log(eventName + " event finished.");
+      this.report.log(eventName + " event finished.");
 
       return result;
 
@@ -459,9 +459,9 @@ public class EventLoop implements Runnable {
       String msg = ("The element you are trying to access (" +
                     how + " = " + what + ") is not visible");
       if (required) {
-         this.report.ReportError("Error: " + msg + "!");
+         this.report.error("Error: " + msg + "!");
       } else {
-         this.report.Log(msg + ", but required = false.");
+         this.report.log(msg + ", but required = false.");
       }
    }
 
@@ -470,7 +470,7 @@ public class EventLoop implements Runnable {
       int index = -1;
       String frameid = null;
 
-      this.report.Log("Frame event starting.");
+      this.report.log("Frame event starting.");
 
       if (event.containsKey("index")) {
          String tmp = event.get("index").toString();
@@ -490,10 +490,10 @@ public class EventLoop implements Runnable {
 
       try {
          if (index > -1) {
-            this.report.Log("Switching to frame by index: '" + index + "'.");
+            this.report.log("Switching to frame by index: '" + index + "'.");
             this.Browser.getDriver().switchTo().frame(index);
          } else {
-            this.report.Log("Switching to frame by name: '" + frameid + "'.");
+            this.report.log("Switching to frame by name: '" + frameid + "'.");
             this.Browser.getDriver().switchTo().frame(frameid);
          }
 
@@ -501,14 +501,14 @@ public class EventLoop implements Runnable {
             this.processEvents((ArrayList<Event>) event.get("children"), null);
          }
 
-         this.report.Log("Switching back to default frame.");
+         this.report.log("Switching back to default frame.");
          this.Browser.getDriver().switchTo().defaultContent();
       } catch (NoSuchFrameException exp) {
-         this.report.ReportError("Failed to find frame!");
+         this.report.error("Failed to find frame!");
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
-      this.report.Log("Frame event finished.");
+      this.report.log("Frame event finished.");
 
       return result;
    }
@@ -519,7 +519,7 @@ public class EventLoop implements Runnable {
       boolean result = false;
       WebElement element = null;
 
-      this.report.Log("UL event Started.");
+      this.report.log("UL event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -529,7 +529,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, null, required);
          if (element == null) {
-            this.report.Log("UL event finished.");
+            this.report.log("UL event finished.");
             result = false;
             return result;
          }
@@ -537,12 +537,12 @@ public class EventLoop implements Runnable {
          this.checkDisabled(event, element);
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                             + event.get("jscriptevent").toString());
             this.Browser.fire_event(element,
                                     event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("click")) {
@@ -550,13 +550,13 @@ public class EventLoop implements Runnable {
          }
 
          if (click) {
-            this.report.Log("UL click started.");
+            this.report.log("UL click started.");
             this.firePlugin(element, Elements.UL,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.UL,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("UL click finished.");
+            this.report.log("UL click finished.");
          }
 
          if (event.containsKey("children")) {
@@ -566,10 +566,10 @@ public class EventLoop implements Runnable {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("UL event Finished.");
+      this.report.log("UL event Finished.");
 
       return result;
    }
@@ -580,7 +580,7 @@ public class EventLoop implements Runnable {
       boolean result = false;
       WebElement element = null;
 
-      this.report.Log("Area event Started.");
+      this.report.log("Area event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -590,7 +590,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, null, required);
          if (element == null) {
-            this.report.Log("Area event finished.");
+            this.report.log("Area event finished.");
             result = false;
             return result;
          }
@@ -602,22 +602,22 @@ public class EventLoop implements Runnable {
          }
 
          if (click) {
-            this.report.Log("Area click started.");
+            this.report.log("Area click started.");
             this.firePlugin(element, Elements.AREA,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.AREA,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Area click finished.");
+            this.report.log("Area click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("Area event Finished.");
+      this.report.log("Area event Finished.");
       return result;
    }
 
@@ -627,7 +627,7 @@ public class EventLoop implements Runnable {
       boolean result = false;
       WebElement element = null;
 
-      this.report.Log("Map event Started.");
+      this.report.log("Map event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -637,7 +637,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, null, required);
          if (element == null) {
-            this.report.Log("Map event finished.");
+            this.report.log("Map event finished.");
             result = false;
             return result;
          }
@@ -649,13 +649,13 @@ public class EventLoop implements Runnable {
          this.checkDisabled(event, element);
 
          if (click) {
-            this.report.Log("Map click started.");
+            this.report.log("Map click started.");
             this.firePlugin(element, Elements.MAP,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.MAP,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Map click finished.");
+            this.report.log("Map click finished.");
          }
 
          if (event.containsKey("children")) {
@@ -665,10 +665,10 @@ public class EventLoop implements Runnable {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("Map event Finished.");
+      this.report.log("Map event Finished.");
 
       return result;
    }
@@ -679,7 +679,7 @@ public class EventLoop implements Runnable {
       boolean result = false;
       WebElement element = null;
 
-      this.report.Log("OL event Started.");
+      this.report.log("OL event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -689,7 +689,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, null, required);
          if (element == null) {
-            this.report.Log("OL event finished.");
+            this.report.log("OL event finished.");
             result = false;
             return result;
          }
@@ -701,22 +701,22 @@ public class EventLoop implements Runnable {
          this.checkDisabled(event, element);
 
          if (click) {
-            this.report.Log("OL click started.");
+            this.report.log("OL click started.");
             this.firePlugin(element, Elements.OL,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.OL,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("OL click finished.");
+            this.report.log("OL click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("OL event Finished.");
+      this.report.log("OL event Finished.");
 
       return result;
    }
@@ -734,7 +734,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("Image event Started.");
+      this.report.log("Image event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -744,7 +744,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Image event finished.");
+            this.report.log("Image event finished.");
             return element;
          }
 
@@ -757,31 +757,31 @@ public class EventLoop implements Runnable {
          handleVars(element.getAttribute("src"), event);
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: " +
+            this.report.log("Firing Javascript Event: " +
                             event.get("jscriptevent").toString());
             this.Browser.fire_event(element,
                                     event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (click) {
-            this.report.Log("Image click started.");
+            this.report.log("Image click started.");
             this.firePlugin(element, Elements.IMAGE,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.IMAGE,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Image click finished.");
+            this.report.log("Image click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("Image event Finished.");
+      this.report.log("Image event Finished.");
       return element;
    }
 
@@ -789,7 +789,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.report.Log("FileField event Started.");
+      this.report.log("FileField event Started.");
       this.resetThreadTime();
 
       if (event.containsKey("required")) {
@@ -799,7 +799,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("FileField event finished.");
+            this.report.log("FileField event finished.");
             return element;
          }
 
@@ -813,10 +813,10 @@ public class EventLoop implements Runnable {
             setvalue = this.replaceString(setvalue);
             setvalue = FilenameUtils.separatorsToSystem(setvalue);
             setvalue = (new File(setvalue)).getAbsolutePath();
-            this.report.Log(String.format("Setting filefield to: '%s'.",
+            this.report.log(String.format("Setting filefield to: '%s'.",
                                           setvalue));
             element.sendKeys(setvalue);
-            this.report.Log("Finished set.");
+            this.report.log("Finished set.");
          }
 
          String value = element.getAttribute("value");
@@ -826,10 +826,10 @@ public class EventLoop implements Runnable {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("FileField event finished..");
+      this.report.log("FileField event finished..");
       this.resetThreadTime();
       return element;
    }
@@ -839,7 +839,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("LI event Started.");
+      this.report.log("LI event Started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -848,7 +848,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("LI event finished.");
+            this.report.log("LI event finished.");
             return element;
          }
 
@@ -861,33 +861,33 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                             + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (click) {
-            this.report.Log("Click element.");
+            this.report.log("Click element.");
             this.firePlugin(element, Elements.LI,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.LI,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Click finished.");
+            this.report.log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
       if (event.containsKey("children")) {
          this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
-      this.report.Log("LI event finished.");
+      this.report.log("LI event finished.");
       return element;
    }
 
@@ -896,7 +896,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("TR event Started.");
+      this.report.log("TR event Started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -905,7 +905,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("TR event finished.");
+            this.report.log("TR event finished.");
             return element;
          }
 
@@ -918,25 +918,25 @@ public class EventLoop implements Runnable {
          }
 
          if (click) {
-            this.report.Log("Click element.");
+            this.report.log("Click element.");
             this.firePlugin(element, Elements.TR,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TR,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Click finished.");
+            this.report.log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
       if (event.containsKey("children")) {
          this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
-      this.report.Log("TR event finished.");
+      this.report.log("TR event finished.");
       return element;
    }
 
@@ -954,7 +954,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("TH event starting.");
+      this.report.log("TH event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -963,7 +963,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("TH event finished.");
+            this.report.log("TH event finished.");
             return element;
          }
 
@@ -997,12 +997,12 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: " +
+            this.report.log("Firing Javascript Event: " +
                             event.get("jscriptevent").toString());
             this.Browser.fire_event(element,
                                     event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1011,11 +1011,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("TH event finished.");
+      this.report.log("TH event finished.");
       return element;
    }
 
@@ -1025,7 +1025,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("TD event Started.");
+      this.report.log("TD event Started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1034,7 +1034,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("TD event finished.");
+            this.report.log("TD event finished.");
             return element;
          }
 
@@ -1048,26 +1048,26 @@ public class EventLoop implements Runnable {
          }
 
          if (click) {
-            this.report.Log("Click element.");
+            this.report.log("Click element.");
             this.firePlugin(element, Elements.TD,
                   PluginEvent.BEFORECLICK);
             element.click();
             this.firePlugin(element, Elements.TD,
                   PluginEvent.AFTERCLICK);
-            this.report.Log("Click finished.");
+            this.report.log("Click finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
          element = null;
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
       if (event.containsKey("children")) {
          this.processEvents((ArrayList<Event>) event.get("children"), element);
       }
 
-      this.report.Log("TD event finished.");
+      this.report.log("TD event finished.");
       return element;
    }
 
@@ -1076,7 +1076,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.report.Log("Hidden event Started.");
+      this.report.log("Hidden event Started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1086,7 +1086,7 @@ public class EventLoop implements Runnable {
          element = this.findElement(event, parent, required);
          if (element == null) {
             result = false;
-            this.report.Log("Hidden event finished.");
+            this.report.log("Hidden event finished.");
             return result;
          }
 
@@ -1094,11 +1094,11 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
          result = true;
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          result = false;
       }
 
-      this.report.Log("Hidden event finished.");
+      this.report.log("Hidden event finished.");
       return result;
    }
 
@@ -1107,7 +1107,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("span event starting.");
+      this.report.log("span event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1116,7 +1116,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Span event finished.");
+            this.report.log("Span event finished.");
             return element;
          }
 
@@ -1153,11 +1153,11 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1166,11 +1166,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("Span event finished.");
+      this.report.log("Span event finished.");
       return element;
    }
 
@@ -1178,7 +1178,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.report.Log("Input event starting.");
+      this.report.log("Input event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1187,7 +1187,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Input event finished.");
+            this.report.log("Input event finished.");
             return element;
          }
 
@@ -1211,17 +1211,17 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: " + event.get("jscriptevent").toString());
+            this.report.log("Firing Javascript Event: " + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("Input event finished.");
+      this.report.log("Input event finished.");
       return element;
    }
 
@@ -1230,7 +1230,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("Radio event starting.");
+      this.report.log("Radio event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1239,7 +1239,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Radio event finished.");
+            this.report.log("Radio event finished.");
             return element;
          }
 
@@ -1253,7 +1253,7 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("set")) {
-            this.report.Warn("Using the 'set' command for a radio element is not supported anymore!  Use click!");
+            this.report.warning("Using the 'set' command for a radio element is not supported anymore!  Use click!");
             click = this.clickToBool(event.get("set").toString());
          }
 
@@ -1263,9 +1263,9 @@ public class EventLoop implements Runnable {
          if (click) {
             this.firePlugin(element, Elements.RADIO,
                   PluginEvent.BEFORECLICK);
-            this.report.Log("Clicking Element.");
+            this.report.log("Clicking Element.");
             element.click();
-            this.report.Log("Click finished.");
+            this.report.log("Click finished.");
             this.firePlugin(element, Elements.RADIO,
                   PluginEvent.AFTERCLICK);
          }
@@ -1283,11 +1283,11 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("checked")) {
@@ -1303,11 +1303,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("Radio event finished.");
+      this.report.log("Radio event finished.");
       return element;
    }
 
@@ -1324,7 +1324,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.report.Log("Select event Started.");
+      this.report.log("Select event Started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1334,7 +1334,7 @@ public class EventLoop implements Runnable {
          Select sel = null;
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Select event finished.");
+            this.report.log("Select event finished.");
             return null;
          }
 
@@ -1364,8 +1364,7 @@ public class EventLoop implements Runnable {
             }
 
             if (!optionFound) {
-               this.report.ReportError("Failed to find select option '" +
-                                       val + "'!");
+               this.report.error("Failed to find select option '" + val + "'!");
             }
          }
 
@@ -1401,7 +1400,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("clear") &&
              this.clickToBool(event.get("clear").toString()) &&
              sel.isMultiple()) {
-            this.report.Log("Clearing select element.");
+            this.report.log("Clearing select element.");
             sel.deselectAll();
          }
 
@@ -1411,7 +1410,7 @@ public class EventLoop implements Runnable {
                boolean useVal = event.containsKey("setreal");
                String val = this.replaceString(event.get(useVal ? "setreal" :
                                                          "set").toString());
-               this.report.Log("Setting option by " +
+               this.report.log("Setting option by " +
                                (useVal ? "value" : "visible text") +
                                ": '" + val + "'.");
                try {
@@ -1423,14 +1422,14 @@ public class EventLoop implements Runnable {
                   this.firePlugin(element, Elements.SELECT,
                                   PluginEvent.AFTERSET);
                } catch (NoSuchElementException e) {
-                  this.report.ReportError("Option with " +
-                                          (useVal ? "value" : "visible text") +
-                                          " '" + val + "' does not exist");
+                  this.report.error("Option with " +
+                                    (useVal ? "value" : "visible text") +
+                                    " '" + val + "' does not exist");
                }
             }
 
             if (event.containsKey("jscriptevent")) {
-               this.report.Log("Firing Javascript Event: " +
+               this.report.log("Firing Javascript Event: " +
                                event.get("jscriptevent").toString());
                this.Browser.fire_event(element,
                                        event.get("jscriptevent").toString());
@@ -1438,7 +1437,7 @@ public class EventLoop implements Runnable {
                   Thread.sleep(1000);
                } catch (InterruptedException e) {
                }
-               this.report.Log("Javascript event finished.");
+               this.report.log("Javascript event finished.");
             }
 
             if (event.containsKey("click") &&
@@ -1458,17 +1457,17 @@ public class EventLoop implements Runnable {
              * Selecting a value has the potential to refresh the page
              * (Bug 49533).
              */
-            this.report.Log("Page refreshed; select element no longer exists.");
+            this.report.log("Page refreshed; select element no longer exists.");
             element = null;
          }
 
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("Select event finished.");
+      this.report.log("Select event finished.");
       return element;
    }
 
@@ -1486,7 +1485,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       WebElement element = null;
 
-      this.report.Log("Option event starting.");
+      this.report.log("Option event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1495,7 +1494,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Option event finished.");
+            this.report.log("Option event finished.");
             return element;
          }
 
@@ -1515,10 +1514,10 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("jscriptevent")) {
             String ev = (String)event.get("jscriptevent");
-            this.report.Log("Firing Javascript Event: " + ev);
+            this.report.log("Firing Javascript Event: " + ev);
             this.Browser.fire_event(element, ev);
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("click")) {
@@ -1534,10 +1533,10 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException e) {
          logElementNotVisible(required, event);
       } catch (Exception e) {
-         this.report.ReportException(e);
+         this.report.exception(e);
       }
 
-      this.report.Log("Option event finished.");
+      this.report.log("Option event finished.");
       return element;
    }
 
@@ -1547,7 +1546,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("Form event starting.");
+      this.report.log("Form event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1556,7 +1555,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Form event finished.");
+            this.report.log("Form event finished.");
             return element;
          }
 
@@ -1583,10 +1582,10 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
-      this.report.Log("Form event finished.");
+      this.report.log("Form event finished.");
       return element;
    }
 
@@ -1595,7 +1594,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("Table event started.");
+      this.report.log("Table event started.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1604,7 +1603,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Table event finished.");
+            this.report.log("Table event finished.");
             return element;
          }
 
@@ -1640,12 +1639,12 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent")
                   .toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("children")) {
@@ -1654,11 +1653,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("Table event finished.");
+      this.report.log("Table event finished.");
       return element;
    }
 
@@ -1707,7 +1706,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("Div event starting.");
+      this.report.log("Div event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1716,7 +1715,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Div event finished.");
+            this.report.log("Div event finished.");
             return element;
          }
 
@@ -1752,11 +1751,11 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          String value = element.getText();
@@ -1769,11 +1768,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("Div event finished.");
+      this.report.log("Div event finished.");
       return element;
    }
 
@@ -1819,7 +1818,7 @@ public class EventLoop implements Runnable {
                element.click();
                this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
             }
-            this.report.Log(msg);
+            this.report.log(msg);
          }
 
          if (event.containsKey("assert")) {
@@ -1842,7 +1841,7 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
       }
 
       this.resetThreadTime();
@@ -1862,7 +1861,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("thead event starting.");
+      this.report.log("thead event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1871,7 +1870,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("thead event finished.");
+            this.report.log("thead event finished.");
             return element;
          }
 
@@ -1905,12 +1904,12 @@ public class EventLoop implements Runnable {
 
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element,
                                     event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1919,11 +1918,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("thead event finished.");
+      this.report.log("thead event finished.");
       return element;
    }
 
@@ -1940,7 +1939,7 @@ public class EventLoop implements Runnable {
       boolean click = false;
       WebElement element = null;
 
-      this.report.Log("tbody event starting.");
+      this.report.log("tbody event starting.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -1949,7 +1948,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("thead event finished.");
+            this.report.log("thead event finished.");
             return element;
          }
 
@@ -1983,12 +1982,12 @@ public class EventLoop implements Runnable {
 
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element,
                                     event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("children") && element != null) {
@@ -1997,11 +1996,11 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
-      this.report.Log("tbody event finished.");
+      this.report.log("tbody event finished.");
       return element;
    }
 
@@ -2058,7 +2057,7 @@ public class EventLoop implements Runnable {
       }
 
       if (!this.windowExists(this.getCurrentHWND())) {
-         this.report.Log("Browser window closed. Skipping plugin execution.");
+         this.report.log("Browser window closed. Skipping plugin execution.");
          return false;
       }
 
@@ -2167,7 +2166,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.resetThreadTime();
-      this.report.Log("Starting button event.");
+      this.report.log("Starting button event.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -2176,7 +2175,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Finished button event.");
+            this.report.log("Finished button event.");
             return null;
          }
 
@@ -2194,37 +2193,37 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("alert")) {
             boolean alert = this.clickToBool(event.get("alert").toString());
-            this.report.Log(String.format("Setting Alert Hack to: '%s'", alert));
+            this.report.log(String.format("Setting Alert Hack to: '%s'", alert));
             this.Browser.alertHack(alert);
-            this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
+            this.report.warning("You are using a deprecated alert hack, please use the <alert> command!");
          }
 
          if (click) {
             this.firePlugin(element, Elements.BUTTON,
                   PluginEvent.BEFORECLICK);
-            this.report.Log("Clicking button.");
+            this.report.log("Clicking button.");
             element.click();
-            this.report.Log("Finished clicking button.");
+            this.report.log("Finished clicking button.");
             this.firePlugin(element, Elements.BUTTON,
                   PluginEvent.AFTERCLICK);
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
       this.resetThreadTime();
-      this.report.Log("Finished button event.");
+      this.report.log("Finished button event.");
 
       return element;
    }
@@ -2235,7 +2234,7 @@ public class EventLoop implements Runnable {
 
       this.resetThreadTime();
 
-      this.report.Log("Starting textarea event.");
+      this.report.log("Starting textarea event.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -2244,7 +2243,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Finished textarea event.");
+            this.report.log("Finished textarea event.");
             return null;
          }
 
@@ -2259,27 +2258,27 @@ public class EventLoop implements Runnable {
          if (event.containsKey("set")) {
             value = event.get("set").toString();
             value = this.replaceString(value);
-            this.report.Log(String.format("Setting Value to: '%s'.", value));
+            this.report.log(String.format("Setting Value to: '%s'.", value));
             clearText(element);
             element.sendKeys(value);
          } else if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
-               this.report.Log("Clearing textarea.");
+               this.report.log("Clearing textarea.");
                clearText(element);
             }
          } else if (event.containsKey("append")) {
             value = event.get("append").toString();
             value = this.replaceString(value);
-            this.report.Log(String.format("Appending Value to: '%s'.", value));
+            this.report.log(String.format("Appending Value to: '%s'.", value));
             element.sendKeys(value);
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("assert")) {
@@ -2298,9 +2297,9 @@ public class EventLoop implements Runnable {
              this.clickToBool(event.get("click").toString())) {
             this.firePlugin(element, Elements.TEXTAREA,
                             PluginEvent.BEFORECLICK);
-            this.report.Log("Clicking textarea.");
+            this.report.log("Clicking textarea.");
             element.click();
-            this.report.Log("Finished clicking textarea.");
+            this.report.log("Finished clicking textarea.");
             this.firePlugin(element, Elements.TEXTAREA,
                             PluginEvent.AFTERCLICK);
          }
@@ -2308,12 +2307,12 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
       this.resetThreadTime();
-      this.report.Log("Finished textarea event.");
+      this.report.log("Finished textarea event.");
       return element;
    }
 
@@ -2349,7 +2348,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.resetThreadTime();
-      this.report.Log("Starting textfield event.");
+      this.report.log("Starting textfield event.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -2358,7 +2357,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Finished textfield event.");
+            this.report.log("Finished textfield event.");
             return null;
          }
 
@@ -2369,7 +2368,7 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
-               this.report.Log("Clearing textfield.");
+               this.report.log("Clearing textfield.");
                clearText(element);
             }
          }
@@ -2377,7 +2376,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("set")) {
             String value = event.get("set").toString();
             value = this.replaceString(value);
-            this.report.Log(String.format("Setting Value to: '%s'.", value));
+            this.report.log(String.format("Setting Value to: '%s'.", value));
             clearText(element);
             element.sendKeys(value);
          }
@@ -2389,11 +2388,11 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: "
+            this.report.log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("assert")) {
@@ -2413,12 +2412,12 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
       this.resetThreadTime();
-      this.report.Log("Finished textfield event.");
+      this.report.log("Finished textfield event.");
       return element;
    }
 
@@ -2435,7 +2434,7 @@ public class EventLoop implements Runnable {
       WebElement element = null;
 
       this.resetThreadTime();
-      this.report.Log("Starting password event.");
+      this.report.log("Starting password event.");
 
       if (event.containsKey("required")) {
          required = this.clickToBool(event.get("required").toString());
@@ -2444,7 +2443,7 @@ public class EventLoop implements Runnable {
       try {
          element = this.findElement(event, parent, required);
          if (element == null) {
-            this.report.Log("Finished password event.");
+            this.report.log("Finished password event.");
             return null;
          }
 
@@ -2454,7 +2453,7 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
-               this.report.Log("Clearing password field.");
+               this.report.log("Clearing password field.");
                clearText(element);
             }
          }
@@ -2462,7 +2461,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("set")) {
             String value = event.get("set").toString();
             value = this.replaceString(value);
-            this.report.Log(String.format("Setting Value to: '%s'.", value));
+            this.report.log(String.format("Setting Value to: '%s'.", value));
             clearText(element);
             element.sendKeys(value);
          }
@@ -2474,10 +2473,10 @@ public class EventLoop implements Runnable {
          }
 
          if (event.containsKey("jscriptevent")) {
-            this.report.Log("Firing Javascript Event: " + event.get("jscriptevent").toString());
+            this.report.log("Firing Javascript Event: " + event.get("jscriptevent").toString());
             this.Browser.fire_event(element, event.get("jscriptevent").toString());
             Thread.sleep(1000);
-            this.report.Log("Javascript event finished.");
+            this.report.log("Javascript event finished.");
          }
 
          if (event.containsKey("assert")) {
@@ -2497,12 +2496,12 @@ public class EventLoop implements Runnable {
       } catch (ElementNotVisibleException exp) {
          logElementNotVisible(required, event);
       } catch (Exception exp) {
-         this.report.ReportException(exp);
+         this.report.exception(exp);
          element = null;
       }
 
       this.resetThreadTime();
-      this.report.Log("Finished password event.");
+      this.report.log("Finished password event.");
       return element;
    }
 
