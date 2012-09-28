@@ -54,11 +54,10 @@ class Var extends Event {
 
       if (this.actions.containsKey("set")) {
          String val = (String)this.actions.get("set");
-         this.eventLoop.report.log("Setting variable '" + var +
-                                   "' => '" + val + "'.");
+         log("Setting variable '" + var + "' => '" + val + "'.");
          this.eventLoop.vars.put(var, val);
       } else if (this.actions.containsKey("unset")) {
-         this.eventLoop.report.log("Unsetting variable '" + var + "'.");
+         log("Unsetting variable '" + var + "'.");
          this.eventLoop.vars.remove(var);
       } else {
          throw new VDDException("Var event missing 'set' or 'unset' attribute");

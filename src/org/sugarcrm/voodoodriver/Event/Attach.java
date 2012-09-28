@@ -76,17 +76,15 @@ class Attach extends Event {
    /**
     * List all open windows.
     *
-    * @param r  the current Reporter object
     * @param b  the current Browser object
     */
 
-   private void listWindows(org.sugarcrm.voodoodriver.Reporter r,
-                            org.sugarcrm.voodoodriver.Browser b) {
+   private void listWindows(org.sugarcrm.voodoodriver.Browser b) {
       int n = 0;
       for (String h: b.getDriver().getWindowHandles()) {
-         r.log(String.format("[%d] Handle: %s", n, h));
-         r.log(String.format("[%d] Title:  %s", n, getTitle(b, h)));
-         r.log(String.format("[%d] URL:    %s", n, getUrl(b, h)));
+         log(String.format("[%d] Handle: %s", n, h));
+         log(String.format("[%d] Title:  %s", n, getTitle(b, h)));
+         log(String.format("[%d] URL:    %s", n, getUrl(b, h)));
          n++;
       }
    }
@@ -194,24 +192,22 @@ class Attach extends Event {
 
    public void execute() throws StopEventException, VDDException {
       org.sugarcrm.voodoodriver.Browser b = this.eventLoop.Browser;
-      org.sugarcrm.voodoodriver.Reporter r = this.eventLoop.report;
 
       this.parentWindow = b.getDriver().getWindowHandle();
       String attachWindow = null;
       int index = 0;
 
-      listWindows(r, b);
+      listWindows(b);
 
-      r.log("Current Window Handle: " + this.parentWindow);
+      log("Current Window Handle: " + this.parentWindow);
 
       if (this.actions.containsKey("index")) {
          String si = this.replaceString((String)this.actions.get("index"));
          try {
             index = Integer.valueOf(si);
          } catch (NumberFormatException e) {
-            r.error("Specified attach index '" +
-                    (String)this.actions.get("index") + "' " +
-                    "is not a valid integer. Using 0.");
+            error("Specified index '" + (String)this.actions.get("index") +
+                  "' is not a valid integer. Using 0.");
          }
       }
 
@@ -221,14 +217,14 @@ class Attach extends Event {
          try {
             if (this.actions.containsKey("title")) {
                String t = this.replaceString((String)this.actions.get("title"));
-               r.log("Search for window with title " + t);
+               log("Search for window with title " + t);
                attachWindow = getWindowByTitle(b, t, index);
             } else if (this.actions.containsKey("url")) {
                String u = this.replaceString((String)this.actions.get("url"));
-               r.log("Search for window with url " + u);
+               log("Search for window with url " + u);
                attachWindow = getWindowByUrl(b, u, index);
             } else {
-               r.log("Search for window with index " + index);
+               log("Search for window with index " + index);
                attachWindow = getWindowByIndex(b, index);
             }
 
@@ -242,16 +238,16 @@ class Attach extends Event {
                }
             } else {
                b.getDriver().switchTo().window(this.parentWindow);
-               r.error(e.getMessage());
+               error(e.getMessage());
                throw new StopEventException();
             }
          }
       }
 
-      r.log("Switching to matching window:");
-      r.log("Handle: " + attachWindow);
-      r.log("Title: " + getTitle(b, attachWindow));
-      r.log("URL: " + getUrl(b, attachWindow));
+      log("Switching to matching window:");
+      log("Handle: " + attachWindow);
+      log("Title: " + getTitle(b, attachWindow));
+      log("URL: " + getUrl(b, attachWindow));
 
       this.eventLoop.setCurrentHWND(attachWindow);
       b.getDriver().switchTo().window(attachWindow);
@@ -267,8 +263,7 @@ class Attach extends Event {
    public void afterChildren() throws VDDException {
       int timeout = this.eventLoop.getAttachTimeout();
 
-      this.eventLoop.report.log("Switching back to window handle: " +
-                                this.parentWindow);
+      log("Switching back to window handle: " + this.parentWindow);
       this.eventLoop.Browser.setBrowserOpened();
       this.eventLoop.Browser.getDriver().switchTo().window(this.parentWindow);
       this.eventLoop.setCurrentHWND(this.parentWindow);

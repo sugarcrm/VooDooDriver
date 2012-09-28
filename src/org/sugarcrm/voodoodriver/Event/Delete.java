@@ -62,7 +62,7 @@ class Delete extends Event {
          throw new VDDException("No HTML element stored as '" + nm + "'");
       }
 
-      this.eventLoop.report.log("Deleting HTML element stored as '" + nm + "'");
+      log("Deleting HTML element stored as '" + nm + "'");
       this.eventLoop.elementStore.remove(nm);
    }
 }

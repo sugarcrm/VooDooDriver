@@ -60,9 +60,9 @@ class Execute extends Event {
       }
 
       args = (String[])this.actions.get("args");
-      this.eventLoop.report.log("Executing child process...");
+      log("Executing child process...");
       for (String arg: args) {
-         this.eventLoop.report.log("  => " + arg);
+         log("  => " + arg);
       }
       
       this.eventLoop.resetThreadTime();
@@ -82,13 +82,13 @@ class Execute extends Event {
       }
 
       this.eventLoop.resetThreadTime();
-      this.eventLoop.report.log("Child process finished.");
+      log("Child process finished.");
 
       if (rv != 0) {
-         this.eventLoop.report.error("Error code from Child process: '" +
-                                     (new Integer(rv)).toString() + "'");
+         error("Error code from child process: '" +
+               (new Integer(rv)).toString() + "'");
       } else {
-         this.eventLoop.report.log("Child process was successful.");
+         log("Child process was successful.");
       }
    }
 }

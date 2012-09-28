@@ -74,8 +74,7 @@ public class Alert extends Event {
           * generic "Exception" in case the Selenium folks fix the
           * Javascript error.
           */
-         this.eventLoop.report.log("Unable to switch back to window. " +
-                                   "Is it closed?");
+         log("Unable to switch back to window. Is it closed?");
       }
    }
 
@@ -132,23 +131,22 @@ public class Alert extends Event {
          alert = this.eventLoop.Browser.getDriver().switchTo().alert();
       } catch (NoAlertPresentException e) {
          if (exists != null && exists == false) {
-            this.eventLoop.report.log("Alert not found and exists is false.");
+            log("Alert not found and exists is false.");
          } else if (required == false) {
-            this.eventLoop.report.log("Alert not found and required is false.");
+            log("Alert not found and required is false.");
          } else {
-            this.eventLoop.report.error("Alert not found");
+            error("Alert not found");
          }
          return;
       }
 
       if (exists != null && exists == false) {
-         this.eventLoop.report.error("Alert found but exists is false");
+         error("Alert found but exists is false");
          switchBack();
          return;
       }
 
-      this.eventLoop.report.log("Found alert with text '" +
-                                alert.getText() + "'");
+      log("Found alert with text '" + alert.getText() + "'");
 
       if (assertStr != null) {
          this.eventLoop.report.Assert(assertStr, alert.getText());
@@ -158,10 +156,10 @@ public class Alert extends Event {
       }
 
       if (accept) {
-         this.eventLoop.report.log("Alert is being accepted.");
+         log("Alert is being accepted.");
          alert.accept();
       } else {
-         this.eventLoop.report.log("Alert is being dismissed.");
+         log("Alert is being dismissed.");
          alert.dismiss();
       }
 

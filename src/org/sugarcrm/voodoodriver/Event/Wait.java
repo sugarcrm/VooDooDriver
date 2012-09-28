@@ -60,26 +60,24 @@ public class Wait extends Event {
          try {
             timeout = new Integer((String)this.actions.get("timeout"));
             if (timeout < 0) {
-               this.eventLoop.report.warning("wait timeout < 0, using 0");
+               warning("wait timeout < 0, using 0");
                timeout = 0;
             } else {
-               this.eventLoop.report.log("Setting timeout to " + timeout + "s");
+               log("Setting timeout to " + timeout + "s");
             }
             useDefault = false;
          } catch (NullPointerException e) {
-            this.eventLoop.report.error("Null timeout value???");
+            error("Null timeout value???");
          } catch (NumberFormatException e) {
-            this.eventLoop.report.error("Specified wait timeout '" +
-                                        this.actions.get("timeout") +
-                                        "' is not a valid integer");
+            error("Specified wait timeout '" + this.actions.get("timeout") +
+                  "' is not a valid integer");
          }
       } else if (this.actions.containsKey("condition")) {
-         this.eventLoop.report.warning("Bug 52537: condition attribute is " +
-                                       "not implemented.");
+         warning("Bug 52537: condition attribute is not implemented.");
       }
 
       if (useDefault) {
-         this.eventLoop.report.log("Using default timeout of " + timeout + "s");
+         log("Using default timeout of " + timeout + "s");
       }
 
 
@@ -87,7 +85,7 @@ public class Wait extends Event {
          try {
             Thread.sleep(1000);
          } catch (InterruptedException e) {
-            this.eventLoop.report.log("wait interrupted");
+            log("wait interrupted");
             break;
          }
       }

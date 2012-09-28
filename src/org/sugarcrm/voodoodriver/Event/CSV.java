@@ -264,8 +264,8 @@ class CSV extends Event {
       }
 
       if (data.length != keys.length) {
-         eventLoop.report.error("Number of elements on line " + line +
-                                " differs from key count. Skipping.");
+         error("Number of elements on line " + line +
+               " differs from key count. Skipping.");
          return false;
       }
 
@@ -275,8 +275,7 @@ class CSV extends Event {
 
          if (eventLoop.hijacks.containsKey(key)) {
             val = String.valueOf(eventLoop.hijacks.get(key));
-            eventLoop.report.log("Hijacking SodaVar: '" + key + "' => '" +
-                                 val + "'.");
+            log("Hijacking SodaVar: '" + key + "' => '" + val + "'.");
          }
 
          eventLoop.vars.put(key, val);
@@ -321,18 +320,16 @@ class CSV extends Event {
     */
 
    public void execute() throws StopEventException, VDDException {
-      org.sugarcrm.voodoodriver.Reporter r = this.eventLoop.report;
-
       if (this.actions.containsKey("override")) {
          String of = (String)this.actions.get("override");
          this.eventLoop.csvOverrideFile = new File(this.replaceString(of));
-         r.log("Setting CSV override to " + this.eventLoop.csvOverrideFile);
+         log("Setting CSV override to " + this.eventLoop.csvOverrideFile);
          throw new StopEventException();
       }
 
       if (this.eventLoop.csvOverrideFile != null) {
          this.csv = this.eventLoop.csvOverrideFile;
-         r.log("Using CSV override file " + this.csv);
+         log("Using CSV override file " + this.csv);
          this.eventLoop.csvOverrideFile = null;
       } else if (this.actions.containsKey("file")) {
          String f = (String)this.actions.get("file");

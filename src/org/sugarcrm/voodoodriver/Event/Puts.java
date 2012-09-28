@@ -56,6 +56,6 @@ public class Puts extends Event {
       }
 
       txt = this.replaceString(txt);
-      this.eventLoop.report.log(txt);
+      log(txt);
    }
 }

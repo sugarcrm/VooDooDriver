@@ -126,12 +126,12 @@ abstract class HtmlEvent extends Event {
          boolean click = (Boolean)val;
 
          if (click) {
-            eventLoop.report.log("Clicking element");
+            log("Clicking element");
             firePlugin(PluginEvent.BEFORECLICK);
             element.click();
             firePlugin(PluginEvent.AFTERCLICK);
          } else {
-            eventLoop.report.log("Not clicking element, click => false");
+            log("Not clicking element, click => false");
          }
       }
    }
@@ -151,7 +151,7 @@ abstract class HtmlEvent extends Event {
        */
 
       public void action(Object val) {
-         eventLoop.report.log("cssprop/cssvalue action");
+         log("cssprop/cssvalue action");
       }
    }
 
@@ -169,7 +169,7 @@ abstract class HtmlEvent extends Event {
       public void action(Object val) {
          String jev = (String)val;
 
-         eventLoop.report.log("Firing Javascript Event: " + jev);
+         log("Firing Javascript Event: " + jev);
          eventLoop.Browser.fire_event(element, jev);
          try {
             Thread.sleep(1000);
@@ -193,18 +193,18 @@ abstract class HtmlEvent extends Event {
 
       public void action(Object val) {
          if (element == null) {
-            eventLoop.report.error("Not saving null element");
+            error("Not saving null element");
             return;
          }
 
          String key = (String)val;
          if (eventLoop.elementStore.containsKey(key)) {
-            eventLoop.report.warning("Clobbering existing saved element with " +
-                                     "same key '" + key + "'");
+            warning("Clobbering existing saved element with same key '" +
+                    key + "'");
          }
 
          eventLoop.elementStore.put(key, element);
-         eventLoop.report.log("Saved HTML element with key '" + key + "'");
+         log("Saved HTML element with key '" + key + "'");
       }
    }
 
@@ -231,8 +231,8 @@ abstract class HtmlEvent extends Event {
          String value = getVarValue();
          String var = (String)val;
 
-         eventLoop.report.log("Setting VDD variable: '" + var + "' => '" +
-                              value.replaceAll("\n", "\\n") + "'.");
+         log("Setting VDD variable: '" + var + "' => '" +
+             value.replaceAll("\n", "\\n") + "'.");
          eventLoop.vars.put(var, value);
       }
    }
@@ -259,10 +259,10 @@ abstract class HtmlEvent extends Event {
       public void action(Object val) {
          boolean alertValue = (Boolean)val;
 
-         eventLoop.report.log("Setting Alert Hack to: '" + alertValue + "'");
+         log("Setting Alert Hack to: '" + alertValue + "'");
          eventLoop.Browser.alertHack(alertValue);
-         eventLoop.report.warning("You are using a deprecated alert hack, " +
-                                  "please use the <alert> command!");
+         warning("You are using a deprecated alert hack, " +
+                 "please use the <alert> command!");
       }
    }
 

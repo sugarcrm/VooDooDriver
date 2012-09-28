@@ -209,6 +209,75 @@ public abstract class Event {
 
 
    /**
+    * Log a message.
+    *
+    * <p>This is a convenience wrapper around <code>Reporter.log</code>.</p>
+    *
+    * @param msg  message to log
+    */
+
+   protected void log(String msg) {
+      this.eventLoop.report.log(msg);
+   }
+
+
+   /**
+    * Log a warning.
+    *
+    * <p>This is a convenience wrapper around
+    * <code>Reporter.warning</code>.</p>
+    *
+    * @param msg  warning to log
+    */
+
+   protected void warning(String msg) {
+      this.eventLoop.report.warning(msg);
+   }
+
+
+   /**
+    * Log an error.
+    *
+    * <p>This is a convenience wrapper around <code>Reporter.error</code>.</p>
+    *
+    * @param msg  error to log
+    */
+
+   protected void error(String msg) {
+      this.eventLoop.report.error(msg);
+   }
+
+
+   /**
+    * Log an exception.
+    *
+    * <p>This is a convenience wrapper around
+    * <code>Reporter.exception</code>.</p>
+    *
+    * @param e  exception to log
+    */
+
+   protected void exception(Throwable e) {
+      this.eventLoop.report.exception(e);
+   }
+
+
+   /**
+    * Log an exception with an error message.
+    *
+    * <p>This is a convenience wrapper around
+    * <code>Reporter.exception</code>.</p>
+    *
+    * @param msg  error to log with the exception
+    * @param e  exception to log
+    */
+
+   protected void exception(String msg, Throwable e) {
+      this.eventLoop.report.exception(msg, e);
+   }
+
+
+   /**
     * Determine whether this attribute is valid for this event.
     *
     * @param type   type of attribute: "selectors" or "actions"

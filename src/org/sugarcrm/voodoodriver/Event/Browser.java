@@ -48,7 +48,7 @@ public class Browser extends Event {
 
    void browserAction(org.sugarcrm.voodoodriver.Browser b, String action)
       throws VDDException {
-      this.eventLoop.report.log("Calling browser action " + action + ".");
+      log("Calling browser action " + action + ".");
 
       String actionl = action.toLowerCase();
       if (actionl.equals("back")) {
@@ -103,19 +103,19 @@ public class Browser extends Event {
                this.eventLoop.Browser.assertPage(this.eventLoop.whitelist);
             }
          } else if (attr.equals("cssprop")) {
-            this.eventLoop.report.warning("browser attribute cssprop unimplemented");
+            warning("browser attribute cssprop unimplemented");
          } else if (attr.equals("cssvalue")) {
-            this.eventLoop.report.warning("browser attribute cssvalue unimplemented");
+            warning("browser attribute cssvalue unimplemented");
          } else if (attr.equals("exist")) {
-            this.eventLoop.report.warning("browser attribute exist unimplemented");
+            warning("browser attribute exist unimplemented");
          } else if (attr.equals("jscriptevent")) {
-            this.eventLoop.report.warning("browser attribute jscriptevent unimplemented");
+            warning("browser attribute jscriptevent unimplemented");
          } else if (attr.equals("send_keys")) {
-            this.eventLoop.report.warning("browser attribute send_keys unimplemented");
+            warning("browser attribute send_keys unimplemented");
          } else if (attr.equals("url")) {
             String url = (String)this.actions.get(attr);
             url = replaceString(url);
-            this.eventLoop.report.log("URL: " + url);
+            log("URL: " + url);
             b.url(url);
          } else {
             throw new VDDException("Unknown browser attribute '" + attr + "'");

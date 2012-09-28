@@ -63,8 +63,7 @@ class Pluginloader extends Event {
       String c = this.replaceString((String)this.actions.get("classname"));
       String f = this.replaceString((String)this.actions.get("file"));
 
-      this.eventLoop.report.log("Loading plugin with classname '" + c +
-                                "' from file '" + f + "'");
+      log("Loading plugin with classname '" + c + "' from file '" + f + "'");
 
       try {
          this.eventLoop.plugins.add(new JavaPlugin(c, f));
