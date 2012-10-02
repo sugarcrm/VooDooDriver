@@ -25,4 +25,18 @@
    <span id="span" save="myspan"/>
    <span id="span" var="myspan"/>
 
+   <!-- H1 through H6 -->
+   <h1 id="h1" click="true"/>
+   <div id="click_test" assert="H1"/>
+   <h2 id="h2" click="true"/>
+   <div id="click_test" assert="H2"/>
+   <h3 id="h3" click="true"/>
+   <div id="click_test" assert="H3"/>
+   <h4 id="h4" click="true"/>
+   <div id="click_test" assert="H4"/>
+   <h5 id="h5" click="true"/>
+   <div id="click_test" assert="H5"/>
+   <h6 id="h6" click="true"/>
+   <div id="click_test" assert="H6"/>
+
 </voodoo>
