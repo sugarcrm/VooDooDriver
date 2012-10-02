@@ -39,4 +39,47 @@
    <h6 id="h6" click="true"/>
    <div id="click_test" assert="H6"/>
 
+   <!-- Many other simple tags -->
+   <address click="true"/>
+   <div id="click_test" assert="ADDRESS"/>
+
+   <em click="true"/>
+   <div id="click_test" assert="EM"/>
+
+   <strong click="true"/>
+   <div id="click_test" assert="STRONG"/>
+
+   <dfn click="true"/>
+   <div id="click_test" assert="DFN"/>
+
+   <code click="true"/>
+   <div id="click_test" assert="CODE"/>
+
+   <samp click="true"/>
+   <div id="click_test" assert="SAMP"/>
+
+   <kbd click="true"/>
+   <div id="click_test" assert="KBD"/>
+
+   <cite click="true"/>
+   <div id="click_test" assert="CITE"/>
+
+   <abbr click="true"/>
+   <div id="click_test" assert="ABBR"/>
+
+   <acronym click="true"/>
+   <div id="click_test" assert="ACRONYM"/>
+
+   <blockquote click="true"/>
+   <div id="click_test" assert="BLOCKQUOTE"/>
+
+   <q click="true"/>
+   <div id="click_test" assert="Q"/>
+
+   <sub click="true"/>
+   <div id="click_test" assert="SUB"/>
+
+   <sup click="true"/>
+   <div id="click_test" assert="SUP"/>
+
 </voodoo>

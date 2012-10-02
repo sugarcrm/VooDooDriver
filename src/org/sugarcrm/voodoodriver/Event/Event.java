@@ -172,6 +172,34 @@ public abstract class Event {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("h6")) {
          event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("address")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("em")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("strong")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("dfn")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("code")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("samp")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("kbd")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("cite")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("abbr")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("acronym")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("blockquote")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("q")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("sub")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("sup")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("p")) {
       } else if (tagName.equals("pre")) {
       } else if (tagName.equals("ul")) {
