@@ -171,7 +171,6 @@ public class Alert extends Event {
          /* NBD */
       }
 
-      /* XXX need to implement plugins */
-      // this.firePlugin(null, Elements.ALERT, PluginEvent.AFTERDIALOGCLOSED);
+      firePlugin(org.sugarcrm.voodoodriver.PluginEvent.AFTERDIALOGCLOSED);
    }
 }

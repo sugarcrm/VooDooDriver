@@ -106,7 +106,8 @@ public abstract class Plugin {
       }
 
       for (PluginEvent e: this.events) {
-         if (e.equals(event)) {
+         if (e.equals(PluginEvent.ALWAYSFIRE) ||
+             e.equals(event)) {
             return true;
          }
       }
@@ -139,7 +140,8 @@ public abstract class Plugin {
       }
 
       for (PluginEvent e: this.events) {
-         if (e.equals(event)) {
+         if (e.equals(PluginEvent.ALWAYSFIRE) ||
+             e.equals(event)) {
             eventMatches = true;
             break;
          }

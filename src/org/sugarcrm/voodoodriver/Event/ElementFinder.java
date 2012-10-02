@@ -624,7 +624,7 @@ class ElementFinder {
                     (existsModified ? " exists and" : "") +
                     " required => false");
       } else if (exists == false) {
-         this.r.error("Elements exists and exists => false");
+         this.r.error("Element exists and exists => false");
          element = null;
       } else {
          this.r.log("Found element");

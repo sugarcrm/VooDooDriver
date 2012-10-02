@@ -234,6 +234,7 @@ abstract class HtmlEvent extends Event {
          log("Setting VDD variable: '" + var + "' => '" +
              value.replaceAll("\n", "\\n") + "'.");
          eventLoop.vars.put(var, value);
+         firePlugin(PluginEvent.AFTERSET);
       }
    }
 
@@ -529,17 +530,6 @@ abstract class HtmlEvent extends Event {
       this.isRequired = ef.isRequired();
 
       return element;
-   }
-
-
-   /**
-    * Execute a VDD plugin at the appropriate time.
-    *
-    * @param ev  the current plugin event
-    */
-
-   protected void firePlugin(PluginEvent ev) {
-      System.err.println("*** firePlugin: Implement me!");
    }
 
 

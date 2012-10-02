@@ -160,8 +160,8 @@ public class JavaPlugin extends Plugin {
          /*
           * Because all software can't be perfect ;)
           */
-         report.error("Exception during plugin (" + className + ") execution.");
-         report.exception(e);
+         report.exception("Exception during plugin (" + className +
+                          ") execution.", e);
          return false;
       }
 

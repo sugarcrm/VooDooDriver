@@ -17,6 +17,9 @@
 
 package org.sugarcrm.voodoodriver;
 
+// XXX: This is only used in Plugin.java (and some residual uses in
+// EventLoop that will be deleted).  Since it duplicates the
+// information from Events.xml, it should probably be deleted.
 
 public enum Elements {
    /* VooDooDriver Events */

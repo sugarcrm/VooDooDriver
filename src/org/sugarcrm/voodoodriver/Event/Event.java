@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.openqa.selenium.WebElement;
 import org.sugarcrm.voodoodriver.EventLoop;
+import org.sugarcrm.voodoodriver.PluginEvent;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Element;
@@ -570,6 +571,17 @@ public abstract class Event {
     */
 
    public void afterChildren() throws VDDException {}
+
+
+   /**
+    * Execute a VDD plugin at the appropriate time.
+    *
+    * @param ev  the current plugin event
+    */
+
+   protected void firePlugin(PluginEvent ev) {
+      this.eventLoop.firePlugin(this, ev);
+   }
 
 
    /**

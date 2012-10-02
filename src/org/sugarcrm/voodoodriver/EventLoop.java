@@ -405,6 +405,7 @@ public class EventLoop implements Runnable {
       this.updateThreadTime();
       this.report.log(eventName + " event finished.");
 
+      this.firePlugin(PluginEvent.AFTEREVENT);
 
 
       //private boolean handleSingleEvent(VDDHash event, WebElement parent) {
@@ -485,13 +486,63 @@ public class EventLoop implements Runnable {
       //    System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
       //    System.exit(1);
       // }
+   }
 
-      // this.firePlugin(null, type, PluginEvent.AFTEREVENT);
+
+   /**
+    *
+    */
+
+   public void firePlugin(PluginEvent type) {
+      this.firePlugin(null, type);
+   }
+
+
+   /**
+    *
+    */
+
+   public void firePlugin(Event event, PluginEvent type) {
+      PluginData data;
+      Elements element = null;
+
+      if (this.plugins.size() == 0) {
+         return;
+      }
+
+      if (!this.windowExists(this.currentHWnd)) {
+         this.report.log("Browser window closed. Skipping plugin execution.");
+         return;
+      }
+
+      if (event != null) {
+         element = Elements.valueOf(event.getName().toUpperCase());
+      }
+
+      data = new PluginData();
+      if (event != null) {
+         data.setElement(event.getElement());
+      }
+      data.setBrowser(this.Browser);
+      data.setVars(this.vars);
+      data.setHijacks(this.hijacks);
+      data.setTestName(this.testName);
+
+      for (Plugin plugin: this.plugins) {
+         if ((event != null && plugin.matches(element, type)) ||
+             (event == null && plugin.matches(type))) {
+            plugin.execute(data, this.report);
+         }
+      }
    }
 
 
    ////////////////////////////////////////////////////////////
    // delete me
+
+   private void firePlugin(WebElement we, Elements el, PluginEvent pe) {
+      // implemented above //
+   }
 
    private void logElementNotVisible(boolean required, VDDHash event) {
       // implemented above //
@@ -519,123 +570,6 @@ public class EventLoop implements Runnable {
 
    private void handleVars(String value, VDDHash event) {
       // Moved to HtmlEvent.VarAction
-   }
-
-
-   /**
-    * Perform pre-fire checks for plugin execution.
-    *
-    * If this routine returns false, plugin execution will be skipped.
-    *
-    * @return true if plugins can execute, false otherwise
-    */
-
-   private boolean pluginPrefireCheck() {
-      if (this.plugins.size() == 0) {
-         return false;
-      }
-
-      if (!this.windowExists(this.currentHWnd)) {
-         this.report.log("Browser window closed. Skipping plugin execution.");
-         return false;
-      }
-
-      return true;
-   }
-
-
-   /**
-    * Execute all plugins.
-    *
-    * @param element    the element on the current HTML page
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         result &= plugin.execute(data, this.report);
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Execute all plugins that match a plugin event.
-    *
-    * @param element    the element on the current HTML page
-    * @param eventType  the type of plugin event
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element, PluginEvent eventType) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         if (plugin.matches(eventType)) {
-            result &= plugin.execute(data, this.report);
-         }
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Execute a plugin that matches the current element and plugin event.
-    *
-    * @param element    the element on the current HTML page
-    * @param type       the element's type
-    * @param eventType  the type of plugin event
-    * @return true if all plugins succeeded, false otherwise
-    */
-
-   private boolean firePlugin(WebElement element, Elements elementType,
-                              PluginEvent eventType) {
-      boolean result = true;
-      PluginData data = new PluginData();
-
-      if (!pluginPrefireCheck()) {
-         return true;
-      }
-
-      data.setElement(element);
-      data.setBrowser(this.Browser);
-      data.setVars(this.vars);
-      data.setHijacks(this.hijacks);
-      data.setTestName(this.testName);
-
-      for (Plugin plugin: this.plugins) {
-         if (plugin.matches(elementType, eventType)) {
-            result &= plugin.execute(data, this.report);
-         }
-      }
-
-      return result;
    }
 
    // stop deleting me

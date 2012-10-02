@@ -17,14 +17,27 @@
 
 package org.sugarcrm.voodoodriver;
 
+/**
+ * Enumeration of all the reasons to execute a plugin.
+ */
+
 public enum PluginEvent {
+   /** Execute plugin prior to a click. */
    BEFORECLICK,
+   /** Execute plugin after a click. */
    AFTERCLICK,
+   /** Execute plugin after setting a var. */
    AFTERSET,
+   /** Execute plugin after an element is found. */
    AFTERFOUND,
+   /** Execute plugin after an alert is closed. */
    AFTERDIALOGCLOSED,
+   /** Execute plugin at every available opportunity. */
    ALWAYSFIRE,
+   /** Execute plugin after each event finished. */
    AFTEREVENT,
+   /** Execute plugin before started each test. */
    BEFORETEST,
+   /** Execute plugin at the completion of each test. */
    AFTERTEST;
 }
