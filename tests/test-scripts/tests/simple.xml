@@ -25,21 +25,26 @@
    <span id="span" save="myspan"/>
    <span id="span" var="myspan"/>
 
-   <!-- H1 through H6 -->
+   <!-- Simple HTML elements -->
+
    <h1 id="h1" click="true"/>
    <div id="click_test" assert="H1"/>
+
    <h2 id="h2" click="true"/>
    <div id="click_test" assert="H2"/>
+
    <h3 id="h3" click="true"/>
    <div id="click_test" assert="H3"/>
+
    <h4 id="h4" click="true"/>
    <div id="click_test" assert="H4"/>
+
    <h5 id="h5" click="true"/>
    <div id="click_test" assert="H5"/>
+
    <h6 id="h6" click="true"/>
    <div id="click_test" assert="H6"/>
 
-   <!-- Many other simple tags -->
    <address click="true"/>
    <div id="click_test" assert="ADDRESS"/>
 
@@ -81,5 +86,20 @@
 
    <sup click="true"/>
    <div id="click_test" assert="SUP"/>
+
+   <p click="true"/>
+   <div id="click_test" assert="P"/>
+
+   <br jscriptevent="click"/>
+   <div id="click_test" assert="BR"/>
+
+   <pre click="true"/>
+   <div id="click_test" assert="PRE"/>
+
+   <ins click="true"/>
+   <div id="click_test" assert="INS"/>
+
+   <del click="true"/>
+   <div id="click_test" assert="DEL"/>
 
 </voodoo>

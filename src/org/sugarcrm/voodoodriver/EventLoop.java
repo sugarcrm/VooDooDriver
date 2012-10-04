@@ -407,17 +407,52 @@ public class EventLoop implements Runnable {
 
       this.firePlugin(PluginEvent.AFTEREVENT);
 
-
-      //private boolean handleSingleEvent(VDDHash event, WebElement parent) {
-      //Elements type = Elements.valueOf(event.get("type").toString());
-
-
       // switch (type) {
+      // case TABLE:
+      //    element = tableEvent(event, parent);
+      //    break;
       // case THEAD:
       //    element = theadEvent(event, parent);
       //    break;
       // case TBODY:
       //    element = tbodyEvent(event, parent);
+      //    break;
+      // case TR:
+      //    element = trEvent(event, parent);
+      //    break;
+      // case TD:
+      //    element = tdEvent(event, parent);
+      //    break;
+
+      // case MAP:
+      //    result = mapEvent(event);
+      //    break;
+      // case AREA:
+      //    result = areaEvent(event);
+      //    break;
+      // case IMAGE:
+      //    element = imageEvent(event, parent);
+      //    break;
+
+      // case UL:
+      //    result = ulEvent(event);
+      //    break;
+      // case OL:
+      //    result = olEvent(event);
+      //    break;
+      // case LI:
+      //    element = liEvent(event, parent);
+      //    break;
+
+      // case FRAME:
+      //    result = frameEvent(event);
+      //    break;
+
+      // case FORM:
+      //    element = formEvent(event, parent);
+      //    break;
+      // case INPUT:
+      //    element = inputEvent(event, parent);
       //    break;
       // case TEXTFIELD:
       //    element = textfieldEvent(event, parent);
@@ -431,66 +466,28 @@ public class EventLoop implements Runnable {
       // case CHECKBOX:
       //    element = checkboxEvent(event, parent);
       //    break;
-      // case TABLE:
-      //    element = tableEvent(event, parent);
-      //    break;
-      // case FORM:
-      //    element = formEvent(event, parent);
-      //    break;
       // case SELECT:
       //    element = selectEvent(event, parent);
       //    break;
       // case HIDDEN:
       //    result = hiddenEvent(event, parent);
       //    break;
-      // case TR:
-      //    element = trEvent(event, parent);
-      //    break;
-      // case TD:
-      //    element = tdEvent(event, parent);
-      //    break;
       // case FILEFIELD:
       //    element = filefieldEvent(event, parent);
-      //    break;
-      // case IMAGE:
-      //    element = imageEvent(event, parent);
       //    break;
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
-      // case LI:
-      //    element = liEvent(event, parent);
-      //    break;
       // case RADIO:
       //    element = radioEvent(event, parent);
       //    break;
-      // case UL:
-      //    result = ulEvent(event);
-      //    break;
-      // case OL:
-      //    result = olEvent(event);
-      //    break;
-      // case MAP:
-      //    result = mapEvent(event);
-      //    break;
-      // case AREA:
-      //    result = areaEvent(event);
-      //    break;
-      // case FRAME:
-      //    result = frameEvent(event);
-      //    break;
-      // case INPUT:
-      //    element = inputEvent(event, parent);
-      //    break;
-      // default:
-      //    System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
-      //    System.exit(1);
-      // }
    }
 
 
    /**
+    * Execute a plugin if the current event matches.
     *
+    * @param type  the current plugin event
     */
 
    public void firePlugin(PluginEvent type) {
@@ -499,7 +496,10 @@ public class EventLoop implements Runnable {
 
 
    /**
+    * Execute a plugin if the current event matches.
     *
+    * @param event  the current executing event
+    * @param type  the current plugin event
     */
 
    public void firePlugin(Event event, PluginEvent type) {
