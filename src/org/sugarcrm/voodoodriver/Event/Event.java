@@ -223,11 +223,25 @@ public abstract class Event {
       } else if (tagName.equals("dd")) {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("table")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("caption")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("thead")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("tfoot")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("tbody")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("colgroup")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("col")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("tr")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("th")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("td")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("link")) {
          event = new Link(element);
       } else if (tagName.equals("image")) {

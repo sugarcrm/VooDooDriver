@@ -1075,41 +1075,69 @@
 
    <table html_tag="table">
       <selectors>
-         <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
       </selectors>
 
       <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="boolean">exist</accessor>
-         <accessor type="string">jscriptevent</accessor>
          <accessor type="boolean">click</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </table>
 
-   <!-- Missing CAPTION event -->
+   <caption html_tag="caption">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </caption>
 
    <thead html_tag="thead">
       <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
-         <accessor type="string">method</accessor>
          <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
       </selectors>
@@ -1118,26 +1146,25 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">click</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
          <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="integer">timeout</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </thead>
 
-   <!-- Missing TFOOT event -->
-
-   <tbody html_tag="tbody">
+   <tfoot html_tag="tfoot">
       <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
-         <accessor type="string">method</accessor>
          <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
       </selectors>
@@ -1146,86 +1173,171 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">click</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </tfoot>
+
+   <tbody html_tag="tbody">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
          <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </tbody>
 
-   <!-- Missing COLGROUP and COL events -->
-
-   <tr html_tag="tr">
+   <colgroup html_tag="colgroup">
       <selectors>
-         <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
       </selectors>
 
       <actions>
-         <accessor type="string">click</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </colgroup>
+
+   <col html_tag="col">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </col>
+
+   <tr html_tag="tr">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </tr>
 
    <th html_tag="th">
-      <accessor_attributes>
+      <selectors>
          <accessor type="string">class</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
          <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
          <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
          <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-      </accessor_attributes>
-
-      <soda_attributes>
-         <accessor type="string">assert</accessor>
-         <accessor type="string">assertnot</accessor>
-         <accessor type="string">click</accessor>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="string">save</accessor>
-         <accessor type="string">var</accessor>
-      </soda_attributes>
-   </th>
-
-   <td html_tag="td">
-      <selectors>
-         <accessor type="string">name</accessor>
-         <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
       </selectors>
 
       <actions>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="string">click</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </th>
+
+   <td html_tag="td">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">var</accessor>
       </actions>
