@@ -211,8 +211,17 @@ public abstract class Event {
       } else if (tagName.equals("del")) {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("ul")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("ol")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("li")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("dl")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("dt")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("dd")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("table")) {
       } else if (tagName.equals("thead")) {
       } else if (tagName.equals("tbody")) {

@@ -16,17 +16,12 @@
 
 package org.sugarcrm.voodoodriver;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
@@ -434,16 +429,6 @@ public class EventLoop implements Runnable {
       //    element = imageEvent(event, parent);
       //    break;
 
-      // case UL:
-      //    result = ulEvent(event);
-      //    break;
-      // case OL:
-      //    result = olEvent(event);
-      //    break;
-      // case LI:
-      //    element = liEvent(event, parent);
-      //    break;
-
       // case FRAME:
       //    result = frameEvent(event);
       //    break;
@@ -626,67 +611,6 @@ public class EventLoop implements Runnable {
       return result;
    }
 
-   private boolean ulEvent(VDDHash event) {
-      boolean required = true;
-      boolean click = false;
-      boolean result = false;
-      WebElement element = null;
-
-      this.report.log("UL event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, null, required);
-         if (element == null) {
-            this.report.log("UL event finished.");
-            result = false;
-            return result;
-         }
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                            + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element,
-                                    event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.report.log("UL click started.");
-            this.firePlugin(element, Elements.UL,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.UL,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("UL click finished.");
-         }
-
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), element);
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("UL event Finished.");
-
-      return result;
-   }
-
    private boolean areaEvent(VDDHash event) {
       boolean required = true;
       boolean click = false;
@@ -782,54 +706,6 @@ public class EventLoop implements Runnable {
       }
 
       this.report.log("Map event Finished.");
-
-      return result;
-   }
-
-   private boolean olEvent(VDDHash event) {
-      boolean required = true;
-      boolean click = false;
-      boolean result = false;
-      WebElement element = null;
-
-      this.report.log("OL event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, null, required);
-         if (element == null) {
-            this.report.log("OL event finished.");
-            result = false;
-            return result;
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         this.checkDisabled(event, element);
-
-         if (click) {
-            this.report.log("OL click started.");
-            this.firePlugin(element, Elements.OL,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.OL,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("OL click finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("OL event Finished.");
 
       return result;
    }
@@ -944,63 +820,6 @@ public class EventLoop implements Runnable {
 
       this.report.log("FileField event finished..");
       this.updateThreadTime();
-      return element;
-   }
-
-   private WebElement liEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("LI event Started.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("LI event finished.");
-            return element;
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         this.checkDisabled(event, element);
-         String value = element.getText();
-         handleVars(value, event);
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                            + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         if (click) {
-            this.report.log("Click element.");
-            this.firePlugin(element, Elements.LI,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.LI,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("Click finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-      }
-
-      if (event.containsKey("children")) {
-         this.processEvents((ArrayList<Event>) event.get("children"), element);
-      }
-
-      this.report.log("LI event finished.");
       return element;
    }
 

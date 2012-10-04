@@ -102,4 +102,24 @@
    <del click="true"/>
    <div id="click_test" assert="DEL"/>
 
+   <ul id="ul">
+      <li id="ulli" click="true"/>
+   </ul>
+   <div id="click_test" assert="ULLI"/>
+
+   <ol id="ol">
+      <li id="olli" click="true"/>
+   </ol>
+   <div id="click_test" assert="OLLI"/>
+
+   <dl id="dl">
+      <dt id="dt" click="true"/>
+   </dl>
+   <div id="click_test" assert="DT"/>
+
+   <dl id="dl">
+      <dd id="dd" click="true"/>
+   </dl>
+   <div id="click_test" assert="DD"/>
+
 </voodoo>
