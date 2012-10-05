@@ -409,9 +409,6 @@ public class EventLoop implements Runnable {
       // case AREA:
       //    result = areaEvent(event);
       //    break;
-      // case IMAGE:
-      //    element = imageEvent(event, parent);
-      //    break;
 
       // case FRAME:
       //    result = frameEvent(event);
@@ -692,70 +689,6 @@ public class EventLoop implements Runnable {
       this.report.log("Map event Finished.");
 
       return result;
-   }
-
-   /**
-    * Handle an &lt;image&gt; event.
-    *
-    * @param event  the &image;th&gt; event
-    * @param parent this element's parent
-    * @return the a {@link WebElement} or null
-    */
-
-   private WebElement imageEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("Image event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Image event finished.");
-            return element;
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         this.checkDisabled(event, element);
-
-         handleVars(element.getAttribute("src"), event);
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: " +
-                            event.get("jscriptevent").toString());
-            this.Browser.fire_event(element,
-                                    event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         if (click) {
-            this.report.log("Image click started.");
-            this.firePlugin(element, Elements.IMAGE,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.IMAGE,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("Image click finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("Image event Finished.");
-      return element;
    }
 
    private WebElement filefieldEvent(VDDHash event, WebElement parent) {

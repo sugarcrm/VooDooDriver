@@ -44,6 +44,7 @@
         action [form]
         method [form]
         alt    [image]
+        src    [image]
         for    [label]
         href   [link]
 -->
@@ -72,8 +73,13 @@
    <!-- title -->
    <!-- action -->
    <!-- method -->
-   <!-- alt -->
    <!-- for -->
+
+   <puts text="Find by alt"/>
+   <image alt="N5629N"/>
+
+   <puts text="Find by src"/>
+   <image src="N5629N.jpg"/>
 
    <puts text="Find by href"/>
    <link click="false" href="{@global.url}/tests/test-data/find-elements.html"/>

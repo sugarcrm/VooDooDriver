@@ -129,26 +129,37 @@
       <colgroup id="colgroup">
          <col id="col1"/>
       </colgroup>
+   </table>
 
+   <table id="table">
       <caption id="caption" click="true"/>
-      <browser assert="CAPTION"/>
+   </table>
+   <div id="click_test" assert="CAPTION"/>
 
+   <table id="table">
       <thead id="thead">
          <td id="thead_td" click="true"/>
-         <browser assert="THEAD_TD"/>
       </thead>
+   </table>
+   <div id="click_test" assert="THEAD_TD"/>
 
+   <table id="table">
       <tfoot id="tfoot">
          <td id="tfoot_td" click="true"/>
-         <browser assert="TFOOT_TD"/>
       </tfoot>
+   </table>
+   <div id="click_test" assert="TFOOT_TD"/>
 
+   <table id="table">
       <tbody id="tbody">
          <tr id="trh">
             <th id="th1" click="true"/>
-            <browser assert="TH1"/>
          </tr>
       </tbody>
    </table>
+   <div id="click_test" assert="TH1"/>
+
+   <image src="N5629N.jpg" click="true"/>
+   <div id="click_test" assert="IMG"/>
 
 </voodoo>

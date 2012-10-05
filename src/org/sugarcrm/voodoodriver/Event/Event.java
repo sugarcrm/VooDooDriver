@@ -245,6 +245,7 @@ public abstract class Event {
       } else if (tagName.equals("link")) {
          event = new Link(element);
       } else if (tagName.equals("image")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("map")) {
       } else if (tagName.equals("area")) {
       } else if (tagName.equals("i")) {
