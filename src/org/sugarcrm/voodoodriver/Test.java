@@ -191,7 +191,6 @@ public class Test {
          this.events = loader.getEvents();
       } catch (Exception e) {
          // XXX -- this will need to be revisited
-         e.printStackTrace(System.err);
          throw new VDDException("Exception loading " + this.testFile, e);
       }
 
@@ -287,10 +286,10 @@ public class Test {
             return false;
          }
       } catch (VDDException e) {
-            this.reporter.exception("Failed to parse test file!", e);
-            this.logResults();
-            this.reporter.closeLog();
-            return false;
+         this.reporter.exception("Failed to parse test file!", e.getCause());
+         this.logResults();
+         this.reporter.closeLog();
+         return false;
       }
 
       if (testBlocked()) {
