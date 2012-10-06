@@ -271,6 +271,7 @@ public abstract class Event {
       } else if (tagName.equals("hr")) {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("frame")) {
+         event = new Iframe(element);
       } else if (tagName.equals("form")) {
       } else if (tagName.equals("input")) {
       } else if (tagName.equals("textfield")) {

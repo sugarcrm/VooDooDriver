@@ -1751,38 +1751,16 @@
 
    <!-- Frames -->
 
-   <!-- Why are there two <frame> events?  The one that corresponds to
-        IFRAME should probably be called <iframe>, no? -->
+   <!-- FRAMESET and NOFRAMES won't be implemented unless needed. -->
 
-   <!-- Missing FRAMESET and NOFRAMES events -->
-
+   <!-- FRAME should actually be IFRAME.  Should FRAME be implemented,
+        this will have to be renamed and the test suite updated. -->
    <frame html_tag="iframe">
       <selectors>
-         <accessor type="string">name</accessor>
-         <accessor type="string">src</accessor>
-         <accessor type="string">text</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
+         <accessor type="string">name</accessor>
       </selectors>
-
-      <actions>
-         <accessor type="string">cssprop</accessor>
-         <accessor type="string">cssvalue</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="string">save</accessor>
-      </actions>
-   </frame>
-
-   <frame>
-      <actions>
-         <accessor type="string">name</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">index</accessor>
-      </actions>
    </frame>
 
    <!-- Forms -->

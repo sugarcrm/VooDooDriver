@@ -55,6 +55,7 @@
 
    -->
    <script file="tests/test-scripts/tests/simple.xml"/>
+   <script file="tests/test-scripts/tests/iframe.xml"/>
 
 
    <!--

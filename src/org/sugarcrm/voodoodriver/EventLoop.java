@@ -23,10 +23,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -403,10 +401,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case FRAME:
-      //    result = frameEvent(event);
-      //    break;
-
       // case FORM:
       //    element = formEvent(event, parent);
       //    break;
@@ -536,54 +530,6 @@ public class EventLoop implements Runnable {
 
 
    // All below will be moved into events...
-
-   private boolean frameEvent(VDDHash event) {
-      boolean result = false;
-      int index = -1;
-      String frameid = null;
-
-      this.report.log("Frame event starting.");
-
-      if (event.containsKey("index")) {
-         String tmp = event.get("index").toString();
-         tmp = this.replaceString(tmp);
-         index = Integer.valueOf(tmp);
-      }
-
-      if (event.containsKey("id")) {
-         frameid = event.get("id").toString();
-         frameid = this.replaceString(frameid);
-      }
-
-      if (event.containsKey("name")) {
-         frameid = event.get("name").toString();
-         frameid = this.replaceString(frameid);
-      }
-
-      try {
-         if (index > -1) {
-            this.report.log("Switching to frame by index: '" + index + "'.");
-            this.Browser.getDriver().switchTo().frame(index);
-         } else {
-            this.report.log("Switching to frame by name: '" + frameid + "'.");
-            this.Browser.getDriver().switchTo().frame(frameid);
-         }
-
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), null);
-         }
-
-         this.report.log("Switching back to default frame.");
-         this.Browser.getDriver().switchTo().defaultContent();
-      } catch (NoSuchFrameException exp) {
-         this.report.error("Failed to find frame!");
-      } catch (Exception exp) {
-         this.report.exception(exp);
-      }
-      this.report.log("Frame event finished.");
-
-      return result;
-   }
 
    private WebElement filefieldEvent(VDDHash event, WebElement parent) {
       boolean required = true;
