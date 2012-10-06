@@ -252,11 +252,24 @@ public abstract class Event {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("area")) {
          event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("tt")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("i")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("b")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("big")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("small")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("strike")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("s")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("u")) {
+         event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("hr")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("frame")) {
       } else if (tagName.equals("form")) {
       } else if (tagName.equals("input")) {

@@ -24,7 +24,7 @@
          document.getElementById("click_test").innerHTML = which;
       }
       function overTest(which) {
-         document.getElementById("over_test").innerHTML = which;
+         document.getElementById("over").innerHTML = which;
       }
     </script>
 
@@ -135,7 +135,21 @@
             onmouseover="overTest('AREA2');"/>
     </map>
 
-    <div id="over_test"></div>
+    <div id="over"></div>
+
+    <p>
+      Some text samples: 
+      <tt     id="tt"     onclick="clickTest('TT')">tt</tt>
+      <i      id="i"      onclick="clickTest('I')">i</i>
+      <b      id="b"      onclick="clickTest('B')">b</b>
+      <big    id="big"    onclick="clickTest('BIG')">big</big>
+      <small  id="small"  onclick="clickTest('SMALL')">small</small>
+      <strike id="strike" onclick="clickTest('STRIKE')">strike</strike>
+      <s      id="s"      onclick="clickTest('S')">s</s>
+      <u      id="u"      onclick="clickTest('U')">u</u>
+    </p>
+
+    <hr id="hr" onclick="clickTest('HR')"/>
 
   </body>
 </html>
