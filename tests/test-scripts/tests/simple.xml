@@ -131,4 +131,12 @@
    <u      click="true"/><div id="click_test" assert="U"/>
    <hr     click="true"/><div id="click_test" assert="HR"/>
 
+   <!-- Forms -->
+   <form name="form" method="post">
+      <p assert="A POST form"/>
+   </form>
+   <form id="form1">
+      <p assert="A GET form"/>
+   </form>
+
 </voodoo>

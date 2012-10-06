@@ -401,9 +401,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case FORM:
-      //    element = formEvent(event, parent);
-      //    break;
       // case INPUT:
       //    element = inputEvent(event, parent);
       //    break;
@@ -977,54 +974,6 @@ public class EventLoop implements Runnable {
       return element;
    }
 
-
-   private WebElement formEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("Form event starting.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Form event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.FORM,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.firePlugin(element, Elements.FORM,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.FORM,
-                  PluginEvent.AFTERCLICK);
-         }
-
-         if (event.containsKey("children") && element != null) {
-            this.processEvents((ArrayList<Event>) event.get("children"), element);
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-      }
-
-      this.report.log("Form event finished.");
-      return element;
-   }
 
    private WebElement checkboxEvent(VDDHash event, WebElement parent) {
       boolean click = false;
