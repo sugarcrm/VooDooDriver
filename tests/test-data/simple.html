@@ -23,6 +23,9 @@
       function clickTest(which) {
          document.getElementById("click_test").innerHTML = which;
       }
+      function overTest(which) {
+         document.getElementById("over_test").innerHTML = which;
+      }
     </script>
 
   </head>
@@ -108,9 +111,31 @@
       </tbody>
     </table>
 
-    <img id="img" src="N5629N.jpg" width="320" height="240"
+    <img id="img" src="N5629N.jpg" width="240" height="180"
          onclick="clickTest('IMG');" alt="N5629N"
          style="position: absolute; top: 5px; right: 5px;"/>
+
+    <object id="object" data="N5629N.jpg" type="image/jpeg"
+            style="position: absolute; top: 190px; right: 5px;"
+            onclick="clickTest('OBJECT');">
+    </object>
+
+    <img id="map_img" src="N5629N.jpg" width="240" height="180"
+         usemap="#map" alt="Image Map"
+         style="position: absolute; top: 375px; right: 5px;"/>
+
+    <map id="map" name="map" onclick="clickTest('MAP');">
+      <area id="area1" shape="circle" coords="45,45,45"
+            nohref="true" alt="area1"
+            onmouseout="overTest('');"
+            onmouseover="overTest('AREA1');"/>
+      <area id="area2" shape="circle" coords="135,45,45"
+            nohref="true" alt="area2"
+            onmouseout="overTest('');"
+            onmouseover="overTest('AREA2');"/>
+    </map>
+
+    <div id="over_test"></div>
 
   </body>
 </html>

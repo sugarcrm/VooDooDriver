@@ -403,13 +403,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case MAP:
-      //    result = mapEvent(event);
-      //    break;
-      // case AREA:
-      //    result = areaEvent(event);
-      //    break;
-
       // case FRAME:
       //    result = frameEvent(event);
       //    break;
@@ -588,105 +581,6 @@ public class EventLoop implements Runnable {
          this.report.exception(exp);
       }
       this.report.log("Frame event finished.");
-
-      return result;
-   }
-
-   private boolean areaEvent(VDDHash event) {
-      boolean required = true;
-      boolean click = false;
-      boolean result = false;
-      WebElement element = null;
-
-      this.report.log("Area event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, null, required);
-         if (element == null) {
-            this.report.log("Area event finished.");
-            result = false;
-            return result;
-         }
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.report.log("Area click started.");
-            this.firePlugin(element, Elements.AREA,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.AREA,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("Area click finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("Area event Finished.");
-      return result;
-   }
-
-   private boolean mapEvent(VDDHash event) {
-      boolean required = true;
-      boolean click = false;
-      boolean result = false;
-      WebElement element = null;
-
-      this.report.log("Map event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, null, required);
-         if (element == null) {
-            this.report.log("Map event finished.");
-            result = false;
-            return result;
-         }
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         this.checkDisabled(event, element);
-
-         if (click) {
-            this.report.log("Map click started.");
-            this.firePlugin(element, Elements.MAP,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.MAP,
-                  PluginEvent.AFTERCLICK);
-            this.report.log("Map click finished.");
-         }
-
-         if (event.containsKey("children")) {
-            this.processEvents((ArrayList<Event>) event.get("children"), element);
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("Map event Finished.");
 
       return result;
    }

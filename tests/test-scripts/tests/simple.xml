@@ -162,4 +162,13 @@
    <image src="N5629N.jpg" click="true"/>
    <div id="click_test" assert="IMG"/>
 
+   <object id="object" click="true"/>
+   <div id="click_test" assert="OBJECT"/>
+
+   <map id="map" click="true"/>
+   <div id="click_test" assert="MAP"/>
+
+   <area alt="area1" jscriptevent="mouseover"/>
+   <div id="over_test" assert="AREA1"/>
+
 </voodoo>

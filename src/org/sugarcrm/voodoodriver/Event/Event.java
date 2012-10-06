@@ -246,8 +246,12 @@ public abstract class Event {
          event = new Link(element);
       } else if (tagName.equals("image")) {
          event = new SimpleHtmlEvent(element);
+      } else if (tagName.equals("object")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("map")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("area")) {
+         event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("i")) {
       } else if (tagName.equals("b")) {
       } else if (tagName.equals("strike")) {

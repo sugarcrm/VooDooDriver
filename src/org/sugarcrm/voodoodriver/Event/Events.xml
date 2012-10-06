@@ -1379,7 +1379,9 @@
       </actions>
    </link>
 
-   <!-- Missing LINK and BASE events -->
+   <!-- Missing LINK and BASE events - neither will be implemented;
+        they provide only meta-information about a page and aren't
+        rendered. -->
 
    <!-- Objects, images, and applets -->
 
@@ -1412,48 +1414,90 @@
       </actions>
    </image>
 
-   <!-- Missing OBJECT and APPLET events -->
-
-   <map html_tag="map">
+   <!-- There are a number of attributes unique to OBJECT, but it's
+        unclear whether adding them as event attributes, either for
+        searching or for matching, would be useful. -->
+   <object html_tag="object">
       <selectors>
-         <accessor type="string">name</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
       </selectors>
 
       <actions>
-         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-         <accessor type="boolean">exists</accessor>
-         <accessor type="boolean">required</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </object>
+
+   <!-- APPLET will not be implemented.  It's been deprecated since 1999. -->
+
+   <map html_tag="map">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </map>
 
    <area html_tag="area">
       <selectors>
-         <accessor type="string">name</accessor>
+         <accessor type="string">alt</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">text</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
          <accessor type="string">xpath</accessor>
-         <accessor type="string">css</accessor>
       </selectors>
 
       <actions>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="boolean">exists</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
-         <accessor type="boolean">required</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </area>
 

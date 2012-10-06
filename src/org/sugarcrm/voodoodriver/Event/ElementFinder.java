@@ -134,21 +134,23 @@ class ElementFinder {
    /**
     * Find images element based on alt text.
     *
-    * @param alt     alt text to search for
+    * @param tagName  HTML tag
+    * @param alt      alt text to search for
     * @return matching {@link WebElement} or null
     */
 
-   private List<WebElement> findElementsByAlt(String alt) {
-      By by = By.tagName("img");
-      List<WebElement> allImgs = null, elements = new ArrayList<WebElement>();
+   private List<WebElement> findElementsByAlt(String tagName, String alt) {
+      By by = By.tagName(tagName);
+      List<WebElement> allElements = null;
+      List<WebElement> elements = new ArrayList<WebElement>();
 
       if (this.parent != null) {
-         allImgs = this.parent.findElements(by);
+         allElements = this.parent.findElements(by);
       } else {
-         allImgs = this.browser.getDriver().findElements(by);
+         allElements = this.browser.getDriver().findElements(by);
       }
 
-      for (WebElement element: allImgs) {
+      for (WebElement element: allElements) {
          String elementAlt = element.getAttribute("alt");
          if (elementAlt != null && elementAlt.equals(alt)) {
             elements.add(element);
@@ -564,7 +566,8 @@ class ElementFinder {
       if (searchByValue) {
          elements = findElementsByValue((String)this.selectors.get("value"));
       } else if (searchByAlt) {
-         elements = findElementsByAlt((String)this.selectors.get("alt"));
+         elements = findElementsByAlt((String)selectors.get("html_tag"),
+                                      (String)this.selectors.get("alt"));
       } else if (searchByText) {
          elements = findElementsByText((String)this.selectors.get("text"));
       } else if (this.parent == null) {
