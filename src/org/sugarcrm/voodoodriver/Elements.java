@@ -66,6 +66,7 @@ public enum Elements {
    FRAME,
    FORM,
    INPUT,
+   EMAIL,
    TEXTFIELD,
    PASSWORD,
    CHECKBOX,
