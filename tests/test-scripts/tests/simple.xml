@@ -13,7 +13,7 @@
    <div id="div" save="mydiv"/>
    <div id="div" var="mydiv"/>
    <!-- This div is not visible, but required is true - shouldn't be an error-->
-   <div id="InvisibleDiv" click="true" required="false"/>
+   <div id="InvisibleDiv" required="false"/>
 
    <!-- SPAN -->
    <span id="span" assert="span text"/>
@@ -120,6 +120,12 @@
    <map id="map" click="true"/><div id="click_test" assert="MAP"/>
    <area alt="area1" jscriptevent="mouseover"/><div id="over" assert="AREA1"/>
 
+   <!-- The simple elements are divided between two pages.  This is
+        primarily so that inevitable Selenium scrolling bugs don't
+        affect the test suite. -->
+
+   <browser url="{@global.url}/tests/test-data/simple2.html"/>
+
    <!-- Alignment, font styles, and horizontal rules -->
    <tt     click="true"/><div id="click_test" assert="TT"/>
    <i      click="true"/><div id="click_test" assert="I"/>
@@ -138,5 +144,10 @@
    <form id="form1">
       <p assert="A GET form"/>
    </form>
+
+   <form id="form1">
+      <input id="input" click="true"/>
+   </form>
+   <div id="click_test" assert="INPUT"/>
 
 </voodoo>

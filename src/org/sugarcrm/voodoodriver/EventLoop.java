@@ -401,9 +401,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case INPUT:
-      //    element = inputEvent(event, parent);
-      //    break;
       // case TEXTFIELD:
       //    element = textfieldEvent(event, parent);
       //    break;
@@ -606,57 +603,6 @@ public class EventLoop implements Runnable {
 
       this.report.log("Hidden event finished.");
       return result;
-   }
-
-   private WebElement inputEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      WebElement element = null;
-
-      this.report.log("Input event starting.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Input event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.INPUT, PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-
-         if (event.containsKey("assert")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assert").toString());
-            this.report.Assert(val, src);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assertnot").toString());
-            this.report.AssertNot(val, src);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: " + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         element = null;
-      }
-
-      this.report.log("Input event finished.");
-      return element;
    }
 
    private WebElement radioEvent(VDDHash event, WebElement parent) {
