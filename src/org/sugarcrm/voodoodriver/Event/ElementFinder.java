@@ -144,6 +144,8 @@ class ElementFinder {
       List<WebElement> allElements = null;
       List<WebElement> elements = new ArrayList<WebElement>();
 
+      this.r.log("Searching for " + tagName + " with alt text '" + alt + "'");
+
       if (this.parent != null) {
          allElements = this.parent.findElements(by);
       } else {
@@ -172,6 +174,8 @@ class ElementFinder {
       By by = null;
       List<WebElement> elements = null;
       String tag = (String)this.selectors.get("html_tag");
+
+      this.r.log("Searching for " + tag + " with text '" + text + "'");
 
       if (tag.equals("a")) {
          by = By.linkText(text);
@@ -543,10 +547,15 @@ class ElementFinder {
          } else {
             by = By.className(className);
          }
+         this.r.log("Searching for class '" + className + "'");
       } else if (this.selectors.containsKey("css")) {
-         by = By.cssSelector((String)selectors.get("css"));
+         String sel = (String)selectors.get("css");
+         by = By.cssSelector(sel);
+         this.r.log("Searching for css '" + sel + "'");
       } else if (this.selectors.containsKey("id")) {
-         by = By.id((String)selectors.get("id"));
+         String id = (String)selectors.get("id");
+         by = By.id(id);
+         this.r.log("Searching for id '" + id + "'");
       } else if (this.selectors.containsKey("text")) {
          searchByText = true;
       } else if (this.selectors.containsKey("name")) {
@@ -554,9 +563,13 @@ class ElementFinder {
       } else if (this.selectors.containsKey("value")) {
          searchByValue = true;
       } else if (this.selectors.containsKey("xpath")) {
-         by = By.xpath((String)selectors.get("xpath"));
+         String xp = (String)selectors.get("xpath");
+         by = By.xpath(xp);
+         this.r.log("Searching for xpath '" + xp + "'");
       } else {
-         by = By.tagName((String)selectors.get("html_tag"));
+         String tag = (String)selectors.get("html_tag");
+         by = By.tagName(tag);
+         this.r.log("Searching for HTML tag '" + tag + "'");
       }
 
       /*
