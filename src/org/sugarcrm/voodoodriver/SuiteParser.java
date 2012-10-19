@@ -132,8 +132,6 @@ public class SuiteParser {
     */
 
    private void parse(NodeList nodes, File baseDir) throws VDDException {
-      int len = nodes.getLength() -1;
-
       for (int k = 0; k < nodes.getLength(); k++) {
          Node node = nodes.item(k);
 

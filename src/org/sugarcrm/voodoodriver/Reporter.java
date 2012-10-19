@@ -408,16 +408,6 @@ public class Reporter {
       return result;
    }
 
-   public String strToRegex(String val) {
-      String result = "";
-      val = val.replaceAll("\\\\", "\\\\\\\\");
-      val = val.replaceAll("^/", "");
-      val = val.replaceAll("/$", "");
-      val = val.replaceAll("/\\w$", "");
-      result = val;
-      return result;
-   }
-
    public boolean Assert(String msg, boolean state, boolean expected) {
       boolean result = false;
       String status = "";
@@ -453,7 +443,7 @@ public class Reporter {
       String msg = "";
 
       if (isRegex(value)) {
-         value = this.strToRegex(value);
+         value = Matcher.quoteReplacement(value);
          Pattern p = Pattern.compile(value, Pattern.MULTILINE);
          Matcher m = p.matcher(src);
          if (m.find()) {
@@ -499,7 +489,7 @@ public class Reporter {
       String msg = "";
 
       if (isRegex(value)) {
-         value = this.strToRegex(value);
+         value = Matcher.quoteReplacement(value);
          if (src.matches(value)) {
             this.FailedAsserts += 1;
             msg = String.format("(!)Assert Failed, Found Unexpected text: '%s'.", value);

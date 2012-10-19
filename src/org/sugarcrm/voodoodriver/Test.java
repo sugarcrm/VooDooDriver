@@ -34,7 +34,7 @@ public class Test {
    private boolean WatchDog = false;
    private ArrayList<Plugin> plugins = null;
    private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
-   private String assertPage = null;
+   private File assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
 
@@ -99,7 +99,7 @@ public class Test {
       this.Browser.setReporter(this.reporter);
 
       if (config.get("assertpagefile") != null) {
-         this.setAssertPage((String)config.get("assertpagefile"));
+         this.setAssertPage(new File((String)config.get("assertpagefile")));
       }
       this.setPlugins(plugin);
       if (config.get("attachtimeout") != null) {
@@ -116,7 +116,7 @@ public class Test {
       this.attachTimeout = timeout;
    }
 
-   public void setAssertPage(String assertPage) {
+   public void setAssertPage(File assertPage) {
       this.assertPage = assertPage;
       this.Browser.setAssertPageFile(this.assertPage, this.reporter);
    }
