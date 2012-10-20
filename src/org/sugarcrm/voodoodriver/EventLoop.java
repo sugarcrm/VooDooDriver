@@ -2275,7 +2275,6 @@ public class EventLoop implements Runnable {
       Set<String> handles = null;
       int len = 0;
       boolean use_URL = false;
-      boolean is_REGEX = false;
       String finder = "";
       String found_handle = null;
       String msg = "";
@@ -2312,10 +2311,6 @@ public class EventLoop implements Runnable {
 
          finder = this.replaceString(finder);
 
-         if (this.report.isRegex(finder)) {
-            is_REGEX = true;
-         }
-
          for (int timer = 0; timer <= timeout; timer++) {
             handles = this.Browser.getDriver().getWindowHandles();
             len = handles.size() - 1;
@@ -2332,41 +2327,18 @@ public class EventLoop implements Runnable {
                this.report.Log(String.format("[%d]: Window URL: '%s'", i,
                      tmp_url));
 
-               if (!is_REGEX) {
-                  if (!use_URL) {
-                     if (tmp_title.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format(
-                              "Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     if (tmp_url.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
-               } else {
-                  if (!use_URL) {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_title);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_url);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
+               TextFinder f = new TextFinder(finder);
+
+               if (use_URL && f.find(tmp_url)) {
+                  found_handle = tmp_handle;
+                  this.report.Log(String.format("Found Window URL '%s'",
+                                                finder));
+                  break;
+               } else if (!use_URL && f.find(tmp_title)) {
+                  found_handle = tmp_handle;
+                  this.report.Log(String.format("Found Window Title '%s'",
+                                                finder));
+                  break;
                }
             } // end for loop //
 
