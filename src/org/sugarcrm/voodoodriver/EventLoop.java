@@ -401,6 +401,9 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
+      // case EMAIL:
+      //    element = emailEvent(event, parent);
+      //    break;
       // case TEXTFIELD:
       //    element = textfieldEvent(event, parent);
       //    break;
@@ -574,6 +577,8 @@ public class EventLoop implements Runnable {
       return element;
    }
 
+
+
    private boolean hiddenEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean required = true;
@@ -603,6 +608,88 @@ public class EventLoop implements Runnable {
 
       this.report.log("Hidden event finished.");
       return result;
+   }
+
+   /**
+    * &lt;email&gt; event
+    *
+    * @param event   the &lt;email&gt; event
+    * @param parent  this element's parent
+    * @return the &lt;email&gt; {@link WebElement} or null
+    */
+
+   private WebElement emailEvent(VDDHash event, WebElement parent) {
+      boolean required = true;
+      WebElement element = null;
+
+      this.report.log("Starting email event.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.log("Finished email event.");
+            return null;
+         }
+
+         this.firePlugin(element, Elements.EMAIL, PluginEvent.AFTERFOUND);
+         this.checkDisabled(event, element);
+
+         if (event.containsKey("clear")) {
+            if (this.clickToBool(event.get("clear").toString())) {
+               this.report.log("Clearing email element.");
+               clearText(element);
+            }
+         }
+
+         if (event.containsKey("set")) {
+            String value = event.get("set").toString();
+            value = this.replaceString(value);
+            this.report.log(String.format("Setting value to: '%s'.", value));
+            clearText(element);
+            element.sendKeys(value);
+         }
+
+         if (event.containsKey("append")) {
+            String value = event.get("append").toString();
+            value = this.replaceString(value);
+            element.sendKeys(value);
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            String jev = (String)event.get("jscriptevent");
+            this.report.log("Firing Javascript Event: " + jev);
+            this.Browser.fire_event(element, jev);
+            Thread.sleep(1000);
+            this.report.log("Javascript event finished.");
+         }
+
+         if (event.containsKey("assert")) {
+            String assvalue = event.get("assert").toString();
+            assvalue = this.replaceString(assvalue);
+            this.report.Assert(assvalue, element.getAttribute("value"));
+         }
+
+         if (event.containsKey("assertnot")) {
+            String assvalue = event.get("assertnot").toString();
+            assvalue = this.replaceString(assvalue);
+            this.report.AssertNot(assvalue, element.getAttribute("value"));
+         }
+
+         String value = element.getAttribute("value");
+         handleVars(value, event);
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.exception(exp);
+         element = null;
+      }
+
+      this.report.log("Finished email event.");
+      return element;
    }
 
    private WebElement radioEvent(VDDHash event, WebElement parent) {
@@ -1151,7 +1238,7 @@ public class EventLoop implements Runnable {
 
 
    /**
-    * Clear a text or a password input or a textfield element.
+    * Clear a text, password, or email input or a textfield element.
     *
     * Using javascript on IE instead of WebElement.clear() is needed
     * due to Selenium issue 3402.

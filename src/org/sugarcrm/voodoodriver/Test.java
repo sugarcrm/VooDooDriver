@@ -139,7 +139,7 @@ public class Test {
       b.setReporter(this.reporter);
       String apf = (String)config.get("assertpagefile");
       if (apf != null) {
-         b.setAssertPageFile(apf);
+         b.setAssertPageFile(new File(apf));
       }
    }
 

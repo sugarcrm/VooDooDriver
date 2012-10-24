@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * Please see the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 
 public class Reporter {
@@ -254,7 +252,7 @@ public class Reporter {
     * There's a long discussion in the Java documentation about why
     * using Thread.stop() is a terrible, terrible thing.  However, the
     * alternate offered, in combination with the klunky way Java
-    * handles exception means that any program wanting to terminate a
+    * handles exceptions means that any program wanting to terminate a
     * thread abnormally must design this ability in from the ground up
     * -- not the case with VDD.  Consequently, despite the "dangers"
     * involved in stopping a running thread, it's done here.  It won't
@@ -500,46 +498,6 @@ public class Reporter {
 
 
    /**
-    * Determine whether a string is a regular expression.
-    *
-    * @param str  the string
-    */
-
-   public boolean isRegex(String str) {
-      boolean result = false;
-      Pattern p = Pattern.compile("^\\/");
-      Matcher m = p.matcher(str);
-
-      p = Pattern.compile("\\/$|\\/\\w+$");
-      Matcher m2 = p.matcher(str);
-
-      if (m.find() && m2.find()) {
-         result = true;
-      } else {
-         result = false;
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Convert a string to a regular expression.
-    *
-    * @param val  the string to convert
-    * @return string with regex metacharacters escaped appropriately
-    */
-
-   public String strToRegex(String val) {
-      val = val.replaceAll("\\\\", "\\\\\\\\");
-      val = val.replaceAll("^/", "");
-      val = val.replaceAll("/$", "");
-      val = val.replaceAll("/\\w$", "");
-      return val;
-   }
-
-
-   /**
     * Assert that two boolean values are equal to each other.
     *
     * <p>As with all Assert* methods, this logs failures as assertion
@@ -588,55 +546,34 @@ public class Reporter {
     * <p>As with all Assert* methods, this logs failures as assertion
     * failures which are treated specially.</p>
     *
-    * @param value  the search string
-    * @param src  the string in which to search
+    * @param search  the search string
+    * @param src     the string in which to search
     * @return whether the assertion passed
     */
 
-   public boolean Assert(String value, String src) {
-      boolean result = false;
-      String msg = "";
+   public boolean Assert(String search, String src) {
+      TextFinder f = new TextFinder(search);
+      boolean found = f.find(src);
 
-      if (isRegex(value)) {
-         value = this.strToRegex(value);
-         Pattern p = Pattern.compile(value, Pattern.MULTILINE);
-         Matcher m = p.matcher(src);
-         if (m.find()) {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed, Found: '%s'.", value);
-            this.log(msg);
-            result = true;
-         } else {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed for find: '%s'!", value);
-            this._log(msg);
-            result = false;
-         }
+      if (found) {
+         this.PassedAsserts += 1;
+         this.log("Assert Passed, found: '" + search + "'.");
       } else {
-         if (src.contains(value)) {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed, Found: '%s'.", value);
-            this.log(msg);
-            result = true;
-         } else {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed for find: '%s'!", value);
-            this._log(msg);
-            result = false;
-         }
+         this.FailedAsserts += 1;
+         this._log("(!)Assert Failed for: '" + search + "'!");
       }
 
-      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
+      if (!found && (Boolean)this.saveHtmlOn.get("assertfail")) {
          this.SavePage();
       }
-      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+      if (!found && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
-      if (result == false && this.haltOnFailure) {
+      if (!found && this.haltOnFailure) {
          killTestThread();
       }
 
-      return result;
+      return found;
    }
 
 
@@ -646,53 +583,34 @@ public class Reporter {
     * <p>As with all Assert* methods, this logs failures as assertion
     * failures which are treated specially.</p>
     *
-    * @param value  the search string
-    * @param src  the string in which to search
+    * @param search  the search string
+    * @param src     the string in which to search
     * @return whether the assertion passed
     */
 
-   public boolean AssertNot(String value, String src) {
-      boolean result = false;
-      String msg = "";
+   public boolean AssertNot(String search, String src) {
+      TextFinder f = new TextFinder(search);
+      boolean found = f.find(src);
 
-      if (isRegex(value)) {
-         value = this.strToRegex(value);
-         if (src.matches(value)) {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed, Found Unexpected text: '%s'.", value);
-            this._log(msg);
-            result = false;
-         } else {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed did not find: '%s' as expected.", value);
-            this.log(msg);
-            result = true;
-         }
+      if (found) {
+         this.FailedAsserts += 1;
+         this._log("(!)Assert Failed, found unexpected text: '" + search + "'.");
       } else {
-         if (src.contains(value)) {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assertnot Failed: Found: '%s'.", value);
-            this._log(msg);
-            result = false;
-         } else {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed did not find: '%s' as expected.", value);
-            this.log(msg);
-            result = true;
-         }
+         this.PassedAsserts += 1;
+         this.log("Assert Passed, did not find: '" + search + "'!");
       }
 
-      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
+      if (found && (Boolean)this.saveHtmlOn.get("assertfail")) {
          this.SavePage();
       }
-      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+      if (found && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
-      if (result == false && this.haltOnFailure) {
+      if (found && this.haltOnFailure) {
          killTestThread();
       }
 
-      return result;
+      return !found;
    }
 
 

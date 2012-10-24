@@ -16,6 +16,7 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -64,7 +65,7 @@ public abstract class Browser {
     * Page assert file.
     */
 
-   private String assertPageFile = null;
+   private File assertPageFile = null;
 
    /**
     * {@link PageAsserter} object.
@@ -209,15 +210,15 @@ public abstract class Browser {
     */
 
    public String getPageSource() {
-      int retries = 20;
+      int retries = 50;
 
       while (retries-- > 0) {
          try {
             return this.Driver.getPageSource();
-         } catch (Exception e) {}
+         } catch (org.openqa.selenium.NoSuchWindowException e) {}
 
          try {
-            Thread.sleep(1000);
+            Thread.sleep(100);
          } catch (java.lang.InterruptedException e) {}
       }
 
@@ -457,9 +458,9 @@ public abstract class Browser {
       if (this.asserter == null && this.assertPageFile != null) {
          try {
             this.asserter = new PageAsserter(this.assertPageFile,
-                                             this.reporter, whitelist);
-         } catch (Exception exp) {
-            this.reporter.exception(exp);
+                                             this.reporter);
+         } catch (VDDException e) {
+            this.reporter.exception(e);
          }
       }
 
@@ -474,12 +475,16 @@ public abstract class Browser {
    /**
     * Load the page assert file.
     *
-    * @param filename  the file of page asserts
+    * @param f  the file of page asserts
     */
 
-   public void setAssertPageFile(String filename) {
-      this.assertPageFile = filename;
-      this.asserter = new PageAsserter(filename, this.reporter, null);
+   public void setAssertPageFile(File f) {
+      this.assertPageFile = f;
+      try {
+         this.asserter = new PageAsserter(f, reporter);
+      } catch (VDDException e) {
+         this.reporter.exception(e);
+      }
    }
 
 
@@ -489,7 +494,7 @@ public abstract class Browser {
     * @return page assert file or null, if no file has been assigned
     */
 
-   public String getAssertPageFile() {
+   public File getAssertPageFile() {
       return this.assertPageFile;
    }
 }
