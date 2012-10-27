@@ -98,7 +98,7 @@ public class TextFinder {
 
    private boolean compileRegex(String regex) {
       try {
-         this.pattern = Pattern.compile(regex,
+         this.pattern = Pattern.compile(regex.replaceAll("^/|/$", ""),
                                         Pattern.MULTILINE |
                                         Pattern.DOTALL |
                                         Pattern.UNICODE_CASE);
