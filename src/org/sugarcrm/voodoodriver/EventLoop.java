@@ -2887,7 +2887,6 @@ public class EventLoop implements Runnable {
    private boolean browserEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean assertPage = true;
-      BrowserActions browser_action = null;
 
       this.resetThreadTime();
 
@@ -2895,24 +2894,34 @@ public class EventLoop implements Runnable {
 
       try {
          if (event.containsKey("action")) {
-            browser_action = BrowserActions.valueOf(event.get("action").toString().toUpperCase());
-            switch (browser_action) {
-            case REFRESH:
-               this.report.Log("Calling Browser event refresh.");
-               this.Browser.refresh();
-               break;
-            case CLOSE:
-               this.report.Log("Calling Browser event close.");
-               this.Browser.close();
-               break;
-            case BACK:
-               this.report.Log("Calling Browser event back.");
-               this.Browser.back();
-               break;
-            case FORWARD:
-               this.report.Log("Calling Browser event forward.");
-               this.Browser.forward();
-               break;
+            int retry = 2;
+
+            while (retry-- > 0) {
+               try {
+                  switch (BrowserActions.valueOf(event.get("action").toString().toUpperCase())) {
+                  case REFRESH:
+                     this.report.Log("Calling Browser event refresh.");
+                     this.Browser.refresh();
+                     break;
+                  case CLOSE:
+                     this.report.Log("Calling Browser event close.");
+                     this.Browser.close();
+                     break;
+                  case BACK:
+                     this.report.Log("Calling Browser event back.");
+                     this.Browser.back();
+                     break;
+                  case FORWARD:
+                     this.report.Log("Calling Browser event forward.");
+                     this.Browser.forward();
+                     break;
+                  }
+               } catch (org.openqa.selenium.UnhandledAlertException e) {
+                  this.report.unhandledAlert(e);
+                  if (retry >= 0) {
+                     this.report.Log("Retrying browser action...");
+                  }
+               }
             }
          } else {
             int event_count = event.keySet().size() - 1;
