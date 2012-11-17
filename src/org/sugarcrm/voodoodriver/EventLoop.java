@@ -2916,6 +2916,7 @@ public class EventLoop implements Runnable {
                      this.Browser.forward();
                      break;
                   }
+                  break;
                } catch (org.openqa.selenium.UnhandledAlertException e) {
                   this.report.unhandledAlert(e);
                   if (retry >= 0) {
