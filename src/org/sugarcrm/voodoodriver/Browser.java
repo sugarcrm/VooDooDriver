@@ -215,7 +215,11 @@ public abstract class Browser {
       while (retries-- > 0) {
          try {
             return this.Driver.getPageSource();
-         } catch (org.openqa.selenium.NoSuchWindowException e) {}
+         } catch (org.openqa.selenium.UnhandledAlertException e) {
+            this.reporter.unhandledAlert(e);
+         } catch (org.openqa.selenium.NoSuchWindowException e) {
+            return "";
+         }
 
          try {
             Thread.sleep(100);
@@ -239,16 +243,25 @@ public abstract class Browser {
     */
 
    public Object executeJS(String script, WebElement element) {
-      Object result = null;
       JavascriptExecutor js = (JavascriptExecutor)this.Driver;
+      int retry = 2;
 
-      if (element != null) {
-         result = js.executeScript(script, element);
-      } else {
-         result = js.executeScript(script);
+      while (retry-- > 0) {
+         try {
+            if (element != null) {
+               return js.executeScript(script, element);
+            } else {
+               return js.executeScript(script);
+            }
+         } catch (org.openqa.selenium.UnhandledAlertException e) {
+            this.reporter.unhandledAlert(e);
+            if (retry >= 0) {
+               this.reporter.Log("Retrying js after unhandled alert...");
+            }
+         }
       }
 
-      return result;
+      return null;
    }
 
 

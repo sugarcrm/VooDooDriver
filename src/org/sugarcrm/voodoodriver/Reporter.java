@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Date;
 import org.apache.commons.io.FilenameUtils;
+import org.openqa.selenium.Alert;
 
 public class Reporter {
 
@@ -416,6 +417,40 @@ public class Reporter {
 
    public void setBlocked() {
       this.Blocked = 1;
+   }
+
+
+   /**
+    * Accept and log an unhandled alert.
+    *
+    * <p>Should the test script leave an alert up, an
+    * UnhandledAlertException will eventually be thrown by selenium.
+    * While from a test's point of view, the timing of this exception
+    * seems non-deterministic, it is thrown when the first "do
+    * something" call is made to selenium after the alert's appearance
+    * (just retrieving data from the page won't trigger it).</p>
+    *
+    * <p>Since the exception it generates needs to be logged and
+    * logging an exception can fetch the page source which will throw
+    * an exception, the alert is handled by the Reporter class which
+    * has ways to log exceptions without triggering a page fetch.</p>
+    *
+    * @param e  the UnhandledAlertException
+    */
+
+   public void unhandledAlert(org.openqa.selenium.UnhandledAlertException e) {
+      Alert alert = this.browser.getDriver().switchTo().alert();
+      String alertText = alert.getText();
+      /*
+       * Presumably, accept will be more likely to Do The Right
+       * Thing(TM) WRT getting rid of alerts and moving on, but it
+       * depends entirely on how the page in question is written.
+       */
+      alert.accept();
+
+      this._log("(!)Unhandled alert found and dismissed.  Alert text is \"" +
+                alertText + "\"");
+      justReportTheException(e);
    }
 
 

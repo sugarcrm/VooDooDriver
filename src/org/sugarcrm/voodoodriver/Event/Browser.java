@@ -48,19 +48,31 @@ public class Browser extends Event {
 
    void browserAction(org.sugarcrm.voodoodriver.Browser b, String action)
       throws VDDException {
+      int retry = 2;
+
       log("Calling browser action " + action + ".");
 
-      String actionl = action.toLowerCase();
-      if (actionl.equals("back")) {
-         b.back();
-      } else if (actionl.equals("close")) {
-         b.close();
-      } else if (actionl.equals("forward")) {
-         b.forward();
-      } else if (actionl.equals("refresh")) {
-         b.refresh();
-      } else {
-         throw new VDDException("Unknown browser action '" + action + "'");
+      while (retry-- > 0) {
+         try {
+            String actionl = action.toLowerCase();
+            if (actionl.equals("back")) {
+               b.back();
+            } else if (actionl.equals("close")) {
+               b.close();
+            } else if (actionl.equals("forward")) {
+               b.forward();
+            } else if (actionl.equals("refresh")) {
+               b.refresh();
+            } else {
+               throw new VDDException("Unknown browser action '" + action + "'");
+            }
+            break;
+         } catch (org.openqa.selenium.UnhandledAlertException e) {
+            this.eventLoop.report.unhandledAlert(e);
+            if (retry >= 0) {
+               log("Retrying browser action...");
+            }
+         }
       }
    }
 
