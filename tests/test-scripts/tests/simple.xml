@@ -145,9 +145,4 @@
       <p assert="A GET form"/>
    </form>
 
-   <form id="form1">
-      <input id="input" click="true"/>
-   </form>
-   <div id="click_test" assert="INPUT"/>
-
 </voodoo>

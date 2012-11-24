@@ -45,18 +45,24 @@
    <!-- HTML events -->
 
    <script file="tests/test-scripts/tests/find-elements.xml"/>
-
    <script file="tests/test-scripts/tests/link.xml"/>
    <script file="tests/test-scripts/tests/alert.xml"/>
-
-   <!-- simple.xml covers the following HTML events:
-
-           * div
-
-   -->
-   <script file="tests/test-scripts/tests/simple.xml"/>
    <script file="tests/test-scripts/tests/iframe.xml"/>
 
+   <!-- simple.xml tests support for the following HTML events: div,
+        span, h1, h2, h3, h4, h5, h6, address, em, strong, dfn, code,
+        samp, kbd, cite, abbr, acronym, blockquote, q, sub, sup, p,
+        br, pre, ins, del, ul, ol, li, dl, dt, dd, table, caption,
+        thead, tfoot, tbody, colgroup, col, tr, th, td, image, object,
+        map, area, tt, i, b, big, small, strike, s, u, hr, frame,
+        form.
+   -->
+   <script file="tests/test-scripts/tests/simple.xml"/>
+
+   <!-- interactive.xml tests support for the following HTML elements:
+        input
+   -->
+   <script file="tests/test-scripts/tests/interactive.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>

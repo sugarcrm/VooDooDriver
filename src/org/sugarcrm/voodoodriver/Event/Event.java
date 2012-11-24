@@ -275,7 +275,7 @@ public abstract class Event {
       } else if (tagName.equals("form")) {
          event = new SimpleHtmlEvent(element);
       } else if (tagName.equals("input")) {
-         event = new SimpleHtmlEvent(element);
+         event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("textfield")) {
       } else if (tagName.equals("password")) {
       } else if (tagName.equals("checkbox")) {

@@ -1810,13 +1810,17 @@
       </selectors>
 
       <actions>
+         <accessor type="string">append</accessor>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </input>

@@ -1,0 +1,24 @@
+<voodoo>
+   <!-- This script tests all "interactive" HTML events, those that
+        can accept user input of some type.
+   -->
+
+   <browser url="{@global.url}/tests/test-data/interactive.html"/>
+
+   <form id="form1">
+      <input id="input" click="true"/>
+   </form>
+   <div id="click_test" assert="INPUT"/>
+
+   <form id="form1">
+      <input id="text" set="foo bar"/>
+      <input id="text" append=" baz"/>
+      <input id="text" click="true"/>
+   </form>
+   <div id="click_test" assert="foo bar baz"/>
+
+   <form id="form1">
+      <input id="disabled" disabled="true"/>
+   </form>
+
+</voodoo>

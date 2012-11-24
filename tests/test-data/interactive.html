@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>Test page full of interactive HTML elements</title>
+
+    <script type="text/javascript">
+      function clickTest(which) {
+         document.getElementById("click_test").innerHTML = which;
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <div id="click_test">some text</div>
+
+    <form id="form1">
+      <input id="input" type="button" value="click"
+             onclick="clickTest('INPUT');"/>
+      <input id="text" type="text" value="zzzz"
+             onclick="clickTest(this.value)"/>
+      <input id="disabled" type="button" value="Disabled" disabled/>
+    </form>
+
+  </body>
+</html>
