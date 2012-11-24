@@ -256,7 +256,7 @@ public abstract class Browser {
          } catch (org.openqa.selenium.UnhandledAlertException e) {
             this.reporter.unhandledAlert(e);
             if (retry >= 0) {
-               this.reporter.Log("Retrying js after unhandled alert...");
+               this.reporter.log("Retrying js after unhandled alert...");
             }
          }
       }

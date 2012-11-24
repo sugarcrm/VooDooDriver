@@ -448,9 +448,8 @@ public class Reporter {
        */
       alert.accept();
 
-      this._log("(!)Unhandled alert found and dismissed.  Alert text is \"" +
-                alertText + "\"");
-      justReportTheException(e);
+      justLogTheException("(!)Unhandled alert found and dismissed. " +
+                          "Alert text is \"" + alertText + "\"", e);
    }
 
 
