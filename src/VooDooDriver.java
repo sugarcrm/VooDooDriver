@@ -693,14 +693,14 @@ public class VooDooDriver {
       startTime = new Date();
 
       for (String test: tests) {
-         Vars v = createVars(config);
+         Vars vars = createVars(config);
 
          if (browser.isClosed()) {
             browser.newBrowser();
          }
 
          boolean testPassed = runOneTest(new File(test), "Command line", config,
-                                         null, false);
+                                         vars, false);
 
          if (haltOnFailure && !testPassed) {
             System.out.println("(*)Test failed and --haltOnFailure is set. " +
