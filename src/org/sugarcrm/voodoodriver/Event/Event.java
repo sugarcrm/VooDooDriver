@@ -279,7 +279,9 @@ public abstract class Event {
       } else if (tagName.equals("email")) {
          event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("textfield")) {
+         event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("password")) {
+         event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("checkbox")) {
       } else if (tagName.equals("radio")) {
       } else if (tagName.equals("button")) {

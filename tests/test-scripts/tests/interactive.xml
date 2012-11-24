@@ -33,4 +33,16 @@
    </form>
    <div id="click_test" assert="bar@baz"/>
 
+   <form id="form1">
+      <textfield id="text" set="text field"/>
+      <textfield id="text" click="true"/>
+   </form>
+   <div id="click_test" assert="text field"/>
+
+   <form id="form1">
+      <password id="password" set="verysecret"/>
+      <password id="password" click="true"/>
+   </form>
+   <div id="click_test" assert="verysecret"/>
+
 </voodoo>
