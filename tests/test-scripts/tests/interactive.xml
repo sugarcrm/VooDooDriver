@@ -21,4 +21,16 @@
       <input id="disabled" disabled="true"/>
    </form>
 
+   <form id="form1">
+      <email id="email1" set="foo@bar.com"/>
+      <email id="email1" click="true"/>
+   </form>
+   <div id="click_test" assert="foo@bar.com"/>
+
+   <form id="form1">
+      <email id="email2" set="foo@bar.com,bar@baz"/>
+      <email id="email2" click="true"/>
+   </form>
+   <div id="click_test" assert="bar@baz"/>
+
 </voodoo>
