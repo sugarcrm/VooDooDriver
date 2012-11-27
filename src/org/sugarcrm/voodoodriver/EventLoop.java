@@ -401,20 +401,8 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case EMAIL:
-      //    element = emailEvent(event, parent);
-      //    break;
-      // case TEXTFIELD:
-      //    element = textfieldEvent(event, parent);
-      //    break;
-      // case PASSWORD:
-      //    element = passwordEvent(event, parent);
-      //    break;
       // case BUTTON:
       //    element = buttonEvent(event, parent);
-      //    break;
-      // case CHECKBOX:
-      //    element = checkboxEvent(event, parent);
       //    break;
       // case SELECT:
       //    element = selectEvent(event, parent);
@@ -925,78 +913,6 @@ public class EventLoop implements Runnable {
       return element;
    }
 
-
-   private WebElement checkboxEvent(VDDHash event, WebElement parent) {
-      boolean click = false;
-      boolean required = true;
-      WebElement element = null;
-
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            return element;
-         }
-
-         this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-            if (click) {
-               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.BEFORECLICK);
-               element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
-            }
-         }
-
-         if (event.containsKey("set")) {
-            String msg = "";
-            String set = event.get("set").toString();
-            set = this.replaceString(set);
-
-            if (Boolean.valueOf(set) == element.isSelected()) {
-               msg = String.format("Checkbox current checked state is already: '%s', skipping click.", set);
-            } else {
-               msg = String.format("Checkbox's state is '%s', clicking to set state to '%s'.", element.isSelected(), set);
-               element.click();
-               this.firePlugin(element, Elements.CHECKBOX, PluginEvent.AFTERCLICK);
-            }
-            this.report.log(msg);
-         }
-
-         if (event.containsKey("assert")) {
-            String src = String.valueOf(element.isSelected());
-            String value = event.get("assert").toString();
-            value = this.replaceString(value);
-            this.report.Assert(value, src);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String src = String.valueOf(element.isSelected());
-            String value = event.get("assertnot").toString();
-            value = this.replaceString(value);
-            this.report.AssertNot(value, src);
-         }
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-      }
-
-      this.updateThreadTime();
-      return element;
-   }
 
    private WebElement buttonEvent(VDDHash event, WebElement parent) {
       boolean click = true;

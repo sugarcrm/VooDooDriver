@@ -6,6 +6,18 @@
       function clickTest(which) {
          document.getElementById("click_test").innerHTML = which;
       }
+
+      function doCheckboxes(checkboxes) {
+         var n = 0;
+         for (i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked == true) {
+               n++;
+            }
+         }
+         document.getElementById('checkbox_output').innerHTML = "checked " +
+                                                                n + " boxes";
+         return true;
+      }
     </script>
 
   </head>
@@ -23,6 +35,20 @@
       <input id="email1" type="email" onclick="clickTest(this.value)"/>
       <input id="email2" type="email" multiple="true"
              onclick="clickTest(this.value)"/>
+    </form>
+
+    <form id="form2">
+      <p id="checkbox_output">empty</p>
+      <a id="check_checkboxes" href="#"
+         onclick="doCheckboxes(document.getElementsByName('checkbox'));">
+        check the checkboxes
+      </a>
+      <label for="cb1">one</label>
+      <input id="cb1" type="checkbox" name="checkbox" value="1"/>
+      <label for="cb2">two</label>
+      <input id="cb2" type="checkbox" name="checkbox" value="2"/>
+      <label for="cb3">three</label>
+      <input id="cb3" type="checkbox" name="checkbox" value="3"/>
     </form>
 
   </body>
