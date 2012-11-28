@@ -21,12 +21,12 @@ import org.sugarcrm.voodoodriver.VDDException;
 import org.w3c.dom.Element;
 
 /**
- * The checkbox event.
+ * The checkbox and radio events.
  *
  * @author Jon duSaint
  */
 
-class Checkbox extends HtmlEvent {
+class ToggleEvent extends HtmlEvent {
 
    /**
     * Set action.
@@ -35,35 +35,47 @@ class Checkbox extends HtmlEvent {
    protected class SetAction implements Action {
 
       /**
+       * True if the element is a radio control.
+       */
+
+      private boolean isRadio() {
+         return getName().toLowerCase().equals("radio");
+      }
+
+
+      /**
        * Run the set action.
        */
 
       public void action(Object val) {
+         String ev = getName();
          Boolean desired = (Boolean)val;
          Boolean actual = element.isSelected();
 
-         if (desired ^ actual) {
-            log("Setting checkbox state to " +
-                (desired ? "" : "un") + "checked.");
+         if (isRadio() && !desired) {
+            error("Impossible to deselect radio elements.");
+         } else if (desired ^ actual) {
+            log("Setting " + ev + " state to " +
+                (desired ? "" : "de") + "selected.");
             firePlugin(PluginEvent.BEFORECLICK);
             element.click();
             firePlugin(PluginEvent.AFTERCLICK);
          } else {
-            log("Checkbox is already " + 
-                (actual ? "" : "un") + "checked. Skipping.");
+            log(ev + " is already " +
+                (actual ? "" : "de") + "selected. Skipping.");
          }
       }
    }
 
 
    /**
-    * Instantiate a Checkbox event.
+    * Instantiate a ToggleEvent.
     *
     * @param e  the event as specified in the test script
     * @throws VDDException if event instantiation fails
     */
 
-   public Checkbox(Element e) throws VDDException {
+   public ToggleEvent(Element e) throws VDDException {
       super(e);
 
       this.actionList.addLast(new Pair<String,Action>("disabled",

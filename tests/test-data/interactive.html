@@ -18,6 +18,17 @@
                                                                 n + " boxes";
          return true;
       }
+
+      function doRadios(radios) {
+         var which = "none";
+         for (k = 0; k < radios.length; k++) {
+            if (radios[k].checked) {
+               which = radios[k].id;
+            }
+         }
+
+         document.getElementById('radio_output').innerHTML = which;
+      }
     </script>
 
   </head>
@@ -49,6 +60,22 @@
       <input id="cb2" type="checkbox" name="checkbox" value="2"/>
       <label for="cb3">three</label>
       <input id="cb3" type="checkbox" name="checkbox" value="3"/>
+    </form>
+
+    <form id="form3">
+      <p id="radio_output">empty</p>
+      <a id="check_radios" href="#"
+         onclick="doRadios(document.getElementsByName('radio'));">
+        check the checkboxes
+      </a>
+      <label for="radio0">0</label>
+      <input type="radio" value="0" id="radio0" name="radio"/>
+      <label for="radio1">1</label>
+      <input type="radio" value="1" id="radio1" name="radio"/>
+      <label for="radio2">2</label>
+      <input type="radio" value="2" id="radio2" name="radio"/>
+      <label for="radio3">3</label>
+      <input type="radio" value="3" id="radio3" name="radio"/>
     </form>
 
   </body>

@@ -416,9 +416,6 @@ public class EventLoop implements Runnable {
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
-      // case RADIO:
-      //    element = radioEvent(event, parent);
-      //    break;
    }
 
 
@@ -597,93 +594,6 @@ public class EventLoop implements Runnable {
       this.report.log("Hidden event finished.");
       return result;
    }
-
-   private WebElement radioEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      boolean click = false;
-      WebElement element = null;
-
-      this.report.log("Radio event starting.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Radio event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.RADIO,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (event.containsKey("set")) {
-            this.report.warning("Using the 'set' command for a radio element is not supported anymore!  Use click!");
-            click = this.clickToBool(event.get("set").toString());
-         }
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-
-         if (click) {
-            this.firePlugin(element, Elements.RADIO,
-                  PluginEvent.BEFORECLICK);
-            this.report.log("Clicking Element.");
-            element.click();
-            this.report.log("Click finished.");
-            this.firePlugin(element, Elements.RADIO,
-                  PluginEvent.AFTERCLICK);
-         }
-
-         if (event.containsKey("assert")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assert").toString());
-            this.report.Assert(val, src);
-         }
-
-         if (event.containsKey("assertnot")) {
-            String src = element.getText();
-            String val = this.replaceString(event.get("assertnot").toString());
-            this.report.AssertNot(val, src);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                  + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-
-         if (event.containsKey("checked")) {
-            boolean ischecked = element.isSelected();
-            boolean expected = this
-                  .clickToBool(event.get("checked").toString());
-            String msg = "";
-            msg = String.format("Radio control's current checked state: '%s', was expecting: '%s'!",
-                        ischecked, expected);
-            this.report.Assert(msg, ischecked, expected);
-
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         element = null;
-      }
-
-      this.report.log("Radio event finished.");
-      return element;
-   }
-
 
    /**
     * Handle a &lt;select&gt; event

@@ -59,7 +59,7 @@
    <link id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 1 boxes"/>
    
-   <checkbox value="2" click="true"/>
+   <checkbox value="2" set="true"/>
    <link id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 2 boxes"/>
    
@@ -67,8 +67,25 @@
    <link id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 3 boxes"/>
    
-   <checkbox name="checkbox" click="true" />
+   <checkbox name="checkbox" set="false" />
    <link id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 2 boxes"/>
+
+   <!-- radio -->
+   <radio id="radio0" click="true"/>
+   <link id="check_radios"/>
+   <p id="radio_output" assert="radio0"/>
+
+   <radio id="radio1" set="true"/>
+   <link id="check_radios"/>
+   <p id="radio_output" assert="radio1"/>
+
+   <radio id="radio2" click="true"/>
+   <link id="check_radios"/>
+   <p id="radio_output" assert="radio2"/>
+
+   <radio id="radio3" set="true"/>
+   <link id="check_radios"/>
+   <p id="radio_output" assert="radio3"/>
 
 </voodoo>
