@@ -283,7 +283,7 @@ public abstract class Event {
       } else if (tagName.equals("password")) {
          event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("checkbox")) {
-         event = new Checkbox(element);
+         event = new ToggleEvent(element);
       } else if (tagName.equals("radio")) {
       } else if (tagName.equals("button")) {
       } else if (tagName.equals("filefield")) {
