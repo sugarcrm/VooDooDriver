@@ -190,7 +190,7 @@ class Attach extends Event {
     * @throws VDDException if execution is unsuccessful
     */
 
-   public void execute() throws StopEventException, VDDException {
+   public void execute() throws VDDException {
       org.sugarcrm.voodoodriver.Browser b = this.eventLoop.Browser;
 
       this.parentWindow = b.getDriver().getWindowHandle();

@@ -27,7 +27,7 @@ import org.sugarcrm.voodoodriver.VDDException;
  * @author Jon duSaint
  */
 
-public class StopEventException extends VDDException {
+public class StopEventException extends RuntimeException {
 
    /**
     * Construct a new exception with <code>null</code> as its detail message.

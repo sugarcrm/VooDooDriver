@@ -319,7 +319,7 @@ class CSV extends Event {
     * @throws VDDException if execution is unsuccessful
     */
 
-   public void execute() throws StopEventException, VDDException {
+   public void execute() throws VDDException {
       if (this.actions.containsKey("override")) {
          String of = (String)this.actions.get("override");
          this.eventLoop.csvOverrideFile = new File(this.replaceString(of));
