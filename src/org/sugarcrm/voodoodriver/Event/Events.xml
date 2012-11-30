@@ -1981,32 +1981,34 @@
       </actions>
    </radio>
 
-   <!-- N.B. there is, in fact, an HTML tag "button" -->
    <button html_tag="input|button" html_type="button|submit|reset">
       <selectors>
-         <accessor type="string">name</accessor>
+         <accessor type="string">alt</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">src</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
       </selectors>
 
       <actions>
-         <accessor type="boolean">click</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="boolean">alert</accessor>
-         <accessor type="boolean">required</accessor>
-         <accessor type="integer">timeout</accessor>
-         <accessor type="string">jscriptevent</accessor>
-         <accessor type="string">assertPage</accessor>
-         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertpage</accessor>
+         <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
+         <accessor type="boolean">set</accessor>
          <accessor type="string">var</accessor>
       </actions>
    </button>

@@ -401,9 +401,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case BUTTON:
-      //    element = buttonEvent(event, parent);
-      //    break;
       // case SELECT:
       //    element = selectEvent(event, parent);
       //    break;
@@ -823,74 +820,6 @@ public class EventLoop implements Runnable {
       return element;
    }
 
-
-   private WebElement buttonEvent(VDDHash event, WebElement parent) {
-      boolean click = true;
-      boolean required = true;
-      WebElement element = null;
-
-      this.updateThreadTime();
-      this.report.log("Starting button event.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Finished button event.");
-            return null;
-         }
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-
-         this.firePlugin(element, Elements.BUTTON,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (event.containsKey("alert")) {
-            boolean alert = this.clickToBool(event.get("alert").toString());
-            this.report.log(String.format("Setting Alert Hack to: '%s'", alert));
-            this.Browser.alertHack(alert);
-            this.report.warning("You are using a deprecated alert hack, please use the <alert> command!");
-         }
-
-         if (click) {
-            this.firePlugin(element, Elements.BUTTON,
-                  PluginEvent.BEFORECLICK);
-            this.report.log("Clicking button.");
-            element.click();
-            this.report.log("Finished clicking button.");
-            this.firePlugin(element, Elements.BUTTON,
-                  PluginEvent.AFTERCLICK);
-         }
-
-         if (event.containsKey("jscriptevent")) {
-            this.report.log("Firing Javascript Event: "
-                  + event.get("jscriptevent").toString());
-            this.Browser.fire_event(element, event.get("jscriptevent").toString());
-            Thread.sleep(1000);
-            this.report.log("Javascript event finished.");
-         }
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         element = null;
-      }
-
-      this.updateThreadTime();
-      this.report.log("Finished button event.");
-
-      return element;
-   }
 
    private WebElement textareaEvent(VDDHash event, WebElement parent) {
       boolean required = true;

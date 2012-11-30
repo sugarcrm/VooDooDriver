@@ -287,6 +287,7 @@ public abstract class Event {
       } else if (tagName.equals("radio")) {
          event = new ToggleEvent(element);
       } else if (tagName.equals("button")) {
+         event = new Button(element);
       } else if (tagName.equals("filefield")) {
       } else if (tagName.equals("hidden")) {
       } else if (tagName.equals("select")) {

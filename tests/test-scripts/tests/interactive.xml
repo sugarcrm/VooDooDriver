@@ -56,36 +56,46 @@
    <!-- checkbox -->
 
    <checkbox value="1" click="true"/>
-   <link id="check_checkboxes"/>
+   <button id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 1 boxes"/>
    
    <checkbox value="2" set="true"/>
-   <link id="check_checkboxes"/>
+   <button id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 2 boxes"/>
    
    <checkbox value="3" click="true"/>
-   <link id="check_checkboxes"/>
+   <button id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 3 boxes"/>
    
    <checkbox name="checkbox" set="false" />
-   <link id="check_checkboxes"/>
+   <button id="check_checkboxes"/>
    <p id="checkbox_output" assert="checked 2 boxes"/>
 
    <!-- radio -->
+
    <radio id="radio0" click="true"/>
-   <link id="check_radios"/>
+   <button id="check_radios"/>
    <p id="radio_output" assert="radio0"/>
 
    <radio id="radio1" set="true"/>
-   <link id="check_radios"/>
+   <button id="check_radios"/>
    <p id="radio_output" assert="radio1"/>
 
    <radio id="radio2" click="true"/>
-   <link id="check_radios"/>
+   <button id="check_radios"/>
    <p id="radio_output" assert="radio2"/>
 
    <radio id="radio3" set="true"/>
-   <link id="check_radios"/>
+   <button id="check_radios"/>
    <p id="radio_output" assert="radio3"/>
+
+   <!-- button -->
+
+   <button id="button1" disabled="true" click="false"/>
+   <p id="button_out" assertnot="button1"/>
+   <button id="button2" assertpage="true"/>
+   <p id="button_out" assert="button2"/>
+   <button id="button3" alert="true"/>
+   <p id="button_out" assert="button3"/>
 
 </voodoo>
