@@ -39,6 +39,11 @@
 
          return false;
       }
+
+      function checkFile() {
+         document.getElementById('file_out').innerHTML =
+            document.getElementById('file').value;
+      }
     </script>
 
   </head>
@@ -97,6 +102,14 @@
         Button 2!
       </button>
       <input type="button" id="button3" value="Button 3!" onclick="buttonClick(3);"/>
+    </form>
+
+    <form id="form5" onsubmit="return false;">
+      <p id="file_out">empty</p>
+      <input type="file" id="file"/>
+      <button type="button" id="check_file" onclick="checkFile();">
+        Check!
+      </button>
     </form>
 
   </body>

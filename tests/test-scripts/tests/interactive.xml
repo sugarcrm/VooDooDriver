@@ -98,4 +98,10 @@
    <button id="button3" alert="true"/>
    <p id="button_out" assert="button3"/>
 
+   <!-- filefield -->
+
+   <filefield id="file" set="../../test-data/interactive.html"/>
+   <button id="check_file"/>
+   <p id="file_out" assert="interactive.html$"/>
+
 </voodoo>

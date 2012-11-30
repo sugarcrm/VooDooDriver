@@ -289,6 +289,7 @@ public abstract class Event {
       } else if (tagName.equals("button")) {
          event = new Button(element);
       } else if (tagName.equals("filefield")) {
+         event = new Filefield(element);
       } else if (tagName.equals("hidden")) {
       } else if (tagName.equals("select")) {
       } else if (tagName.equals("select_list")) {
@@ -387,7 +388,7 @@ public abstract class Event {
 
    protected void rterror(String msg) {
       this.eventLoop.report.error(msg);
-      throw new StopEventException;
+      throw new StopEventException();
    }
 
 

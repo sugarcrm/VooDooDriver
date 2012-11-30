@@ -407,9 +407,6 @@ public class EventLoop implements Runnable {
       // case HIDDEN:
       //    result = hiddenEvent(event, parent);
       //    break;
-      // case FILEFIELD:
-      //    element = filefieldEvent(event, parent);
-      //    break;
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
@@ -509,57 +506,6 @@ public class EventLoop implements Runnable {
 
 
    // All below will be moved into events...
-
-   private WebElement filefieldEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      WebElement element = null;
-
-      this.report.log("FileField event Started.");
-      this.updateThreadTime();
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("FileField event finished.");
-            return element;
-         }
-
-         this.firePlugin(element, Elements.FILEFIELD,
-               PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-
-         if (event.containsKey("set")) {
-            String setvalue = event.get("set").toString();
-            setvalue = this.replaceString(setvalue);
-            setvalue = FilenameUtils.separatorsToSystem(setvalue);
-            setvalue = (new File(setvalue)).getAbsolutePath();
-            this.report.log(String.format("Setting filefield to: '%s'.",
-                                          setvalue));
-            element.sendKeys(setvalue);
-            this.report.log("Finished set.");
-         }
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         element = null;
-         this.report.exception(exp);
-      }
-
-      this.report.log("FileField event finished..");
-      this.updateThreadTime();
-      return element;
-   }
-
-
 
    private boolean hiddenEvent(VDDHash event, WebElement parent) {
       boolean result = false;
