@@ -442,6 +442,24 @@ abstract class HtmlEvent extends Event {
          throws NoSuchElementException {
          doInsert(element, which, 0);
       }
+
+
+      /**
+       * Replace an action pair.
+       *
+       * @param element  the new action pair
+       * @throws NoSuchElementException if the specified element doesn't exist
+       */
+      public void replacePair(Pair element) throws NoSuchElementException {
+         for (int k = 0; k < this.size(); k++) {
+            if (this.get(k).string().equals(element.string())) {
+               this.set(k, element);
+               return;
+            }
+         }
+         throw new NoSuchElementException("'" + element.string() +
+                                          "' action not in list");
+      }
    }
 
 
