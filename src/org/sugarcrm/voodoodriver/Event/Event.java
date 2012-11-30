@@ -374,6 +374,24 @@ public abstract class Event {
 
 
    /**
+    * Log an error and throw a StopEventException.
+    *
+    * <p>In the event of a runtime error - e.g. element not found,
+    * page data not as expected, etc. - an error needs to be logged
+    * and the current event terminated.  This method does just
+    * that.</p>
+    *
+    * @param msg  error to log
+    * @throws StopEventException
+    */
+
+   protected void rterror(String msg) {
+      this.eventLoop.report.error(msg);
+      throw new StopEventException;
+   }
+
+
+   /**
     * Return whether an element is required.
     *
     * <p>Only useful for HTML events</p>
