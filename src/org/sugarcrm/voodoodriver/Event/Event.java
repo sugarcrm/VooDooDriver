@@ -291,6 +291,7 @@ public abstract class Event {
       } else if (tagName.equals("filefield")) {
          event = new Filefield(element);
       } else if (tagName.equals("hidden")) {
+         event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("select")) {
       } else if (tagName.equals("select_list")) {
       } else if (tagName.equals("option")) {

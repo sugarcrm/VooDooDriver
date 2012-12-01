@@ -104,4 +104,8 @@
    <button id="check_file"/>
    <p id="file_out" assert="interactive.html$"/>
 
+   <!-- hidden -->
+
+   <hidden id="hidden" disabled="true"/>
+
 </voodoo>

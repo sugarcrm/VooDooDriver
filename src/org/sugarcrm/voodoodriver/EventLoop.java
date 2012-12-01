@@ -404,9 +404,6 @@ public class EventLoop implements Runnable {
       // case SELECT:
       //    element = selectEvent(event, parent);
       //    break;
-      // case HIDDEN:
-      //    result = hiddenEvent(event, parent);
-      //    break;
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
@@ -506,37 +503,6 @@ public class EventLoop implements Runnable {
 
 
    // All below will be moved into events...
-
-   private boolean hiddenEvent(VDDHash event, WebElement parent) {
-      boolean result = false;
-      boolean required = true;
-      WebElement element = null;
-
-      this.report.log("Hidden event Started.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            result = false;
-            this.report.log("Hidden event finished.");
-            return result;
-         }
-
-         String value = element.getAttribute("value");
-         handleVars(value, event);
-         result = true;
-      } catch (Exception exp) {
-         this.report.exception(exp);
-         result = false;
-      }
-
-      this.report.log("Hidden event finished.");
-      return result;
-   }
 
    /**
     * Handle a &lt;select&gt; event

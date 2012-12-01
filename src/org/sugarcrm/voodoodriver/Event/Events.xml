@@ -2045,23 +2045,27 @@
 
    <hidden html_tag="input" html_type="hidden">
       <selectors>
-         <accessor type="string">name</accessor>
+         <accessor type="string">alt</accessor>
          <accessor type="string">class</accessor>
-         <accessor type="string">method</accessor>
-         <accessor type="string">text</accessor>
-         <accessor type="string">id</accessor>
-         <accessor type="string">value</accessor>
-         <accessor type="string">index</accessor>
-         <accessor type="string">xpath</accessor>
          <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
       </selectors>
 
       <actions>
-         <accessor type="string">var</accessor>
-         <accessor type="boolean">exists</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
       </actions>
    </hidden>
 
