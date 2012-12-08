@@ -117,7 +117,7 @@ public abstract class Event {
 
    public static Event createEvent(Element element)
       throws UnknownEventException, VDDException {
-      Event event = new TestEvent(element); // XXX temporary
+      Event event;
       String tagName = element.getTagName().toLowerCase();
 
       if (tagName.equals("arg")) {
