@@ -221,8 +221,9 @@ class ElementFinder {
       String type = (String)this.selectors.get("html_type");
       String js = null;
 
-      this.r.log("Searching all " + type + " elements for value='" +
-                 value + "'. This could be take a while...");
+      this.r.log("Searching all " + (type == null ? tag : type) +
+                 " elements for value='" + value +
+                 "'. This could be take a while...");
 
       String[] tags = tag.split("\\|");
       String[] types = (type == null) ? new String[0] : type.split("\\|");

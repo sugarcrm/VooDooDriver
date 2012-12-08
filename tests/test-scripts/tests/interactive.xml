@@ -108,4 +108,8 @@
 
    <hidden id="hidden" disabled="true"/>
 
+   <!-- label -->
+
+   <label for="label_target" assert="label"/>
+
 </voodoo>

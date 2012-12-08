@@ -294,10 +294,9 @@ public abstract class Event {
          event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("select")) {
          event = new Select(element);
-      } else if (tagName.equals("select_list")) {
-      } else if (tagName.equals("option")) {
       } else if (tagName.equals("textarea")) {
       } else if (tagName.equals("label")) {
+         event = new SimpleHtmlEvent(element);
       } else {
          throw new UnknownEventException("Unknown Event name '" +
                                          element.getTagName() + "'");
