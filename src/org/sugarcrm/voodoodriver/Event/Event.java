@@ -295,6 +295,7 @@ public abstract class Event {
       } else if (tagName.equals("select")) {
          event = new Select(element);
       } else if (tagName.equals("textarea")) {
+         event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("label")) {
          event = new SimpleHtmlEvent(element);
       } else {

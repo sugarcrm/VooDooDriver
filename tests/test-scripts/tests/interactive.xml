@@ -108,6 +108,12 @@
 
    <hidden id="hidden" disabled="true"/>
 
+   <!-- textarea -->
+
+   <textarea id="textarea" set="text area"/>
+   <button id="check_textarea" click="true"/>
+   <p id="textarea_out" assert="text area"/>
+
    <!-- label -->
 
    <label for="label_target" assert="label"/>

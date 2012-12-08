@@ -44,6 +44,11 @@
          document.getElementById('file_out').innerHTML =
             document.getElementById('file').value;
       }
+
+      function checkTextarea() {
+         document.getElementById('textarea_out').innerHTML =
+            document.getElementById('textarea').value;
+      }
     </script>
 
   </head>
@@ -113,7 +118,15 @@
       <input type="hidden" value="hidden!" id="hidden" disabled/>
     </form>
 
-    <form id="form5">
+    <form id="form6" onsubmit="return false;">
+      <p id="textarea_out">empty</p>
+      <textarea id="textarea">zzzz</textarea>
+      <button type="button" id="check_textarea" onclick="checkTextarea()">
+        Check Textarea!
+      </button>
+    </form>
+
+    <form id="form7">
       <label for="label_target">label</label>
       <input type="text" id="label_target"/>
     </form>
