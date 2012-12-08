@@ -79,10 +79,6 @@
    <!-- cssprop/cssvalue -->
 
 
-   <!-- disabled -->
-
-   <link id="disabled" disabled="true"/>
-
    <!-- jscriptevent -->
 
    <link id="jsevent" jscriptevent="onclick"/>

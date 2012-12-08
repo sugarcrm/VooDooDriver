@@ -291,9 +291,6 @@ abstract class HtmlEvent extends Event {
     * Disabled action.
     *
     * Used by link and all input elements
-    *
-    * N.b. A doesn't support the disabled attribute, so this should
-    * probably not be used by link.
     */
 
    protected class DisabledAction implements Action {

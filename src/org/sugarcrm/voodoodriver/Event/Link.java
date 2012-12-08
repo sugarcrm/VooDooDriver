@@ -38,8 +38,6 @@ class Link extends HtmlEvent {
    public Link(Element e) throws VDDException {
       super(e);
 
-      this.actionList.addFirst(new Pair<String,Action>("disabled",
-                                                       new DisabledAction()));
       this.actionList.insertBefore(new Pair<String,Action>("alert",
                                                            new AlertAction()),
                                    "click");
