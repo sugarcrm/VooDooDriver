@@ -60,9 +60,13 @@
    <script file="tests/test-scripts/tests/simple.xml"/>
 
    <!-- interactive.xml tests support for the following HTML elements:
-        input
+        input, email, text, password, checkbox, radio, button,
+        filefield, hidden.
    -->
    <script file="tests/test-scripts/tests/interactive.xml"/>
+
+   <!-- select-test.xml tests support for the select event -->
+   <script file="tests/test-scripts/tests/select-test.xml"/>
 
    <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
@@ -71,7 +75,6 @@
    <script file="tests/test-scripts/tests/misc-test.xml"/>
    <script file="tests/test-scripts/tests/table-test.xml"/>
    <script file="tests/test-scripts/tests/checkbox-test.xml"/>
-   <script file="tests/test-scripts/tests/select-test.xml"/>
    <script file="tests/test-scripts/tests/list-test.xml"/>
    <script file="tests/test-scripts/tests/image-test.xml"/>
    <script file="tests/test-scripts/tests/javaplugin-test.xml"/>

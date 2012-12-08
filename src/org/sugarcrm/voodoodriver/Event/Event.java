@@ -293,6 +293,7 @@ public abstract class Event {
       } else if (tagName.equals("hidden")) {
          event = new InteractiveHtmlEvent(element);
       } else if (tagName.equals("select")) {
+         event = new Select(element);
       } else if (tagName.equals("select_list")) {
       } else if (tagName.equals("option")) {
       } else if (tagName.equals("textarea")) {

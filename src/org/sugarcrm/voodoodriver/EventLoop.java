@@ -22,12 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
-import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 import org.sugarcrm.voodoodriver.Event.Event;
 
 
@@ -39,7 +35,6 @@ import org.sugarcrm.voodoodriver.Event.Event;
  * @author Jon duSaint
  */
 
-@SuppressWarnings("unchecked")  //XXX
 public class EventLoop implements Runnable {
 
    /**
@@ -401,9 +396,6 @@ public class EventLoop implements Runnable {
       this.firePlugin(PluginEvent.AFTEREVENT);
 
       // switch (type) {
-      // case SELECT:
-      //    element = selectEvent(event, parent);
-      //    break;
       // case TEXTAREA:
       //    element = textareaEvent(event, parent);
       //    break;
@@ -503,166 +495,6 @@ public class EventLoop implements Runnable {
 
 
    // All below will be moved into events...
-
-   /**
-    * Handle a &lt;select&gt; event
-    *
-    * @param event  the &lt;select&gt; event
-    * @param parent this element's parent
-    * @return the a {@link WebElement} or null
-    */
-
-   private WebElement selectEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
-      WebElement element = null;
-
-      this.report.log("Select event Started.");
-
-      if (event.containsKey("required")) {
-         required = this.clickToBool(event.get("required").toString());
-      }
-
-      try {
-         Select sel = null;
-         element = this.findElement(event, parent, required);
-         if (element == null) {
-            this.report.log("Select event finished.");
-            return null;
-         }
-
-         sel = new Select(element);
-         this.firePlugin(element, Elements.SELECT, PluginEvent.AFTERFOUND);
-
-         this.checkDisabled(event, element);
-         handleVars(element.getAttribute("value"), event);
-
-         if (event.containsKey("assert") ||
-             event.containsKey("assertnot")) {
-            boolean wantSel = event.containsKey("assert");
-            String val = this.replaceString(event.get(wantSel ? "assert" :
-                                                      "assertnot").toString());
-            boolean optionFound = false;
-
-            for (WebElement opt: sel.getOptions()) {
-               if (opt.getText().equals(val)) {
-                  boolean issel = opt.isSelected();
-                  this.report.Assert("Select option '" + val + "' is " +
-                                     (issel ? "" : "not ") + "selected",
-                                     wantSel ^ issel,
-                                     false);
-                  optionFound = true;
-                  break;
-               }
-            }
-
-            if (!optionFound) {
-               this.report.error("Failed to find select option '" + val + "'!");
-            }
-         }
-
-         if (event.containsKey("assertselected")) {
-            boolean anySelected = sel.getAllSelectedOptions().size() > 0;
-            boolean shouldBeSelected =
-               clickToBool(event.get("assertselected").toString());
-
-            report.Assert("Option " + (anySelected ? "" : "not ") + "selected",
-                          anySelected, shouldBeSelected);
-         }
-
-         if (event.containsKey("included") ||
-             event.containsKey("notincluded")) {
-            boolean wantOpt = event.containsKey("included");
-            String val = this.replaceString(event.get(!wantOpt ? "notincluded" :
-                                                      "included").toString());
-            boolean haveOpt = false;
-
-            for (WebElement opt: sel.getOptions()) {
-               if (opt.getText().equals(val)) {
-                  haveOpt = true;
-                  break;
-               }
-            }
-
-            String m = String.format("Select option %s%s found and%s expected",
-                                     val, haveOpt ? "" : " not",
-                                     wantOpt ? "" : " not");
-            this.report.Assert(m, wantOpt ^ haveOpt, false);
-         }
-
-         if (event.containsKey("clear") &&
-             this.clickToBool(event.get("clear").toString()) &&
-             sel.isMultiple()) {
-            this.report.log("Clearing select element.");
-            sel.deselectAll();
-         }
-
-         try {
-            if (event.containsKey("set") ||
-                event.containsKey("setreal")) {
-               boolean useVal = event.containsKey("setreal");
-               String val = this.replaceString(event.get(useVal ? "setreal" :
-                                                         "set").toString());
-               this.report.log("Setting option by " +
-                               (useVal ? "value" : "visible text") +
-                               ": '" + val + "'.");
-               try {
-                  if (useVal) {
-                     sel.selectByValue(val);
-                  } else {
-                     sel.selectByVisibleText(val);
-                  }
-                  this.firePlugin(element, Elements.SELECT,
-                                  PluginEvent.AFTERSET);
-               } catch (NoSuchElementException e) {
-                  this.report.error("Option with " +
-                                    (useVal ? "value" : "visible text") +
-                                    " '" + val + "' does not exist");
-               }
-            }
-
-            if (event.containsKey("jscriptevent")) {
-               this.report.log("Firing Javascript Event: " +
-                               event.get("jscriptevent").toString());
-               this.Browser.fire_event(element,
-                                       event.get("jscriptevent").toString());
-               try {
-                  Thread.sleep(1000);
-               } catch (InterruptedException e) {
-               }
-               this.report.log("Javascript event finished.");
-            }
-
-            if (event.containsKey("click") &&
-                this.clickToBool(event.get("click").toString())) {
-               this.firePlugin(element, Elements.SELECT,
-                               PluginEvent.BEFORECLICK);
-               element.click();
-               this.firePlugin(element, Elements.SELECT,
-                               PluginEvent.AFTERCLICK);
-            }
-
-            if (element.isDisplayed() && event.containsKey("children")) {
-               this.processEvents((ArrayList<Event>)event.get("children"), element);
-            }
-         } catch (StaleElementReferenceException e) {
-            /*
-             * Selecting a value has the potential to refresh the page
-             * (Bug 49533).
-             */
-            this.report.log("Page refreshed; select element no longer exists.");
-            element = null;
-         }
-
-      } catch (ElementNotVisibleException exp) {
-         logElementNotVisible(required, event);
-      } catch (Exception exp) {
-         this.report.exception(exp);
-      }
-
-      this.report.log("Select event finished.");
-      return element;
-   }
-
 
    /**
     * Handle an &lt;option&gt; event
