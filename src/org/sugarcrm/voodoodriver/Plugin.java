@@ -33,7 +33,7 @@ public abstract class Plugin {
     * Array of HTML elements that this plugin executes in response to.
     */
 
-   private Elements[] elements = null;
+   private String[] elements;
 
    /**
     * Array of plugin events that this plugin executes in response to.
@@ -51,17 +51,11 @@ public abstract class Plugin {
    /**
     * Assign this plugin's list of HTML elements.
     *
-    * Each element in the array is converted from a string to the
-    * corresponding {@link Elements}.
-    *
     * @param elements  array of HTML elements
     */
 
    public void setElements(String[] elements) {
-      this.elements = new Elements[elements.length];
-      for (int k = 0; k < elements.length; k++) {
-         this.elements[k] = Elements.valueOf(elements[k].toUpperCase());
-      }
+      this.elements = elements.clone();
    }
 
 
@@ -124,7 +118,7 @@ public abstract class Plugin {
     * @return  whether this plugin's spec matches
     */
 
-   public boolean matches(Elements element, PluginEvent event) {
+   public boolean matches(String element, PluginEvent event) {
       boolean elementMatches = false;
       boolean eventMatches = false;
 
@@ -132,7 +126,7 @@ public abstract class Plugin {
          return false;
       }
 
-      for (Elements c: this.elements) {
+      for (String c: this.elements) {
          if (c.equals(element)) {
             elementMatches = true;
             break;

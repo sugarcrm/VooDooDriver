@@ -417,7 +417,7 @@ public class EventLoop implements Runnable {
 
    public void firePlugin(Event event, PluginEvent type) {
       PluginData data;
-      Elements element = null;
+      String element = null;
 
       if (this.plugins.size() == 0) {
          return;
@@ -429,7 +429,7 @@ public class EventLoop implements Runnable {
       }
 
       if (event != null) {
-         element = Elements.valueOf(event.getName().toUpperCase());
+         element = event.getName().toLowerCase();
       }
 
       data = new PluginData();
