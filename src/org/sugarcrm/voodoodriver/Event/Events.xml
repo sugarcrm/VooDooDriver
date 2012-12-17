@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<soda>
+<voodoo>
    <!--
       Copyright 2011-2012 SugarCRM Inc.
 
@@ -1816,6 +1816,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -1848,6 +1849,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -1880,6 +1882,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -1912,6 +1915,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -2034,6 +2038,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -2131,6 +2136,7 @@
          <accessor type="boolean">click</accessor>
          <accessor type="string">cssprop</accessor>
          <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">jscriptevent</accessor>
          <accessor type="string">save</accessor>
@@ -2169,4 +2175,4 @@
    <!-- Scripts -->
 
    <!-- Missing SCRIPT and NOSCRIPT events -->
-</soda>
+</voodoo>

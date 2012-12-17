@@ -31,6 +31,13 @@ import org.w3c.dom.Element;
 class InteractiveHtmlEvent extends HtmlEvent {
 
    /**
+    * Value of the default attribute.
+    */
+
+   private String defaultValue;
+
+
+   /**
     * Clear the text out of an interactive element.
     */
 
@@ -78,6 +85,28 @@ class InteractiveHtmlEvent extends HtmlEvent {
       public void action(Object val) {
          log("Clearing " + element.getTagName());
          clearText();
+      }
+   }
+
+
+   /**
+    * Default action.
+    *
+    *
+    */
+
+   protected class DefaultAction implements Action {
+
+      /**
+       * Run the default action.
+       *
+       * XXX: This action did nothing in earlier versions of the code,
+       * but it is used in the test suite to unclear aim.  Once its
+       * use case is identified, this code will be revisited.
+       */
+
+      public void action(Object val) {
+         defaultValue = (String)val;
       }
    }
 
