@@ -607,7 +607,12 @@ abstract class HtmlEvent extends Event {
       for (Pair action: this.actionList) {
          String s = (String)action.string();
          if (this.actions.containsKey(s)) {
-            ((Action)action.action()).action(this.actions.get(s));
+            Object val = this.actions.get(s);
+            /* Replace action var/hijack strings. */
+            if (val instanceof String) {
+               val = replaceString((String)val);
+            }
+            ((Action)action.action()).action(val);
          }
       }
 
