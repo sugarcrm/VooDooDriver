@@ -219,6 +219,8 @@ public abstract class Browser {
             this.reporter.unhandledAlert(e);
          } catch (org.openqa.selenium.NoSuchWindowException e) {
             return "";
+         } catch (org.openqa.selenium.remote.UnreachableBrowserException e) {
+            return "";
          }
 
          try {
