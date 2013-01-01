@@ -533,6 +533,11 @@ public class VooDooDriver {
     */
 
    public static void main(String[] args) {
+      Thread shutdown = new Thread() {
+            public void run() {
+               System.out.println("(!)VDD terminated prematurely");
+            }
+         };
 
       earlyLog();
 
@@ -562,6 +567,8 @@ public class VooDooDriver {
       }
       System.out.println("(*)Report: " + summary.getFilename());
 
+      Runtime.getRuntime().addShutdownHook(shutdown);
+
       if (config.containsKey("suite")) {
          RunSuites(config);
       }
@@ -569,6 +576,8 @@ public class VooDooDriver {
       if (config.containsKey("test")) {
          RunTests(config);
       }
+
+      Runtime.getRuntime().removeShutdownHook(shutdown);
 
       summary.close();
 

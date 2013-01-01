@@ -19,6 +19,7 @@ package org.sugarcrm.voodoodriver.Event;
 import java.util.ArrayList;
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.sugarcrm.voodoodriver.Reporter;
 import org.sugarcrm.voodoodriver.VDDHash;
@@ -577,17 +578,21 @@ class ElementFinder {
        * Perform the element search.
        */
 
-      if (searchByValue) {
-         elements = findElementsByValue((String)this.selectors.get("value"));
-      } else if (searchByAlt) {
-         elements = findElementsByAlt((String)selectors.get("html_tag"),
-                                      (String)this.selectors.get("alt"));
-      } else if (searchByText) {
-         elements = findElementsByText((String)this.selectors.get("text"));
-      } else if (this.parent == null) {
-         elements = this.browser.findElements(by, timeout);
-      } else {
-         elements = findElementsInParent(by, timeout);
+      try {
+         if (searchByValue) {
+            elements = findElementsByValue((String)this.selectors.get("value"));
+         } else if (searchByAlt) {
+            elements = findElementsByAlt((String)selectors.get("html_tag"),
+                                         (String)this.selectors.get("alt"));
+         } else if (searchByText) {
+            elements = findElementsByText((String)this.selectors.get("text"));
+         } else if (this.parent == null) {
+            elements = this.browser.findElements(by, timeout);
+         } else {
+            elements = findElementsInParent(by, timeout);
+         }
+      } catch (NoSuchElementException e) {
+         elements = new ArrayList<WebElement>(0);
       }
 
       /*

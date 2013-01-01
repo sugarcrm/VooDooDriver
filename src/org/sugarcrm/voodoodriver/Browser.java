@@ -221,6 +221,8 @@ public abstract class Browser {
             return "";
          } catch (org.openqa.selenium.remote.UnreachableBrowserException e) {
             return "";
+         } catch (org.openqa.selenium.WebDriverException e) {
+            return "";
          }
 
          try {
@@ -260,6 +262,9 @@ public abstract class Browser {
             if (retry >= 0) {
                this.reporter.log("Retrying js after unhandled alert...");
             }
+         } catch (org.openqa.selenium.WebDriverException e) {
+            this.reporter.exception("WebDriver Exception (alert present?)", e);
+            return null;
          }
       }
 

@@ -72,6 +72,9 @@ public class Browser extends Event {
             if (retry >= 0) {
                log("Retrying browser action...");
             }
+         } catch (org.openqa.selenium.WebDriverException e) {
+            error("Failed to execute browser action (alert present?)");
+            return;
          }
       }
    }
@@ -128,7 +131,12 @@ public class Browser extends Event {
             String url = (String)this.actions.get(attr);
             url = replaceString(url);
             log("URL: " + url);
-            b.url(url);
+            try {
+               b.url(url);
+            } catch (org.openqa.selenium.WebDriverException e) {
+               throw new VDDException("Failed to navigate to URL " +
+                                      "(alert present?)", e);
+            }
          } else {
             throw new VDDException("Unknown browser attribute '" + attr + "'");
          }
