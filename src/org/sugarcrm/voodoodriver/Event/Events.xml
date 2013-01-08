@@ -124,6 +124,9 @@
    </script>
 
    <timestamp>
+      <actions>
+         <accessor type="string">format</accessor>
+      </actions>
    </timestamp>
 
    <var>

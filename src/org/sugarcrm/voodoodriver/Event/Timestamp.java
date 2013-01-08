@@ -49,8 +49,22 @@ public class Timestamp extends Event {
     */
 
    public void execute() throws VDDException {
-      DateFormat df = new SimpleDateFormat("yyMMdd_hhmmss");
-      String date = df.format(new Date());
+      SimpleDateFormat f = null;
+
+      try {
+         f = new SimpleDateFormat(this.actions.get("format").toString());
+      } catch (NullPointerException e) {
+         // "format" was not specified - NBD
+      } catch (IllegalArgumentException e) {
+         error("Invalid Date format for timestamp '" +
+               this.actions.get("format") + "'. Using default.");
+      }
+
+      if (f == null) {
+         f = new SimpleDateFormat("yyMMdd_hhmmss");
+      }
+
+      String date = f.format(new Date());
 
       log("Setting STAMP => '" + date + "'.");
       this.eventLoop.vars.put("stamp", date);
