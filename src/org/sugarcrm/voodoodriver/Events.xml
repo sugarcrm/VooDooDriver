@@ -134,6 +134,9 @@
    </script>
 
    <timestamp>
+      <soda_attributes>
+         <accessor type="string">format</accessor>
+      </soda_attributes>
    </timestamp>
 
    <var>

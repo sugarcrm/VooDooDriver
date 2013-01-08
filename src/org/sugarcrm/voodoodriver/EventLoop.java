@@ -380,10 +380,10 @@ public class EventLoop implements Runnable {
          element = optionEvent(event, parent);
          break;
       case STAMP:
-         result = stampEvent();
+         result = stampEvent(event);
          break;
       case TIMESTAMP:
-         result = stampEvent();
+         result = stampEvent(event);
          break;
       case SPAN:
          element = spanEvent(event, parent);
@@ -1614,14 +1614,31 @@ public class EventLoop implements Runnable {
    }
 
    private boolean stampEvent() {
-      boolean result = false;
-      Date now = new Date();
-      DateFormat df = new SimpleDateFormat("yyMMdd_hhmmss");
-      String date_str = df.format(now);
+      return stampEvent(null);
+   }
+
+   private boolean stampEvent(VDDHash event) {
+      SimpleDateFormat f = null;
+
+      try {
+         f = new SimpleDateFormat(event.get("format").toString());
+      } catch (NullPointerException e) {
+         // "format" was not specified - NBD
+      } catch (IllegalArgumentException e) {
+         this.report.ReportError("Invalid Date format for timestamp '" +
+                                 event.get("format") + "'. Using default.");
+      }
+
+      if (f == null) {
+         f = new SimpleDateFormat("yyMMdd_hhmmss");
+      }
+
+      String date_str = f.format(new Date());
 
       this.report.Log(String.format("Setting STAMP => '%s'.", date_str));
       this.sodaVars.put("stamp", date_str);
-      return result;
+
+      return true;
    }
 
    private WebElement spanEvent(VDDHash event, WebElement parent) {
