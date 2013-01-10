@@ -53,7 +53,7 @@ public abstract class Browser {
     * The browser profile.
     */
 
-   private String profile = null;
+   protected String profile = null;
 
    /**
     * {@link Reporter} object used for logging.

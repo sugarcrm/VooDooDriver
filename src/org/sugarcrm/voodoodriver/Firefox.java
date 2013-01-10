@@ -56,7 +56,12 @@ public class Firefox extends Browser {
 
    public void newBrowser() {
       FirefoxBinary b = new FirefoxBinary();
-      FirefoxProfile p = new FirefoxProfile();
+      FirefoxProfile p = null;
+      if (this.profile == null) {
+         p = new FirefoxProfile();
+      } else {
+         p = new FirefoxProfile(new java.io.File(this.profile));
+      }
 
       if (this.downloadDirectory != null) {
          try {
