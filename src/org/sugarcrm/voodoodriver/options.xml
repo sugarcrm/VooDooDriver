@@ -65,8 +65,8 @@
            help="Print a help message and exit"/>
    <option name="plugin" arg="files"
            help="An XML file specifying a VooDooDriver plugin and its parameters"/>
-   <option name="profile" arg="none"
-           help="The name of the profile with which to start the browser"/>
+   <option name="profile" arg="dir"
+           help="The profile with which to start the browser"/>
    <option name="restartcount" arg="integer"
            help="The number of tests in a suite to run before restarting the browser"/>
    <option name="restarttest" arg="string"

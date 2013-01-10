@@ -398,6 +398,9 @@ public class VooDooDriver {
       if (config.get("downloaddir") != null) {
          browser.setDownloadDirectory((String)config.get("downloaddir"));
       }
+      if (config.get("profile") != null) {
+         browser.setProfile((String)config.get("profile"));
+      }
 
       config.put("browser", browser);
    }
