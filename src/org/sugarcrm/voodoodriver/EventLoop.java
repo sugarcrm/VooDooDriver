@@ -2960,6 +2960,11 @@ public class EventLoop implements Runnable {
                   String url = event.get(key).toString();
                   url = this.replaceString(url);
                   this.report.Log(String.format("URL: '%s'", url));
+
+                  if (this.Browser.isClosed()) {
+                     this.Browser.newBrowser();
+                     this.setCurrentHWND(this.Browser.getDriver().getWindowHandle());
+                  }
                   this.Browser.url(url);
                   break;
                case BROWSER_assert:
