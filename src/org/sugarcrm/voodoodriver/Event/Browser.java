@@ -131,6 +131,13 @@ public class Browser extends Event {
             String url = (String)this.actions.get(attr);
             url = replaceString(url);
             log("URL: " + url);
+
+            if (b.isClosed()) {
+               log("Browser window is closed. Reopening.");
+               b.newBrowser();
+               this.eventLoop.setCurrentHWND(b.getDriver().getWindowHandle());
+            }
+
             try {
                b.url(url);
             } catch (org.openqa.selenium.WebDriverException e) {
