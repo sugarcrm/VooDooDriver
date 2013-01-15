@@ -123,7 +123,7 @@ public class TextFinder {
          return m.find();
       }
 
-      return text.contains(this.search);
+      return text.equals(this.search);
    }
 
 
