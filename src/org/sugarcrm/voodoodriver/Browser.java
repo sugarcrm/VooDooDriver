@@ -217,10 +217,6 @@ public abstract class Browser {
             return this.Driver.getPageSource();
          } catch (org.openqa.selenium.UnhandledAlertException e) {
             this.reporter.unhandledAlert(e);
-         } catch (org.openqa.selenium.NoSuchWindowException e) {
-            return "";
-         } catch (org.openqa.selenium.remote.UnreachableBrowserException e) {
-            return "";
          } catch (org.openqa.selenium.WebDriverException e) {
             return "";
          }

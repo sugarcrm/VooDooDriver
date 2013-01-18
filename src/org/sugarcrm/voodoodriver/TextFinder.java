@@ -63,9 +63,8 @@ public class TextFinder {
    public TextFinder(String search) {
       if (isRegex(search) && compileRegex(search)) {
          this.isRegex = true;
-      } else {
-         this.search = search;
       }
+      this.search = search;
    }
 
 
@@ -123,6 +122,24 @@ public class TextFinder {
          return m.find();
       }
 
+      return text.contains(this.search);
+   }
+
+
+   /**
+    * Determine whether the search string or regex matches the entire
+    * provided text.
+    *
+    * @param text  the text to search through
+    * @return true if there is a match
+    */
+
+   public boolean findExact(String text) {
+      if (this.isRegex) {
+         Matcher m = this.pattern.matcher(text);
+         return m.matches();
+      }
+
       return text.equals(this.search);
    }
 
@@ -143,5 +160,16 @@ public class TextFinder {
       }
 
       return text.replace(this.search, replacement);
+   }
+
+
+   /**
+    * Return the search string.
+    *
+    * @return  the search string
+    */
+
+   public String toString() {
+      return this.search;
    }
 }
