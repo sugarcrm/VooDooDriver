@@ -2346,12 +2346,12 @@ public class EventLoop implements Runnable {
 
                TextFinder f = new TextFinder(finder);
 
-               if (use_URL && f.find(tmp_url)) {
+               if (use_URL && f.findExact(tmp_url)) {
                   found_handle = tmp_handle;
                   this.report.Log(String.format("Found Window URL '%s'",
                                                 finder));
                   break;
-               } else if (!use_URL && f.find(tmp_title)) {
+               } else if (!use_URL && f.findExact(tmp_title)) {
                   found_handle = tmp_handle;
                   this.report.Log(String.format("Found Window Title '%s'",
                                                 finder));
