@@ -159,6 +159,8 @@ public class SuiteParser {
                   }
                });
 
+            java.util.Arrays.sort(files);
+
             for (int n = 0; n < files.length; n++) {
                File f = new File(fileset, files[n]);
                System.out.println("(*)Adding file to VDD Suite list: " + f);
