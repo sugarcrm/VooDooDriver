@@ -3135,6 +3135,53 @@ public class EventLoop implements Runnable {
       return element;
    }
 
+
+   /**
+    * The value of the current event's timeout attribute.
+    *
+    * <p>Part of the doFindElements hack below.</p>
+    */
+
+   private int hackTimeout;
+
+   /**
+    * Internal findElements wrapper.
+    *
+    * <p>This method is somewhat of a hack.  The FindElements class on
+    * the dev_v2 branch cleans up and centralizes all element finding.
+    * Backporting, however, would be difficult and probably
+    * counterproductive.</p>
+    *
+    * @param by  how to look for the element
+    * @param el  parent element or null
+    */
+
+   private List<WebElement> findElementsInternal(By by, WebElement el)
+      throws NoSuchElementException {
+      long end = System.currentTimeMillis() + this.hackTimeout * 1000;
+      
+      do {
+         List<WebElement> lst = null;
+
+         try {
+            if (el != null) {
+               lst = el.findElements(by);
+            } else {
+               lst = this.Browser.getDriver().findElements(by);
+            }
+
+            if (lst != null && lst.size() > 0) {
+               return lst;
+            }
+
+            Thread.sleep(100);
+         } catch (Exception e) {}
+      } while (System.currentTimeMillis() < end);
+
+      throw new NoSuchElementException("Failed to find element by " + by);
+   }
+
+
    private WebElement findElement(VDDHash event, WebElement parent,
          boolean required) {
       WebElement element = null;
@@ -3159,6 +3206,8 @@ public class EventLoop implements Runnable {
                timeout);
          this.report.Log(msg);
       }
+
+      this.hackTimeout = timeout;  // Hackily plumb the timeout attribute
 
       if (event.containsKey("index")) {
          String inx = event.get("index").toString();
@@ -3272,11 +3321,7 @@ public class EventLoop implements Runnable {
          } else {
             List<WebElement> elements;
 
-            if (parent == null) {
-               elements = this.Browser.findElements(by, timeout);
-            } else {
-               elements = parent.findElements(by);
-            }
+            elements = findElementsInternal(by, parent);
             elements = filterElements(elements, event);
             index = (index < 0) ? 0 : index;
             if (index >= elements.size()) {
@@ -3476,11 +3521,7 @@ public class EventLoop implements Runnable {
 
       href = this.replaceString(href);
 
-      if (parent != null) {
-         list = parent.findElements(By.tagName("a"));
-      } else {
-         list = this.Browser.getDriver().findElements(By.tagName("a"));
-      }
+      list = findElementsInternal(By.tagName("a"), parent);
 
       int len = list.size() - 1;
       for (int i = 0; i <= len; i++) {
@@ -3512,11 +3553,7 @@ public class EventLoop implements Runnable {
       List<WebElement> elementList = null;
       alt = this.replaceString(alt);
 
-      if (parent != null) {
-         elementList = parent.findElements(by);
-      } else {
-         elementList = this.Browser.getDriver().findElements(by);
-      }
+      elementList = findElementsInternal(by, parent);
 
       for (WebElement element: elementList) {
          String elementAlt = element.getAttribute("alt");
