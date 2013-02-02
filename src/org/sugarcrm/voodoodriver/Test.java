@@ -37,6 +37,7 @@ public class Test {
    private File assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
+   private int eventTimeout = 5;  // 5 second event timeout //
 
 
    /**
@@ -104,6 +105,9 @@ public class Test {
       this.setPlugins(plugin);
       if (config.get("attachtimeout") != null) {
          this.setAttachTimeout((Integer)config.get("attachtimeout"));
+      }
+      if (config.get("eventtimeout") != null) {
+         this.eventTimeout = (Integer)config.get("eventtimeout");
       }
    }
 
@@ -176,7 +180,8 @@ public class Test {
          long current = 0;
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
                                      this.GVars, this.HiJacks, this.OldVars,
-                                     this.plugins, this.testFile.getName());
+                                     this.plugins, this.testFile.getName(),
+                                     this.eventTimeout);
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);
