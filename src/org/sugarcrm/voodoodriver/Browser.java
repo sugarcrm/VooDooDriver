@@ -339,28 +339,6 @@ public abstract class Browser {
 
 
    /**
-    * Find more then one element in the browser's DOM.
-    *
-    * @param by         element selection criteria
-    * @param retryTime  time limit (in seconds) for retries
-    * @return a {@link List} of all {@link WebElement}s found
-    */
-
-   public List<WebElement> findElements(By by, int retryTime)
-      throws NoSuchElementException {
-      long end = System.currentTimeMillis() + retryTime * 1000;
-      
-      do {
-         try {
-            return this.Driver.findElements(by);
-         } catch (Exception exp) {}
-      } while (System.currentTimeMillis() < end);
-
-      throw new NoSuchElementException("Failed to find element by " + by);
-   }
-
-
-   /**
     * Set the internal {@link Reporter} object.
     *
     * @param rep  a {@link Reporter} object

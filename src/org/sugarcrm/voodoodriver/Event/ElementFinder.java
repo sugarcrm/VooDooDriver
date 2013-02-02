@@ -65,6 +65,13 @@ class ElementFinder {
 
    private String event;
 
+   /**
+    * Timeout value. Set by <code>timeout</code> attribute. Default is
+    * five seconds.
+    */
+
+   private int timeout;
+
 
    /**
     * Instantiate an ElementFinder object.
@@ -133,6 +140,44 @@ class ElementFinder {
 
 
    /**
+    * Find elements matching the specified parameters.
+    *
+    * <p>This method uses the By object provided to find the matching
+    * elements either on the current page, or as children of
+    * <code>this.parent</code> if it exists.</p>
+    *
+    * @param by  match parameters
+    * @return list of matching elements
+    * @throws NoSuchElementException if no matching elements are found
+    *                                before the expiry of timeout
+    */
+
+   private List<WebElement> findElements(By by) throws NoSuchElementException {
+      long end = System.currentTimeMillis() + this.timeout * 1000;
+      
+      do {
+         List<WebElement> lst = null;
+
+         try {
+            if (this.parent != null) {
+               lst = this.parent.findElements(by);
+            } else {
+               lst = this.browser.getDriver().findElements(by);
+            }
+
+            if (lst != null && lst.size() > 0) {
+               return lst;
+            }
+
+            Thread.sleep(100);
+         } catch (Exception e) {}
+      } while (System.currentTimeMillis() < end);
+
+      throw new NoSuchElementException("Failed to find element by " + by);
+   }
+
+
+   /**
     * Find images element based on alt text.
     *
     * @param tagName  HTML tag
@@ -140,20 +185,13 @@ class ElementFinder {
     * @return matching {@link WebElement} or null
     */
 
-   private List<WebElement> findElementsByAlt(String tagName, String alt) {
-      By by = By.tagName(tagName);
-      List<WebElement> allElements = null;
+   private List<WebElement> findElementsByAlt(String tagName, String alt)
+      throws NoSuchElementException {
       List<WebElement> elements = new ArrayList<WebElement>();
 
       this.r.log("Searching for " + tagName + " with alt text '" + alt + "'");
 
-      if (this.parent != null) {
-         allElements = this.parent.findElements(by);
-      } else {
-         allElements = this.browser.getDriver().findElements(by);
-      }
-
-      for (WebElement element: allElements) {
+      for (WebElement element: findElements(By.tagName(tagName))) {
          String elementAlt = element.getAttribute("alt");
          if (elementAlt != null && elementAlt.equals(alt)) {
             elements.add(element);
@@ -171,7 +209,8 @@ class ElementFinder {
     * @return matching {@link WebElement} or null
     */
 
-   private List<WebElement> findElementsByText(String text) {
+   private List<WebElement> findElementsByText(String text)
+      throws NoSuchElementException {
       By by = null;
       List<WebElement> elements = null;
       String tag = (String)this.selectors.get("html_tag");
@@ -184,11 +223,7 @@ class ElementFinder {
          by = By.tagName(tag);
       }
 
-      if (this.parent != null) {
-         elements = this.parent.findElements(by);
-      } else {
-         elements = this.browser.getDriver().findElements(by);
-      }
+      elements = findElements(by);
 
       if (!tag.equals("a")) {
          ArrayList<WebElement> discard = new ArrayList<WebElement>();
@@ -295,27 +330,6 @@ class ElementFinder {
          (ArrayList<WebElement>)this.browser.executeJS(js, this.parent);
 
       return lst;
-   }
-
-
-   /**
-    * Perform the element search in the context of a parent element.
-    *
-    * @param by       element search parameters
-    * @param timeout  maximum time to spend finding matches
-    * @return {@link List} of matching {@link WebElement}
-    */
-
-   private List<WebElement> findElementsInParent(By by, int timeout) {
-      long end = System.currentTimeMillis() + timeout * 1000;
-      
-      do {
-         try {
-            return parent.findElements(by);
-         } catch (Exception exp) {}
-      } while (System.currentTimeMillis() < end);
-
-      return new ArrayList<WebElement>(0);
    }
 
 
@@ -462,13 +476,14 @@ class ElementFinder {
       boolean existsModified = false;
       int index = 0;
       boolean requiredModified = false;
-      int timeout = 5;
       By by = null;
       boolean searchByAlt = false;
       boolean searchByText = false;
       boolean searchByValue = false;
       List<WebElement> elements;
       WebElement element = null;
+
+      this.timeout = 5;
 
       /*
        * VDD element search modifiers.
@@ -495,7 +510,7 @@ class ElementFinder {
 
       if (selectors.containsKey("timeout")) {
          try {
-            timeout = Integer.valueOf((String)selectors.get("timeout"));
+            this.timeout = Integer.valueOf((String)selectors.get("timeout"));
          } catch (NumberFormatException e) {
             this.r.error("Invalid value for 'timeout': " + e);
             return null;
@@ -586,10 +601,8 @@ class ElementFinder {
                                          (String)this.selectors.get("alt"));
          } else if (searchByText) {
             elements = findElementsByText((String)this.selectors.get("text"));
-         } else if (this.parent == null) {
-            elements = this.browser.findElements(by, timeout);
          } else {
-            elements = findElementsInParent(by, timeout);
+            elements = findElements(by);
          }
       } catch (NoSuchElementException e) {
          elements = new ArrayList<WebElement>(0);
