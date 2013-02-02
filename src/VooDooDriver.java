@@ -185,15 +185,16 @@ public class VooDooDriver {
             }
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"attachtimeout", "blocklistfile",
-                                     "browser", "plugin", "restartcount",
-                                     "restarttest", "resultdir", "savehtml",
-                                     "screenshot"};
+                                     "browser", "eventtimeout", "plugin",
+                                     "restartcount", "restarttest",
+                                     "resultdir", "savehtml", "screenshot"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
 
             for (String s: validCmdopts) {
                if (name.contains(s)) {
                   if (name.equals("attachtimeout") ||
+                      name.equals("eventtimeout") ||
                       name.equals("restartcount")) {
                      /* Integer cmdopts */
                      try {
@@ -292,6 +293,7 @@ public class VooDooDriver {
 
       /* Defaults */
       opts.put("attachtimeout", 0);
+      opts.put("eventtimeout", 5);
       opts.put("haltOnFailure", false);
       opts.put("restartcount", 0);
       opts.put("resultdir", defaultResultDir());

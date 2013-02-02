@@ -37,7 +37,7 @@ public class Test {
    private String assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
-   private int eventTimeout = 5;  // 5 second event timeout //
+   private int eventTimeout = 0;
 
 
    /**
@@ -72,6 +72,7 @@ public class Test {
       this.blocked = (BlockList)config.get("blocklist");
       @SuppressWarnings("unchecked")
          ArrayList<Plugin> plugin = (ArrayList<Plugin>)config.get("plugin");
+      this.eventTimeout = (Integer)config.get("eventtimeout");
 
       String saveHtml = (String)config.get("savehtml");
       String screenshot = (String)config.get("screenshot");
@@ -106,9 +107,6 @@ public class Test {
       this.setPlugins(plugin);
       if (config.get("attachtimeout") != null) {
          this.setAttachTimeout((Integer)config.get("attachtimeout"));
-      }
-      if (config.get("eventtimeout") != null) {
-         this.eventTimeout = (Integer)config.get("eventtimeout");
       }
    }
 
