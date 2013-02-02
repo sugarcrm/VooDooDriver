@@ -116,6 +116,17 @@ class ElementFinder {
 
 
    /**
+    * Set the element search timeout.
+    *
+    * @param timeout  the search timeout in seconds
+    */
+
+   public void setTimeout(int timeout) {
+      this.timeout = timeout;
+   }
+
+
+   /**
     * Set the parent element.
     *
     * @param parent  the parent element
@@ -482,8 +493,6 @@ class ElementFinder {
       boolean searchByValue = false;
       List<WebElement> elements;
       WebElement element = null;
-
-      this.timeout = 5;
 
       /*
        * VDD element search modifiers.

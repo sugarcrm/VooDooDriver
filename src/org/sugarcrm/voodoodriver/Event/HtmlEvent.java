@@ -550,6 +550,7 @@ abstract class HtmlEvent extends Event {
       ef.setBrowser(this.eventLoop.Browser);
       ef.setSelectors(this.selectors);
       ef.setReporter(this.eventLoop.report);
+      ef.setTimeout(this.eventLoop.getElementTimeout());
       if (this.parent != null) {
          ef.setParentElement(this.parent);
       }

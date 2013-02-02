@@ -135,6 +135,13 @@ public class EventLoop implements Runnable {
 
    private volatile Boolean threadStop = false;
 
+   /**
+    * Element search timeout.  VDD retries element finding for this
+    * duration (in seconds) before giving up.
+    */
+
+   private int elementTimeout = 5;
+
 
    /**
     * Instantiate EventLoop.
@@ -155,6 +162,9 @@ public class EventLoop implements Runnable {
 
       this.Browser = (Browser)config.get("browser");
       this.hijacks = (VDDHash)config.get("hijack");;
+      if (config.get("eventtimeout") != null) {
+         this.elementTimeout = (Integer)config.get("eventtimeout");
+      }
       this.whitelist = new HashMap<String,String>();
       this.elementStore = new HashMap<String,WebElement>();
 
@@ -202,6 +212,17 @@ public class EventLoop implements Runnable {
 
    public int getAttachTimeout() {
       return this.attachTimeout;
+   }
+
+
+   /**
+    * Get the element search timeout.
+    *
+    * @return the element search timeout
+    */
+
+   public int getElementTimeout() {
+      return this.elementTimeout;
    }
 
 
