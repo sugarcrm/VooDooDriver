@@ -64,6 +64,7 @@ public class EventLoop implements Runnable {
    private VDDHash whitelist = null;
    private ArrayList<Plugin> plugins = null;
    private String testName = "";
+   private int eventTimeout = 0;
 
 
    /**
@@ -80,13 +81,15 @@ public class EventLoop implements Runnable {
     */
    public EventLoop(Browser browser, Events events, Reporter reporter,
                     VDDHash gvars, VDDHash hijacks, VDDHash oldvars,
-                    ArrayList<Plugin> plugins, String testName) {
+                    ArrayList<Plugin> plugins, String testName,
+                    int eventTimeout) {
       testEvents = events;
       this.Browser = browser;
       this.report = reporter;
       this.hijacks = hijacks;
       this.testName = testName;
       this.whitelist = new VDDHash();
+      this.eventTimeout = eventTimeout;
 
       if (oldvars != null) {
          sodaVars = oldvars;
@@ -3193,7 +3196,7 @@ public class EventLoop implements Runnable {
       String how = "";
       String what = "";
       int index = -1;
-      int timeout = 5;
+      int timeout = this.eventTimeout;
       String msg = "";
 
       if (event.containsKey("exists")) {

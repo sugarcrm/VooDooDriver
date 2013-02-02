@@ -54,6 +54,8 @@
            help="Load alternate config file"/>
    <option name="downloaddir" arg="dir"
            help="Location for saving downloaded files"/>
+   <option name="eventtimeout" arg="integer"
+           help="Timeout for finding an element during event execution"/>
    <option name="gvar" arg="kvp"
            help="A global variable within VooDooDriver, specified as a key-value pair"/>
    <option name="hijack" arg="kvp"
