@@ -514,7 +514,7 @@ public class VooDooDriver {
       System.out.println("(*)Creating log file: " + vddLog);
       FileOutputStream logStream = null;
       try {
-         logStream = new FileOutputStream(vddLog);
+         logStream = new FileOutputStream(vddLog, true);
          ((VDDLog)System.out).openLog(logStream);
          ((VDDLog)System.err).openLog(logStream);
       } catch (java.io.FileNotFoundException e) {
