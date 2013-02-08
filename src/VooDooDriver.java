@@ -729,7 +729,13 @@ public class VooDooDriver {
             if ( (restartCount > 0) && (testRanCount >= restartCount)) {
                System.out.printf("(*))Auto restarting browser.\n");
                if (!browser.isClosed()) {
-                  browser.close();
+                  try {
+                     browser.close();
+                  } catch (org.openqa.selenium.WebDriverException e) {
+                     System.out.println("(!)Dismissing unhandled Alert.");
+                     browser.getDriver().switchTo().alert().accept();
+                     browser.close();
+                  }
                }
                browser.newBrowser();
 
