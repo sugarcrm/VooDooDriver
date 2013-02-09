@@ -264,8 +264,8 @@ class Attach extends Event {
       int timeout = this.eventLoop.getAttachTimeout();
 
       log("Switching back to window handle: " + this.parentWindow);
-      this.eventLoop.Browser.setBrowserOpened();
       this.eventLoop.Browser.getDriver().switchTo().window(this.parentWindow);
+      this.eventLoop.Browser.setBrowserOpened();
       this.eventLoop.setCurrentHWND(this.parentWindow);
 
       if (timeout > 0) {

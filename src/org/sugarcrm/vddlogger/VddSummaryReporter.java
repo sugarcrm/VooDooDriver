@@ -935,7 +935,7 @@ public class VddSummaryReporter {
    /**
     * get the name of the suite, without extension
     * @param d
-    * @return
+    * @return suite name
     */
    private String getSuiteName(Document d) {
       String name = "";

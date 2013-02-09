@@ -28,5 +28,7 @@ public enum BrowserActions {
    CLOSE,
    BACK,
    REFRESH,
-   FORWARD;
+   FORWARD,
+   MAXIMIZE,
+   RESTORE;
 }

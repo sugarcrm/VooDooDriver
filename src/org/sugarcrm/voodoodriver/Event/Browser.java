@@ -63,6 +63,10 @@ public class Browser extends Event {
                b.forward();
             } else if (actionl.equals("refresh")) {
                b.refresh();
+            } else if (actionl.equals("maximize")) {
+               b.maximize();
+            } else if (actionl.equals("restore")) {
+               b.restore();
             } else {
                throw new VDDException("Unknown browser action '" + action + "'");
             }
@@ -80,9 +84,6 @@ public class Browser extends Event {
             if (retry >= 0) {
                log("Retrying browser action...");
             }
-         } catch (org.openqa.selenium.WebDriverException e) {
-            error("Failed to execute browser action (alert present?)");
-            return;
          }
       }
    }

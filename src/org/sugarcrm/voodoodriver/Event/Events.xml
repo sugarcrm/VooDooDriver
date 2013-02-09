@@ -43,6 +43,8 @@
             <name>close</name>
             <name>forward</name>
             <name>refresh</name>
+            <name>maximize</name>
+            <name>restore</name>
          </action>
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>

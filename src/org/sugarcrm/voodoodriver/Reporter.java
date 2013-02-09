@@ -439,9 +439,11 @@ public class Reporter {
     */
 
    public void unhandledAlert(org.openqa.selenium.WebDriverException e) {
+      String alertText = "";
+
       try {
          Alert alert = this.browser.getDriver().switchTo().alert();
-         String alertText = alert.getText();
+         alertText = alert.getText();
          /*
           * Presumably, accept will be more likely to Do The Right
           * Thing(TM) WRT getting rid of alerts and moving on, but it

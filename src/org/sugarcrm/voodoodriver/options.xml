@@ -65,6 +65,8 @@
            help="Stop the test run as soon as any failure occurs"/>
    <option name="help" arg="none"
            help="Print a help message and exit"/>
+   <option name="maximizewindows" arg="none"
+           help="Maximize new browser windows"/>
    <option name="plugin" arg="files"
            help="An XML file specifying a VooDooDriver plugin and its parameters"/>
    <option name="profile" arg="dir"
