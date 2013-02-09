@@ -19,6 +19,7 @@ package org.sugarcrm.voodoodriver;
 import java.io.File;
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -71,6 +72,19 @@ public abstract class Browser {
     */
 
    private PageAsserter asserter = null;
+
+   /**
+    * Size of the browser window when not maximized.
+    */
+
+   private Dimension browserSize;
+
+
+   /**
+    * True if new browser windows should be maximized immediately after open.
+    */
+
+   private boolean maximizeWindows = false;
 
 
    /**
@@ -158,12 +172,47 @@ public abstract class Browser {
 
 
    /**
+    * Maximize the browser window.
+    */
+
+   public void maximize() {
+      if (this.browserSize == null) {
+         this.browserSize = this.Driver.manage().window().getSize();
+         this.Driver.manage().window().maximize();
+      }
+   }
+
+
+   /**
+    * Restore the browser window.
+    */
+
+   public void restore() {
+      if (this.browserSize != null) {
+         this.Driver.manage().window().setSize(this.browserSize);
+         this.browserSize = null;
+      }
+   }
+
+
+   /**
     * Close the browser window.
     */
 
    public void close() {
       this.Driver.close();
       this.setBrowserClosed();
+   }
+
+
+   /**
+    * Set whether to maximize new windows.
+    *
+    * @param maximize  true if new windows should be maximized
+    */
+
+   public void maximizeBrowserWindows(boolean maximize) {
+      this.maximizeWindows = maximize;
    }
 
 
@@ -198,6 +247,9 @@ public abstract class Browser {
     */
 
    public void setBrowserOpened() {
+      if (this.maximizeWindows == true) {
+         maximize();
+      }
       this.closed = false;
    }
 

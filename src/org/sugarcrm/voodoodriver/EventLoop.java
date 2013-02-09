@@ -2400,8 +2400,8 @@ public class EventLoop implements Runnable {
             this.processEvents((Events) event.get("children"), null);
          }
 
-         this.Browser.setBrowserOpened();
          this.Browser.getDriver().switchTo().window(currentWindow);
+         this.Browser.setBrowserOpened();
          this.setCurrentHWND(currentWindow);
          msg = String.format("Switching back to window handle: '%s'.",
                currentWindow);
@@ -2934,6 +2934,14 @@ public class EventLoop implements Runnable {
                   case FORWARD:
                      this.report.Log("Calling Browser event forward.");
                      this.Browser.forward();
+                     break;
+                  case MAXIMIZE:
+                     this.report.Log("Calling Browser event maximize.");
+                     this.Browser.maximize();
+                     break;
+                  case RESTORE:
+                     this.report.Log("Calling Browser event restore.");
+                     this.Browser.restore();
                      break;
                   }
                   break;

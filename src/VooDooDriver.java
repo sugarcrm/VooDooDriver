@@ -186,8 +186,8 @@ public class VooDooDriver {
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"attachtimeout", "blocklistfile",
                                      "browser", "eventtimeout",
-                                     "haltOnFailure", "plugin",
-                                     "restartcount", "restarttest",
+                                     "haltOnFailure", "maximizewindows",
+                                     "plugin", "restartcount", "restarttest",
                                      "resultdir", "savehtml", "screenshot"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
@@ -205,7 +205,8 @@ public class VooDooDriver {
                                           name, value);
                         System.exit(1);
                      }
-                  } else if (name.equals("haltOnFailure")) {
+                  } else if (name.equals("haltOnFailure") ||
+                             name.equals("maximizewindows")) {
                      configOpts.put(s, Boolean.valueOf(value));
                   } else if (name.equals("plugin")) {
                      /*
@@ -403,6 +404,9 @@ public class VooDooDriver {
       }
       if (config.get("profile") != null) {
          browser.setProfile((String)config.get("profile"));
+      }
+      if (config.get("maximizewindows") != null) {
+         browser.maximizeBrowserWindows((Boolean)config.get("maximizewindows"));
       }
 
       config.put("browser", browser);
