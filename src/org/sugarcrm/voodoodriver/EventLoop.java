@@ -65,6 +65,7 @@ public class EventLoop implements Runnable {
    private ArrayList<Plugin> plugins = null;
    private String testName = "";
    private int eventTimeout = 0;
+   private long DEFAULT_WAIT_DURATION = 5;
 
 
    /**
@@ -2863,45 +2864,56 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+   /**
+    * Duration of the current wait event.
+    */
+
+   private long waitDuration = 0;
+
+   /**
+    * Get the duration of a wait event in progress.
+    *
+    * <p>This is 0 unless a wait event is in progress, in which case
+    * it's set to the length of the wait in milliseconds.  This
+    * information is used by <code>Test.runTest</code> to extend the
+    * watchdog timeout by the duration of this wait.</p>
+    */
+
+   public long getWaitDuration() {
+      return waitDuration;
+   }
+
    private boolean waitEvent(VDDHash event) {
       boolean result = false;
-      int default_timeout = 5;
+      long timeout = DEFAULT_WAIT_DURATION;
 
       this.resetThreadTime();
       this.report.Log("Starting Wait event.");
 
       if (event.containsKey("timeout")) {
-         Integer int_out = new Integer(event.get("timeout").toString());
-         default_timeout = int_out.intValue();
-         this.report.Log(String.format("Setting timeout to: %d seconds.",
-               default_timeout));
-      } else {
-         this.report.Log(String.format("default timeout: %d seconds.",
-               default_timeout));
+         timeout = (new Integer(event.get("timeout").toString())).intValue();
+         this.report.Log("Setting timeout to " + timeout + " seconds.");
       }
 
-      default_timeout = default_timeout * 1000;
+      this.report.Log("Waiting " + timeout + " seconds.");
 
       try {
-         this.report.Log(String.format("waiting: '%d' seconds.",
-               (default_timeout / 1000)));
-         int wait_seconds = default_timeout / 1000;
-
-         for (int i = 0; i <= wait_seconds - 1; i++) {
+         this.waitDuration = timeout * 1000;
+         while (timeout-- > 0) {
             if (isStopped()) {
                break;
             }
-            Thread.sleep(1000);
+            try {
+               Thread.sleep(1000);
+            } catch (InterruptedException e) {}
          }
-
-         result = true;
-      } catch (InterruptedException exp) {
-         result = false;
+      } finally {
+         this.resetThreadTime();
+         this.waitDuration = 0;
       }
 
-      this.resetThreadTime();
       this.report.Log("Wait event finished.");
-      return result;
+      return true;
    }
 
    private boolean browserEvent(VDDHash event, WebElement parent) {

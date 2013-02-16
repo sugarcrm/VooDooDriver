@@ -31,9 +31,8 @@ public class Test {
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
    private BlockList blocked = null;
-   private boolean WatchDog = false;
    private ArrayList<Plugin> plugins = null;
-   private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
+   private static final long watchdogTimeout = 60 * 5 * 1000; // 5 minutes
    private File assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
@@ -159,7 +158,7 @@ public class Test {
 
    public boolean runTest(boolean isSuitetest) {
       boolean result = false;
-      this.WatchDog = false;
+      boolean watchdog = false;
 
       if (this.isRestartTest) {
          this.reporter.setIsRestTest(true);
@@ -175,7 +174,6 @@ public class Test {
 
       result = CheckTestBlocked();
       if (!result) {
-         long current = 0;
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
                                      this.GVars, this.HiJacks, this.OldVars,
                                      this.plugins, this.testFile.getName(),
@@ -185,20 +183,15 @@ public class Test {
             eventDriver.setAttachTimeout(this.attachTimeout);
          }
 
-         while (eventDriver.isAlive() && this.WatchDog != true) {
-            Date current_time = new Date();
-            Date thread_time = eventDriver.getThreadTime();
-            current = current_time.getTime();
-            long thread = thread_time.getTime();
+         while (eventDriver.isAlive()) {
+            long elstamp = eventDriver.getThreadTime().getTime();
+            long now = (new Date()).getTime();
 
-            current = current / 1000;
-            thread = thread / 1000;
-            long seconds = (current - thread);
-
-            if (seconds > ThreadTimeout) {
-               this.WatchDog = true;
+            if (now - elstamp >
+                watchdogTimeout + eventDriver.getWaitDuration()) {
+               watchdog = true;
                eventDriver.stop();
-               this.reporter.ReportWatchDog(seconds);
+               this.reporter.ReportWatchDog((now - elstamp) / 1000);
                break;
             }
 
@@ -210,10 +203,10 @@ public class Test {
          }
       }
 
-      if (this.WatchDog) {
-         System.out.printf("Trying to close browser after watchdog!\n");
+      if (watchdog) {
+         System.out.println("Trying to close browser after watchdog timeout!");
          this.Browser.forceClose();
-         System.out.printf("Closed???!\n");
+         System.out.println("Closed???!");
       }
 
       this.logResults();
