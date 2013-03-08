@@ -173,6 +173,7 @@
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">exists</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
       </actions>
    </alert>
 

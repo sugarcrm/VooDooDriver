@@ -92,6 +92,7 @@ public class Alert extends Event {
       Boolean exists = null;
       boolean required = true;
       org.openqa.selenium.Alert alert = null;
+      int timeout = 2;
 
       /*
        * These attributes have the same functionality as those used by
@@ -123,12 +124,45 @@ public class Alert extends Event {
          required = (Boolean)this.actions.get("required");
       }
 
+      if (this.actions.containsKey("timeout")) {
+         try {
+            timeout = new Integer((String)this.actions.get("timeout"));
+
+            if (timeout < 0) {
+               warning("alert timeout < 0, using 0");
+               timeout = 0;
+            } else {
+               log("Setting alert timeout to " + timeout + "s");
+            }
+         } catch (NullPointerException e) {
+            error("Null timeout value???");
+         } catch (NumberFormatException e) {
+            error("Specified wait timeout '" + this.actions.get("timeout") +
+                  "' is not a valid integer");
+         }
+      }
+
       /*
        * Attempt to switch to the alert so we can handle it.
        */
 
       try {
-         alert = this.eventLoop.Browser.getDriver().switchTo().alert();
+         this.eventLoop.setWaitDuration(timeout * 1000);
+
+         while (true) {
+            try {
+               alert = this.eventLoop.Browser.getDriver().switchTo().alert();
+               break;
+            } catch (NoAlertPresentException e) {
+               if (timeout-- < 0) {
+                  throw e;
+               }
+
+               try {
+                  Thread.sleep(1000);
+               } catch (InterruptedException i) {}
+            }
+         }
       } catch (NoAlertPresentException e) {
          if (exists != null && exists == false) {
             log("Alert not found and exists is false.");
@@ -138,6 +172,8 @@ public class Alert extends Event {
             error("Alert not found");
          }
          return;
+      } finally {
+         this.eventLoop.setWaitDuration(0);
       }
 
       if (exists != null && exists == false) {
