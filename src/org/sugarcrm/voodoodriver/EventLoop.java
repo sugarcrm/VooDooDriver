@@ -665,6 +665,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       String msg = "";
       String alert_text = "";
+      int timeout = 2;
 
       this.report.Log("Alert event starting.");
 
@@ -690,13 +691,39 @@ public class EventLoop implements Runnable {
          }
       }
 
+      if (event.containsKey("timeout")) {
+         try {
+            timeout =
+               Integer.valueOf(replaceString((String)event.get("timeout")));
+         } catch (NullPointerException e) {
+            this.report.ReportError("No value specified for timeout.");
+         } catch (NumberFormatException e) {
+            this.report.ReportError("Invalid integer value for timeout.");
+         }
+      }
+
       if (event.containsKey("required")) {
          String s = (String)event.get("required");
          required = this.clickToBool(this.replaceString(s));
       }
 
       try {
-         Alert alert = this.Browser.getDriver().switchTo().alert();
+         Alert alert = null;
+         while (timeout > 0) {
+            try {
+               alert = this.Browser.getDriver().switchTo().alert();
+               break;
+            } catch (NoAlertPresentException e) {
+               try {
+                  Thread.sleep(1000);
+               } catch (InterruptedException i) {}
+               timeout -= 1;
+            }
+         }
+         if (alert == null) {
+            throw new NoAlertPresentException();
+         }
+
          alert_text = alert.getText();
          msg = String.format("Found Alert dialog: '%s'.", alert_text);
          this.report.Log(msg);
@@ -2481,18 +2508,6 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.AFTERCLICK);
-         }
-
          if (event.containsKey("assert")) {
             String src = element.getText();
             String value = event.get("assert").toString();
@@ -2507,6 +2522,9 @@ public class EventLoop implements Runnable {
             this.report.AssertNot(value, src);
          }
 
+         String value = element.getText();
+         handleVars(value, event);
+
          if (event.containsKey("jscriptevent")) {
             this.report.Log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
@@ -2515,8 +2533,17 @@ public class EventLoop implements Runnable {
             this.report.Log("Javascript event finished.");
          }
 
-         String value = element.getText();
-         handleVars(value, event);
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         if (click) {
+            this.firePlugin(element, Elements.DIV,
+                  PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.DIV,
+                  PluginEvent.AFTERCLICK);
+         }
 
          if (event.containsKey("children")) {
             this.processEvents((Events) event.get("children"), element);

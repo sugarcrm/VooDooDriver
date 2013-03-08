@@ -185,6 +185,7 @@
          <accessor type="string">assert</accessor>
          <accessor type="string">assertnot</accessor>
          <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
       </soda_attributes>
    </alert>
 
