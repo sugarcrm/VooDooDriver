@@ -82,7 +82,7 @@ public class TextFinder {
     */
 
    private boolean isRegex(String str) {
-      Pattern p = Pattern.compile("^\\^|[\\[\\]*()?+|\\\\.]|\\$$");
+      Pattern p = Pattern.compile("^/\\^?.*(?:[\\[\\]*()?+|\\\\.]).*\\$?/$");
       Matcher m = p.matcher(str);
       return m.find();
    }
