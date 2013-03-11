@@ -1585,6 +1585,18 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
          }
