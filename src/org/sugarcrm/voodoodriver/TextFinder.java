@@ -64,7 +64,7 @@ public class TextFinder {
       if (isRegex(search) && compileRegex(search)) {
          this.isRegex = true;
       }
-      this.search = search;
+      this.search = search.replaceAll("^/(.*)/$", "$1");
    }
 
 
