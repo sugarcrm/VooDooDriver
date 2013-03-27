@@ -2793,6 +2793,10 @@ public class EventLoop implements Runnable {
             this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
          }
 
+         if (event.containsKey("children")) {
+            this.processEvents((Events) event.get("children"), null);
+         }
+
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
          }
