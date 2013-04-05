@@ -1150,7 +1150,6 @@ public class EventLoop implements Runnable {
       this.report.Log("Javascript event starting.");
 
       if (event.containsKey("content")) {
-         this.report.Warn("Using javascript contents is deprecated, please use the file attribute!");
          scriptdata = event.get("content").toString();
       }
 
