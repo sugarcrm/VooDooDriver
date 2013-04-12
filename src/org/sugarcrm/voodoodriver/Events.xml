@@ -1296,6 +1296,7 @@
          <accessor type="boolean">exists</accessor>
          <accessor type="string">included</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">multiselect</accessor>
          <accessor type="string">notincluded</accessor>
          <accessor type="boolean">required</accessor>
          <accessor type="string">save</accessor>

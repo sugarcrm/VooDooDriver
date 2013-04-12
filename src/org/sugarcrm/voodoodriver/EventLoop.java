@@ -1988,7 +1988,7 @@ public class EventLoop implements Runnable {
     */
 
    private WebElement selectEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
+      boolean required = true, multiselect = true;
       WebElement element = null;
 
       this.report.Log("Select event Started.");
@@ -2065,6 +2065,12 @@ public class EventLoop implements Runnable {
             this.report.Assert(m, wantOpt ^ haveOpt, false);
          }
 
+         if (event.containsKey("multiselect") &&
+             !this.clickToBool(event.get("multiselect").toString()) &&
+             sel.isMultiple()) {
+            multiselect = false;
+         }
+
          if (event.containsKey("clear") &&
              this.clickToBool(event.get("clear").toString()) &&
              sel.isMultiple()) {
@@ -2081,6 +2087,14 @@ public class EventLoop implements Runnable {
                this.report.Log("Setting option by " +
                                (useVal ? "value" : "visible text") +
                                ": '" + val + "'.");
+               if (multiselect == false) {
+                  /*
+                   * isMultiple() must be true in order for
+                   * multiselect to be false
+                   */
+                  sel.deselectAll();
+               }
+
                try {
                   if (useVal) {
                      sel.selectByValue(val);
