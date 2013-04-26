@@ -402,6 +402,9 @@ public class VooDooDriver {
       if (config.get("downloaddir") != null) {
          browser.setDownloadDirectory((String)config.get("downloaddir"));
       }
+      if (config.get("webdriverlog") != null) {
+         browser.enableWebDriverLogging(new File((String)config.get("resultdir")));
+      }
       if (config.get("profile") != null) {
          browser.setProfile((String)config.get("profile"));
       }
