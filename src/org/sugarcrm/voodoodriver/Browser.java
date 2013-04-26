@@ -270,20 +270,13 @@ public abstract class Browser {
     */
 
    public String getPageSource() {
-      int retries = 50;
-
-      while (retries-- > 0) {
-         try {
-            return this.Driver.getPageSource();
-         } catch (org.openqa.selenium.UnhandledAlertException e) {
-            this.reporter.unhandledAlert(e);
-         } catch (org.openqa.selenium.WebDriverException e) {
-            return "";
-         }
-
-         try {
-            Thread.sleep(100);
-         } catch (java.lang.InterruptedException e) {}
+      try {
+         return this.Driver.getPageSource();
+      } catch (org.openqa.selenium.UnhandledAlertException e) {
+         this.reporter.Warn("Unhandled alert when getting page source", false);
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.Warn("WebDriverException when getting page source" + e,
+                            false);
       }
 
       return "";
@@ -304,21 +297,15 @@ public abstract class Browser {
 
    public Object executeJS(String script, WebElement element) {
       JavascriptExecutor js = (JavascriptExecutor)this.Driver;
-      int retry = 2;
 
-      while (retry-- > 0) {
-         try {
-            if (element != null) {
-               return js.executeScript(script, element);
-            } else {
-               return js.executeScript(script);
-            }
-         } catch (org.openqa.selenium.UnhandledAlertException e) {
-            this.reporter.unhandledAlert(e);
-            if (retry >= 0) {
-               this.reporter.Log("Retrying js after unhandled alert...");
-            }
+      try {
+         if (element != null) {
+            return js.executeScript(script, element);
+         } else {
+            return js.executeScript(script);
          }
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.Warn("Exception during javascript execution: " + e);
       }
 
       return null;

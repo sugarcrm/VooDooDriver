@@ -292,15 +292,19 @@ public class Reporter {
       this._log("(*)" + msg);
    }
 
-   public void Warn(String msg) {
+   public void Warn(String msg, boolean savePage) {
       this._log("(W)" + msg);
 
-      if ((Boolean)this.saveHtmlOn.get("warning")) {
+      if (savePage && (Boolean)this.saveHtmlOn.get("warning")) {
          this.SavePage();
       }
       if ((Boolean)this.screenshotOn.get("warning")) {
          this.screenshot();
       }
+   }
+
+   public void Warn(String msg) {
+      Warn(msg, true);
    }
 
    public void ReportError(String msg) {
