@@ -344,18 +344,32 @@ public class Reporter {
     *
     * <p>Warning messages are prepended with '(W)'.</p>
     *
-    * @param msg  the warning to be logged
+    * @param msg       the warning to be logged
+    * @param savePage  whether to save the page on warnings
     */
 
-   public void warning(String msg) {
+   public void warning(String msg, boolean savePage) {
       this._log("(W)" + msg);
 
-      if ((Boolean)this.saveHtmlOn.get("warning")) {
+      if (savePage && (Boolean)this.saveHtmlOn.get("warning")) {
          this.SavePage();
       }
       if ((Boolean)this.screenshotOn.get("warning")) {
          this.screenshot();
       }
+   }
+
+
+   /**
+    * Log a warning.
+    *
+    * <p>Warning messages are prepended with '(W)'.</p>
+    *
+    * @param msg  the warning to be logged
+    */
+
+   public void warning(String msg) {
+      warning(msg, true);
    }
 
 

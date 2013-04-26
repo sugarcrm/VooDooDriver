@@ -271,20 +271,14 @@ public abstract class Browser {
     */
 
    public String getPageSource() {
-      int retries = 50;
-
-      while (retries-- > 0) {
-         try {
-            return this.Driver.getPageSource();
-         } catch (org.openqa.selenium.UnhandledAlertException e) {
-            this.reporter.unhandledAlert(e);
-         } catch (org.openqa.selenium.WebDriverException e) {
-            return "";
-         }
-
-         try {
-            Thread.sleep(100);
-         } catch (java.lang.InterruptedException e) {}
+      try {
+         return this.Driver.getPageSource();
+      } catch (org.openqa.selenium.UnhandledAlertException e) {
+         this.reporter.warning("Unhandled alert when getting page source",
+                               false);
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.warning("WebDriverException when getting page source" + e,
+                               false);
       }
 
       return "";
@@ -300,29 +294,21 @@ public abstract class Browser {
     *
     * @param script  The javascript to run in the browser.
     * @param element The Element to use on the page as the CONTROL var.
-    * @return the {@link Object} returned by the javascript code
+    * @return the {@link Object} returned by the javascript code or
+    *         null if the script throws an exception
     */
 
    public Object executeJS(String script, WebElement element) {
       JavascriptExecutor js = (JavascriptExecutor)this.Driver;
-      int retry = 2;
 
-      while (retry-- > 0) {
-         try {
-            if (element != null) {
-               return js.executeScript(script, element);
-            } else {
-               return js.executeScript(script);
-            }
-         } catch (org.openqa.selenium.UnhandledAlertException e) {
-            this.reporter.unhandledAlert(e);
-            if (retry >= 0) {
-               this.reporter.log("Retrying js after unhandled alert...");
-            }
-         } catch (org.openqa.selenium.WebDriverException e) {
-            this.reporter.exception("WebDriver Exception (alert present?)", e);
-            return null;
+      try {
+         if (element != null) {
+            return js.executeScript(script, element);
+         } else {
+            return js.executeScript(script);
          }
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.Warn("Exception during javascript execution: " + e);
       }
 
       return null;
