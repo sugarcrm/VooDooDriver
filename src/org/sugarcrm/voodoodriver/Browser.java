@@ -135,6 +135,15 @@ public abstract class Browser {
 
 
    /**
+    * Enable WebDriver logging.
+    */
+
+   public void enableWebDriverLogging(File directory) {
+      // Only works on firefox
+   }
+
+
+   /**
     * Open the specified URL in the browser.
     *
     * @param url  URL to open

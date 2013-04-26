@@ -16,6 +16,8 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.io.File;
+import java.util.Date;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -40,6 +42,13 @@ public class Firefox extends Browser {
 
 
    /**
+    * Directory into which to save the web driver logs.
+    */
+
+   private File webDriverLogDirectory = null;
+
+
+   /**
     * Set this object's download directory.
     *
     * @param dir  path to the download directory
@@ -47,6 +56,31 @@ public class Firefox extends Browser {
 
    public void setDownloadDirectory(String dir) {
       this.downloadDirectory = dir;
+   }
+
+
+   /**
+    * Enable WebDriver logging.
+    */
+
+   public void enableWebDriverLogging(File directory) {
+      this.webDriverLogDirectory = directory;
+   }
+
+
+   /**
+    * Create a log file name in the specified directory with the
+    * specified base name.
+    *
+    * @param dir   log directory
+    * @param base  base name for log file
+    * @return complete path to log file 
+    */
+
+   private File makeLogfileName(File dir, String base) {
+      base += "-" + String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS.%1$tL",
+                                  new Date()) + ".log";
+      return new File(dir, base);
    }
 
 
@@ -81,6 +115,17 @@ public class Firefox extends Browser {
          p.setPreference("browser.download.manager.alertOnEXEOpen", false);
          p.setPreference("browser.download.manager.focusWhenStarting", false);
          p.setPreference("browser.download.useDownloadDir", true);
+      }
+
+      if (this.webDriverLogDirectory != null) {
+         File wdl = makeLogfileName(this.webDriverLogDirectory, "webdriver");
+         File fl = makeLogfileName(this.webDriverLogDirectory, "firefox");
+
+         System.out.println("(*) Creating WebDriver log " + wdl);
+         p.setPreference("webdriver.log.file", wdl.toString());
+
+         System.out.println("(*) Creating Firefox log " + fl);
+         p.setPreference("webdriver.firefox.logfile", fl.toString());
       }
 
       DesiredCapabilities c = new DesiredCapabilities();
