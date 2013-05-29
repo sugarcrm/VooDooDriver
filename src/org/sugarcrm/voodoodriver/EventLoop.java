@@ -140,7 +140,7 @@ public class EventLoop implements Runnable {
     * Checks to see if a browser window exists.
     *
     * @param hwnd {@link String}
-    * @return
+    * @return true if the window exists
     */
    private boolean windowExists(String hwnd) {
       Set<String> windows = null;

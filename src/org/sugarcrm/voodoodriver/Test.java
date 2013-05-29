@@ -229,7 +229,6 @@ public class Test {
    }
 
    private boolean CheckTestBlocked() {
-      boolean result = false;
       String test_file = this.testFile.getName();
 
       test_file = test_file.substring(0, test_file.length() - 4);
@@ -238,22 +237,27 @@ public class Test {
          return false;
       }
 
-      for (int i = 0; i <= this.blocked.size() -1; i++) {
-         String blocked_file = this.blocked.get(i).get("testfile").toString();
-         if (test_file.equals(blocked_file)) {
-            result = true;
-            String module_name = this.blocked.get(i).get("modulename").toString();
-            String bug_number = this.blocked.get(i).get("bugnumber").toString();
-            String reason = this.blocked.get(i).get("reason").toString();
-            String msg = String.format("Test is currently blocked, Bug Number: '%s', Module Name: '%s'"+
-                  ", Reason: '%s'", bug_number, module_name, reason);
-            this.reporter.Log(msg);
+      for (VDDHash item: this.blocked) {
+         if (test_file.equals(item.get("testfile").toString())) {
+            String module_name = (item.containsKey("modulename") ?
+                                  item.get("modulename").toString() :
+                                  "<<No Module>>");
+            String bug_number = (item.containsKey("bugnumber") ?
+                                 item.get("bugnumber").toString() :
+                                 "00000");
+            String reason = (item.containsKey("reason") ?
+                             item.get("reason").toString() :
+                             "");
+            this.reporter.Log("Test is currently blocked, " +
+                              "Bug Number: '" + bug_number + "', " +
+                              "Module Name: '" + module_name + "', " +
+                              "Reason: '" + reason + "'");
             this.reporter.ReportBlocked();
-            break;
+            return true;
          }
       }
 
-      return result;
+      return false;
    }
 
 }
