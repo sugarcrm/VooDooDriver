@@ -226,37 +226,32 @@ public class Test {
     */
 
    private boolean testBlocked() {
-      String test_file = this.testFile.getName();
-
-      test_file = test_file.substring(0, test_file.length() - 4);
-
       if (!this.config.containsKey("blocklist")) {
          return false;
       }
-
-      BlockList blockList = (BlockList)this.config.get("blocklist");
 
       /* Chop off ".xml" */
       String baseName = this.testFile.getName();
       baseName = baseName.substring(0, baseName.length() - 4);
 
-      for (int i = 0; i < blockList.size(); i++) {
-         String blocked = String.valueOf(blockList.get(i).get("testfile"));
-
-         if (!baseName.equals(blocked)) {
+      for (VDDHash item: (BlockList)this.config.get("blocklist")) {
+         if (!baseName.equals(item.get("testfile").toString())) {
             continue;
          }
 
-         String module = String.valueOf(blockList.get(i).get("modulename"));
-         String bug = String.valueOf(blockList.get(i).get("bugnumber"));
-         String reason = String.valueOf(blockList.get(i).get("reason"));
-
-         String msg = String.format("Test is currently blocked: " +
-                                    "Bug Number: '%s', " +
-                                    "Module Name: '%s', " +
-                                    "Reason: '%s'",
-                                    bug, module, reason);
-         this.reporter.log(msg);
+         String moduleName = (item.containsKey("modulename") ?
+                              item.get("modulename").toString() :
+                              "<<No Module>>");
+         String bugNumber = (item.containsKey("bugnumber") ?
+                             item.get("bugnumber").toString() :
+                             "00000");
+         String reason = (item.containsKey("reason") ?
+                          item.get("reason").toString() :
+                          "");
+         this.reporter.log("Test is currently blocked, " +
+                           "Bug Number: '" + bugNumber + "', " +
+                           "Module Name: '" + moduleName + "', " +
+                           "Reason: '" + reason + "'");
          this.reporter.setBlocked();
          return true;
       }

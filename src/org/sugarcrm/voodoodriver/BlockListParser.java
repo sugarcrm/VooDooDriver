@@ -91,7 +91,12 @@ public class BlockListParser {
                tmp.put(kid_name, value);
             }
          }
-         list.add(tmp);
+
+         if (tmp.containsKey("testfile")) {
+            list.add(tmp);
+         } else {
+            System.err.println("(!)Skipping block list entry with missing 'testfile' field.");
+         }
       }
 
       return list;
