@@ -2019,7 +2019,7 @@ public class EventLoop implements Runnable {
             boolean optionFound = false;
 
             for (WebElement opt: sel.getOptions()) {
-               if (opt.getText().equals(val)) {
+               if (opt.getText().contains(val)) {
                   boolean issel = opt.isSelected();
                   this.report.Assert("Select option '" + val + "' is " +
                                      (issel ? "" : "not ") + "selected",
@@ -2053,7 +2053,7 @@ public class EventLoop implements Runnable {
             boolean haveOpt = false;
 
             for (WebElement opt: sel.getOptions()) {
-               if (opt.getText().equals(val)) {
+               if (opt.getText().contains(val)) {
                   haveOpt = true;
                   break;
                }
