@@ -3546,10 +3546,7 @@ public class EventLoop implements Runnable {
             element = elements.get(index);
          }
       } catch (NoSuchElementException exp) {
-         if (required && exists) {
-            this.report.ReportError("Failed to find element! " + exp);
-            element = null;
-         }
+         element = null;
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
