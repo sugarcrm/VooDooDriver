@@ -3440,15 +3440,10 @@ public class EventLoop implements Runnable {
          what = this.replaceString(what);
          String dowhat = event.get("do").toString();
 
-         if (index > -1) {
-            msg = String.format("Trying to find page element '%s' by: '%s' => '%s' index => '%s'.",
-                        dowhat, how, what, index);
-         } else {
-            msg = String.format(
-                  "Trying to find page element '%s' by: '%s' => '%s'.", dowhat,
-                  how, what);
-         }
-         this.report.Log(msg);
+         this.report.Log("Trying to find page element '" + dowhat + "' by: " +
+                         "'" + how + "' => '" + what + "'" +
+                         ((index > -1 && !how.equals("index")) ?
+                          " index => '" + index + "'" : "") + ".");
 
          if (how.matches("class") && what.matches(".*\\s+.*")) {
             String elem_type = event.get("do").toString();
