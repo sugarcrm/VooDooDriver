@@ -101,10 +101,12 @@ public class VooDooDriver {
       System.out.printf("(*)Java RunTime Info:\n");
       dumpKeys(javaInfo);
 
-      if (javaInfo.containsKey("java.vendor") &&
-          !javaInfo.get("java.vendor").toString().contains("Sun Microsystems")) {
-         System.out.println("(!)Warning: This is not a 'Sun Microsystems' " +
-                            "JRE/JDK and is not supported.");
+      if (javaInfo.containsKey("java.vendor")) {
+         String vendor = javaInfo.get("java.vendor").toString();
+         if (!(vendor.contains("Sun Microsystems") ||
+               vendor.contains("Oracle Corporation"))) {
+            System.out.println("(!)Warning: This is not a supported JRE/JDK.");
+         }
       }
    }
 
