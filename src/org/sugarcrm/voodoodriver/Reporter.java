@@ -438,18 +438,21 @@ public class Reporter {
     * @param e  the UnhandledAlertException
     */
 
-   public void unhandledAlert(org.openqa.selenium.UnhandledAlertException e) {
-      Alert alert = this.browser.getDriver().switchTo().alert();
-      String alertText = alert.getText();
-      /*
-       * Presumably, accept will be more likely to Do The Right
-       * Thing(TM) WRT getting rid of alerts and moving on, but it
-       * depends entirely on how the page in question is written.
-       */
-      alert.accept();
+   public void unhandledAlert(org.openqa.selenium.WebDriverException e) {
+      try {
+         Alert alert = this.browser.getDriver().switchTo().alert();
+         String alertText = alert.getText();
+         /*
+          * Presumably, accept will be more likely to Do The Right
+          * Thing(TM) WRT getting rid of alerts and moving on, but it
+          * depends entirely on how the page in question is written.
+          */
+         alert.accept();
 
-      justLogTheException("(!)Unhandled alert found and dismissed. " +
-                          "Alert text is \"" + alertText + "\"", e);
+      } finally {
+         justLogTheException("(!)Unhandled alert found and dismissed. " +
+                             "Alert text is \"" + alertText + "\"", e);
+      }
    }
 
 

@@ -67,7 +67,15 @@ public class Browser extends Event {
                throw new VDDException("Unknown browser action '" + action + "'");
             }
             break;
-         } catch (org.openqa.selenium.UnhandledAlertException e) {
+         } catch (org.openqa.selenium.WebDriverException e) {
+            /*
+             * Presumably an UnhandledAlertException.  However,
+             * FirefoxDriver can't be counted on to throw that, so
+             * catch the parent exception and handle the alert.  If
+             * there is no alert, a new exception will be thrown
+             * (which is OK), and this exception will be reported
+             * regardless.
+             */
             this.eventLoop.report.unhandledAlert(e);
             if (retry >= 0) {
                log("Retrying browser action...");
