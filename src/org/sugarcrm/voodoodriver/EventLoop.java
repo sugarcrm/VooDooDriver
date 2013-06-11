@@ -144,6 +144,13 @@ public class EventLoop implements Runnable {
 
 
    /**
+    * Duration of the current wait event.
+    */
+
+   private long waitDuration = 0;
+
+
+   /**
     * Instantiate EventLoop.
     *
     * @param events   list of events from the test file
@@ -223,6 +230,37 @@ public class EventLoop implements Runnable {
 
    public int getElementTimeout() {
       return this.elementTimeout;
+   }
+
+
+   /**
+    * Get the duration of a wait event in progress.
+    *
+    * <p>This is 0 unless a wait event is in progress, in which case
+    * it's set to the length of the wait in milliseconds.  This
+    * information is used by <code>Test.runTest</code> to extend the
+    * watchdog timeout by the duration of this wait.</p>
+    *
+    * @return  current wait duration
+    */
+
+   public long getWaitDuration() {
+      return this.waitDuration;
+   }
+
+   /**
+    * Set the duration of a wait event.
+    *
+    * <p>The wait event updates EventLoop's value of
+    * <code>waitDuration</code> to provide <code>Test.runTest</code>
+    * with the duration of the current wait in order to prevent the
+    * watchdog timer from expiring during long waits.</p>
+    *
+    * @param duration  current wait duration
+    */
+
+   public void setWaitDuration(long duration) {
+      this.waitDuration = duration;
    }
 
 

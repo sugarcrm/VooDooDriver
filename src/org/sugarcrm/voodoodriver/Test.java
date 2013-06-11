@@ -77,7 +77,7 @@ public class Test {
     * Amount of time allowed before this test times out.  Default is 5 minutes.
     */
 
-   private static final int TIMEOUT = 60 * 5;
+   private static final long watchdogTimeout = 60 * 5 * 1000; // 5 minutes
 
    /**
     * Milliseconds to sleep while waiting for test completion.
@@ -272,7 +272,7 @@ public class Test {
     */
 
    public boolean runTest() {
-      boolean watchDog = false;
+      boolean watchdog = false;
 
       if (this.isRestartTest) {
          this.reporter.setIsRestTest(true);
@@ -308,25 +308,26 @@ public class Test {
          }
       }
 
-      while (this.eventLoop.isAlive() && watchDog != true) {
+      while (eventLoop.isAlive()) {
+         long elstamp = eventLoop.getThreadTime().getTime();
+         long now = (new Date()).getTime();
+
+         if (now - elstamp >
+             watchdogTimeout + eventLoop.getWaitDuration()) {
+            watchdog = true;
+            eventLoop.stop();
+            this.reporter.watchdog((now - elstamp) / 1000);
+            break;
+         }
+
          try {
             Thread.sleep(SLEEPYTIME);
          } catch (InterruptedException e) {
             this.reporter.warning("Thread interrupted.  Ignoring.");
          }
-
-         long current = (new Date()).getTime();
-         long thread  = this.eventLoop.getThreadTime().getTime();
-         long seconds = (current - thread) / 1000;
-
-         if (seconds > TIMEOUT) {
-            watchDog = true;
-            this.eventLoop.stop();
-            this.reporter.watchdog(seconds);
-         }
       }
 
-      if (watchDog) {
+      if (watchdog) {
          this.reporter.log("Trying to close browser after watchdog.");
          ((Browser)this.config.get("browser")).forceClose();
       }

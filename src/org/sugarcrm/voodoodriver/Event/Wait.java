@@ -80,14 +80,16 @@ public class Wait extends Event {
          log("Using default timeout of " + timeout + "s");
       }
 
+      this.eventLoop.setWaitDuration(timeout * 1000);
 
-      while (!this.eventLoop.isStopped() && timeout-- > 0) {
-         try {
+      try {
+         while (!this.eventLoop.isStopped() && timeout-- > 0) {
             Thread.sleep(1000);
-         } catch (InterruptedException e) {
-            log("wait interrupted");
-            break;
          }
+      } catch (InterruptedException e) {
+         log("wait interrupted");
+      } finally {
+         this.eventLoop.setWaitDuration(0);
       }
    }
 }
