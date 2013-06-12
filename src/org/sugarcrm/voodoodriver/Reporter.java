@@ -741,4 +741,49 @@ public class Reporter {
            super.finalize();
        }
    }
+
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #log}
+    */
+
+   @Deprecated
+   public void Log(String m) {
+      log(m);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #error}
+    */
+
+   @Deprecated
+   public void ReportError(String m) {
+      error(m);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #exception}
+    */
+
+   @Deprecated
+   public void ReportException(Throwable e) {
+      exception(e);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #warning}
+    */
+
+   @Deprecated
+   public void Warn(String m) {
+      warning(m);
+   }
 }

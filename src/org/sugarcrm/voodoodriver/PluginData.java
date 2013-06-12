@@ -184,11 +184,39 @@ public class PluginData {
    /**
     * Fetch the current Soda Vars.
     *
-    * @return {@link VDDHash} of current Soda Vars
+    * @return {@link Vars} containing current Soda Vars
     */
 
    public Vars getVars() {
       return (Vars)this.d.get("vars");
+   }
+
+
+   /**
+    * Fetch the current Soda Vars.
+    *
+    * <p>This method flattens the Vars object into a legacy VDDHash
+    * var structure.  The intention is to maintain compatibility with
+    * SugarWait during the dev_v2 to dev to master transition.</p>
+    *
+    * @return {@link VDDHash} of Soda vars
+    * @deprecated Replaced by {@link getVars}
+    */
+
+   @Deprecated
+   public VDDHash getSodaVars() {
+      Vars v = (Vars)this.d.get("vars");
+      VDDHash h = new VDDHash();
+
+      for (String k: v) {
+         try {
+            h.put(k, v.get(k));
+         } catch (NoSuchFieldException e) {
+            /* Will never happen. */
+         }
+      }
+
+      return h;
    }
 
 

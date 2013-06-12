@@ -17,7 +17,9 @@
 package org.sugarcrm.voodoodriver;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 
 /**
@@ -50,7 +52,7 @@ import java.util.LinkedList;
  * @author Jonathan duSaint
  */
 
-public class Vars {
+public class Vars implements Iterable<String> {
 
    /**
     * The stack of variable contexts.
@@ -165,4 +167,41 @@ public class Vars {
       this.context.pop();
    }
 
+
+   /**
+    * Iterator for all keys in all contexts of this object.
+    *
+    * @return <code>Iterator</code> implementation
+    */
+
+   public Iterator<String> iterator() {
+      return new Iterator<String>() {
+         private int contextIndex = 0;
+         private Iterator<String> current = null;
+
+         public boolean hasNext() {
+            if (this.current == null || !this.current.hasNext()) {
+               while (this.contextIndex < context.size()) {
+                  Set<String> keys = context.get(this.contextIndex++).keySet();
+
+                  if (keys.isEmpty()) {
+                     continue;
+                  }
+
+                  this.current = keys.iterator();
+               }
+            }
+
+            return this.current == null ? false : this.current.hasNext();
+         }
+
+         public String next() {
+            return this.current.next();
+         }
+
+         public void remove() {
+            throw new UnsupportedOperationException();
+         }
+      };
+   }
 }
