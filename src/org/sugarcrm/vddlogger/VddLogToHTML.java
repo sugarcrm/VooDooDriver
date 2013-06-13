@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.vddlogger;
 
@@ -23,57 +23,72 @@ import java.util.regex.Pattern;
 public class VddLogToHTML {
 
    private final String HTML_HEADER_RESOURCE = "reportlogheader.txt";
-   private String fileName;
-   private FileReader input;
-   private BufferedReader br;
-   private String strLine;
-   private FileOutputStream output;
-   private PrintStream repFile;
+   private File outfile;
+
+   private PrintStream out;
+   private BufferedReader in;
+
    private int backTraceID;
    private int eventDumpID;
+
    private VddLogIssues issues = null;
 
-   public VddLogToHTML(String inputFile) {
-      strLine = new String();
+
+   /**
+    * Create a VddLogToHTML object.
+    *
+    * This constructor opens both the input and output files.
+    *
+    * @param inputFilename  VDD log file to be converted
+    * @throws VDDLogException for any I/O exception
+    */
+
+   public VddLogToHTML(String inputFilename) throws VDDLogException {
+      File infile;
+
       backTraceID = 0;
-      eventDumpID = 0 ;
+      eventDumpID = 0;
+
+      try {
+         infile = (new File(inputFilename)).getCanonicalFile();
+      } catch (IOException e) {
+         throw new VDDLogException("Unable to resolve " + inputFilename, e);
+      }
 
       this.issues = new VddLogIssues();
 
-      /**
-       * set up file reading
-       */
       try {
-         /*sets up file reader to read input one character at a time*/
-         input = new FileReader(inputFile);
-         /*sets up buffered reader to read input one line at a time*/
-         br = new BufferedReader(input);
+         in = new BufferedReader(new FileReader(infile));
       } catch (FileNotFoundException e) {
-         System.out.printf("(!)Error: Failed to find file: '%s'!\n", inputFile);
-      } catch (Exception e) {
-         e.printStackTrace();
+         throw new VDDLogException("Failed to find input file " + infile, e);
       }
 
-      /**
-       * add the correct extension and "Report-" prefix to the output html
+      /*
+       * The output file name is the same as the input file name with
+       * "Report-" prepended and the extension changed from .log to
+       * .html.
        */
-      fileName = inputFile.substring(inputFile.lastIndexOf("/")+1, inputFile.length()-4);
-      String filePath = inputFile.substring(0, inputFile.lastIndexOf('/')+1);
-      fileName = "Report-"+fileName+".html";
-      System.out.printf("(*)Generating report: '%s'.\n", fileName);
 
-      /**
-       * sets up output file
-       */
+      String fn = infile.getName();
+      if (!fn.endsWith(".log")) {
+         throw new VDDLogException(inputFilename + " is not a VDD log file");
+      }
+      outfile = new File(infile.getParent() + File.separator +
+                         "Report-" + fn.replaceAll(".log$", ".html"));
+
+      System.out.println("(*)Generating report: " + outfile);
+
       try {
-         output = new FileOutputStream(filePath+fileName);
-         repFile = new PrintStream(output);
-      } catch (Exception e) {
-         System.out.printf("(!)Error: Failed trying to write to file: '%s'!\n", fileName);
+         out = new PrintStream(new FileOutputStream(outfile));
+      } catch (FileNotFoundException e) {
+         throw new VDDLogException("Unable to write to " + outfile, e);
       }
-
-      System.out.printf("(*)Finished report generation.\n");
    }
+
+
+   /**
+    *
+    */
 
    public VddLogIssues getIssues() {
       return this.issues;
@@ -197,21 +212,25 @@ public class VddLogToHTML {
       }
    }
 
+
    /**
-    * generates a html report file
+    * Generate an HTML report file.
     */
+
    public void generateReport(){
+      String strLine = "";
+
       generateHtmlHeader();
 
       try{
          /**
           * read first line
           */
-         strLine = br.readLine();
+         strLine = in.readLine();
          while (strLine != null){
             processIssues(strLine);
-            repFile.println(generateTableRow(strLine));
-            strLine = br.readLine();
+            out.println(generateTableRow(strLine));
+            strLine = in.readLine();
          }
 
       }catch (Exception e){
@@ -219,9 +238,11 @@ public class VddLogToHTML {
          e.printStackTrace();
       }
 
-      repFile.print("\n</table>\n</center>\n</body>\n</html>\n");
-      repFile.close();
+      out.print("\n</table>\n</center>\n</body>\n</html>\n");
+      out.close();
    }
+
+
    ////////////////////////////////////////////
    //line cases
    ////////////////////////////////////////////
@@ -582,10 +603,10 @@ public class VddLogToHTML {
             stream = new FileInputStream(header_fd);
          }
 
-         InputStreamReader in = new InputStreamReader(stream);
-         BufferedReader br = new BufferedReader(in);
+         /* XXX: This name masks the class variable in. */
+         BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
-         while ((line = br.readLine()) != null) {
+         while ((line = in.readLine()) != null) {
             header += line;
             header += "\n";
          }
@@ -594,7 +615,7 @@ public class VddLogToHTML {
          exp.printStackTrace();
       }
 
-      repFile.print(header);
+      out.print(header);
    }
 
    /**
@@ -605,7 +626,7 @@ public class VddLogToHTML {
     */
    private String generateDateTime (String line){
       String htmlDateTime = line.substring(1, line.indexOf("]"));
-      return htmlDateTime.replaceFirst("-", "- <br />");
+      return htmlDateTime.replaceFirst("-", "- <br/>");
    }
 
    /**
@@ -620,14 +641,16 @@ public class VddLogToHTML {
       return str;
    }
 
-   /**
-    * returns the .html file name
-    * @return output file name
-    */
-   public String getFileName(){
-      return fileName;
-   }
 
+   /**
+    * Return the output .html file name.
+    *
+    * @return  output file name
+    */
+
+   public String getFileName(){
+      return outfile.toString();
+   }
 }
 
 

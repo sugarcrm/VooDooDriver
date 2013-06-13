@@ -65,6 +65,7 @@ public class EventLoop implements Runnable {
    private ArrayList<Plugin> plugins = null;
    private String testName = "";
    private int eventTimeout = 0;
+   private long DEFAULT_WAIT_DURATION = 5;
 
 
    /**
@@ -139,7 +140,7 @@ public class EventLoop implements Runnable {
     * Checks to see if a browser window exists.
     *
     * @param hwnd {@link String}
-    * @return
+    * @return true if the window exists
     */
    private boolean windowExists(String hwnd) {
       Set<String> windows = null;
@@ -379,6 +380,9 @@ public class EventLoop implements Runnable {
       case SELECT:
          element = selectEvent(event, parent);
          break;
+      case OPTION:
+         element = optionEvent(event, parent);
+         break;
       case STAMP:
          result = stampEvent(event);
          break;
@@ -462,6 +466,39 @@ public class EventLoop implements Runnable {
          break;
       case EMAIL:
          element = emailEvent(event, parent);
+         break;
+      case H1:
+         element = miscEvent(event, parent);
+         break;
+      case H2:
+         element = miscEvent(event, parent);
+         break;
+      case H3:
+         element = miscEvent(event, parent);
+         break;
+      case H4:
+         element = miscEvent(event, parent);
+         break;
+      case H5:
+         element = miscEvent(event, parent);
+         break;
+      case H6:
+         element = miscEvent(event, parent);
+         break;
+      case I:
+         element = miscEvent(event, parent);
+         break;
+      case B:
+         element = miscEvent(event, parent);
+         break;
+      case STRIKE:
+         element = miscEvent(event, parent);
+         break;
+      case S:
+         element = miscEvent(event, parent);
+         break;
+      case U:
+         element = miscEvent(event, parent);
          break;
       default:
          System.out.printf("(!)Unknown command: '%s'!\n", type.toString());
@@ -585,10 +622,10 @@ public class EventLoop implements Runnable {
 
          if (event.containsKey("children")) {
             this.processEvents((Events) event.get("children"), null);
-         } else {
-            this.report.Log("Switching back to default frame.");
-            this.Browser.getDriver().switchTo().defaultContent();
          }
+
+         this.report.Log("Switching back to default frame.");
+         this.Browser.getDriver().switchTo().defaultContent();
       } catch (NoSuchFrameException exp) {
          this.report.ReportError("Failed to find frame!");
       } catch (Exception exp) {
@@ -628,6 +665,7 @@ public class EventLoop implements Runnable {
       boolean required = true;
       String msg = "";
       String alert_text = "";
+      int timeout = 2;
 
       this.report.Log("Alert event starting.");
 
@@ -653,13 +691,39 @@ public class EventLoop implements Runnable {
          }
       }
 
+      if (event.containsKey("timeout")) {
+         try {
+            timeout =
+               Integer.valueOf(replaceString((String)event.get("timeout")));
+         } catch (NullPointerException e) {
+            this.report.ReportError("No value specified for timeout.");
+         } catch (NumberFormatException e) {
+            this.report.ReportError("Invalid integer value for timeout.");
+         }
+      }
+
       if (event.containsKey("required")) {
          String s = (String)event.get("required");
          required = this.clickToBool(this.replaceString(s));
       }
 
       try {
-         Alert alert = this.Browser.getDriver().switchTo().alert();
+         Alert alert = null;
+         while (timeout > 0) {
+            try {
+               alert = this.Browser.getDriver().switchTo().alert();
+               break;
+            } catch (NoAlertPresentException e) {
+               try {
+                  Thread.sleep(1000);
+               } catch (InterruptedException i) {}
+               timeout -= 1;
+            }
+         }
+         if (alert == null) {
+            throw new NoAlertPresentException();
+         }
+
          alert_text = alert.getText();
          msg = String.format("Found Alert dialog: '%s'.", alert_text);
          this.report.Log(msg);
@@ -1086,7 +1150,6 @@ public class EventLoop implements Runnable {
       this.report.Log("Javascript event starting.");
 
       if (event.containsKey("content")) {
-         this.report.Warn("Using javascript contents is deprecated, please use the file attribute!");
          scriptdata = event.get("content").toString();
       }
 
@@ -1198,6 +1261,15 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+
+   /**
+    * Handle an &lt;image&gt; event.
+    *
+    * @param event  the &image;th&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
    private WebElement imageEvent(VDDHash event, WebElement parent) {
       boolean required = true;
       boolean click = false;
@@ -1224,6 +1296,15 @@ public class EventLoop implements Runnable {
          this.checkDisabled(event, element);
 
          handleVars(element.getAttribute("src"), event);
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
 
          if (click) {
             this.report.Log("Image click started.");
@@ -1502,6 +1583,18 @@ public class EventLoop implements Runnable {
          handleVars(value, event);
 
          this.checkDisabled(event, element);
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
 
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
@@ -1885,19 +1978,18 @@ public class EventLoop implements Runnable {
       return element;
    }
 
+
+   /**
+    * Handle a &lt;select&gt; event
+    *
+    * @param event  the &lt;select&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
    private WebElement selectEvent(VDDHash event, WebElement parent) {
-      boolean required = true;
+      boolean required = true, multiselect = true;
       WebElement element = null;
-      String setvalue = null;
-      String msg = "";
-      boolean do_assert = false;
-      boolean assert_direction = true;
-      boolean included = false;
-      boolean included_direction = true;
-      boolean real = false;
-      boolean click = false;
-      String assert_value = "";
-      String included_value = "";
 
       this.report.Log("Select event Started.");
 
@@ -1906,140 +1998,116 @@ public class EventLoop implements Runnable {
       }
 
       try {
+         Select sel = null;
          element = this.findElement(event, parent, required);
-         if (element != null) {
-            Select sel = new Select(element);
-            this.firePlugin(element, Elements.SELECT,
-                  PluginEvent.AFTERFOUND);
+         if (element == null) {
+            this.report.Log("Select event finished.");
+            return null;
+         }
 
-            this.checkDisabled(event, element);
+         sel = new Select(element);
+         this.firePlugin(element, Elements.SELECT, PluginEvent.AFTERFOUND);
 
-            if (event.containsKey("clear") &&
-                this.clickToBool(event.get("clear").toString()) &&
-                sel.isMultiple()) {
-               this.report.Log("Clearing select element.");
-               sel.deselectAll();
+         this.checkDisabled(event, element);
+         handleVars(element.getAttribute("value"), event);
+
+         if (event.containsKey("assert") ||
+             event.containsKey("assertnot")) {
+            boolean wantSel = event.containsKey("assert");
+            String val = this.replaceString(event.get(wantSel ? "assert" :
+                                                      "assertnot").toString());
+            boolean optionFound = false;
+
+            for (WebElement opt: sel.getOptions()) {
+               if (opt.getText().contains(val)) {
+                  boolean issel = opt.isSelected();
+                  this.report.Assert("Select option '" + val + "' is " +
+                                     (issel ? "" : "not ") + "selected",
+                                     wantSel ^ issel,
+                                     false);
+                  optionFound = true;
+                  break;
+               }
             }
 
-            if (event.containsKey("set")) {
-               setvalue = event.get("set").toString();
-               setvalue = this.replaceString(setvalue);
+            if (!optionFound) {
+               this.report.ReportError("Failed to find select option '" +
+                                       val + "'!");
+            }
+         }
+
+         if (event.containsKey("assertselected")) {
+            boolean anySelected = sel.getAllSelectedOptions().size() > 0;
+            boolean shouldBeSelected =
+               clickToBool(event.get("assertselected").toString());
+
+            report.Assert("Option " + (anySelected ? "" : "not ") + "selected",
+                          anySelected, shouldBeSelected);
+         }
+
+         if (event.containsKey("included") ||
+             event.containsKey("notincluded")) {
+            boolean wantOpt = event.containsKey("included");
+            String val = this.replaceString(event.get(!wantOpt ? "notincluded" :
+                                                      "included").toString());
+            boolean haveOpt = false;
+
+            for (WebElement opt: sel.getOptions()) {
+               if (opt.getText().contains(val)) {
+                  haveOpt = true;
+                  break;
+               }
             }
 
-            if (event.containsKey("setreal")) {
-               setvalue = event.get("setreal").toString();
-               setvalue = this.replaceString(setvalue);
-               real = true;
-            }
+            String m = String.format("Select option %s%s found and%s expected",
+                                     val, haveOpt ? "" : " not",
+                                     wantOpt ? "" : " not");
+            this.report.Assert(m, wantOpt ^ haveOpt, false);
+         }
 
-            if (setvalue != null) {
-               if (real) {
-                  sel.selectByValue(setvalue);
-                  this.report.Log("Setting option by value: '" +
-                                  setvalue + "'.");
+         if (event.containsKey("multiselect") &&
+             !this.clickToBool(event.get("multiselect").toString()) &&
+             sel.isMultiple()) {
+            multiselect = false;
+         }
 
-               } else {
-                  sel.selectByVisibleText(setvalue);
-                  this.report.Log("Setting option by visible text: '" +
-                                  setvalue + "'.");
+         if (event.containsKey("clear") &&
+             this.clickToBool(event.get("clear").toString()) &&
+             sel.isMultiple()) {
+            this.report.Log("Clearing select element.");
+            sel.deselectAll();
+         }
+
+         try {
+            if (event.containsKey("set") ||
+                event.containsKey("setreal")) {
+               boolean useVal = event.containsKey("setreal");
+               String val = this.replaceString(event.get(useVal ? "setreal" :
+                                                         "set").toString());
+               this.report.Log("Setting option by " +
+                               (useVal ? "value" : "visible text") +
+                               ": '" + val + "'.");
+               if (multiselect == false) {
+                  /*
+                   * isMultiple() must be true in order for
+                   * multiselect to be false
+                   */
+                  sel.deselectAll();
                }
 
                try {
-                  /*
-                   * Selecting a value has the potential to refresh
-                   * the page.  Check for a stale element and refresh
-                   * it if needed (Bug 49533).
-                   */
-                  element.isDisplayed();
-               } catch (StaleElementReferenceException e) {
-                  this.report.Log("Page updated. Refreshing stale select element.");
-                  element = this.findElement(event, null, required);
-                  sel = new Select(element);
-               }
-
-               this.firePlugin(element, Elements.SELECT,
-                     PluginEvent.AFTERSET);
-            }
-
-            if (event.containsKey("assert")) {
-               do_assert = true;
-               assert_direction = true;
-               assert_value = event.get("assert").toString();
-               assert_value = this.replaceString(assert_value);
-            }
-
-            if (event.containsKey("assertnot")) {
-               do_assert = true;
-               assert_direction = false;
-               assert_value = event.get("assertnot").toString();
-               assert_value = this.replaceString(assert_value);
-            }
-
-            if (do_assert) {
-               int found = -1;
-               List<WebElement> options = sel.getOptions();
-               int opt_len = options.size() - 1;
-               String opt_val = "";
-
-               /* Check that this option exists */
-               for (int i = 0; i <= opt_len; i++) {
-                  opt_val = options.get(i).getText();
-                  if (opt_val.contains(assert_value)) {
-                     found = i;
-                     break;
-                  }
-               }
-
-               if (found < 0) {
-                  msg = String.format("Failed to find select option: '%s'!",
-                        assert_value);
-                  this.report.ReportError(msg);
-               } else {
-                  if (assert_direction) {
-                     if (options.get(found).isSelected()) {
-                        msg = String.format("Select option: '%s' is selected.",
-                              assert_value);
-                        this.report.Assert(msg, true, true);
-                     } else {
-                        msg = String.format(
-                              "Select option: '%s' is not selected.",
-                              assert_value);
-                        this.report.Assert(msg, false, true);
-                     }
+                  if (useVal) {
+                     sel.selectByValue(val);
                   } else {
-                     if (options.get(found).isSelected()) {
-                        msg = String.format("Select option: '%s' is selected.",
-                              assert_value);
-                        this.report.Assert(msg, false, true);
-                     } else {
-                        msg = String.format(
-                              "Select option: '%s' is not selected.",
-                              assert_value);
-                        this.report.Assert(msg, true, true);
-                     }
+                     sel.selectByVisibleText(val);
                   }
+                  this.firePlugin(element, Elements.SELECT,
+                                  PluginEvent.AFTERSET);
+               } catch (NoSuchElementException e) {
+                  this.report.ReportError("Option with " +
+                                          (useVal ? "value" : "visible text") +
+                                          " '" + val + "' does not exist");
                }
-            }
-
-            if (event.containsKey("assertselected")) {
-               boolean anySelected = sel.getAllSelectedOptions().size() > 0;
-               boolean shouldBeSelected =
-                  clickToBool(event.get("assertselected").toString());
-
-               report.Assert("Option " + (anySelected ? "":"not ") + "selected",
-                             anySelected, shouldBeSelected);
-            }
-
-            if (event.containsKey("click")) {
-               click = this.clickToBool(event.get("click").toString());
-            }
-
-            if (click) {
-               this.firePlugin(element, Elements.FORM,
-                               PluginEvent.BEFORECLICK);
-               element.click();
-               this.firePlugin(element, Elements.FORM,
-                               PluginEvent.AFTERCLICK);
             }
 
             if (event.containsKey("jscriptevent")) {
@@ -2047,68 +2115,32 @@ public class EventLoop implements Runnable {
                                event.get("jscriptevent").toString());
                this.Browser.fire_event(element,
                                        event.get("jscriptevent").toString());
-               Thread.sleep(1000);
+               try {
+                  Thread.sleep(1000);
+               } catch (InterruptedException e) {
+               }
                this.report.Log("Javascript event finished.");
             }
 
-            if (event.containsKey("included")) {
-               included = true;
-               included_direction = true;
-               included_value = event.get("included").toString();
-               included_value = this.replaceString(included_value);
+            if (event.containsKey("click") &&
+                this.clickToBool(event.get("click").toString())) {
+               this.firePlugin(element, Elements.SELECT,
+                               PluginEvent.BEFORECLICK);
+               element.click();
+               this.firePlugin(element, Elements.SELECT,
+                               PluginEvent.AFTERCLICK);
             }
 
-            if (event.containsKey("notincluded")) {
-               included = true;
-               included_direction = false;
-               included_value = event.get("notincluded").toString();
-               included_value = this.replaceString(included_value);
+            if (element.isDisplayed() && event.containsKey("children")) {
+               this.processEvents((Events)event.get("children"), element);
             }
-
-            if (included) {
-               List<WebElement> options = sel.getOptions();
-               int sel_len = options.size() - 1;
-               boolean found = false;
-
-               for (int i = 0; i <= sel_len; i++) {
-                  String opt_value = options.get(i).getText();
-                  if (opt_value.contains(included_value)) {
-                     found = true;
-                     break;
-                  }
-               }
-
-               if (included_direction) {
-                  if (found) {
-                     msg = String.format("Found Select list option: '%s'.",
-                           included_value);
-                     this.report.Assert(msg, true, true);
-                  } else {
-                     msg = String.format("Failed to find Select list option: '%s'.",
-                           included_value);
-                     this.report.Assert(msg, false, true);
-                  }
-               } else {
-                  if (found) {
-                     msg = String.format("Found Select list option: '%s', when it wasn't expected!",
-                           included_value);
-                     this.report.Assert(msg, false, false);
-                  } else {
-                     msg = String.format("Failed to find Select list option: '%s', as expected.",
-                           included_value);
-                     this.report.Assert(msg, true, true);
-                  }
-               }
-
-               if (event.containsKey("children") && element != null) {
-                  this.processEvents((Events)event.get("children"), element);
-               }
-            }
-
-
-            String value = element.getAttribute("value");
-            handleVars(value, event);
-
+         } catch (StaleElementReferenceException e) {
+            /*
+             * Selecting a value has the potential to refresh the page
+             * (Bug 49533).
+             */
+            this.report.Log("Page refreshed; select element no longer exists.");
+            element = null;
          }
 
       } catch (ElementNotVisibleException exp) {
@@ -2120,6 +2152,76 @@ public class EventLoop implements Runnable {
       this.report.Log("Select event finished.");
       return element;
    }
+
+
+   /**
+    * Handle an &lt;option&gt; event
+    *
+    * @param event  the &lt;option&gt; event
+    * @param parent this element's parent
+    * @return the a {@link WebElement} or null
+    */
+
+   private WebElement optionEvent(VDDHash event, WebElement parent) {
+      boolean click = true;
+      boolean required = true;
+      WebElement element = null;
+
+      this.report.Log("Option event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log("Option event finished.");
+            return element;
+         }
+
+         this.firePlugin(element, Elements.OPTION, PluginEvent.AFTERFOUND);
+
+         this.checkDisabled(event, element);
+
+         if (event.containsKey("assert")) {
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, element.getText());
+         }
+
+         if (event.containsKey("assertnot")) {
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, element.getText());
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            String ev = (String)event.get("jscriptevent");
+            this.report.Log("Firing Javascript Event: " + ev);
+            this.Browser.fire_event(element, ev);
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         if (click) {
+            this.firePlugin(element, Elements.OPTION, PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.OPTION, PluginEvent.AFTERCLICK);
+         }
+
+      } catch (ElementNotVisibleException e) {
+         logElementNotVisible(required, event);
+      } catch (Exception e) {
+         this.report.ReportException(e);
+      }
+
+      this.report.Log("Option event finished.");
+      return element;
+   }
+
 
    private WebElement formEvent(VDDHash event, WebElement parent) {
       boolean required = true;
@@ -2246,7 +2348,6 @@ public class EventLoop implements Runnable {
       Set<String> handles = null;
       int len = 0;
       boolean use_URL = false;
-      boolean is_REGEX = false;
       String finder = "";
       String found_handle = null;
       String msg = "";
@@ -2283,10 +2384,6 @@ public class EventLoop implements Runnable {
 
          finder = this.replaceString(finder);
 
-         if (this.report.isRegex(finder)) {
-            is_REGEX = true;
-         }
-
          for (int timer = 0; timer <= timeout; timer++) {
             handles = this.Browser.getDriver().getWindowHandles();
             len = handles.size() - 1;
@@ -2303,41 +2400,18 @@ public class EventLoop implements Runnable {
                this.report.Log(String.format("[%d]: Window URL: '%s'", i,
                      tmp_url));
 
-               if (!is_REGEX) {
-                  if (!use_URL) {
-                     if (tmp_title.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format(
-                              "Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     if (tmp_url.equals(finder)) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
-               } else {
-                  if (!use_URL) {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_title);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window Title '%s'", finder));
-                        break;
-                     }
-                  } else {
-                     Pattern p = Pattern.compile(finder);
-                     Matcher m = p.matcher(tmp_url);
-                     if (m.find()) {
-                        found_handle = tmp_handle;
-                        this.report.Log(String.format("Found Window URL '%s'",
-                              finder));
-                        break;
-                     }
-                  }
+               TextFinder f = new TextFinder(finder);
+
+               if (use_URL && f.findExact(tmp_url)) {
+                  found_handle = tmp_handle;
+                  this.report.Log(String.format("Found Window URL '%s'",
+                                                finder));
+                  break;
+               } else if (!use_URL && f.findExact(tmp_title)) {
+                  found_handle = tmp_handle;
+                  this.report.Log(String.format("Found Window Title '%s'",
+                                                finder));
+                  break;
                }
             } // end for loop //
 
@@ -2379,8 +2453,8 @@ public class EventLoop implements Runnable {
             this.processEvents((Events) event.get("children"), null);
          }
 
-         this.Browser.setBrowserOpened();
          this.Browser.getDriver().switchTo().window(currentWindow);
+         this.Browser.setBrowserOpened();
          this.setCurrentHWND(currentWindow);
          msg = String.format("Switching back to window handle: '%s'.",
                currentWindow);
@@ -2396,7 +2470,8 @@ public class EventLoop implements Runnable {
             Thread.sleep(tout);
          }
       } catch (Exception exp) {
-         exp.printStackTrace();
+         this.report.ReportException(exp);
+         result = false;
       }
 
       this.report.Log("Attach event finished.");
@@ -2458,18 +2533,6 @@ public class EventLoop implements Runnable {
 
          this.checkDisabled(event, element);
 
-         if (event.containsKey("click")) {
-            click = this.clickToBool(event.get("click").toString());
-         }
-
-         if (click) {
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.BEFORECLICK);
-            element.click();
-            this.firePlugin(element, Elements.DIV,
-                  PluginEvent.AFTERCLICK);
-         }
-
          if (event.containsKey("assert")) {
             String src = element.getText();
             String value = event.get("assert").toString();
@@ -2484,6 +2547,9 @@ public class EventLoop implements Runnable {
             this.report.AssertNot(value, src);
          }
 
+         String value = element.getText();
+         handleVars(value, event);
+
          if (event.containsKey("jscriptevent")) {
             this.report.Log("Firing Javascript Event: "
                   + event.get("jscriptevent").toString());
@@ -2492,8 +2558,17 @@ public class EventLoop implements Runnable {
             this.report.Log("Javascript event finished.");
          }
 
-         String value = element.getText();
-         handleVars(value, event);
+         if (event.containsKey("click")) {
+            click = this.clickToBool(event.get("click").toString());
+         }
+
+         if (click) {
+            this.firePlugin(element, Elements.DIV,
+                  PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, Elements.DIV,
+                  PluginEvent.AFTERCLICK);
+         }
 
          if (event.containsKey("children")) {
             this.processEvents((Events) event.get("children"), element);
@@ -2529,12 +2604,16 @@ public class EventLoop implements Runnable {
          }
          fd = null;
 
-         loader = new TestLoader(testfile, null);
+         loader = new TestLoader(new File(testfile), null);
          newEvents = loader.getEvents();
+         if (newEvents == null) {
+            this.report.ReportError("Failed to load script '" + testfile + "'");
+            return false;
+         }
          this.processEvents(newEvents, null);
 
       } catch (Exception exp) {
-         exp.printStackTrace();
+         this.report.ReportException(exp);
          result = false;
       }
 
@@ -2727,6 +2806,10 @@ public class EventLoop implements Runnable {
             this.report.Warn("You are using a deprecated alert hack, please use the <alert> command!");
          }
 
+         if (event.containsKey("children")) {
+            this.processEvents((Events) event.get("children"), null);
+         }
+
          if (event.containsKey("click")) {
             click = this.clickToBool(event.get("click").toString());
          }
@@ -2837,51 +2920,61 @@ public class EventLoop implements Runnable {
       return result;
    }
 
+   /**
+    * Duration of the current wait event.
+    */
+
+   private long waitDuration = 0;
+
+   /**
+    * Get the duration of a wait event in progress.
+    *
+    * <p>This is 0 unless a wait event is in progress, in which case
+    * it's set to the length of the wait in milliseconds.  This
+    * information is used by <code>Test.runTest</code> to extend the
+    * watchdog timeout by the duration of this wait.</p>
+    */
+
+   public long getWaitDuration() {
+      return waitDuration;
+   }
+
    private boolean waitEvent(VDDHash event) {
       boolean result = false;
-      int default_timeout = 5;
+      long timeout = DEFAULT_WAIT_DURATION;
 
       this.resetThreadTime();
       this.report.Log("Starting Wait event.");
 
       if (event.containsKey("timeout")) {
-         Integer int_out = new Integer(event.get("timeout").toString());
-         default_timeout = int_out.intValue();
-         this.report.Log(String.format("Setting timeout to: %d seconds.",
-               default_timeout));
-      } else {
-         this.report.Log(String.format("default timeout: %d seconds.",
-               default_timeout));
+         timeout = (new Integer(event.get("timeout").toString())).intValue();
+         this.report.Log("Setting timeout to " + timeout + " seconds.");
       }
 
-      default_timeout = default_timeout * 1000;
+      this.report.Log("Waiting " + timeout + " seconds.");
 
       try {
-         this.report.Log(String.format("waiting: '%d' seconds.",
-               (default_timeout / 1000)));
-         int wait_seconds = default_timeout / 1000;
-
-         for (int i = 0; i <= wait_seconds - 1; i++) {
+         this.waitDuration = timeout * 1000;
+         while (timeout-- > 0) {
             if (isStopped()) {
                break;
             }
-            Thread.sleep(1000);
+            try {
+               Thread.sleep(1000);
+            } catch (InterruptedException e) {}
          }
-
-         result = true;
-      } catch (InterruptedException exp) {
-         result = false;
+      } finally {
+         this.resetThreadTime();
+         this.waitDuration = 0;
       }
 
-      this.resetThreadTime();
       this.report.Log("Wait event finished.");
-      return result;
+      return true;
    }
 
    private boolean browserEvent(VDDHash event, WebElement parent) {
       boolean result = false;
       boolean assertPage = true;
-      BrowserActions browser_action = null;
 
       this.resetThreadTime();
 
@@ -2889,24 +2982,51 @@ public class EventLoop implements Runnable {
 
       try {
          if (event.containsKey("action")) {
-            browser_action = BrowserActions.valueOf(event.get("action").toString().toUpperCase());
-            switch (browser_action) {
-            case REFRESH:
-               this.report.Log("Calling Browser event refresh.");
-               this.Browser.refresh();
-               break;
-            case CLOSE:
-               this.report.Log("Calling Browser event close.");
-               this.Browser.close();
-               break;
-            case BACK:
-               this.report.Log("Calling Browser event back.");
-               this.Browser.back();
-               break;
-            case FORWARD:
-               this.report.Log("Calling Browser event forward.");
-               this.Browser.forward();
-               break;
+            int retry = 2;
+
+            while (retry-- > 0) {
+               try {
+                  switch (BrowserActions.valueOf(event.get("action").toString().toUpperCase())) {
+                  case REFRESH:
+                     this.report.Log("Calling Browser event refresh.");
+                     this.Browser.refresh();
+                     break;
+                  case CLOSE:
+                     this.report.Log("Calling Browser event close.");
+                     this.Browser.close();
+                     break;
+                  case BACK:
+                     this.report.Log("Calling Browser event back.");
+                     this.Browser.back();
+                     break;
+                  case FORWARD:
+                     this.report.Log("Calling Browser event forward.");
+                     this.Browser.forward();
+                     break;
+                  case MAXIMIZE:
+                     this.report.Log("Calling Browser event maximize.");
+                     this.Browser.maximize();
+                     break;
+                  case RESTORE:
+                     this.report.Log("Calling Browser event restore.");
+                     this.Browser.restore();
+                     break;
+                  }
+                  break;
+               } catch (org.openqa.selenium.WebDriverException e) {
+                  /*
+                   * Presumably an UnhandledAlertException.  However,
+                   * FirefoxDriver can't be counted on to throw that,
+                   * so catch the parent exception and handle the
+                   * alert.  If there is no alert, a new exception
+                   * will be thrown (which is OK), and this exception
+                   * will be reported regardless.
+                   */
+                  this.report.unhandledAlert(e);
+                  if (retry >= 0) {
+                     this.report.Log("Retrying browser action...");
+                  }
+               }
             }
          } else {
             int event_count = event.keySet().size() - 1;
@@ -2927,6 +3047,11 @@ public class EventLoop implements Runnable {
                   String url = event.get(key).toString();
                   url = this.replaceString(url);
                   this.report.Log(String.format("URL: '%s'", url));
+
+                  if (this.Browser.isClosed()) {
+                     this.Browser.newBrowser();
+                     this.setCurrentHWND(this.Browser.getDriver().getWindowHandle());
+                  }
                   this.Browser.url(url);
                   break;
                case BROWSER_assert:
@@ -2964,7 +3089,7 @@ public class EventLoop implements Runnable {
 
                case BROWSER_assertPage:
                   assertPage = this.clickToBool(event.get("assertPage").toString());
-                  this.report.Log(String.format("Borwser assertPage => '%s'.",
+                  this.report.Log(String.format("Browser assertPage => '%s'.",
                         assertPage));
                   break;
                default:
@@ -3140,6 +3265,86 @@ public class EventLoop implements Runnable {
 
 
    /**
+    * Miscellaneous events.
+    *
+    * This meta-event is for elements that don't have any features
+    * that distinguish themselves from other elements.  Currently,
+    * H1..H6, I, B, STRIKE, S, and U elements are handled here.
+    *
+    * @param event  the event
+    * @param parent this element's parent
+    * @return the matching {@link WebElement} or null
+    */
+
+   private WebElement miscEvent(VDDHash event, WebElement parent) {
+      Elements type = (Elements)event.get("type");
+      String eventName = type.toString().toLowerCase();
+      boolean required = true;
+      WebElement element = null;
+
+      this.report.Log(eventName + " event starting.");
+
+      if (event.containsKey("required")) {
+         required = this.clickToBool(event.get("required").toString());
+      }
+
+      try {
+         element = this.findElement(event, parent, required);
+         if (element == null) {
+            this.report.Log(eventName + " event finished.");
+            return null;
+         }
+
+         this.firePlugin(element, type, PluginEvent.AFTERFOUND);
+         this.checkDisabled(event, element);
+
+         String value = element.getText();
+         handleVars(value, event);
+
+         if (event.containsKey("assert")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assert").toString());
+            this.report.Assert(val, src);
+         }
+
+         if (event.containsKey("assertnot")) {
+            String src = element.getText();
+            String val = this.replaceString(event.get("assertnot").toString());
+            this.report.AssertNot(val, src);
+         }
+
+         if (event.containsKey("jscriptevent")) {
+            this.report.Log("Firing Javascript Event: " +
+                            event.get("jscriptevent").toString());
+            this.Browser.fire_event(element,
+                                    event.get("jscriptevent").toString());
+            Thread.sleep(1000);
+            this.report.Log("Javascript event finished.");
+         }
+
+         if (event.containsKey("click") &&
+             this.clickToBool(event.get("click").toString())) {
+            this.firePlugin(element, type, PluginEvent.BEFORECLICK);
+            element.click();
+            this.firePlugin(element, type, PluginEvent.AFTERCLICK);
+         }
+
+         if (event.containsKey("children") && element != null) {
+            this.processEvents((Events)event.get("children"), element);
+         }
+      } catch (ElementNotVisibleException exp) {
+         logElementNotVisible(required, event);
+      } catch (Exception exp) {
+         this.report.ReportException(exp);
+         element = null;
+      }
+
+      this.report.Log(eventName + " event finished.");
+      return element;
+   }
+
+
+   /**
     * The value of the current event's timeout attribute.
     *
     * <p>Part of the doFindElements hack below.</p>
@@ -3191,6 +3396,7 @@ public class EventLoop implements Runnable {
       By by = null;
       boolean href = false;
       boolean alt = false;
+      boolean text = false;
       boolean value = false;
       boolean exists = true;
       String how = "";
@@ -3200,7 +3406,7 @@ public class EventLoop implements Runnable {
       String msg = "";
 
       if (event.containsKey("exists")) {
-         exists = this.clickToBool(event.get("exists").toString());
+         exists = this.clickToBool(replaceString((String)event.get("exists")));
       }
 
       if (event.containsKey("timeout")) {
@@ -3234,15 +3440,10 @@ public class EventLoop implements Runnable {
          what = this.replaceString(what);
          String dowhat = event.get("do").toString();
 
-         if (index > -1) {
-            msg = String.format("Trying to find page element '%s' by: '%s' => '%s' index => '%s'.",
-                        dowhat, how, what, index);
-         } else {
-            msg = String.format(
-                  "Trying to find page element '%s' by: '%s' => '%s'.", dowhat,
-                  how, what);
-         }
-         this.report.Log(msg);
+         this.report.Log("Trying to find page element '" + dowhat + "' by: " +
+                         "'" + how + "' => '" + what + "'" +
+                         ((index > -1 && !how.equals("index")) ?
+                          " index => '" + index + "'" : "") + ".");
 
          if (how.matches("class") && what.matches(".*\\s+.*")) {
             String elem_type = event.get("do").toString();
@@ -3284,7 +3485,7 @@ public class EventLoop implements Runnable {
             href = true;
             break;
          case TEXT:
-            by = By.linkText(what);
+            text = true;
             break;
          case NAME:
             by = By.name(what);
@@ -3321,6 +3522,10 @@ public class EventLoop implements Runnable {
             element = this.slowFindElement((String)event.get("html_tag"),
                                            (String)event.get("html_type"),
                                            what, parent, index);
+         } else if (text) {
+            element = this.findElementByText((String)event.get("html_tag"),
+                                             (String)event.get("text"),
+                                             parent, index);
          } else {
             List<WebElement> elements;
 
@@ -3336,10 +3541,7 @@ public class EventLoop implements Runnable {
             element = elements.get(index);
          }
       } catch (NoSuchElementException exp) {
-         if (required && exists) {
-            this.report.ReportError("Failed to find element! " + exp);
-            element = null;
-         }
+         element = null;
       } catch (Exception exp) {
          this.report.ReportException(exp);
          element = null;
@@ -3450,9 +3652,9 @@ public class EventLoop implements Runnable {
 
       String root = (parent == null) ? "document" : "arguments[0]";
       String[] tags = tag.split("\\|");
-      String[] types = type.split("\\|");
+      String[] types = (type == null) ? new String[0] : type.split("\\|");
 
-      if (this.Browser instanceof IE) {
+      if (types.length == 0 || this.Browser instanceof IE) {
          /*
           * IE only supports the Selectors API with versions 8 and
           * greater, and then only when rendering the document in
@@ -3475,6 +3677,9 @@ public class EventLoop implements Runnable {
          for (int k = 0; k < types.length; k++) {
             typeFilter += String.format("args[k].type == '%s'%s", types[k],
                                         (k == types.length - 1) ? "" : " || ");
+         }
+         if (typeFilter.length() == 0) {
+            typeFilter = "true"; // Accept all types if none was specified
          }
 
          js = String.format("function finder(args) {\n" +
@@ -3566,6 +3771,49 @@ public class EventLoop implements Runnable {
       }
 
       return null;
+   }
+
+
+   /**
+    * Find an element by its innerText attribute.
+    *
+    * @param tag   the HTML tag of the element
+    * @param text  the text to search for
+    * @return matching {@link WebElement} or null
+    */
+
+   private WebElement findElementByText(String tag, String text,
+                                        WebElement parent, int index) {
+      By by = null;
+      List<WebElement> elements = null;
+      text = this.replaceString(text);
+
+      if (tag.equals("a")) {
+         by = By.linkText(text);
+      } else {
+         by = By.tagName(tag);
+      }
+
+      elements = findElementsInternal(by, parent);
+
+      if (!tag.equals("a")) {
+         ArrayList<WebElement> discard = new ArrayList<WebElement>();
+
+         for (WebElement e: elements) {
+            if (!e.getText().contains(text)) {
+               discard.add(e); // Can't delete elements while iterating
+            }
+         }
+
+         elements.removeAll(discard);
+      }
+
+      index = (index < 0) ? 0 : index; // -1 is default value
+      if (index >= elements.size()) {
+         return null;
+      }
+
+      return elements.get(index);
    }
 
 
@@ -3811,12 +4059,12 @@ public class EventLoop implements Runnable {
             value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          } else if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing textarea.");
-               element.clear();
+               clearText(element);
             }
          } else if (event.containsKey("append")) {
             value = event.get("append").toString();
@@ -3867,6 +4115,7 @@ public class EventLoop implements Runnable {
       this.report.Log("Finished textarea event.");
       return element;
    }
+
 
    /**
     * Clear a text, password, or email input or a textfield element.
@@ -3920,7 +4169,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing textfield.");
-               element.clear();
+               clearText(element);
             }
          }
 
@@ -3928,7 +4177,7 @@ public class EventLoop implements Runnable {
             String value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          }
 
@@ -4005,7 +4254,7 @@ public class EventLoop implements Runnable {
          if (event.containsKey("clear")) {
             if (this.clickToBool(event.get("clear").toString())) {
                this.report.Log("Clearing password field.");
-               element.clear();
+               clearText(element);
             }
          }
 
@@ -4013,7 +4262,7 @@ public class EventLoop implements Runnable {
             String value = event.get("set").toString();
             value = this.replaceString(value);
             this.report.Log(String.format("Setting Value to: '%s'.", value));
-            element.clear();
+            clearText(element);
             element.sendKeys(value);
          }
 

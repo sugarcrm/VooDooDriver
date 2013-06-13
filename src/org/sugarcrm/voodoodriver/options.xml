@@ -65,10 +65,12 @@
            help="Stop the test run as soon as any failure occurs"/>
    <option name="help" arg="none"
            help="Print a help message and exit"/>
+   <option name="maximizewindows" arg="none"
+           help="Maximize new browser windows"/>
    <option name="plugin" arg="files"
            help="An XML file specifying a VooDooDriver plugin and its parameters"/>
-   <option name="profile" arg="none"
-           help="The name of the profile with which to start the browser"/>
+   <option name="profile" arg="dir"
+           help="The profile with which to start the browser"/>
    <option name="restartcount" arg="integer"
            help="The number of tests in a suite to run before restarting the browser"/>
    <option name="restarttest" arg="string"
@@ -86,6 +88,8 @@ can consume disk space quickly. Be sure you have enough."/>
            help="A VooDooDriver test suite to run"/>
    <option name="test" arg="files"
            help="VooDooDriver test file to run"/>
+   <option name="webdriverlog" arg="none"
+           help="Save the WebDriver log"/>
    <option name="version" arg="none"
            help="Print version information and exit"/>
 </voodoo>

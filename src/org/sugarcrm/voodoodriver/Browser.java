@@ -16,8 +16,10 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.io.File;
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -51,7 +53,7 @@ public abstract class Browser {
     * The browser profile.
     */
 
-   private String profile = null;
+   protected String profile = null;
 
    /**
     * {@link Reporter} object used for logging.
@@ -63,13 +65,26 @@ public abstract class Browser {
     * Page assert file.
     */
 
-   private String assertPageFile = null;
+   private File assertPageFile = null;
 
    /**
     * {@link PageAsserter} object.
     */
 
    private PageAsserter asserter = null;
+
+   /**
+    * Size of the browser window when not maximized.
+    */
+
+   private Dimension browserSize;
+
+
+   /**
+    * True if new browser windows should be maximized immediately after open.
+    */
+
+   private boolean maximizeWindows = false;
 
 
    /**
@@ -119,17 +134,22 @@ public abstract class Browser {
 
 
    /**
+    * Enable WebDriver logging.
+    */
+
+   public void enableWebDriverLogging(File directory) {
+      // Only works on firefox
+   }
+
+
+   /**
     * Open the specified URL in the browser.
     *
     * @param url  URL to open
     */
 
    public void url(String url) {
-      try {
-         this.Driver.navigate().to(url);
-      } catch (Exception exp) {
-         exp.printStackTrace();  // XXX
-      }
+      this.Driver.navigate().to(url);
    }
 
 
@@ -161,12 +181,47 @@ public abstract class Browser {
 
 
    /**
+    * Maximize the browser window.
+    */
+
+   public void maximize() {
+      if (this.browserSize == null) {
+         this.browserSize = this.Driver.manage().window().getSize();
+         this.Driver.manage().window().maximize();
+      }
+   }
+
+
+   /**
+    * Restore the browser window.
+    */
+
+   public void restore() {
+      if (this.browserSize != null) {
+         this.Driver.manage().window().setSize(this.browserSize);
+         this.browserSize = null;
+      }
+   }
+
+
+   /**
     * Close the browser window.
     */
 
    public void close() {
       this.Driver.close();
       this.setBrowserClosed();
+   }
+
+
+   /**
+    * Set whether to maximize new windows.
+    *
+    * @param maximize  true if new windows should be maximized
+    */
+
+   public void maximizeBrowserWindows(boolean maximize) {
+      this.maximizeWindows = maximize;
    }
 
 
@@ -201,6 +256,9 @@ public abstract class Browser {
     */
 
    public void setBrowserOpened() {
+      if (this.maximizeWindows == true) {
+         maximize();
+      }
       this.closed = false;
    }
 
@@ -212,16 +270,13 @@ public abstract class Browser {
     */
 
    public String getPageSource() {
-      int retries = 20;
-
-      while (retries-- > 0) {
-         try {
-            return this.Driver.getPageSource();
-         } catch (Exception e) {}
-
-         try {
-            Thread.sleep(1000);
-         } catch (java.lang.InterruptedException e) {}
+      try {
+         return this.Driver.getPageSource();
+      } catch (org.openqa.selenium.UnhandledAlertException e) {
+         this.reporter.Warn("Unhandled alert when getting page source", false);
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.Warn("WebDriverException when getting page source" + e,
+                            false);
       }
 
       return "";
@@ -241,16 +296,19 @@ public abstract class Browser {
     */
 
    public Object executeJS(String script, WebElement element) {
-      Object result = null;
       JavascriptExecutor js = (JavascriptExecutor)this.Driver;
 
-      if (element != null) {
-         result = js.executeScript(script, element);
-      } else {
-         result = js.executeScript(script);
+      try {
+         if (element != null) {
+            return js.executeScript(script, element);
+         } else {
+            return js.executeScript(script);
+         }
+      } catch (org.openqa.selenium.WebDriverException e) {
+         this.reporter.Warn("Exception during javascript execution: " + e);
       }
 
-      return result;
+      return null;
    }
 
 
@@ -303,16 +361,23 @@ public abstract class Browser {
 
    public String generateUIEvent(UIEvents type) {
       if (type == UIEvents.FOCUS) {
-         return ("var ele = arguments[0];\n" +
-                 "ele.focus();\nreturn 0;\n");
+         return ("arguments[0].focus();\n" +
+                 "return 0;\n");
       }
 
+      String e = type.toString().toLowerCase();
+
       return ("var ele = arguments[0];\n" +
-              "var evObj = document.createEvent('MouseEvents');\n" +
-              "evObj.initMouseEvent('" + type.toString().toLowerCase() + "'," +
-                                   " true, true, window, 1, 12, 345, 7, 220," +
-                                   " false, false, true, false, 0, null);\n" +
-              "ele.dispatchEvent(evObj);\n" +
+              "if (document.createEvent) {\n" +
+              "   var eo = document.createEvent('MouseEvents');\n" +
+              "   eo.initMouseEvent('" + e + "',\n" +
+              "                     true, true, window, 1, 12, 345, 7, 220,\n" +
+              "                     false, false, true, false, 0, null);\n" +
+              "   ele.dispatchEvent(eo);\n" +
+              "} else if (document.createEventObject) {" +
+              "   var eo = document.createEventObject();\n" +
+              "   ele.fireEvent('on" + e + "', eo);\n" +
+              "}\n" +
               "return 0;\n");
    }
 
@@ -431,9 +496,9 @@ public abstract class Browser {
       if (this.asserter == null && this.assertPageFile != null) {
          try {
             this.asserter = new PageAsserter(this.assertPageFile,
-                                             this.reporter, whitelist);
-         } catch (Exception exp) {
-            this.reporter.ReportException(exp);
+                                             this.reporter);
+         } catch (VDDException e) {
+            this.reporter.ReportException(e);
          }
       }
 
@@ -448,13 +513,17 @@ public abstract class Browser {
    /**
     * Load the page assert file.
     *
-    * @param filename  the file of page asserts
+    * @param f         the file of page asserts
     * @param reporter  {@link Reporter} object to use
     */
 
-   public void setAssertPageFile(String filename, Reporter reporter) {
-      this.assertPageFile = filename;
-      this.asserter = new PageAsserter(filename, reporter, null);
+   public void setAssertPageFile(File f, Reporter reporter) {
+      this.assertPageFile = f;
+      try {
+         this.asserter = new PageAsserter(f, reporter);
+      } catch (VDDException e) {
+         this.reporter.ReportException(e);
+      }
    }
 
 
@@ -464,7 +533,7 @@ public abstract class Browser {
     * @return page assert file or null, if no file has been assigned
     */
 
-   public String getAssertPageFile() {
+   public File getAssertPageFile() {
       return this.assertPageFile;
    }
 }

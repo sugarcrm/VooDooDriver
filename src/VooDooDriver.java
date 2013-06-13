@@ -38,9 +38,9 @@ import org.sugarcrm.voodoodriver.PluginLoader;
 import org.sugarcrm.voodoodriver.SuiteParser;
 import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
-import org.sugarcrm.voodoodriver.TestList;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 
 
@@ -97,10 +97,12 @@ public class VooDooDriver {
       System.out.printf("(*)Java RunTime Info:\n");
       dumpKeys(javaInfo);
 
-      if (javaInfo.containsKey("java.vendor") &&
-          !javaInfo.get("java.vendor").toString().contains("Sun Microsystems")) {
-         System.out.println("(!)Warning: This is not a 'Sun Microsystems' " +
-                            "JRE/JDK and is not supported.");
+      if (javaInfo.containsKey("java.vendor")) {
+         String vendor = javaInfo.get("java.vendor").toString();
+         if (!(vendor.contains("Sun Microsystems") ||
+               vendor.contains("Oracle Corporation"))) {
+            System.out.println("(!)Warning: This is not a supported JRE/JDK.");
+         }
       }
    }
 
@@ -185,8 +187,9 @@ public class VooDooDriver {
             }
          } else if (type.contains("cmdopt")) {
             String validCmdopts[] = {"attachtimeout", "blocklistfile",
-                                     "browser", "eventtimeout", "plugin",
-                                     "restartcount", "restarttest",
+                                     "browser", "eventtimeout",
+                                     "haltOnFailure", "maximizewindows",
+                                     "plugin", "restartcount", "restarttest",
                                      "resultdir", "savehtml", "screenshot"};
             name = tmp.get("name").toString();
             value = tmp.get("value").toString();
@@ -204,6 +207,9 @@ public class VooDooDriver {
                                           name, value);
                         System.exit(1);
                      }
+                  } else if (name.equals("haltOnFailure") ||
+                             name.equals("maximizewindows")) {
+                     configOpts.put(s, Boolean.valueOf(value));
                   } else if (name.equals("plugin")) {
                      /*
                       * This is a hack.  This config file reading
@@ -398,6 +404,15 @@ public class VooDooDriver {
       if (config.get("downloaddir") != null) {
          browser.setDownloadDirectory((String)config.get("downloaddir"));
       }
+      if (config.get("webdriverlog") != null) {
+         browser.enableWebDriverLogging(new File((String)config.get("resultdir")));
+      }
+      if (config.get("profile") != null) {
+         browser.setProfile((String)config.get("profile"));
+      }
+      if (config.get("maximizewindows") != null) {
+         browser.maximizeBrowserWindows((Boolean)config.get("maximizewindows"));
+      }
 
       config.put("browser", browser);
    }
@@ -504,7 +519,7 @@ public class VooDooDriver {
       System.out.println("(*)Creating log file: " + vddLog);
       FileOutputStream logStream = null;
       try {
-         logStream = new FileOutputStream(vddLog);
+         logStream = new FileOutputStream(vddLog, true);
          ((VDDLog)System.out).openLog(logStream);
          ((VDDLog)System.err).openLog(logStream);
       } catch (java.io.FileNotFoundException e) {
@@ -582,14 +597,15 @@ public class VooDooDriver {
 
       System.out.printf("(*)Running Soda Tests...\n");
 
-      for (String test: tests) {
+      for (String testn: tests) {
+         File test = new File(testn);
          System.out.println("Starting Test " + test);
 
          if (browser.isClosed()) {
             browser.newBrowser();
          }
 
-         Test t = new Test(config, FilenameUtils.separatorsToSystem(test));
+         Test t = new Test(config, test);
          t.runTest(false);
 
          if (haltOnFailure &&
@@ -682,9 +698,8 @@ public class VooDooDriver {
       for (int i = 0; i <= len; i++) {
          String suite_base_noext = "";
          String suite_name = suites.get(i);
-         String suite_base_name = "";
-         File suite_fd = new File(suite_name);
-         suite_base_name = suite_fd.getName();
+         File suite = new File(suite_name);
+         String suite_base_name = suite.getName();
          int testRanCount = 0;
 
          writeSummary(suiteRptFD, "\t<suite>\n\n");
@@ -696,13 +711,17 @@ public class VooDooDriver {
          Matcher m = p.matcher(suite_base_name);
          suite_base_noext = m.replaceAll("");
 
-         suite_fd = null;
          Test testobj = null;
          System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
          System.out.printf("(*)Parsing Suite file...\n");
-         SuiteParser suiteP = new SuiteParser(suite_name,
-                                              (VDDHash)config.get("gvar"));
-         TestList suite_test_list = suiteP.getTests();
+         ArrayList<File> suite_test_list;
+         try {
+            SuiteParser s = new SuiteParser(suite, (VDDHash)config.get("gvar"));
+            suite_test_list = s.getTests();
+         } catch (VDDException e) {
+            System.err.println("Failed to load " + suite + ": " + e);
+            continue;
+         }
          VDDHash vars = null;
          TestResults test_results_hash = null;
          ArrayList<TestResults> test_resultsStore =
@@ -719,7 +738,13 @@ public class VooDooDriver {
             if ( (restartCount > 0) && (testRanCount >= restartCount)) {
                System.out.printf("(*))Auto restarting browser.\n");
                if (!browser.isClosed()) {
-                  browser.close();
+                  try {
+                     browser.close();
+                  } catch (org.openqa.selenium.WebDriverException e) {
+                     System.out.println("(!)Dismissing unhandled Alert.");
+                     browser.getDriver().switchTo().alert().accept();
+                     browser.close();
+                  }
                }
                browser.newBrowser();
 
@@ -742,8 +767,8 @@ public class VooDooDriver {
                                String.format("\t\t\t<starttime>%s</starttime>\n",
                                              date_str));
 
-                  testobj = new Test(config, restartTest, suite_base_noext,
-                                     vars);
+                  testobj = new Test(config, new File(restartTest),
+                                     suite_base_noext, vars);
                   testobj.setIsRestartTest(true);
 
                   testobj.runTest(false);
@@ -791,7 +816,7 @@ public class VooDooDriver {
             }
 
             writeSummary(suiteRptFD, "\t\t<test>\n");
-            String current_test = suite_test_list.get(test_index);
+            File current_test = suite_test_list.get(test_index);
             writeSummary(suiteRptFD,
                          String.format("\t\t\t<testfile>%s</testfile>\n",
                                        current_test));
@@ -858,8 +883,7 @@ public class VooDooDriver {
             writeSummary(suiteRptFD, "\t\t</test>\n\n");
 
             if (restartCount > 0) {
-               File tmpF = new File(current_test);
-               File pF = tmpF.getParentFile();
+               File pF = current_test.getParentFile();
 
                if (pF != null) {
                   String path = pF.getAbsolutePath();

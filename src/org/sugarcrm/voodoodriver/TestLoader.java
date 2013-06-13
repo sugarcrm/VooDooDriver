@@ -46,24 +46,23 @@ public class TestLoader {
     * @param reporter {@link Reporter} object for logging messages and errors
     */
 
-   public TestLoader(String sodaTest, Reporter reporter) {
-      File testFD = null;
+   public TestLoader(File sodaTest, Reporter reporter) {
       DocumentBuilderFactory dbf = null;
       DocumentBuilder db = null;
 
       this.reporter = reporter;
 
       try {
-         testFD = new File(sodaTest);
          dbf = DocumentBuilderFactory.newInstance();
          db = dbf.newDocumentBuilder();
-         doc = db.parse(testFD);
+         doc = db.parse(sodaTest);
          sodaTypes = new EventLoader();
          types = sodaTypes.getTypes();
          events = this.parse(doc.getDocumentElement().getChildNodes());
       } catch (Exception exp) {
          this.events = null;
          if (this.reporter == null) {
+            System.err.println("(!)Error initializing TestLoader:");
             exp.printStackTrace();
          } else {
             this.reporter.ReportException(exp);

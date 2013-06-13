@@ -1,0 +1,60 @@
+<!-- Regression test for SugarWait. -->
+<voodoo>
+   <puts text="SugarWait regression test starting." />
+   <browser url="{@global.url}/tests/test-data/sugarwait.html"/>
+
+   <!-- normal wait -->
+   <puts text="*** Test: Normal wait ***"/>
+   <li id="normal"/>
+   <puts text="*** Expected result: 'SugarWait Result: true' ***"/>
+
+   <!-- baseUrl != currentUrl -->
+   <puts text="*** Test: baseUrl != currentUrl ***"/>
+   <link id="gotoothersite"/>
+   <browser action="back"/>
+   <puts text="*** Expected result: 'Current page is not part of Sugar. Skipping SugarWait.' ***"/>
+
+   <!-- alert is active -->
+   <puts text="*** Test: alert is active ***"/>
+   <browser url="{@global.url}/tests/test-data/sugarwait.html"/>
+   <link id="doalert"/>
+   <alert alert="true"/>
+   <puts text="*** Expected result: 'JS alert is active.  Aborting SugarWait.' ***"/>
+
+   <!-- window closed prior to starting event -->
+   <puts text="*** Test: window closed prior to event ***"/>
+   <browser action="close"/>
+   <link id="obviouslynothere"/>
+   <puts text="*** Expected result: 'Browser window closed. Skipping plugin execution.' ***"/>
+
+   <!-- element closes window -->
+   <puts text="*** Test: element closes window ***"/>
+   <browser url="{@global.url}/tests/test-data/sugarwait.html"/>
+   <link id="openanother"/>
+   <attach index="1">
+      <link id="closeme"/>
+   </attach>
+   <puts text="*** Expected result: 'Browser window closed. Skipping plugin execution.' ***"/>
+
+   <!-- window closes during SUGAR invocation -->
+   <puts text="*** Test: window closes during SUGAR invocation ***"/>
+   <browser url="{@global.url}/tests/test-data/sugarwait.html"/>
+   <link id="openanother"/>
+   <attach index="1">
+      <li id="closer" click="true"/>
+   </attach>
+   <puts text="*** Expected result: 'JS exception caught but window closed. Ignoring.' ***"/>
+
+   <!-- actual js error -->
+   <puts text="*** Test: actual js error ***"/>
+   <li id="jserror" click="true"/>
+   <puts text="*** Expected result: 'Unexpected exception in SugarWait' ***"/>
+
+   <!-- undefined SUGAR -->
+   <puts text="*** Test: SUGAR undefined ***"/>
+   <li id="undefsugar" click="true"/>
+   <puts text="*** Expected result: 'Sugarwait failed: Can't find SUGAR object after 30 tries' ***"/>
+
+   <browser action="close"/>
+   <puts text="SugarWait regression test finished." />
+</voodoo>

@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2012 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * Please see the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -21,9 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
+import org.openqa.selenium.Alert;
 
 public class Reporter {
 
@@ -69,13 +68,20 @@ public class Reporter {
 
 
    /**
+    * Whether to terminate the current thread on error.
+    */
+
+   private boolean haltOnFailure = false;
+
+
+   /**
     * Instantiate a Reporter object.
     *
     * @param reportName
     * @param resultDir
     */
 
-   public Reporter(String reportName, String resultDir) {
+   public Reporter(String reportName, String resultDir, VDDHash config) {
       Date now = new Date();
       String frac = String.format("%1$tN", now);
       String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
@@ -101,8 +107,8 @@ public class Reporter {
 
       try {
          reportFD = new FileOutputStream(reportLog);
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Unable to create report file: " + e);
       }
 
       /* Initialize screenshot and savehtml events */
@@ -114,6 +120,8 @@ public class Reporter {
          this.saveHtmlOn.put(ssEvent, false);
          this.screenshotOn.put(ssEvent, false);
       }
+
+      this.haltOnFailure = (Boolean)config.get("haltOnFailure");
    }
 
    public void setTestName(String name) {
@@ -222,6 +230,26 @@ public class Reporter {
       return result;
    }
 
+
+   /**
+    * Terminate the current thread.
+    *
+    * There's a long discussion in the Java documentation about why
+    * using Thread.stop() is a terrible, terrible thing.  However, the
+    * alternate offered, in combination with the klunky way Java
+    * handles exceptions means that any program wanting to terminate a
+    * thread abnormally must design this ability in from the ground up
+    * -- not the case with VDD.  Consequently, despite the "dangers"
+    * involved in stopping a running thread, it's done here.  It won't
+    * matter anyways as VDD will be terminating itself shortly.
+    */
+
+   private void killTestThread() {
+      System.err.println("(!)Error seen and haltOnFailure set: terminating.");
+      Thread.currentThread().stop();
+   }
+
+
    private String replaceLineFeed(String str) {
       str = str.replaceAll("\n", "\\\\n");
       return str;
@@ -242,36 +270,41 @@ public class Reporter {
          msg = "Found empty message!";
       }
 
+      System.out.printf("%s\n", msg);
+
       try {
          this.reportFD.write(logstr.getBytes());
-         System.out.printf("%s\n", msg);
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error writing to report file: " + e);
       }
    }
 
    public void closeLog() {
       try {
          this.reportFD.close();
-         this.reportFD = null;
-      } catch (Exception exp) {
-         exp.printStackTrace();
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error closing report file: " + e);
       }
+      this.reportFD = null;
    }
 
    public void Log(String msg) {
       this._log("(*)" + msg);
    }
 
-   public void Warn(String msg) {
+   public void Warn(String msg, boolean savePage) {
       this._log("(W)" + msg);
 
-      if ((Boolean)this.saveHtmlOn.get("warning")) {
+      if (savePage && (Boolean)this.saveHtmlOn.get("warning")) {
          this.SavePage();
       }
       if ((Boolean)this.screenshotOn.get("warning")) {
          this.screenshot();
       }
+   }
+
+   public void Warn(String msg) {
+      Warn(msg, true);
    }
 
    public void ReportError(String msg) {
@@ -284,9 +317,16 @@ public class Reporter {
       if ((Boolean)this.screenshotOn.get("error")) {
          this.screenshot();
       }
+
+      if (this.haltOnFailure) {
+         killTestThread();
+      }
    }
 
-   public void ReportWatchDog() {
+   public void ReportWatchDog(long seconds) {
+      this._log(String.format("(!)Test watchdogged out after: '%d' seconds!",
+                              seconds));
+
       this.WatchDog = 1;
 
       if ((Boolean)this.saveHtmlOn.get("watchdog")) {
@@ -303,6 +343,43 @@ public class Reporter {
 
 
    /**
+    * Accept and log an unhandled alert.
+    *
+    * <p>Should the test script leave an alert up, an
+    * UnhandledAlertException will eventually be thrown by selenium.
+    * While from a test's point of view, the timing of this exception
+    * seems non-deterministic, it is thrown when the first "do
+    * something" call is made to selenium after the alert's appearance
+    * (just retrieving data from the page won't trigger it).</p>
+    *
+    * <p>Since the exception it generates needs to be logged and
+    * logging an exception can fetch the page source which will throw
+    * an exception, the alert is handled by the Reporter class which
+    * has ways to log exceptions without triggering a page fetch.</p>
+    *
+    * @param e  the UnhandledAlertException
+    */
+
+   public void unhandledAlert(org.openqa.selenium.WebDriverException e) {
+      try {
+         Alert alert = this.browser.getDriver().switchTo().alert();
+         String alertText = alert.getText();
+         /*
+          * Presumably, accept will be more likely to Do The Right
+          * Thing(TM) WRT getting rid of alerts and moving on, but it
+          * depends entirely on how the page in question is written.
+          */
+         alert.accept();
+
+         this._log("(!)Unhandled alert found and dismissed.  Alert text is \"" +
+                   alertText + "\"");
+      } finally {
+         justReportTheException(e);
+      }
+   }
+
+
+   /**
     * Log the exception only.
     *
     * This helper routine is needed since some of the Reporter methods
@@ -312,28 +389,19 @@ public class Reporter {
 
    private void justReportTheException(Exception e) {
       this.Exceptions += 1;
-      String msg = "--Exception Backtrace: ";
-      StackTraceElement[] trace = e.getStackTrace();
-      String message = "";
 
-      if (e.getMessage() != null) {
-         String[] msg_lines = e.getMessage().split("\\n");
-         for (int i = 0; i <= msg_lines.length -1; i++) {
-            message += msg_lines[i] + "  ";
-         }
-
-         this._log("(!)Exception raised: " + message);
-
-         for (int i = 0; i <= trace.length -1; i++) {
-            String tmp = trace[i].toString();
-            msg += "--" + tmp;
-         }
+      if (e.getMessage() == null) {
+         this._log("(!)ReportException: Exception message is null!");
       } else {
-         msg = "ReportException: Exception message is null!!!";
-         e.printStackTrace();
+         this._log("(!)" + e.getMessage().replaceAll("\\n", "  "));
       }
 
-      this._log("(!)" + msg);
+      String bt = "--Exception Backtrace: ";
+      for (StackTraceElement el: e.getStackTrace()) {
+         bt += "--" + el.toString();
+      }
+
+      this._log("(!)" + bt);
    }
 
 
@@ -356,35 +424,12 @@ public class Reporter {
       if ((Boolean)this.screenshotOn.get("exception")) {
          this.screenshot();
       }
-   }
 
-
-   public boolean isRegex(String str) {
-      boolean result = false;
-      Pattern p = Pattern.compile("^\\/");
-      Matcher m = p.matcher(str);
-
-      p = Pattern.compile("\\/$|\\/\\w+$");
-      Matcher m2 = p.matcher(str);
-
-      if (m.find() && m2.find()) {
-         result = true;
-      } else {
-         result = false;
+      if (this.haltOnFailure) {
+         killTestThread();
       }
-
-      return result;
    }
 
-   public String strToRegex(String val) {
-      String result = "";
-      val = val.replaceAll("\\\\", "\\\\\\\\");
-      val = val.replaceAll("^/", "");
-      val = val.replaceAll("/$", "");
-      val = val.replaceAll("/\\w$", "");
-      result = val;
-      return result;
-   }
 
    public boolean Assert(String msg, boolean state, boolean expected) {
       boolean result = false;
@@ -409,92 +454,61 @@ public class Reporter {
       if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
-
-      return result;
-   }
-
-   public boolean Assert(String value, String src) {
-      boolean result = false;
-      String msg = "";
-
-      if (isRegex(value)) {
-         value = this.strToRegex(value);
-         Pattern p = Pattern.compile(value, Pattern.MULTILINE);
-         Matcher m = p.matcher(src);
-         if (m.find()) {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed, Found: '%s'.", value);
-            this.Log(msg);
-            result = true;
-         } else {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed for find: '%s'!", value);
-            this._log(msg);
-            result = false;
-         }
-      } else {
-         if (src.contains(value)) {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed, Found: '%s'.", value);
-            this.Log(msg);
-            result = true;
-         } else {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed for find: '%s'!", value);
-            this._log(msg);
-            result = false;
-         }
-      }
-
-      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
-         this.SavePage();
-      }
-      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
-         this.screenshot();
+      if (result == false && this.haltOnFailure) {
+         killTestThread();
       }
 
       return result;
    }
 
-   public boolean AssertNot(String value, String src) {
-      boolean result = false;
-      String msg = "";
+   public boolean Assert(String search, String src) {
+      TextFinder f = new TextFinder(search);
+      boolean found = f.find(src);
 
-      if (isRegex(value)) {
-         value = this.strToRegex(value);
-         if (src.matches(value)) {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assert Failed, Found Unexpected text: '%s'.", value);
-            this._log(msg);
-            result = false;
-         } else {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed did not find: '%s' as expected.", value);
-            this.Log(msg);
-            result = true;
-         }
+      if (found) {
+         this.PassedAsserts += 1;
+         this.Log("Assert Passed, found: '" + search + "'.");
       } else {
-         if (src.contains(value)) {
-            this.FailedAsserts += 1;
-            msg = String.format("(!)Assertnot Failed: Found: '%s'.", value);
-            this._log(msg);
-            result = false;
-         } else {
-            this.PassedAsserts += 1;
-            msg = String.format("Assert Passed did not find: '%s' as expected.", value);
-            this.Log(msg);
-            result = true;
-         }
+         this.FailedAsserts += 1;
+         this._log("(!)Assert Failed for: '" + search + "'!");
       }
 
-      if (result == false && (Boolean)this.saveHtmlOn.get("assertfail")) {
+      if (!found && (Boolean)this.saveHtmlOn.get("assertfail")) {
          this.SavePage();
       }
-      if (result == false && (Boolean)this.screenshotOn.get("assertfail")) {
+      if (!found && (Boolean)this.screenshotOn.get("assertfail")) {
          this.screenshot();
       }
+      if (!found && this.haltOnFailure) {
+         killTestThread();
+      }
 
-      return result;
+      return found;
+   }
+
+   public boolean AssertNot(String search, String src) {
+      TextFinder f = new TextFinder(search);
+      boolean found = f.find(src);
+
+      if (found) {
+         this.FailedAsserts += 1;
+         this._log("(!)Assert Failed, found unexpected text: '" + search + "'.");
+      } else {
+         this.PassedAsserts += 1;
+         this.Log("Assert Passed, did not find: '" + search + "'!");
+      }
+
+      if (found && (Boolean)this.saveHtmlOn.get("assertfail")) {
+         this.SavePage();
+      }
+      if (found && (Boolean)this.screenshotOn.get("assertfail")) {
+         this.screenshot();
+      }
+      if (found && this.haltOnFailure) {
+         killTestThread();
+      }
+
+      return !found;
    }
 
 

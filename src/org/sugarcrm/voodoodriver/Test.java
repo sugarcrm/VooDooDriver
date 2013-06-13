@@ -23,7 +23,7 @@ import java.util.Date;
 public class Test {
 
    private Browser Browser = null;
-   private String testFile = "";
+   private File testFile;
    private EventLoop eventDriver = null;
    private Events events = null;
    private Reporter reporter = null;
@@ -31,10 +31,9 @@ public class Test {
    private VDDHash OldVars = null;
    private VDDHash HiJacks = null;
    private BlockList blocked = null;
-   private boolean WatchDog = false;
    private ArrayList<Plugin> plugins = null;
-   private static final int ThreadTimeout = 60 * 5; // 5 minute timeout //
-   private String assertPage = null;
+   private static final long watchdogTimeout = 60 * 5 * 1000; // 5 minutes
+   private File assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
    private int eventTimeout = 0;
@@ -47,7 +46,7 @@ public class Test {
     * @param testFile   name of this test file
     */
 
-   public Test(VDDHash config, String testFile) {
+   public Test(VDDHash config, File testFile) {
       this(config, testFile, null, null);
    }
 
@@ -61,7 +60,7 @@ public class Test {
     * @param oldvars    gvars from last test
     */
 
-   public Test(VDDHash config, String testFile, String suitename,
+   public Test(VDDHash config, File testFile, String suitename,
                VDDHash oldvars) {
 
       this.testFile = testFile;
@@ -78,17 +77,16 @@ public class Test {
       String screenshot = (String)config.get("screenshot");
       String resultsdir = (String)config.get("resultdir");
       String report_name = "";
-      File tmp_file = new File(testFile);
 
-      report_name = tmp_file.getName();
+      report_name = testFile.getName();
       report_name = report_name.replaceAll(".xml$", "");
 
       if (suitename != null) {
          resultsdir = resultsdir + "/" + suitename;
       }
 
-      this.reporter = new Reporter(report_name, resultsdir);
-      this.reporter.setTestName(testFile);
+      this.reporter = new Reporter(report_name, resultsdir, config);
+      this.reporter.setTestName(testFile.getName());
       this.reporter.setBrowser((Browser)config.get("browser"));
 
       if (saveHtml != null && saveHtml.length() > 0) {
@@ -101,8 +99,8 @@ public class Test {
 
       this.Browser.setReporter(this.reporter);
 
-      if (config.get("assertpage") != null) {
-         this.setAssertPage((String)config.get("assertpage"));
+      if (config.get("assertpagefile") != null) {
+         this.setAssertPage(new File((String)config.get("assertpagefile")));
       }
       this.setPlugins(plugin);
       if (config.get("attachtimeout") != null) {
@@ -119,7 +117,7 @@ public class Test {
       this.attachTimeout = timeout;
    }
 
-   public void setAssertPage(String assertPage) {
+   public void setAssertPage(File assertPage) {
       this.assertPage = assertPage;
       this.Browser.setAssertPageFile(this.assertPage, this.reporter);
    }
@@ -141,10 +139,9 @@ public class Test {
       TestLoader loader = null;
 
       try {
-         System.out.printf("Loading Soda Test: '%s'.\n", testFile);
+         this.reporter.Log("Loading Soda Test: '" + testFile + "'");
          loader = new TestLoader(testFile, this.reporter);
          this.events = loader.getEvents();
-         System.out.printf("Finished.\n");
       } catch (Exception exp) {
          this.reporter.ReportException(exp);
          result = false;
@@ -161,7 +158,7 @@ public class Test {
 
    public boolean runTest(boolean isSuitetest) {
       boolean result = false;
-      this.WatchDog = false;
+      boolean watchdog = false;
 
       if (this.isRestartTest) {
          this.reporter.setIsRestTest(true);
@@ -177,48 +174,39 @@ public class Test {
 
       result = CheckTestBlocked();
       if (!result) {
-         long current = 0;
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
                                      this.GVars, this.HiJacks, this.OldVars,
-                                     this.plugins, this.testFile,
+                                     this.plugins, this.testFile.getName(),
                                      this.eventTimeout);
 
          if (this.attachTimeout > 0) {
             eventDriver.setAttachTimeout(this.attachTimeout);
          }
 
-         while (eventDriver.isAlive() && this.WatchDog != true) {
-            Date current_time = new Date();
-            Date thread_time = eventDriver.getThreadTime();
-            current = current_time.getTime();
-            long thread = thread_time.getTime();
+         while (eventDriver.isAlive()) {
+            long elstamp = eventDriver.getThreadTime().getTime();
+            long now = (new Date()).getTime();
 
-            current = current / 1000;
-            thread = thread / 1000;
-            long seconds = (current - thread);
-
-            if (seconds > ThreadTimeout) {
-               this.WatchDog = true;
+            if (now - elstamp >
+                watchdogTimeout + eventDriver.getWaitDuration()) {
+               watchdog = true;
                eventDriver.stop();
-               String msg = String.format("Test watchdogged out after: '%d' seconds!\n", seconds);
-               this.reporter.ReportError(msg);
-               this.reporter.ReportWatchDog();
+               this.reporter.ReportWatchDog((now - elstamp) / 1000);
                break;
             }
 
             try {
                Thread.sleep(9000);
-            } catch (Exception exp) {
-               exp.printStackTrace();
-               System.exit(-1);
+            } catch (InterruptedException e) {
+               // ignore
             }
          }
       }
 
-      if (this.WatchDog) {
-         System.out.printf("Trying to close browser after watchdog!\n");
+      if (watchdog) {
+         System.out.println("Trying to close browser after watchdog timeout!");
          this.Browser.forceClose();
-         System.out.printf("Closed???!\n");
+         System.out.println("Closed???!");
       }
 
       this.logResults();
@@ -241,34 +229,35 @@ public class Test {
    }
 
    private boolean CheckTestBlocked() {
-      boolean result = false;
-      File fd = null;
-      String test_file = this.testFile;
+      String test_file = this.testFile.getName();
 
-      fd = new File(test_file);
-      test_file = fd.getName();
-      test_file = test_file.substring(0, test_file.length() -4);
+      test_file = test_file.substring(0, test_file.length() - 4);
 
       if (this.blocked == null) {
          return false;
       }
 
-      for (int i = 0; i <= this.blocked.size() -1; i++) {
-         String blocked_file = this.blocked.get(i).get("testfile").toString();
-         if (test_file.equals(blocked_file)) {
-            result = true;
-            String module_name = this.blocked.get(i).get("modulename").toString();
-            String bug_number = this.blocked.get(i).get("bugnumber").toString();
-            String reason = this.blocked.get(i).get("reason").toString();
-            String msg = String.format("Test is currently blocked, Bug Number: '%s', Module Name: '%s'"+
-                  ", Reason: '%s'", bug_number, module_name, reason);
-            this.reporter.Log(msg);
+      for (VDDHash item: this.blocked) {
+         if (test_file.equals(item.get("testfile").toString())) {
+            String module_name = (item.containsKey("modulename") ?
+                                  item.get("modulename").toString() :
+                                  "<<No Module>>");
+            String bug_number = (item.containsKey("bugnumber") ?
+                                 item.get("bugnumber").toString() :
+                                 "00000");
+            String reason = (item.containsKey("reason") ?
+                             item.get("reason").toString() :
+                             "");
+            this.reporter.Log("Test is currently blocked, " +
+                              "Bug Number: '" + bug_number + "', " +
+                              "Module Name: '" + module_name + "', " +
+                              "Reason: '" + reason + "'");
             this.reporter.ReportBlocked();
-            break;
+            return true;
          }
       }
 
-      return result;
+      return false;
    }
 
 }

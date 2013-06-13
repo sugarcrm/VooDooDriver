@@ -16,9 +16,13 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.io.File;
+import java.util.Date;
 import org.openqa.selenium.Mouse;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 
 /**
@@ -38,6 +42,13 @@ public class Firefox extends Browser {
 
 
    /**
+    * Directory into which to save the web driver logs.
+    */
+
+   private File webDriverLogDirectory = null;
+
+
+   /**
     * Set this object's download directory.
     *
     * @param dir  path to the download directory
@@ -49,11 +60,42 @@ public class Firefox extends Browser {
 
 
    /**
+    * Enable WebDriver logging.
+    */
+
+   public void enableWebDriverLogging(File directory) {
+      this.webDriverLogDirectory = directory;
+   }
+
+
+   /**
+    * Create a log file name in the specified directory with the
+    * specified base name.
+    *
+    * @param dir   log directory
+    * @param base  base name for log file
+    * @return complete path to log file 
+    */
+
+   private File makeLogfileName(File dir, String base) {
+      base += "-" + String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS.%1$tL",
+                                  new Date()) + ".log";
+      return new File(dir, base);
+   }
+
+
+   /**
     * Create a new firefox browser instance.
     */
 
    public void newBrowser() {
-      FirefoxProfile p = new FirefoxProfile();
+      FirefoxBinary b = new FirefoxBinary();
+      FirefoxProfile p = null;
+      if (this.profile == null) {
+         p = new FirefoxProfile();
+      } else {
+         p = new FirefoxProfile(new java.io.File(this.profile));
+      }
 
       if (this.downloadDirectory != null) {
          try {
@@ -75,8 +117,22 @@ public class Firefox extends Browser {
          p.setPreference("browser.download.useDownloadDir", true);
       }
 
-      FirefoxDriver fd = new FirefoxDriver(p);
-      this.setDriver(fd);
+      if (this.webDriverLogDirectory != null) {
+         File wdl = makeLogfileName(this.webDriverLogDirectory, "webdriver");
+         File fl = makeLogfileName(this.webDriverLogDirectory, "firefox");
+
+         System.out.println("(*) Creating WebDriver log " + wdl);
+         p.setPreference("webdriver.log.file", wdl.toString());
+
+         System.out.println("(*) Creating Firefox log " + fl);
+         p.setPreference("webdriver.firefox.logfile", fl.toString());
+      }
+
+      DesiredCapabilities c = new DesiredCapabilities();
+      c.setCapability("unexpectedAlertBehaviour", "ignore");
+
+      FirefoxDriver ff = new FirefoxDriver(b, p, c);
+      this.setDriver(ff);
       this.setBrowserOpened();
    }
 
@@ -111,11 +167,7 @@ public class Firefox extends Browser {
     */
 
    public void forceClose() {
-      try {
-         OSInfo.killProcesses(OSInfo.getProcessIDs("firefox"));
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+      OSInfo.killProcesses(OSInfo.getProcessIDs("firefox"));
       this.setBrowserClosed();
    }
 

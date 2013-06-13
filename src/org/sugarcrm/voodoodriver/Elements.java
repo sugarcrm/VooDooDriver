@@ -77,8 +77,14 @@ public enum Elements {
    HIDDEN,
    SELECT,
    SELECT_LIST,
+   OPTION,
    TEXTAREA,
    LABEL,
+   I,
+   B,
+   STRIKE,
+   S,
+   U,
 
    /* Events not found in Events.xml -- shouldn't these be deleted? */
    ACTION,

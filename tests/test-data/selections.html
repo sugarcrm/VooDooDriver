@@ -1,31 +1,65 @@
 <html>
+  <head>
+
+    <title>Select Test</title>
+
     <script type="text/javascript">
-    function checkListValue(){
-        var value = document.getElementById('list').value;
-        if (value == 0){
-            document.getElementById('status').innerHTML="selected zero";
-        }
-        else if (value == 1){
-            document.getElementById('status').innerHTML="selected one";
-        }
-        else if (value == 2){
-            document.getElementById('status').innerHTML="selected two";
-        }
-        else {
-            document.getElementById('status').innerHTML="selected nothing";
-        }
-    }
+      function checkValues() {
+         var lst = document.getElementById("single");
+         var m = document.getElementById("multi");
+
+         // Check the single select first
+         var sel = "nothing";
+         if (lst.value == 0 || lst.value == 1 || lst.value == 2) {
+            sel = lst.children[lst.selectedIndex].label;
+         }
+         document.getElementById("singlestatus").innerHTML = "selected " + sel;
+
+         // Now check the multiple select
+         sel = "";
+         for (var k = 0; k < m.children.length; k++) {
+            if (m.children[k].selected) {
+               sel += m.children[k].label;
+            }
+         }
+         if (sel.length == 0) {
+            sel = "nothing";
+         }
+         document.getElementById("multistatus").innerHTML = "selected " + sel;
+      }
     </script>
-    <body>
-        <select id="list">
-            <option value="null">please select something</option>
-            <option value="0">zero</option>
-            <option value="1">one</option>
-            <option value="2">two</option>
-        </select>
-        
-        <p><b id='status'>status message</b>
-            <input type='button' id="button" value='check list' onclick="checkListValue()" />
-        </p>
-    </body>
+
+  </head>
+  <body>
+
+    <form action="selections.html" method="post">
+      <select id="single">
+        <option value="null">please select something</option>
+        <option value="0">zero</option>
+        <option value="1">one</option>
+        <option value="2">two</option>
+      </select>
+      <select id="multi" multiple="true">
+        <option value="a">alpha</option>
+        <option value="b">bravo</option>
+        <option value="c">charlie</option>
+        <option value="d">delta</option>
+      </select>
+      <select id="jumper" onchange="form.submit()" onclick="form.submit()"
+              onmouseover="document.getElementById('js').innerHTML = 'over'">
+              onmouseout="document.getElementById('js').innerHTML = 'nichts'">
+        <option value="1">eins</option>
+        <option value="2">zwei</option>
+        <option value="3">drei</option>
+      </select>
+    </form>
+
+    <p>
+      <b id="singlestatus">no selection</b><br/>
+      <b id="multistatus">no selection</b><br/>
+      <b id="js">nichts</b><br/>
+      <input type="button" id="b" value="check lists" onclick="checkValues()"/>
+    </p>
+
+  </body>
 </html>
