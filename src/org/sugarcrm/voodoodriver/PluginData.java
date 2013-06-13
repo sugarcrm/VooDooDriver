@@ -200,7 +200,7 @@ public class PluginData {
     * SugarWait during the dev_v2 to dev to master transition.</p>
     *
     * @return {@link VDDHash} of Soda vars
-    * @deprecated Replaced by {@link getVars}
+    * @deprecated Replaced by {@link #getVars}
     */
 
    @Deprecated
