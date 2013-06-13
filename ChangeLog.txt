@@ -1,4 +1,124 @@
 ===============================================================================
+2013-06-13  Jonathan duSaint  <jdusaint@sugarcrm.com>
+
+This merge is a major update to VDD, encompassing nearly a year's
+worth of changes.  The most major change is the updated of the
+Selenium libraries to 2.25.0.  That change broke much of the alert
+handling and many of the subsequent changes deal with that fallout.
+Many new events and event attributes have been added, as well as
+command line arguments and cmdopts.  Much work was also done toward
+getting VDD to work on Windows against IE.  As always, in addition to
+the externally-visible changes, a great deal of work was done to the
+internals of VDD to increase speed, reliability, and maintainability.
+
+= New Features =
+
+ * New events: <option>, <h1>, <h2>, <h3>, <h4>, <h5>, <h6>, <i>, <b>,
+               <strike>, <s>, <u>, <th>, <email>
+ * New attributes: jscriptevent for <image>, exists and required for
+                   many events, format for <timestamp>, timeout for <alert>,
+                   assert/assertnot for <td>, multiselect for <select>
+ * New options: --profile, --eventtimeout, --webdriverlog
+ * Text search optimizations (Java's regex engine is slow and this
+   helps with that).
+ * Ability to maximize and restore browser window
+
+= Bugs Fixed =
+
+ * 44048: Need the ability to assert duplicated options in select list.
+ * 53899: The assertpage feature does not appear to be working.
+ * 54159: Voodoo fails on "required" attribute for td tag
+ * 54613: li elements cannot be accessed by the text attribute.
+ * 55085: Inproper behavior of VooDoo after 'Frame' event
+ * 55464: A number of tags still don't work in VDD.
+ * 55678: Support <th> tag in voodoo
+ * 55735: "onmouseover" does not work for images
+ * 55786: VooDoo Driver tried to find a select element again after a
+          new page is loaded
+ * 56570: Replacing variable in link tag is problematic
+ * 57864: Dev run: Can't restart the browser when a modal dialog is present.
+ * 57865: Dev run: Can't execute JavaScript when a modal dialog is present.
+ * 60042: Voodoo dev: <attach> is failing.
+ * 60284: watchdog should not be triggered when hardcode wait is happening
+ * 61860: Failure Error: Invalid attribute for ALERT event: 'timeout'
+ * 61883: Dev version of Voodoo fails to assert on $ correctly.
+ * 61884: Dev version of Voodoo fails to assert on regexps correctly
+ * 61891: VDD doesn't try to do an assert for <td> element
+ * 62013: VDD doesn't execute commands inside <link></link> sctructure
+ * 62326: JavaScript handling is unexpectedly dismissing modal dialogs.
+ * 62388: [VDD] Calendar > Shared > User List: unable to select only
+          one item from the list
+
+= All Changes =
+
+08a04b9 Update unsupported JRE/JDK warning
+d2fc4cb Modify message in findElement
+b50b4b8 Remove duplicate error
+9425ebd Fix matching problem in <select>
+2c43fa8 Add field checking to blocklist code
+906f713 Bug 62326: Stop accepting unexpected alerts
+55eef7c Create flag to enable webdriver logging
+71a6dcf Bug 62388: Allow for single select in a multi box
+cb5c2a3 Undeprecate using js content
+91b4606 Bug 62013: Allow child events of link
+bf87b50 Bug 61891: Add assert/assertnot to td event
+b4f3a57 Strip / delims
+a1cfa3b Bugs 61883 and 61884: Restore regex delims
+3440da6 Bug 61860: Add timeout attribute to alert event
+783cd8e Bug 60284: Prolong watchdog timeout during <wait>
+6824802 Add window maximize/restore support to VDD
+9267836 Append to voodoo.log
+b33d3d1 Dismiss unexpected alerts when closing browser
+7216246 Add the eventtimeout option to the config file
+4b55851 Add --eventtimeout command line option
+36909ec Add the timeout attribute to all events
+ecf34b3 Use the timeout value when finding elements
+9a0abaf Add the eventtimeout option to the config file
+93c9465 Add --eventtimeout command line option
+a581faf Add the timeout attribute to all events
+46c8aae Use the timeout value when finding elements
+86dec43 Sort the test files in a fileset.
+f6f03da Bug 60042: Give TextFinder another search method
+533776f Bug 60042: Modify text search
+39fcb4c Create SugarWait regression suite
+dfa47ec Reopen browser window when loading url
+158acbe Plumb --profile command line option
+4161ebf Add "format" attribute to timestamp event
+04c305f Add "format" attribute to timestamp event
+5d36bb3 Insert missing break.
+1c72359 Bugs 57864 and 57865: Accept unhandled alerts
+44cc09a Bug 55678: Add TH event
+2721c99 Add email event to VDD.
+58fc311 Remove '/' regex delimeters.
+1b0fc23 Delete Reporter.isRegex
+b686918 Rework PageAsserter
+d8ed1c4 Add email event to VDD.
+68b1ca9 Error out correctly with script error
+e169910 Add some missing event attributes.
+6cbe9ac Audit usage of Exception.printStackTrace()
+2e227eb Bug 56570: Replace text in 'exists' attribute.
+9566644 Bug 55786: Stop reloading select element
+06a7a72 Bug 55735: Add jscriptevent to image event
+688caad Bug 55678: Add TH event
+c0ef532 Bug 55464: Add several missing events.
+155df8f Add unexpectedAlertBehavior capability to Firefox
+6b5fe92 Update selenium libs to 2.25.0
+59bdb69 Bug 55085: Switch back to default frame
+c31e4b3 Replace link text
+f3f724b Bug 54159: Add required attribute to td
+6ce266d Bug 54613: text should search all innerText
+7ebe20e Fix Z-order bug with input.clear()
+b71b0f6 Plumb --haltOnFailure into Reporter
+af4e85c Work around a java.io.File "feature".
+87cd3cc Fix file/path handling in suite files
+57d2448 Fix jscriptevent for IE.
+6ed2984 VDD test suite fixes.
+681788a Fix VDDReporter path stupidity.
+6275437 Bug 44048: Create <option> event
+6ca724b Bug 53899: Fix --assertpagefile functionality
+
+
+===============================================================================
 2012-06-27  Jonathan duSaint  <jdusaint@sugarcrm.com>
 
 The merge is mostly bug fixes, with a few minor enhancements.  Support
