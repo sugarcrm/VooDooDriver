@@ -150,6 +150,12 @@ class CSV extends Event {
           */
 
          public boolean hasNext() {
+            /* Ensure the file is read when the CSV event has no children. */
+            if (lst.size() == 0) {
+               readNextCSVLine();
+               return false;
+            }
+
             if (index % lst.size() != 0) {
                return true;
             }
@@ -290,7 +296,14 @@ class CSV extends Event {
     */
 
    public boolean hasChildren() {
-      return this.children != null && children.size() > 0;
+      /*
+       * Handle the case here in which a CSV event has no children.
+       */
+      if (this.children == null) {
+         this.children = new CSVChildList(new ArrayList<Event>());
+      }
+
+      return true;
    }
 
 
