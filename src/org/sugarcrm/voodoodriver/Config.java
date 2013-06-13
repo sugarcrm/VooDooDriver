@@ -193,6 +193,7 @@ public class Config {
          String[] kvp = arg.split("::");
          if (kvp.length != 2) {
             System.err.printf("(!)Invalid argument to --%s '%s'\n", name, arg);
+            System.exit(1);
          }
          String key = kvp[0];
          String value = kvp[1];
