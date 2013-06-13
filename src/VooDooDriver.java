@@ -606,6 +606,7 @@ public class VooDooDriver {
 
    private static Vars createVars(VDDHash config) {
       Vars v = new Vars();
+      v.setFlat(true);
 
       VDDHash gvars = (VDDHash)config.get("gvar");
       if (gvars == null) {

@@ -62,6 +62,13 @@ public class Vars implements Iterable<String> {
 
 
    /**
+    * If <code>true</code>, the Vars object will have only one context.
+    */
+
+   private boolean flat = false;
+
+
+   /**
     * Create a Vars object with a single context.
     */
 
@@ -89,6 +96,26 @@ public class Vars implements Iterable<String> {
             this.put(key, h.get(key));
          }
       }
+
+      setFlat(v.flat);
+   }
+
+
+   /**
+    * Set whether this Vars is flat.
+    *
+    * <p>A flat Vars structure maintains only one context, making
+    * {@link #pushContext} and {@link #popContext} into no-ops.  If
+    * <code>setFlat</code> is called with <code>true</code> no new
+    * contexts will be created and neither will those already created
+    * be destroyed, unless <code>setFlat</code> is called again with
+    * <code>false</code>.
+    *
+    * @param flat  if <code>true</code>, make this a flat data structure
+    */
+
+   public void setFlat(boolean flat) {
+      this.flat = flat;
    }
 
 
@@ -153,6 +180,9 @@ public class Vars implements Iterable<String> {
     */
 
    public void pushContext() {
+      if (this.flat) {
+         return;
+      }
       HashMap<String,String> newContext = new HashMap<String,String>();
       this.context.push(newContext);
    }
@@ -163,6 +193,9 @@ public class Vars implements Iterable<String> {
     */
 
    public void popContext() {
+      if (this.flat) {
+         return;
+      }
       assert this.context.size() >= 1;
       this.context.pop();
    }
