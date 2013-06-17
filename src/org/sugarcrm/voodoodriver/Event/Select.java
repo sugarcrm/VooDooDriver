@@ -46,6 +46,14 @@ class Select extends HtmlEvent {
 
 
    /**
+    * Clicking a multi-select control is additive by default.  If this
+    * is true, clicking replaces the previous selection.
+    */
+
+   private boolean multiselect = true;
+
+
+   /**
     * An action to instantiate the Select object.  This action is
     * injected in the constructor to the start of the action list and
     * is always executed.  It's needed so that other actions don't
@@ -61,6 +69,28 @@ class Select extends HtmlEvent {
 
       public void action(Object val) {
          select = new org.openqa.selenium.support.ui.Select(element);
+      }
+   }
+
+
+   /**
+    * Update the multiselect attribute of this event.
+    */
+
+   protected class MultiselectAction implements Action {
+
+      /**
+       * Run the multiselect action.
+       */
+
+      public void action(Object val) {
+         boolean value = (Boolean)val;
+
+         if (!select.isMultiple() && !value) {
+            rterror("multiselect=\"false\" is not valid for single select controls");
+         }
+
+         multiselect = value;
       }
    }
 
@@ -239,6 +269,14 @@ class Select extends HtmlEvent {
                 ": '" + value + "'.");
 
             try {
+               if (!multiselect) {
+                  /*
+                   * isMultiple() must be true in order for
+                   * multiselect to be false.
+                   */
+                  select.deselectAll();
+               }
+
                if (byValue) {
                   select.selectByValue(value);
                } else {
@@ -284,6 +322,8 @@ class Select extends HtmlEvent {
                                                  new IncludedAction(true)));
       actionList.addLast(new Pair<String,Action>("notincluded",
                                                  new IncludedAction(false)));
+      actionList.addLast(new Pair<String,Action>("multiselect",
+                                                 new MultiselectAction()));
       actionList.addLast(new Pair<String,Action>("clear", new ClearAction()));
       actionList.addLast(new Pair<String,Action>("set", new SetAction(false)));
       actionList.addLast(new Pair<String,Action>("setreal",

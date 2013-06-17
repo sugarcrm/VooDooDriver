@@ -2108,6 +2108,7 @@
          <accessor type="boolean">disabled</accessor>
          <accessor type="string">included</accessor>
          <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">multiselect</accessor>
          <accessor type="string">notincluded</accessor>
          <accessor type="string">save</accessor>
          <accessor type="string">set</accessor>
