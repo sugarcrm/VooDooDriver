@@ -270,7 +270,7 @@ class ElementFinder {
 
       this.r.log("Searching all " + (type == null ? tag : type) +
                  " elements for value='" + value +
-                 "'. This could be take a while...");
+                 "'. This could take a while...");
 
       String[] tags = tag.split("\\|");
       String[] types = (type == null) ? new String[0] : type.split("\\|");
