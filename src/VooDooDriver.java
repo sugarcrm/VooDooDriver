@@ -850,7 +850,7 @@ public class VooDooDriver {
                                                        suiteStopTime));
          summary.closeTag();
 
-         if (!testPassed) {
+         if (haltOnFailure && !testPassed) {
             System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
             break;
          }
