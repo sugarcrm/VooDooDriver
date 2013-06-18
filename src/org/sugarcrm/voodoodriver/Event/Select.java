@@ -126,7 +126,7 @@ class Select extends HtmlEvent {
          String option = (String)val;
 
          for (WebElement optionElement: select.getOptions()) {
-            if (optionElement.getText().equals(option)) {
+            if (optionElement.getText().contains(option)) {
                boolean isSelected = optionElement.isSelected();
                eventLoop.report.Assert("Select option '" + option + "' is " +
                                        (isSelected ? "" : "not ") + "selected",
@@ -199,7 +199,7 @@ class Select extends HtmlEvent {
          boolean foundOption = false;
 
          for (WebElement option: select.getOptions()) {
-            if (option.getText().equals(searchOption)) {
+            if (option.getText().contains(searchOption)) {
                foundOption = true;
                break;
             }
