@@ -20,6 +20,14 @@ function jserror() {
    SUGAR.util.ajaxCallInProgress = function () { z.foo.bar(); };
 }
 
+function neverLoadSugar() {
+   SUGAR = {
+      util: {
+         ajaxCallInProgress: function() { return true; }
+      }
+   };
+}
+
 function undefSugar() {
    SUGAR = undefined;
 }
@@ -36,6 +44,7 @@ function undefSugar() {
       <li id="normal">normal</li>
       <li id="closer" onclick="unexpectedClose();">closer</li>
       <li id="jserror" onclick="jserror();">JS Error</li>
+      <li id="neverload" onclick="neverLoadSugar();">Page doesn't load</li>
       <li id="undefsugar" onclick="undefSugar();">SUGAR undefined</li>
     </ul>
 

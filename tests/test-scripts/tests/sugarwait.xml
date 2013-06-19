@@ -50,6 +50,11 @@
    <li id="jserror" click="true"/>
    <puts text="*** Expected result: 'Unexpected exception in SugarWait' ***"/>
 
+   <!-- page does not finish loading -->
+   <puts text="*** Test: page does not finish loading ***"/>
+   <li id="neverload" click="true"/>
+   <puts text="*** Expected result: 'SugarWait finished, result: false (page did not finish loading)' ***"/>
+
    <!-- undefined SUGAR -->
    <puts text="*** Test: SUGAR undefined ***"/>
    <li id="undefsugar" click="true"/>
