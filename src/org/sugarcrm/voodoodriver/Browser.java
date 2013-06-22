@@ -308,7 +308,7 @@ public abstract class Browser {
          this.reporter.Warn("Exception during javascript execution: " + e);
       }
 
-      return null;
+      return "undefined";
    }
 
 
