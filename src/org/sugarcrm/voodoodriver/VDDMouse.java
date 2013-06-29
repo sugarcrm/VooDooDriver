@@ -55,6 +55,7 @@ public class VDDMouse {
       if (!(wsrc instanceof RemoteWebElement) ||
           !(wdst instanceof RemoteWebElement)) {
          this.reporter.ReportError("src/dst is not a RemoteWebElement!");
+         return;
       }
 
       src = (RemoteWebElement)wsrc;
