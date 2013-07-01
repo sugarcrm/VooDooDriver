@@ -88,8 +88,10 @@ can consume disk space quickly. Be sure you have enough."/>
            help="A VooDooDriver test suite to run"/>
    <option name="test" arg="files"
            help="VooDooDriver test file to run"/>
-   <option name="webdriverlog" arg="none"
-           help="Save the WebDriver log"/>
    <option name="version" arg="none"
            help="Print version information and exit"/>
+   <option name="webdriverlog" arg="none"
+           help="Save the WebDriver log"/>
+   <option name="watchdogtimeout" arg="integer"
+           help="Number of seconds to use for the watchdog timeout"/>
 </voodoo>

@@ -32,7 +32,7 @@ public class Test {
    private VDDHash HiJacks = null;
    private BlockList blocked = null;
    private ArrayList<Plugin> plugins = null;
-   private static final long watchdogTimeout = 60 * 5 * 1000; // 5 minutes
+   private long watchdogTimeout = 0;
    private File assertPage = null;
    private int attachTimeout = 0;
    private boolean isRestartTest = false;
@@ -72,6 +72,7 @@ public class Test {
       @SuppressWarnings("unchecked")
          ArrayList<Plugin> plugin = (ArrayList<Plugin>)config.get("plugin");
       this.eventTimeout = (Integer)config.get("eventtimeout");
+      this.watchdogTimeout = (Integer)config.get("watchdogtimeout") * 1000;
 
       String saveHtml = (String)config.get("savehtml");
       String screenshot = (String)config.get("screenshot");
