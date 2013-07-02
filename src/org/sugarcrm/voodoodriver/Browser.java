@@ -80,7 +80,6 @@ public abstract class Browser {
 
    private Dimension browserSize;
 
-
    /**
     * True if new browser windows should be maximized immediately after open.
     */
@@ -93,6 +92,12 @@ public abstract class Browser {
     */
 
    protected File webDriverLogDirectory = null;
+
+   /**
+    * Number of seconds to use for Selenium's page load timeout.
+    */
+
+   protected int seleniumTimeout;
 
 
    /**
@@ -113,6 +118,17 @@ public abstract class Browser {
     */
    public String getProfile() {
       return this.profile;
+   }
+
+
+   /**
+    * Set the value for Selenium's page load timeout.
+    *
+    * @param timeout  page load timeout in seconds
+    */
+
+   public void setSeleniumTimeout(int timeout) {
+      this.seleniumTimeout = timeout;
    }
 
 
@@ -469,6 +485,8 @@ public abstract class Browser {
    public void setDriver(WebDriver driver) {
       this.Driver = driver;
       logDriverCaps();
+      driver.manage().timeouts().pageLoadTimeout(this.seleniumTimeout,
+                                                 java.util.concurrent.TimeUnit.SECONDS);
    }
 
    /**

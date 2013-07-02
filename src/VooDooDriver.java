@@ -416,6 +416,8 @@ public class VooDooDriver {
          browser.maximizeBrowserWindows((Boolean)config.get("maximizewindows"));
       }
 
+      browser.setSeleniumTimeout((Integer)config.get("watchdogtimeout") / 2);
+
       config.put("browser", browser);
    }
 
