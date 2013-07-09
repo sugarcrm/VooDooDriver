@@ -77,7 +77,7 @@ public class Test {
     * Amount of time allowed before this test times out.  Default is 5 minutes.
     */
 
-   private static final long watchdogTimeout = 60 * 5 * 1000; // 5 minutes
+   private long watchdogTimeout = 0;
 
    /**
     * Milliseconds to sleep while waiting for test completion.
@@ -99,6 +99,7 @@ public class Test {
       this.config = config;
       this.testFile = testFile;
       this.vars = vars;
+      this.watchdogTimeout = (Integer)config.get("watchdogtimeout") * 1000;
 
       initializeReporter(suitename);
    }

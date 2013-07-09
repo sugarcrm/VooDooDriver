@@ -42,8 +42,8 @@
             <name>back</name>
             <name>close</name>
             <name>forward</name>
-            <name>refresh</name>
             <name>maximize</name>
+            <name>refresh</name>
             <name>restore</name>
          </action>
          <accessor type="string">assert</accessor>

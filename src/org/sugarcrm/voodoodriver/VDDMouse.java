@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2013 SugarCRM Inc.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -21,6 +21,7 @@ import java.awt.event.InputEvent;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.internal.Locatable;
 
 public class VDDMouse {
@@ -39,20 +40,31 @@ public class VDDMouse {
       }
    }
 
-   public void DnD(WebElement src,WebElement dst) {
+   public void DnD(WebElement wsrc, WebElement wdst) {
       int src_x, src_y, dst_x, dst_y;
       Dimension srcDim = null;
       Dimension dstDim = null;
-      String msg = "";
-      this.reporter.log("Starting DnD.");
+      RemoteWebElement src, dst;
 
       if (this.robo == null) {
          return;
       }
 
+      this.reporter.log("Starting DnD.");
+
+      if (!(wsrc instanceof RemoteWebElement) ||
+          !(wdst instanceof RemoteWebElement)) {
+         this.reporter.ReportError("src/dst is not a RemoteWebElement!");
+         return;
+      }
+
+      src = (RemoteWebElement)wsrc;
+      dst = (RemoteWebElement)wdst;
+
       Thread.currentThread();
-      Point srcPoint = ((Locatable)src).getCoordinates().getLocationOnScreen();
-      Point dstPoint = ((Locatable)src).getCoordinates().getLocationOnScreen();
+
+      Point srcPoint = src.getCoordinates().onScreen();
+      Point dstPoint = dst.getCoordinates().onScreen();
       srcDim = src.getSize();
       dstDim = dst.getSize();
       src_x = srcPoint.getX() + (srcDim.getWidth() / 2);
@@ -60,10 +72,8 @@ public class VDDMouse {
       dst_x = dstPoint.getX() + (dstDim.getWidth() / 2);
       dst_y = dstPoint.getY() + (dstDim.getHeight() / 2);
 
-      msg = String.format("DnD Source Screen Coordinates: X => '%d' Y => '%d'", src_x, src_y);
-      this.reporter.log(msg);
-      msg = String.format("DnD Dest Screen Coordinates: X => '%d' Y => '%d'", dst_x, dst_y);
-      this.reporter.log(msg);
+      this.reporter.log(String.format("DnD Source Screen Coordinates: X => '%d' Y => '%d'", src_x, src_y));
+      this.reporter.log(String.format("DnD Dest Screen Coordinates: X => '%d' Y => '%d'", dst_x, dst_y));
 
       this.robo.mouseMove(srcPoint.x / 2, srcPoint.y / 2);
       this.robo.delay(800);
@@ -73,8 +83,8 @@ public class VDDMouse {
       this.robo.delay(800);
       this.robo.mouseRelease(InputEvent.BUTTON1_MASK);
       this.robo.delay(500);
-      msg = "DnD Finished.";
-      this.reporter.log(msg);
+
+      this.reporter.log("DnD Finished.");
    }
 
    private void Move(int cur_x, int cur_y, int x, int y) {

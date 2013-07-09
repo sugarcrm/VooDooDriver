@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -45,17 +44,6 @@ import org.openqa.selenium.WebElement;
  *
  */
 public class Utils {
-
-   public static void PrintSuiteReportToConsole(String suitename,
-                                                ArrayList<TestResults> list) {
-      String linemarker = StringUtils.repeat("#", 80);
-
-      System.out.printf("\n%s\n", linemarker);
-      System.out.printf("# Suite Name: %s\n", suitename);
-      System.out.printf("%s\n", linemarker);
-
-   }
-
 
    /**
     * Reads a text file into a String object.

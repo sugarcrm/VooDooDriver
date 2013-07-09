@@ -202,7 +202,8 @@ public class VooDooDriver {
                if (name.contains(s)) {
                   if (name.equals("attachtimeout") ||
                       name.equals("eventtimeout") ||
-                      name.equals("restartcount")) {
+                      name.equals("restartcount") ||
+                      name.equals("watchdogtimeout")) {
                      /* Integer cmdopts */
                      try {
                         configOpts.put(s, Integer.valueOf(value));
@@ -307,6 +308,7 @@ public class VooDooDriver {
       opts.put("haltOnFailure", false);
       opts.put("restartcount", 0);
       opts.put("resultdir", defaultResultDir());
+      opts.put("watchdogtimeout", 60 * 5); // 5 minutes
 
       /* Merge gvar */
       VDDHash gvar = new VDDHash();
@@ -417,6 +419,8 @@ public class VooDooDriver {
       if (config.get("maximizewindows") != null) {
          browser.maximizeBrowserWindows((Boolean)config.get("maximizewindows"));
       }
+
+      browser.setSeleniumTimeout((Integer)config.get("watchdogtimeout") / 2);
 
       config.put("browser", browser);
    }

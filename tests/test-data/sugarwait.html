@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>SugarWait Regression Test</title>
+
+    <script type="text/javascript">
+var SUGAR = {
+   util: {
+      ajaxCallInProgress: function() { return false; }
+   }
+};
+
+function unexpectedClose() {
+   SUGAR.util.ajaxCallInProgress = function () {
+                                      window.close();
+                                      return true;
+                                   };
+}
+
+function jserror() {
+   SUGAR.util.ajaxCallInProgress = function () { z.foo.bar(); };
+}
+
+function neverLoadSugar() {
+   SUGAR = {
+      util: {
+         ajaxCallInProgress: function() { return true; }
+      }
+   };
+}
+
+function undefSugar() {
+   SUGAR = undefined;
+}
+    </script>
+  </head>
+  <body>
+
+    <a id="gotoothersite" href="http://google.com">Other Site</a>
+    <a id="openanother" href="sugarwait.html" target="new">Open Me</a>
+    <a id="closeme" href="#" onclick="window.close();">Close Me</a>
+    <a id="doalert" href="#" onclick="alert('alert!');">Alert!</a>
+
+    <ul>
+      <li id="normal">normal</li>
+      <li id="closer" onclick="unexpectedClose();">closer</li>
+      <li id="jserror" onclick="jserror();">JS Error</li>
+      <li id="neverload" onclick="neverLoadSugar();">Page doesn't load</li>
+      <li id="undefsugar" onclick="undefSugar();">SUGAR undefined</li>
+    </ul>
+
+  </body>
+</html>

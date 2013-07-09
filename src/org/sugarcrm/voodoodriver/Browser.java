@@ -17,6 +17,7 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -26,7 +27,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 
 /**
@@ -80,12 +81,23 @@ public abstract class Browser {
 
    private Dimension browserSize;
 
-
    /**
     * True if new browser windows should be maximized immediately after open.
     */
 
    private boolean maximizeWindows = false;
+
+   /**
+    * Directory into which to save the web driver logs.
+    */
+
+   protected File webDriverLogDirectory = null;
+
+   /**
+    * Number of seconds to use for Selenium's page load timeout.
+    */
+
+   protected int seleniumTimeout;
 
 
    /**
@@ -106,6 +118,17 @@ public abstract class Browser {
     */
    public String getProfile() {
       return this.profile;
+   }
+
+
+   /**
+    * Set the value for Selenium's page load timeout.
+    *
+    * @param timeout  page load timeout in seconds
+    */
+
+   public void setSeleniumTimeout(int timeout) {
+      this.seleniumTimeout = timeout;
    }
 
 
@@ -136,10 +159,58 @@ public abstract class Browser {
 
    /**
     * Enable WebDriver logging.
+    *
+    * <p>This currently only works on firefox and chrome.</p>
+    *
+    * @param directory  the WebDriver log directory
     */
 
    public void enableWebDriverLogging(File directory) {
-      // Only works on firefox
+      this.webDriverLogDirectory = directory;
+   }
+
+
+   /**
+    * Create a log file name in the specified directory with the
+    * specified base name.
+    *
+    * @param dir   log directory
+    * @param base  base name for log file
+    * @return complete path to log file 
+    */
+
+   protected File makeLogfileName(File dir, String base) {
+      base += "-" + String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS.%1$tL",
+                                  new Date()) + ".log";
+      return new File(dir, base);
+   }
+
+
+   /**
+    * Log the capability kvps listed by RemoteWebDriver.
+    *
+    * <p>This dataset includes such interesting information as the
+    * browser type and version and the OS.</p>
+    */
+
+   protected void logDriverCaps() {
+      System.out.println("(*)WebDriver Capabilities:");
+      java.util.Map<String,?> m =
+         ((RemoteWebDriver)this.Driver).getCapabilities().asMap();
+
+      String[] keys = m.keySet().toArray(new String[0]);
+      int col = 0;
+      java.util.Arrays.sort(keys);
+      for (String key: keys) {
+         if (key.length() > col) {
+            col = key.length();
+         }
+      }
+
+      for (String key: keys) {
+         System.out.printf("--)%" + String.valueOf(col + 2) + "s: %s\n",
+                           key, m.get(key));
+      }
    }
 
 
@@ -311,7 +382,7 @@ public abstract class Browser {
          this.reporter.Warn("Exception during javascript execution: " + e);
       }
 
-      return null;
+      return "undefined";
    }
 
 
@@ -415,6 +486,9 @@ public abstract class Browser {
 
    public void setDriver(WebDriver driver) {
       this.Driver = driver;
+      logDriverCaps();
+      driver.manage().timeouts().pageLoadTimeout(this.seleniumTimeout,
+                                                 java.util.concurrent.TimeUnit.SECONDS);
    }
 
    /**

@@ -16,8 +16,10 @@
 
 package org.sugarcrm.voodoodriver;
 
+import java.io.File;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 
 /**
@@ -46,7 +48,26 @@ public class Chrome extends Browser {
     */
 
    public void newBrowser() {
-      this.setDriver(new ChromeDriver());
+      DesiredCapabilities dc = DesiredCapabilities.chrome();
+
+      if (this.webDriverLogDirectory != null) {
+         File wdl = makeLogfileName(super.webDriverLogDirectory, "webdriver");
+         File cl = makeLogfileName(super.webDriverLogDirectory, "chrome");
+
+         /*
+          * XXX: neither System.setProperty nor
+          * DesiredCapabilities.setCapability seem to work for this
+          * property.  Fortunately, chromedriver logs more information
+          * in its one log file than firefox does in both.
+          */
+         System.out.println("(*) Creating WebDriver log " + wdl);
+         System.setProperty("webdriver.log.file",  wdl.toString());
+
+         System.out.println("(*) Creating Chrome log " + cl);
+         System.setProperty("webdriver.chrome.logfile", cl.toString());
+      }
+
+      this.setDriver(new ChromeDriver(dc));
       this.setBrowserOpened();
    }
 
@@ -61,13 +82,12 @@ public class Chrome extends Browser {
     */
 
    public String generateUIEvent(UIEvents type) {
-      String result = "var ele = arguments[0];\n";
-      result += "var evObj = document.createEvent('MouseEvents');\n";
-      result += "evObj.initMouseEvent('" + type.toString().toLowerCase() + "', true, true, window, 1, 12, 345, 7, 220,"+
-         "false, false, true, false, 0, null );\n";
-      result += "ele.dispatchEvent(evObj);\n";
-
-      return result;
+      return ("var ele = arguments[0];\n" +
+              "var evObj = document.createEvent('MouseEvents');\n" +
+              "evObj.initMouseEvent('" + type.toString().toLowerCase() + "'," +
+              "                     true, true, window, 1, 12, 345, 7, 220, " +
+              "                     false, false, true, false, 0, null);\n" +
+              "ele.dispatchEvent(evObj);\n");
    }
 
 
