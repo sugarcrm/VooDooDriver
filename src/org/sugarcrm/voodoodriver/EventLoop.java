@@ -592,6 +592,7 @@ public class EventLoop implements Runnable {
       boolean result = false;
       int index = -1;
       String frameid = null;
+      WebElement e = null;
 
       this.report.Log("Frame event starting.");
 
@@ -599,25 +600,29 @@ public class EventLoop implements Runnable {
          String tmp = event.get("index").toString();
          tmp = this.replaceString(tmp);
          index = Integer.valueOf(tmp);
-      }
-
-      if (event.containsKey("id")) {
+      } else if (event.containsKey("id")) {
          frameid = event.get("id").toString();
          frameid = this.replaceString(frameid);
-      }
-
-      if (event.containsKey("name")) {
+      } else if (event.containsKey("name")) {
          frameid = event.get("name").toString();
          frameid = this.replaceString(frameid);
+      } else {
+         e = this.findElement(event, null, true);
+         if (e == null) {
+            this.report.Log("Frame event finished.");
+            return false;
+         }
       }
 
       try {
          if (index > -1) {
             this.report.Log("Switching to frame by index: '" + index + "'.");
             this.Browser.getDriver().switchTo().frame(index);
-         } else {
+         } else if (frameid != null) {
             this.report.Log("Switching to frame by name: '" + frameid + "'.");
             this.Browser.getDriver().switchTo().frame(frameid);
+         } else {
+            this.Browser.getDriver().switchTo().frame(e);
          }
 
          if (event.containsKey("children")) {
@@ -626,6 +631,7 @@ public class EventLoop implements Runnable {
 
          this.report.Log("Switching back to default frame.");
          this.Browser.getDriver().switchTo().defaultContent();
+         result = true;
       } catch (NoSuchFrameException exp) {
          this.report.ReportError("Failed to find frame!");
       } catch (Exception exp) {
