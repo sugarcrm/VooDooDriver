@@ -157,6 +157,10 @@ public class Test {
       return result;
    }
 
+   private void logVDDCommit() {
+      this.reporter.Log((new VersionInfo()).getVDDCommit());
+   }
+
    public boolean runTest(boolean isSuitetest) {
       boolean result = false;
       boolean watchdog = false;
@@ -175,6 +179,8 @@ public class Test {
 
       result = CheckTestBlocked();
       if (!result) {
+         logVDDCommit();
+
          eventDriver = new EventLoop(this.Browser, events, this.reporter,
                                      this.GVars, this.HiJacks, this.OldVars,
                                      this.plugins, this.testFile.getName(),
