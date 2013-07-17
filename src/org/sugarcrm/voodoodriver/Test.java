@@ -202,6 +202,15 @@ public class Test {
 
 
    /**
+    * Log the git commit id of the current VDD jar.
+    */
+
+   private void logVDDCommit() {
+      this.reporter.log((new VersionInfo()).getVDDCommit());
+   }
+
+
+   /**
     * Log the results of running this Test.
     */
 
@@ -293,6 +302,8 @@ public class Test {
          this.reporter.closeLog();
          return false;
       }
+
+      logVDDCommit();
 
       this.eventLoop = new EventLoop(this.events, this.config, this.reporter,
                                      this.vars, this.testFile.toString());

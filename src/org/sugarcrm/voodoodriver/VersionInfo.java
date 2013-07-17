@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2013 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -23,37 +23,38 @@ import java.util.Properties;
 
 public class VersionInfo {
 
-   private final String propFile = "vdd.properties";
-   private final String propName = "version";
+   private static final String PROPERTIES = "vdd.properties";
+   private static final String COMMIT = "commit";
+   private static final String VERSION = "version";
 
-   public VersionInfo() {
+   private static String commit = "unknown";
+   private static String version = "undefined";
 
-   }
+   static {
+      Class c = VersionInfo.class;
+      Properties p = new Properties();
 
-   public String getVDDVersion() {
-      String result = "";
-      InputStream stream = null;
-      Properties prop = null;
-
-      String className = this.getClass().getName().replace('.', '/');
-      String classJar =  this.getClass().getResource("/" + className + ".class").toString();
       try {
-         prop = new Properties();
-
-         if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(this.propFile);
+         if (c.getResource("/" + c.getName().replace('.', '/') + ".class").getProtocol().equals("jar")) {
+            p.load(c.getResourceAsStream(PROPERTIES));
          } else {
-            File fd = new File(getClass().getResource(this.propFile).getFile());
-            stream = new FileInputStream(fd);
+            p.load(new FileInputStream(new File(c.getResource(PROPERTIES).getFile())));
          }
 
-         prop.load(stream);
-         result = prop.getProperty(this.propName);
-      } catch (Exception exp) {
-         exp.printStackTrace();
-         result = "undefined version(bad build)";
+         commit = p.getProperty(COMMIT);
+         version = p.getProperty(VERSION);
+      } catch (java.io.IOException e) {
+         System.err.println("(!)IOException loading " + PROPERTIES + ":");
+         e.printStackTrace();
       }
+   }
 
-      return result;
+
+   public String getVDDVersion() {
+      return version;
+   }
+
+   public String getVDDCommit() {
+      return commit;
    }
 }

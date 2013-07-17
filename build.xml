@@ -3,7 +3,6 @@
    <description>Build script for VooDooDriver</description>
 
    <!-- set global properties for this build -->
-   <property name="buildnum" value="666" />
    <property name="bin" location="bin"/>
    <property name="src" location="src"/>
    <property name="build" location="build"/>
@@ -91,14 +90,30 @@
       <delete dir="${dist}" failonerror="false" />
    </target>
 
-   <target name="create-propfile">
+   <available file=".git" type="dir" property="git.present"/>
+   <target name="git.commit" if="git.present">
+      <exec executable="git" outputproperty="git.commit" failifexecutionfails="false" errorproperty="">
+         <arg value="log"/>
+         <arg value="-1"/>
+         <arg value="--pretty=format:%H"/>
+      </exec>
+      <condition property="vdd.commit" value="${git.commit}" else="unknown">
+         <and>
+            <isset property="git.commit"/>
+            <length string="${git.commit}" trim="yes" length="0" when="greater"/>
+         </and>
+      </condition>
+   </target>
+
+   <target name="create-propfile" depends="git.commit">
       <tstamp>
          <format property="timestamp" pattern="MM/dd/yyyy hh:mm aa" 
                  timezone="America/Los_Angeles" />
       </tstamp>
 		
       <propertyfile file="${build}/org/sugarcrm/voodoodriver/vdd.properties" comment="VooDooDriver Properties">
-         <entry key="version" value="${timestamp} 1.5.1 (build: ${buildnum})" />
+         <entry key="version" value="${timestamp} 1.5.1" />
+         <entry key="commit" value="VDD commit ${vdd.commit}"/>
       </propertyfile>
    </target>
 	

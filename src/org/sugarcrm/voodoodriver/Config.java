@@ -398,9 +398,9 @@ public class Config {
     */
 
    private void printVersion() {
-      VersionInfo vinfo = new VersionInfo();
-      System.out.printf("(*)VooDooDriver Version: %s\n",
-                        vinfo.getVDDVersion());
+      VersionInfo v = new VersionInfo();
+      System.out.println("(*)VooDooDriver Version: " + v.getVDDVersion() +
+                         ", " + v.getVDDCommit());
    }
 
 
