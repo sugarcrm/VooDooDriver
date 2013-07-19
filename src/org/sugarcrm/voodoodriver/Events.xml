@@ -121,6 +121,9 @@
       </accessor_attributes>
    </puts>
 
+   <savehtml>
+   </savehtml>
+
    <screenshot>
       <soda_attributes>
          <accessor type="string">file</accessor>

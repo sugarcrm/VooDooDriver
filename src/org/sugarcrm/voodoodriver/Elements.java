@@ -32,6 +32,7 @@ public enum Elements {
    JAVASCRIPT,
    PLUGINLOADER,
    PUTS,
+   SAVEHTML,
    SCREENSHOT,
    SCRIPT,
    TIMESTAMP,

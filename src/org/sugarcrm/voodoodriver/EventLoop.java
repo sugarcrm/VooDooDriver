@@ -422,6 +422,9 @@ public class EventLoop implements Runnable {
       case RADIO:
          element = radioEvent(event, parent);
          break;
+      case SAVEHTML:
+         result = savehtmlEvent(event);
+         break;
       case EXECUTE:
          result = executeEvent(event);
          break;
@@ -1183,6 +1186,11 @@ public class EventLoop implements Runnable {
 
       this.report.Log("Javascript event finished.");
       return result;
+   }
+
+   private boolean savehtmlEvent(VDDHash event) {
+      this.report.SavePage();
+      return true;
    }
 
    private boolean executeEvent(VDDHash event) {
