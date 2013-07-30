@@ -763,7 +763,7 @@ public class VddSummaryReporter {
          if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
             isrestart = isRestart(nl.item(i));
             if (isrestart) {
-               //continue;
+               continue;
             }
             n += Integer.parseInt(el.getFirstChild().getNodeValue());
          }
@@ -790,7 +790,7 @@ public class VddSummaryReporter {
          if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
             isrestart = isRestart(nl.item(i));
             if (isrestart) {
-            //   continue;
+               continue;
             }
             n += Integer.parseInt(el.getFirstChild().getNodeValue());
          }
@@ -817,7 +817,7 @@ public class VddSummaryReporter {
          if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
             isrestart = isRestart(nl.item(i));
             if (isrestart) {
-            //   continue;
+               continue;
             }
             n += Integer.parseInt(el.getFirstChild().getNodeValue());
          }
@@ -844,7 +844,7 @@ public class VddSummaryReporter {
          if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
             isrestart = isRestart(nl.item(i));
             if (isrestart) {
-            //   continue;
+              continue;
             }
             n += Integer.parseInt(el.getFirstChild().getNodeValue());
          }
@@ -864,7 +864,7 @@ public class VddSummaryReporter {
          if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
             isrestart = isRestart(nl.item(i));
             if (isrestart) {
-            //   continue;
+               continue;
             }
             n += Integer.parseInt(el.getFirstChild().getNodeValue());
          }
