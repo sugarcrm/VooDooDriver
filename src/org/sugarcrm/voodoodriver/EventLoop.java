@@ -3574,9 +3574,9 @@ public class EventLoop implements Runnable {
             this.report.Log(msg);
          }
       } else if (element != null && exists != true) {
-         this.report.ReportError("Found element with exist => 'false'!");
+         this.report.ReportError("Found element but exist = 'false'!");
       } else if (element == null && exists != true) {
-         this.report.Log("Did not find element as exist => 'false'.");
+         this.report.Log("Element not found and exist = 'false'.");
       } else {
          this.report.Log("Found element.");
       }
