@@ -16,15 +16,7 @@
 
 package org.sugarcrm.vddlogger;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -191,19 +183,20 @@ public class VDDReporter {
 
    public void generateReport() {
       HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
-      PrintStream report = null;
+      java.io.PrintStream report = null;
 
       File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
       System.out.println("(*)SummaryFile: " + summaryFile);
 
       try {
-         report = new PrintStream(new java.io.FileOutputStream(summaryFile));
+         report =
+            new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
       } catch (java.io.FileNotFoundException e) {
          System.err.println("(!)Unable to create summary.html: " + e);
          return;
       }
 
-      report.print(generateHTMLHeader());
+      report.print(readFile(HTML_HEADER_RESOURCE));
 
       for (int i = 0; i < xmlFiles.size(); i ++) {
          HashMap<String, Object> suiteData = null;
@@ -233,12 +226,57 @@ public class VDDReporter {
    }
 
 
+   /**
+    * Read an entire file into a String
+    *
+    * <p>The file will be opened from either the directory tree or
+    * VDDReporter's jar file.</p>
+    *
+    * @param name  name of the file to open
+    * @return the contents of the file
+    */
+
+   private String readFile(String name) {
+      Class c = VDDReporter.class;
+      String nm = c.getName().replace('.', '/');
+      String jar = c.getResource("/" + nm + ".class").toString();
+      java.io.InputStream is = null;
+
+      if (jar.startsWith("jar:")) {
+         is = c.getResourceAsStream(name);
+      } else {
+         try {
+            is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
+         } catch (java.io.FileNotFoundException e) {
+            System.err.println("(!)" + name + " not found: " + e);
+            return "";
+         }
+      }
+
+      java.io.BufferedReader b =
+         new java.io.BufferedReader(new java.io.InputStreamReader(is));
+
+      String out = "";
+      String line;
+      try {
+         while ((line = b.readLine()) != null) {
+            out += line + "\n";
+         }
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error reading " + name + ": " + e);
+      }
+
+      try { b.close(); } catch (java.io.IOException e) {}
+
+      return out;
+   }
+
+
    private void writeIssues() {
       String[] errors_keys = null;
       String[] warnings_keys = null;
       String[] except_keys = null;
       String line = "";
-      InputStream stream = null;
       HashMap<String, Integer> tmpMap = null;
 
       File issuesFile = new File(this.basedir, ISSUES_FILENAME);
@@ -250,25 +288,9 @@ public class VDDReporter {
       except_keys = sortIssue(this.issues.getData().get("exceptions"));
 
       try {
-         String className = this.getClass().getName().replace('.', '/');
-         String classJar =  this.getClass().getResource("/" + className + ".class").toString();
-
-         if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(this.HTML_HEADER_ISSUES_RESOURCE);
-         } else {
-            File header_fd = new File(getClass().getResource(this.HTML_HEADER_ISSUES_RESOURCE).getFile());
-            stream = new FileInputStream(header_fd);
-         }
-
-         InputStreamReader in = new InputStreamReader(stream);
-         BufferedReader br = new BufferedReader(in);
-         BufferedWriter out = new BufferedWriter(new FileWriter(issuesFile));
-
-         while ((line = br.readLine()) != null) {
-            out.write(line + "\n");
-         }
-         br.close();
-         in.close();
+         java.io.BufferedWriter out =
+            new java.io.BufferedWriter(new java.io.FileWriter(issuesFile));
+         out.write(readFile(HTML_HEADER_ISSUES_RESOURCE));
 
          tmpMap = this.issues.getData().get("errors");
          out.write("<table>\n");
@@ -542,48 +564,14 @@ public class VDDReporter {
       return html;
    }
 
-   /**
-    * generates the HTML table header for summary report, then returns it
-    * @return - String of html table header
-    */
-   private String generateHTMLHeader() {
-      String header = "";
-      String line = "";
-      InputStream stream = null;
-
-      try {
-         String className = this.getClass().getName().replace('.', '/');
-         String classJar =  this.getClass().getResource("/" + className + ".class").toString();
-
-         if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
-         } else {
-            File header_fd = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
-            stream = new FileInputStream(header_fd);
-         }
-
-         InputStreamReader in = new InputStreamReader(stream);
-         BufferedReader br = new BufferedReader(in);
-
-         while ((line = br.readLine()) != null) {
-            header += line;
-            header += "\n";
-         }
-
-         br.close();
-         in.close();
-      } catch (Exception exp ) {
-         exp.printStackTrace();
-      }
-
-      return header;
-   }
 
    /**
-    * generates the HTML table footer for summary report, then returns it
-    * @return - String of html table footer
+    * Create the HTML table footer for the summary report
+    *
+    * @return the table footer
     */
-   private String generateHTMLFooter(){
+
+   private String generateHTMLFooter() {
       int n1 = 0;
       int n2 = 0;
       String footerrun = "td_footer_run";
@@ -669,7 +657,7 @@ public class VDDReporter {
          System.out.println("(!)Warning: File > 2GB (" + xml.length() + "). Further truncation will occur.");
       }
       CharBuffer cbuf = CharBuffer.allocate((int)xml.length());
-      FileReader f = new FileReader(xml);
+      java.io.FileReader f = new java.io.FileReader(xml);
       f.read(cbuf);
       cbuf.rewind();
 
