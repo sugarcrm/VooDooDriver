@@ -89,7 +89,7 @@ public class VddLogConverter {
       }
 
       System.out.printf("(*)Generating Summary file...\n");
-      VddSummaryReporter summary = new VddSummaryReporter(xmlsuitefiles, dir);
+      VDDReporter summary = new VDDReporter(xmlsuitefiles, dir);
       summary.generateReport();
    }
 
@@ -105,9 +105,9 @@ public class VddLogConverter {
 
       xmlsuitefiles.add(file);
       System.out.printf("(*)Generating Summary file...\n");
-      VddSummaryReporter summary =
-         new VddSummaryReporter(xmlsuitefiles,
-                                file.getAbsoluteFile().getParentFile());
+      VDDReporter summary =
+         new VDDReporter(xmlsuitefiles,
+                         file.getAbsoluteFile().getParentFile());
       summary.generateReport();
    }
 
