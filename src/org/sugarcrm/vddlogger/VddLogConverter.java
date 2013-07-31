@@ -22,103 +22,64 @@ import java.util.ArrayList;
 public class VddLogConverter {
 
    /**
-    * @param args
+    * VDDReporter entry point.
+    *
+    * @param args  command line arguments
     */
-   public static void main(String[] args) {
-      VddLogCmdOpts opts = null;
-      VddLogCmdParser parser = null;
 
-      parser = new VddLogCmdParser(args);
-      opts = parser.parse();
+   public static void main(String[] args) {
+      ArrayList<File> xml = null;
+      File dir = null;
+      VddLogCmdParser p = new VddLogCmdParser(args);
+      VddLogCmdOpts opts = p.parse();
 
       if (opts.containsKey("help")) {
-         PrintHelp();
+         System.out.println("Usage:\n" +
+                            "   VDDReporter --suitefile=<suite.xml>\n" +
+                            "   VDDReporter --suitedir=<suite dir>");
          System.exit(0);
       }
 
       if (opts.containsKey("suitefile")) {
-         File suitefile = new File((String)opts.get("suitefile"));
+         File f = new File(opts.get("suitefile"));
 
-         if (!suitefile.exists()) {
-            System.out.println("(!)Suite file '" + suitefile +
-                               "' does not exist");
+         if (!f.exists()) {
+            System.out.println("(!)Suite file '" + f + "' does not exist");
             System.exit(3);
          }
 
-         System.out.printf("(*)Processing suite file: '%s'...\n", suitefile);
-         handleSuiteFile(suitefile);
+         System.out.println("(*)Processing suite file: '" + f + "'...");
+         xml = new ArrayList<File>();
+         xml.add(f);
+         dir = f.getAbsoluteFile().getParentFile();
       } else if (opts.containsKey("suitedir")) {
-         File suitedir = new File(opts.get("suitedir"));
+         dir = new File(opts.get("suitedir"));
+         System.out.println("(*)Processing suite directory: '" + dir + "'.");
 
-         if (!suitedir.exists()) {
-            System.out.println("(!)Suite directory '" + suitedir +
-                               "' does not exist");
+         File fs[] = dir.listFiles(new java.io.FilenameFilter() {
+               public boolean accept(File dir, String name) {
+                  boolean ok = name.toLowerCase().endsWith(".xml");
+                  if (ok) {
+                     System.out.println("(*)Found Suite File: '" + name + "'.");
+                  }
+                  return ok;
+               }
+            });
+
+         if (fs == null) {
+            System.out.println("(!)Suite directory '" + dir + "' is not valid");
             System.exit(4);
          }
 
-         System.out.printf("(*)Opening suitedir: '%s'.\n", suitedir);
-         handleSuiteDir(suitedir);
+         xml = new ArrayList<File>(java.util.Arrays.asList(fs));
 
       } else {
          System.out.println("(!)Missing --suitefile or --suitedir!");
          System.exit(2);
       }
+
+      System.out.println("(*)Generating Summary file...");
+      VDDReporter r = new VDDReporter(xml, dir);
+      r.generateReport();
    }
-
-
-   /**
-    * Process the directory specified by --suitedir.
-    *
-    * @param dir  the specified directory
-    */
-
-   private static void handleSuiteDir(File dir) {
-      ArrayList<File> xmlsuitefiles = new ArrayList<File>();
-      String[] files = null;
-
-      files = dir.list();
-
-      for (int i = 0; i <= files.length -1; i++) {
-         if (!files[i].toLowerCase().endsWith(".xml")) {
-            continue;
-         }
-
-         System.out.printf("(*)Found Suite File: '%s'.\n", files[i]);
-         String filename = dir.toString() + File.separatorChar + files[i];
-         xmlsuitefiles.add(new File(filename));
-      }
-
-      System.out.printf("(*)Generating Summary file...\n");
-      VDDReporter summary = new VDDReporter(xmlsuitefiles, dir);
-      summary.generateReport();
-   }
-
-
-   /**
-    * Process the file specified by --suitefile.
-    *
-    * @param file  the specified file
-    */
-
-   public static void handleSuiteFile(File file) {
-      ArrayList<File> xmlsuitefiles = new ArrayList<File>();
-
-      xmlsuitefiles.add(file);
-      System.out.printf("(*)Generating Summary file...\n");
-      VDDReporter summary =
-         new VDDReporter(xmlsuitefiles,
-                         file.getAbsoluteFile().getParentFile());
-      summary.generateReport();
-   }
-
-
-   /**
-    *
-    */
-
-   public static void PrintHelp() {
-      String msg = "This is a help message!";
-      System.out.printf("%s\n", msg);
-   }
-
 }
