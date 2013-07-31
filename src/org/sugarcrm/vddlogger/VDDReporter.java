@@ -33,7 +33,7 @@ import org.xml.sax.InputSource;
  * Entry point for VDD report generation.
  */
 
-public class VddSummaryReporter {
+public class VDDReporter {
 
    private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
    private String HTML_HEADER_ISSUES_RESOURCE = "issues-header.txt";
@@ -59,13 +59,13 @@ public class VddSummaryReporter {
 
 
    /**
-    * Instantiate a VddSummaryReporter object
+    * Instantiate a VDDReporter object
     *
     * @param xmlFiles  list of VDD suite output files
     * @param path      directory containing the XML files
     */
 
-   public VddSummaryReporter(ArrayList<File> xmlFiles, File path) {
+   public VDDReporter(ArrayList<File> xmlFiles, File path) {
       this.count = 0;
       this.xmlFiles = xmlFiles;
       passedTests = 0;
