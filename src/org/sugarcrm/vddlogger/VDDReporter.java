@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -29,7 +28,6 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,10 +45,51 @@ import org.xml.sax.InputSource;
 
 public class VDDReporter {
 
-   private String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
-   private String HTML_HEADER_ISSUES_RESOURCE = "issues-header.txt";
-   private int count;
+   /**
+    * File header for summary.html
+    */
+
+   private final String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
+
+   /**
+    * Filename of summary.html
+    */
+
+   private final String SUMMARY_FILENAME = "summary.html";
+
+   /**
+    * File header for issues.html
+    */
+
+   private final String HTML_HEADER_ISSUES_RESOURCE = "issues-header.txt";
+
+   /**
+    * Filename of issues.html
+    */
+
+   private final String ISSUES_FILENAME = "issues.html";
+
+   /**
+    * List of input XML files.
+    */
+
    private ArrayList<File> xmlFiles;
+
+   /**
+    * Base directory of test result files.
+    */
+
+   private File basedir;
+
+   /**
+    * Collection of counts of errors, warnings, and exceptions from
+    * all suites.
+    */
+
+   private VddLogIssues issues;
+
+
+   private int count = 0;
    private int passedTests = 0;
    private int failedTests = 0;
    private int blockedTests = 0;
@@ -62,12 +101,6 @@ public class VDDReporter {
    private int hours = 0;
    private int minutes = 0;
    private int seconds = 0;
-   private FileOutputStream output;
-   private PrintStream repFile;
-   private Document dom;
-   private String basedir = "";
-   private VddLogIssues issues = null;
-   private String issuesHtmlFile = null;
 
 
    /**
@@ -146,35 +179,9 @@ public class VDDReporter {
     */
 
    public VDDReporter(ArrayList<File> xmlFiles, File path) {
-      this.count = 0;
       this.xmlFiles = xmlFiles;
-      passedTests = 0;
-      failedTests = 0;
-      blockedTests = 0;
-      failedAsserts = 0;
-      passedAsserts = 0;
-      exceptions = 0;
-      errors = 0;
-      watchdog = 0;
-      hours = 0;
-      minutes = 0;
-      seconds = 0;
-
-
-      String summaryFile = String.format("%s%s%s", path, File.separatorChar, "summary.html");
-      this.issuesHtmlFile = String.format("%s%s%s", path, File.separatorChar, "issues.html");
-      this.basedir = path.toString();
-
+      this.basedir = path;
       this.issues = new VddLogIssues();
-
-      try {
-         output = new FileOutputStream(summaryFile);
-         System.out.printf("(*)SummaryFile: %s\n", summaryFile);
-         repFile = new PrintStream(output);
-      } catch (Exception e) {
-         System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", summaryFile);
-         e.printStackTrace();
-      }
    }
 
 
@@ -184,10 +191,19 @@ public class VDDReporter {
 
    public void generateReport() {
       HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
-      repFile.print(generateHTMLHeader());
-      String name = "";
-      String[] keys = null;
+      PrintStream report = null;
 
+      File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
+      System.out.println("(*)SummaryFile: " + summaryFile);
+
+      try {
+         report = new PrintStream(new java.io.FileOutputStream(summaryFile));
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Unable to create summary.html: " + e);
+         return;
+      }
+
+      report.print(generateHTMLHeader());
 
       for (int i = 0; i < xmlFiles.size(); i ++) {
          HashMap<String, Object> suiteData = null;
@@ -198,21 +214,20 @@ public class VDDReporter {
             System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
             continue;
          }
-         name = suiteData.get("suitename").toString();
-         list.put(name, suiteData);
+         list.put(suiteData.get("suitename").toString(), suiteData);
       }
 
-      keys = list.keySet().toArray(new String[0]);
+      String keys[] = list.keySet().toArray(new String[0]);
       java.util.Arrays.sort(keys);
 
       for (int i = 0; i <= keys.length -1; i++) {
          String key = keys[i];
-         repFile.print(generateTableRow(key, list.get(key)));
+         report.print(generateTableRow(key, list.get(key)));
       }
 
-      repFile.print(generateHTMLFooter());
-      repFile.print("\n</body>\n</html>\n");
-      repFile.close();
+      report.print(generateHTMLFooter());
+      report.print("\n</body>\n</html>\n");
+      report.close();
 
       this.writeIssues();
    }
@@ -226,7 +241,9 @@ public class VDDReporter {
       InputStream stream = null;
       HashMap<String, Integer> tmpMap = null;
 
-      System.out.printf("(*)Writing issues file...\n");
+      File issuesFile = new File(this.basedir, ISSUES_FILENAME);
+
+      System.out.println("(*)Writing issues file: " + issuesFile);
 
       errors_keys = sortIssue(this.issues.getData().get("errors"));
       warnings_keys = sortIssue(this.issues.getData().get("warnings"));
@@ -245,8 +262,7 @@ public class VDDReporter {
 
          InputStreamReader in = new InputStreamReader(stream);
          BufferedReader br = new BufferedReader(in);
-         File fd = new File(this.issuesHtmlFile);
-         BufferedWriter out = new BufferedWriter(new FileWriter(fd));
+         BufferedWriter out = new BufferedWriter(new FileWriter(issuesFile));
 
          while ((line = br.readLine()) != null) {
             out.write(line + "\n");
@@ -321,7 +337,7 @@ public class VDDReporter {
          keys[i] = String.format("%d:%s", count, keys[i]);
       }
 
-      Arrays.sort(keys);
+      java.util.Arrays.sort(keys);
       for (int i = 0; i <= keys.length -1; i++) {
          keys[i] = keys[i].replaceFirst("\\d+:", "");
       }
@@ -518,7 +534,8 @@ public class VDDReporter {
       ArrayList<HashMap<String, String>> logs =
          (ArrayList<HashMap<String, String>>)data.get("testlogs");
       VddSuiteReporter reporter = new VddSuiteReporter(suiteName,
-                                                       this.basedir, logs);
+                                                       this.basedir.toString(),
+                                                       logs);
       reporter.generateReport();
       this.issues.appendIssues(reporter.getIssues());
 
@@ -696,6 +713,7 @@ public class VDDReporter {
       HashMap<String, Object> result = new HashMap<String, Object>();
       DocumentBuilder db = dbf.newDocumentBuilder();
       db.setErrorHandler(new VddErrorHandler());
+      Document dom = null;
 
       try {
          dom = db.parse(xml);
