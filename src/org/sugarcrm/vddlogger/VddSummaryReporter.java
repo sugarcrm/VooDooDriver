@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2013 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * Please see the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.sugarcrm.vddlogger;
 
@@ -21,13 +21,17 @@ import java.util.*;
 import java.nio.CharBuffer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.InputSource;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.InputSource;
+
+
+/**
+ * Entry point for VDD report generation.
+ */
 
 public class VddSummaryReporter {
 
@@ -52,6 +56,14 @@ public class VddSummaryReporter {
    private String basedir = "";
    private VddLogIssues issues = null;
    private String issuesHtmlFile = null;
+
+
+   /**
+    * Instantiate a VddSummaryReporter object
+    *
+    * @param xmlFiles  list of VDD suite output files
+    * @param path      directory containing the XML files
+    */
 
    public VddSummaryReporter(ArrayList<File> xmlFiles, File path) {
       this.count = 0;
@@ -84,6 +96,47 @@ public class VddSummaryReporter {
          e.printStackTrace();
       }
    }
+
+
+   /**
+    * Convert the VDD output logs into a report.
+    */
+
+   public void generateReport() {
+      HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
+      repFile.print(generateHTMLHeader());
+      String name = "";
+      String[] keys = null;
+
+
+      for (int i = 0; i < xmlFiles.size(); i ++) {
+         HashMap<String, Object> suiteData = null;
+         try {
+            suiteData = parseXMLFile(xmlFiles.get(i));
+         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
+            continue;
+         }
+         name = suiteData.get("suitename").toString();
+         list.put(name, suiteData);
+      }
+
+      keys = list.keySet().toArray(new String[0]);
+      java.util.Arrays.sort(keys);
+
+      for (int i = 0; i <= keys.length -1; i++) {
+         String key = keys[i];
+         repFile.print(generateTableRow(key, list.get(key)));
+      }
+
+      repFile.print(generateHTMLFooter());
+      repFile.print("\n</body>\n</html>\n");
+      repFile.close();
+
+      this.writeIssues();
+   }
+
 
    private void writeIssues() {
       String[] errors_keys = null;
@@ -196,40 +249,6 @@ public class VddSummaryReporter {
       return keys;
    }
 
-   public void generateReport() {
-      HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
-      repFile.print(generateHTMLHeader());
-      String name = "";
-      String[] keys = null;
-
-
-      for (int i = 0; i < xmlFiles.size(); i ++) {
-         HashMap<String, Object> suiteData = null;
-         try {
-            suiteData = parseXMLFile(xmlFiles.get(i));
-         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
-            continue;
-         }
-         name = suiteData.get("suitename").toString();
-         list.put(name, suiteData);
-      }
-
-      keys = list.keySet().toArray(new String[0]);
-      java.util.Arrays.sort(keys);
-
-      for (int i = 0; i <= keys.length -1; i++) {
-         String key = keys[i];
-         repFile.print(generateTableRow(key, list.get(key)));
-      }
-
-      repFile.print(generateHTMLFooter());
-      repFile.print("\n</body>\n</html>\n");
-      repFile.close();
-
-      this.writeIssues();
-   }
 
    private boolean isRestart(Node node) {
       boolean result = false;
