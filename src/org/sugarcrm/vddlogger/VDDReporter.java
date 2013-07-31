@@ -182,7 +182,7 @@ public class VDDReporter {
     */
 
    public void generateReport() {
-      HashMap<String, HashMap<String, Object>> list = new HashMap<String, HashMap<String,Object>>();
+      HashMap<String,SuiteData> list = new HashMap<String,SuiteData>();
       java.io.PrintStream report = null;
 
       File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
@@ -198,24 +198,23 @@ public class VDDReporter {
 
       report.print(readFile(HTML_HEADER_RESOURCE));
 
-      for (int i = 0; i < xmlFiles.size(); i ++) {
-         HashMap<String, Object> suiteData = null;
+      for (File xml: xmlFiles) {
+         SuiteData suiteData = null;
          try {
-            suiteData = parseXMLFile(xmlFiles.get(i));
+            suiteData = parseXMLFile(xml);
          } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("(!)Failed to parse " + xmlFiles.get(i) + ": " + e);
+            System.out.println("(!)Failed to parse " + xml + ": " + e);
             continue;
          }
-         list.put(suiteData.get("suitename").toString(), suiteData);
+         list.put(suiteData.suitename, suiteData);
       }
 
       String keys[] = list.keySet().toArray(new String[0]);
       java.util.Arrays.sort(keys);
 
-      for (int i = 0; i <= keys.length -1; i++) {
-         String key = keys[i];
-         report.print(generateTableRow(key, list.get(key)));
+      for (String key: keys) {
+         report.print(processSuite(key, list.get(key)));
       }
 
       report.print(generateHTMLFooter());
@@ -432,41 +431,53 @@ public class VDDReporter {
       return result;
    }
 
-   private HashMap<String, Object> getSuiteData(Document doc) {
-      HashMap<String, Object> result = new HashMap<String, Object>();
-      int passed = 0, failed = 0, blocked = 0, asserts = 0, assertsF = 0, errors = 0, exceptions = 0, wd = 0, total = 0;
-      boolean truncated;
-      String runtime = "";
-      String suiteName = getSuiteName(doc);
 
-      passed = getAmtPassed(doc);
-      blocked = getAmtBlocked(doc);
-      failed = getAmtFailed(doc);
-      wd = getAmtwatchdog(doc);
-      asserts = getAmtAsserts(doc);
-      assertsF = getAmtAssertsF(doc);
-      exceptions = getAmtExceptions(doc);
-      errors = getAmtErrors(doc);
-      total = assertsF + exceptions + errors;
-      runtime = getRunTime(doc);
-      truncated = getTruncated(doc);
+   /**
+    * Summary data from the suite log.
+    */
 
-      result.put("passed", passed);
-      result.put("blocked", blocked);
-      result.put("failed", failed);
-      result.put("wd", wd);
-      result.put("asserts", asserts);
-      result.put("assertsF", assertsF);
-      result.put("exceptions", exceptions);
-      result.put("errors", errors);
-      result.put("total", total);
-      result.put("runtime", runtime);
-      result.put("suitename", suiteName);
-      result.put("testlogs", this.getTestLogs(doc));
-      result.put("truncated", truncated);
-
-      return result;
+   private class SuiteData {
+      public int passed = 0;
+      public int failed = 0;
+      public int blocked = 0;
+      public int asserts = 0;
+      public int failedAsserts = 0;
+      public int errors = 0;
+      public int exceptions = 0;
+      public int watchdog = 0;
+      public String runtime = "";
+      public boolean truncated = false;
+      public String suitename;
+      public ArrayList<HashMap<String,String>> testlogs = null;
    }
+
+
+   /**
+    * Read the summary data from the suite log.
+    *
+    * @param doc  XML document representing the suite log
+    * @return SuiteData object with the data
+    */
+
+   private SuiteData getSuiteData(Document doc) {
+      SuiteData d = new SuiteData();
+      
+      d.suitename = getSuiteName(doc);
+      d.passed = getAmtPassed(doc);
+      d.blocked = getAmtBlocked(doc);
+      d.failed = getAmtFailed(doc);
+      d.watchdog = getAmtwatchdog(doc);
+      d.asserts = getAmtAsserts(doc);
+      d.failedAsserts = getAmtAssertsF(doc);
+      d.exceptions = getAmtExceptions(doc);
+      d.errors = getAmtErrors(doc);
+      d.runtime = getRunTime(doc);
+      d.truncated = getTruncated(doc);
+      d.testlogs = this.getTestLogs(doc);
+
+      return d;
+   }
+
 
    /**
     * Generate a row in the suite summary report
@@ -476,27 +487,14 @@ public class VDDReporter {
     * @return a single row for output to summary.html
     */
 
-   @SuppressWarnings("unchecked")
-   private String generateTableRow(String suiteName,
-                                   HashMap<String, Object> data) {
-      int passed        = (Integer)data.get("passed");
-      int failed        = (Integer)data.get("failed");
-      int blocked       = (Integer)data.get("blocked");
-      int wd            = (Integer)data.get("wd");
-      int asserts       = (Integer)data.get("asserts");
-      int assertsF      = (Integer)data.get("assertsF");
-      int exceptions    = (Integer)data.get("exceptions");
-      int errors        = (Integer)data.get("errors");
-      int total         = assertsF + exceptions + errors;
-      String runtime    = data.get("runtime").toString();
-      boolean truncated = (Boolean)data.get("truncated");
-      String hl         = "highlight";
-      String uhl        = "unhighlight";
-      String runclass   = (blocked == 0) ? "td_run_data_error" : "td_run_data";
+   private String processSuite(String suiteName, SuiteData d) {
+      int total  = d.failedAsserts + d.exceptions + d.errors;
+      String hl  = "highlight";
+      String uhl = "unhighlight";
       String html;
       String cls;
 
-      if (truncated || passed + failed + blocked == 0) {
+      if (d.truncated || d.passed + d.failed + d.blocked == 0) {
          hl += "_truncated";
          uhl += "_truncated";
       }
@@ -506,60 +504,59 @@ public class VDDReporter {
                      "    onmouseover=\"this.className='" + hl + "'\"" +
               "    onmouseout=\"this.className='" + uhl + "'\">\n" +
               "   <td class=\"td_file_data\">\n" +
-              "      <a href=\"" + suiteName + "/" + suiteName + ".html\">" +
-              suiteName + ".xml</a>\n" +
-              "   </td>");
+              "      <a href=\"" + d.suitename+"/"+d.suitename + ".html\">" +
+              d.suitename + ".xml</a>\n" +
+              "   </td>\n");
 
       /* Tests column (passed/failed/blocked). */
-      html += ("   <td class=\"" + runclass + "\">" +
-               (passed + failed) + "/" + (passed + failed + blocked) +
+      cls = (d.blocked != 0) ? "td_run_data_error" : "td_run_data";
+      html += ("   <td class=\"" + cls + "\">" +
+               (d.passed + d.failed) + "/" + (d.passed + d.failed + d.blocked) +
                "</td>\n" +
-               "   <td class=\"td_passed_data\">" + passed + "</td>\n" + 
-               "   <td class=\"td_failed_data\">" + failed + "</td>\n" +
-               "   <td class=\"td_blocked_data\">" + blocked + "</td> \n");
+               "   <td class=\"td_passed_data\">" + d.passed + "</td>\n" + 
+               "   <td class=\"td_failed_data\">" + d.failed + "</td>\n" +
+               "   <td class=\"td_blocked_data\">" + d.blocked + "</td>\n");
 
       /* Results column */
 
       /* Watchdog timer expiries */
-      cls = (wd != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
-      html += "   <td class=\"" + cls + "\">" + wd + "</td>\n";
+      cls = (d.watchdog != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
+      html += "   <td class=\"" + cls + "\">" + d.watchdog + "</td>\n";
 
       /* Passed asserts */
-      html += "   <td class=\"td_assert_data\">"+asserts+"</td>\n";
+      html += "   <td class=\"td_assert_data\">" + d.asserts + "</td>\n";
 
       /* Failed asserts */
-      cls = (assertsF != 0) ? "td_assert_error_data" : "td_assert_data";
-      html += "   <td class=\"" + cls + "\">" + assertsF + "</td>\n";
+      cls = (d.failedAsserts != 0) ? "td_assert_error_data" : "td_assert_data";
+      html += "   <td class=\"" + cls + "\">" + d.failedAsserts + "</td>\n";
 
       /* Exceptions */
-      cls = (exceptions != 0) ? "td_exceptions_error_data" :
-                                "td_exceptions_data";
-      html += "   <td class=\"" + cls + "\">" + exceptions + "</td>\n";
+      cls = (d.exceptions != 0) ? "td_exceptions_error_data" :
+                                  "td_exceptions_data";
+      html += "   <td class=\"" + cls + "\">" + d.exceptions + "</td>\n";
 
       /* Errors */
-      cls = (errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
-      html += "   <td class=\"" + cls + "\">" + errors + "</td>\n";
+      cls = (d.errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
+      html += "   <td class=\"" + cls + "\">" + d.errors + "</td>\n";
 
       /* Total Failures */
       cls = (total != 0) ? "td_total_error_data" : "td_total_data";
       html += "   <td class=\"" + cls + "\">" + total + "</td>\n";
 
       /* Runtime */
-      html += "   <td class=\"td_time_data\">" + runtime + "</td>\n";
+      html += "   <td class=\"td_time_data\">" + d.runtime + "</td>\n";
 
       /* Row epilogue */
-      html += "</tr>";
+      html += "</tr>\n";
 
       /*
        * Generate the suite report.
        */
-      ArrayList<HashMap<String, String>> logs =
-         (ArrayList<HashMap<String, String>>)data.get("testlogs");
-      VddSuiteReporter reporter = new VddSuiteReporter(suiteName,
-                                                       this.basedir.toString(),
-                                                       logs);
-      reporter.generateReport();
-      this.issues.appendIssues(reporter.getIssues());
+      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
+                                                this.basedir.toString(),
+                                                d.testlogs);
+      r.generateReport();
+      this.issues.appendIssues(r.getIssues());
 
       return html;
    }
@@ -696,9 +693,8 @@ public class VDDReporter {
       return new InputSource(new StringReader(mungedXml));
    }
 
-   private HashMap<String, Object> parseXMLFile(File xml) throws Exception {
+   private SuiteData parseXMLFile(File xml) throws Exception {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      HashMap<String, Object> result = new HashMap<String, Object>();
       DocumentBuilder db = dbf.newDocumentBuilder();
       db.setErrorHandler(new VddErrorHandler());
       Document dom = null;
@@ -712,8 +708,7 @@ public class VDDReporter {
          System.out.println("(*)Success!");
       }
 
-      result = getSuiteData(dom);
-      return result;
+      return getSuiteData(dom);
    }
 
    /**
