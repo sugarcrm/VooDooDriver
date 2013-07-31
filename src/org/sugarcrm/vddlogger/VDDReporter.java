@@ -67,18 +67,23 @@ public class VDDReporter {
    public static void main(String[] args) {
       ArrayList<File> xml = null;
       File dir = null;
-      VddLogCmdParser p = new VddLogCmdParser(args);
-      VddLogCmdOpts opts = p.parse();
+      HashMap<String,File> opts = new HashMap<String,File>();
 
-      if (opts.containsKey("help")) {
-         System.out.println("Usage:\n" +
-                            "   VDDReporter --suitefile=<suite.xml>\n" +
-                            "   VDDReporter --suitedir=<suite dir>");
-         System.exit(0);
+      for (String arg: args) {
+         if (arg.startsWith("--suitefile=")) {
+            opts.put("suitefile", new File(arg.replace("--suitefile=", "")));
+         } else if (arg.startsWith("--suitedir=")) {
+            opts.put("suitedir", new File(arg.replace("--suitedir=", "")));
+         } else if (arg.equals("--help")) {
+            System.out.println("Usage:\n" +
+                               "   VDDReporter --suitefile=<suite.xml>\n" +
+                               "   VDDReporter --suitedir=<suite dir>");
+            System.exit(0);
+         }
       }
 
       if (opts.containsKey("suitefile")) {
-         File f = new File(opts.get("suitefile"));
+         File f = opts.get("suitefile");
 
          if (!f.exists()) {
             System.out.println("(!)Suite file '" + f + "' does not exist");
@@ -90,7 +95,7 @@ public class VDDReporter {
          xml.add(f);
          dir = f.getAbsoluteFile().getParentFile();
       } else if (opts.containsKey("suitedir")) {
-         dir = new File(opts.get("suitedir"));
+         dir = opts.get("suitedir");
          System.out.println("(*)Processing suite directory: '" + dir + "'.");
 
          File fs[] = dir.listFiles(new java.io.FilenameFilter() {
