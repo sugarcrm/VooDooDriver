@@ -36,22 +36,14 @@ public class VddSuiteReporter {
    private String suiteDir = "";
    private VddLogIssues issues = null;
 
-   public VddSuiteReporter(String suitename, String basedir, ArrayList<HashMap<String, String>> logfiles) {
+   public VddSuiteReporter(String suitename, File basedir,
+                           ArrayList<File> logfiles) {
       String filepath = "";
       this.suiteName = suitename;
       String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
       System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
-      this.filesList = new ArrayList<File>();
+      this.filesList = logfiles;
       this.issues = new VddLogIssues();
-
-      for (int i = 0; i <= logfiles.size() -1; i++) {
-         HashMap<String, String> log = logfiles.get(i);
-         if (!Boolean.valueOf(log.get("isrestart"))) {
-            File tfile = new File(log.get("testlog"));
-            String logfilename = String.format("%s%s%s",outputDir, File.separatorChar, tfile.getName());
-            filesList.add(new File(logfilename));
-         }
-      }
 
       /**
        * set up file output
@@ -67,6 +59,7 @@ public class VddSuiteReporter {
       }
 
       try {
+         // XXX: suiteDir and outputDir are the same
          this.suiteDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
          filepath = String.format("%s%s%s.html", outputDir, File.separatorChar, suitename);
          output = new FileOutputStream(filepath);
@@ -176,7 +169,7 @@ public class VddSuiteReporter {
       String errors = "";
       String color = "";
 
-      findErrorInfo(line);
+      findErrorInfo(line); // XXX
 
       try {
          HashMap<String, String> data = this.findErrorInfo(line);

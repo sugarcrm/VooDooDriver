@@ -80,19 +80,61 @@ public class VDDReporter {
 
    private VddLogIssues issues;
 
+   /**
+    * Summary data from all the suites.
+    */
 
-   private int count = 0;
-   private int passedTests = 0;
-   private int failedTests = 0;
-   private int blockedTests = 0;
-   private int failedAsserts = 0;
-   private int passedAsserts = 0;
-   private int exceptions = 0;
-   private int errors = 0;
-   private int watchdog = 0;
-   private int hours = 0;
-   private int minutes = 0;
-   private int seconds = 0;
+   private SuiteData totals;
+
+
+   /**
+    * Summary data from the suite log.
+    */
+
+   private class SuiteData {
+      public int passed = 0;
+      public int failed = 0;
+      public int blocked = 0;
+      public int asserts = 0;
+      public int failedAsserts = 0;
+      public int errors = 0;
+      public int exceptions = 0;
+      public int watchdog = 0;
+      public double runtime = 0;
+      public boolean truncated = false;
+      public String suitename = null;
+      public ArrayList<File> testlogs = null;
+
+      public SuiteData() {
+         this.testlogs = new ArrayList<File>();
+      }
+
+      /**
+       * Add the values from a SuiteData object to this object.
+       *
+       * @param n  the new SuiteData values
+       */
+
+      public void append(SuiteData n) {
+         this.passed        += n.passed;
+         this.failed        += n.failed;
+         this.blocked       += n.blocked;
+         this.asserts       += n.asserts;
+         this.failedAsserts += n.failedAsserts;
+         this.errors        += n.errors;
+         this.exceptions    += n.exceptions;
+         this.watchdog      += n.watchdog;
+         this.runtime       += n.runtime;
+         this.truncated      = this.truncated || n.truncated;
+         this.testlogs.addAll(n.testlogs);
+      }
+   }
+
+   /**
+    * Running count of the rows being output in summary.html.
+    */
+
+   private int rowCount = 0;
 
 
    /**
@@ -174,6 +216,7 @@ public class VDDReporter {
       this.xmlFiles = xmlFiles;
       this.basedir = path;
       this.issues = new VddLogIssues();
+      this.totals = new SuiteData();
    }
 
 
@@ -199,11 +242,42 @@ public class VDDReporter {
       report.print(readFile(HTML_HEADER_RESOURCE));
 
       for (File xml: xmlFiles) {
-         SuiteData suiteData = readSuiteSummary(xml);
-         if (suiteData == null) {
+         boolean truncated = false;
+         Document doc = loadSuiteSummary(xml);
+         if (doc == null) {
             continue;
          }
-         list.put(suiteData.suitename, suiteData);
+
+         ArrayList<SuiteData> suites = new ArrayList<SuiteData>();
+
+         NodeList suiteNodes = doc.getDocumentElement().getChildNodes();
+         for (int k = 0; k < suiteNodes.getLength(); k++) {
+            Node suite = suiteNodes.item(k);
+
+            if (suite.getNodeType() != Node.ELEMENT_NODE) {
+               continue;
+            }
+
+            String nm = suite.getNodeName().toLowerCase();
+
+            if (nm.equals("truncated")) {
+               truncated = true;
+            } else if (!nm.equals("suite")) {
+               continue;
+            }
+
+            SuiteData suiteData = getSuiteData(suite);
+            if (suiteData == null) {
+               continue;
+            }
+            suites.add(suiteData);
+         }
+
+         for (SuiteData suiteData: suites) {
+            suiteData.truncated = suiteData.truncated || truncated;
+            list.put(suiteData.suitename, suiteData);
+            this.totals.append(suiteData);
+         }
       }
 
       String keys[] = list.keySet().toArray(new String[0]);
@@ -363,91 +437,6 @@ public class VDDReporter {
    }
 
 
-   private boolean isRestart(Node node) {
-      boolean result = false;
-      NodeList parent = node.getParentNode().getChildNodes();
-
-      for (int i = 0; i <= parent.getLength() -1; i++) {
-         Node tmp = parent.item(i);
-         String name = tmp.getNodeName();
-         if (name.contains("isrestart")) {
-            result = Boolean.valueOf(tmp.getTextContent());
-            break;
-         }
-      }
-
-      return result;
-   }
-
-   private boolean isLibTest(Node node) {
-      NodeList parent = node.getParentNode().getChildNodes();
-
-      for (int i = 0; i <= parent.getLength() -1; i++) {
-         Node tmp = parent.item(i);
-         String name = tmp.getNodeName();
-         if (name.contains("testfile")) {
-            File fd = new File(tmp.getTextContent());
-            String path = fd.getParent();
-            if (path == null) {
-               /*
-                * Filename contains no path information, so it's
-                * impossible to know whether this is in the lib.
-                */
-               return false;
-            }
-            path = path.toLowerCase();
-
-            if (path.contains("lib")) {
-               return true;
-            }
-         }
-      }
-
-      return false;
-   }
-
-   private boolean isBlocked(Node node) {
-      boolean result = false;
-      NodeList parent = node.getParentNode().getChildNodes();
-
-      for (int i = 0; i <= parent.getLength() -1; i++) {
-         Node tmp = parent.item(i);
-         String name = tmp.getNodeName();
-         if (name.contains("blocked")) {
-            int blocked = Integer.valueOf(tmp.getTextContent());
-            if (blocked != 0) {
-               result = true;
-            } else {
-               result = false;
-            }
-            break;
-         }
-      }
-
-      return result;
-   }
-
-
-   /**
-    * Summary data from the suite log.
-    */
-
-   private class SuiteData {
-      public int passed = 0;
-      public int failed = 0;
-      public int blocked = 0;
-      public int asserts = 0;
-      public int failedAsserts = 0;
-      public int errors = 0;
-      public int exceptions = 0;
-      public int watchdog = 0;
-      public String runtime = "";
-      public boolean truncated = false;
-      public String suitename;
-      public ArrayList<HashMap<String,String>> testlogs = null;
-   }
-
-
    /**
     * Read the summary data from the suite log.
     *
@@ -455,23 +444,122 @@ public class VDDReporter {
     * @return SuiteData object with the data
     */
 
-   private SuiteData getSuiteData(Document doc) {
+   private SuiteData getSuiteData(Node suite) {
       SuiteData d = new SuiteData();
       
-      d.suitename = getSuiteName(doc);
-      d.passed = getAmtPassed(doc);
-      d.blocked = getAmtBlocked(doc);
-      d.failed = getAmtFailed(doc);
-      d.watchdog = getAmtwatchdog(doc);
-      d.asserts = getAmtAsserts(doc);
-      d.failedAsserts = getAmtAssertsF(doc);
-      d.exceptions = getAmtExceptions(doc);
-      d.errors = getAmtErrors(doc);
-      d.runtime = getRunTime(doc);
-      d.truncated = getTruncated(doc);
-      d.testlogs = this.getTestLogs(doc);
+      NodeList nodes = suite.getChildNodes();
+      for (int k = 0; k < nodes.getLength(); k++) {
+         Node node = nodes.item(k);
+
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
+            continue;
+         }
+
+         Element e = (Element)node;
+         String nm = e.getNodeName().toLowerCase();
+
+         if (nm.equals("suitefile")) {
+            d.suitename = e.getTextContent().replaceFirst("^(.+).xml$", "$1");
+         } else if (nm.equals("runtime")) {
+            String rt = e.getTextContent();
+
+            d.runtime = (new Double(rt.substring(0, rt.indexOf(":"))) * 3600 +
+                         new Double(rt.substring(2, rt.lastIndexOf(":"))) * 60 +
+                         new Double(rt.substring(rt.lastIndexOf(":") + 1,
+                                                 rt.length())));
+         } else if (nm.equals("test")) {
+            /* per-test values */
+            boolean islib = false;
+            File testlog = null;
+            boolean passed = false;
+            boolean isrestart = false;
+            int failedAsserts = 0;
+            int exceptions = 0;
+            int errors = 0;
+            boolean blocked = false;
+            int asserts = 0;
+            int watchdog = 0;
+            boolean truncated = false;
+            NodeList testNodes = e.getChildNodes();
+
+            for (int t = 0; t < testNodes.getLength(); t++) {
+               Node tn = testNodes.item(t);
+
+               if (tn.getNodeType() != Node.ELEMENT_NODE) {
+                  continue;
+               }
+
+               String tnn = tn.getNodeName().toLowerCase();
+
+               if (tnn.equals("testfile")) {
+                  String p = (new File(tn.getTextContent())).getParent();
+                  islib = (p != null) && p.contains("lib");
+               } else if (tnn.equals("testlog")) {
+                  testlog = new File(tn.getTextContent());
+               } else if (tnn.equals("result")) {
+                  passed = tn.getTextContent().toLowerCase().equals("passed");
+               } else if (tnn.equals("isrestart")) {
+                  isrestart = new Boolean(tn.getTextContent());
+               } else if (tnn.equals("failedasserts")) {
+                  failedAsserts = new Integer(tn.getTextContent());
+               } else if (tnn.equals("exceptions")) {
+                  exceptions = new Integer(tn.getTextContent());
+               } else if (tnn.equals("errors")) {
+                  errors = new Integer(tn.getTextContent());
+               } else if (tnn.equals("blocked")) {
+                  blocked = tn.getTextContent().equals("1");
+               } else if (tnn.equals("passedasserts")) {
+                  asserts = new Integer(tn.getTextContent());
+               } else if (tnn.equals("watchdog")) {
+                  watchdog = new Integer(tn.getTextContent());
+               } else if (tnn.equals("truncated")) {
+                  truncated = true;
+               }
+            }
+
+            d.truncated = d.truncated || truncated;
+
+            if (isrestart) {
+               continue;
+            }
+
+            if (!blocked && !islib) {
+               if (passed) {
+                  d.passed++;
+               } else {
+                  d.failed++;
+               }
+            }
+
+            d.blocked       += blocked ? 1 : 0;
+            d.watchdog      += watchdog;
+            d.asserts       += asserts;
+            d.failedAsserts += failedAsserts;
+            d.exceptions    += exceptions;
+            d.errors        += errors;
+            d.testlogs.add(testlog);
+         }
+      }
+
+      /* Disallow files with no suitename (they're truncated beyond repair). */
+      if (d.suitename == null) {
+         return null;
+      }
 
       return d;
+   }
+
+
+   /**
+    * Format a runtime value.
+    *
+    * @param tm  runtime in seconds
+    * @return formatted runtime
+    */
+
+   private String fmtTime(double tm) {
+      return String.format("%02.0f:%02.0f:%02d", Math.floor(tm / 3600),
+                           Math.floor((tm % 3600) / 60), Math.round(tm % 60));
    }
 
 
@@ -496,7 +584,7 @@ public class VDDReporter {
       }
 
       /* Row prologue. */
-      html = ("<tr id=\"" + count + "\" class=\"" + uhl + "\"" +
+      html = ("<tr id=\"" + this.rowCount++ + "\" class=\"" + uhl + "\"" +
                      "    onmouseover=\"this.className='" + hl + "'\"" +
               "    onmouseout=\"this.className='" + uhl + "'\">\n" +
               "   <td class=\"td_file_data\">\n" +
@@ -540,7 +628,7 @@ public class VDDReporter {
       html += "   <td class=\"" + cls + "\">" + total + "</td>\n";
 
       /* Runtime */
-      html += "   <td class=\"td_time_data\">" + d.runtime + "</td>\n";
+      html += "   <td class=\"td_time_data\">" + fmtTime(d.runtime) + "</td>\n";
 
       /* Row epilogue */
       html += "</tr>\n";
@@ -549,7 +637,7 @@ public class VDDReporter {
        * Generate the suite report.
        */
       VddSuiteReporter r = new VddSuiteReporter(d.suitename,
-                                                this.basedir.toString(),
+                                                this.basedir,
                                                 d.testlogs);
       r.generateReport();
       this.issues.appendIssues(r.getIssues());
@@ -571,33 +659,33 @@ public class VDDReporter {
       String failedtd = "td_footer_failed";
       String blockedtd = "td_footer_blocked";
 
-      n1 = passedTests + failedTests;
-      n2 = passedTests + failedTests + blockedTests;
+      n1 = totals.passed + totals.failed;
+      n2 = totals.passed + totals.failed + totals.blocked;
       if (n1 != n2) {
          footerrun = "td_footer_run_err";
       }
 
-      if (failedTests == 0) {
+      if (totals.failed == 0) {
          failedtd = "td_footer_failed_zero";
       }
 
-      if (blockedTests == 0) {
+      if (totals.blocked == 0) {
          blockedtd = "td_footer_blocked_zero";
       }
 
       String footer = "<tr id=\"totals\"> \n" +
             "\t <td class=\"td_header_master\">Totals:</td>" +
-            String.format("\t <td class=\"%s\">"+(passedTests + failedTests)+"/"+(passedTests + failedTests + blockedTests)+"</td>", footerrun) +
-            "\t <td class=\"td_footer_passed\">"+passedTests+"</td>" +
-            String.format("\t <td class=\"%s\">"+failedTests+"</td>", failedtd) +
-            String.format("\t <td class=\"%s\">"+blockedTests+"</td>", blockedtd) +
-            "\t <td class=\"td_footer_watchdog\">"+watchdog+"</td>" +
-            "\t <td class=\"td_footer_passed\">"+passedAsserts+"</td>" +
-            "\t <td class=\"td_footer_assert\">"+failedAsserts+"</td>" +
-            "\t <td class=\"td_footer_exceptions\">"+exceptions+"</td>" +
-            "\t <td class=\"td_footer_watchdog\">"+errors+"</td>" +
-            "\t <td class=\"td_footer_total\">"+(failedAsserts + exceptions + errors)+"</td>" +
-            "\t <td class=\"td_footer_times\">"+printTotalTime(hours, minutes, seconds)+"</td>" +
+            String.format("\t <td class=\"%s\">"+(totals.passed + totals.failed)+"/"+(totals.passed + totals.failed + totals.blocked)+"</td>", footerrun) +
+            "\t <td class=\"td_footer_passed\">"+totals.passed+"</td>" +
+            String.format("\t <td class=\"%s\">"+totals.failed+"</td>", failedtd) +
+            String.format("\t <td class=\"%s\">"+totals.blocked+"</td>", blockedtd) +
+            "\t <td class=\"td_footer_watchdog\">"+totals.watchdog+"</td>" +
+            "\t <td class=\"td_footer_passed\">"+totals.asserts+"</td>" +
+            "\t <td class=\"td_footer_assert\">"+totals.failedAsserts+"</td>" +
+            "\t <td class=\"td_footer_exceptions\">"+totals.exceptions+"</td>" +
+            "\t <td class=\"td_footer_watchdog\">"+totals.errors+"</td>" +
+            "\t <td class=\"td_footer_total\">"+(totals.failedAsserts + totals.exceptions + totals.errors)+"</td>" +
+         "\t <td class=\"td_footer_times\">"+fmtTime(totals.runtime)+"</td>" +
             "</tr>" +
             "</tbody>" +
             "</table>";
@@ -699,7 +787,7 @@ public class VDDReporter {
     * @return suite summary data
     */
 
-   private SuiteData readSuiteSummary(File xml) {
+   private Document loadSuiteSummary(File xml) {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = null;
       Document dom = null;
@@ -717,370 +805,21 @@ public class VDDReporter {
          try {
             dom = db.parse(xml);
          } catch(SAXParseException e) {
-            System.out.println("(!)Error parsing log file (" + e.getMessage() +
-                               ").  Retrying with end tag hack...");
+            System.out.println("(!)Error parsing log file " + xml +
+                               " (" + e.getMessage() + "). " +
+                               "Retrying with end tag hack...");
             InputSource is = endTagHack(xml);
             dom = db.parse(is);
             System.out.println("(*)Success!");
          }
       } catch (java.io.FileNotFoundException e) {
          System.err.println("(!)Suite file '" + xml + "' not found: " + e);
-         return null;
       } catch (java.io.IOException e) {
          System.err.println("(!)Error reading " + xml + ": " + e);
-         return null;
       } catch (org.xml.sax.SAXException e) {
          System.err.println("(!)XML error in " + xml + ": " + e);
-         return null;
       }
 
-      return getSuiteData(dom);
-   }
-
-   /**
-    * get the number of tests that passed within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of tests that passed
-    *
-    */
-   private int getAmtPassed(Document d) {
-      int n = 0;
-      Element el;
-      NodeList nl = d.getElementsByTagName("result");
-      boolean isrestart = false;
-      boolean islibfile = false;
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Passed") == 0) {
-            islibfile = isLibTest(nl.item(i));
-            isrestart = isRestart(nl.item(i));
-
-            if (isrestart) {
-               continue;
-            }
-
-            if (islibfile) {
-               continue;
-            }
-
-            n ++;
-         }
-      }
-
-      //global passedTests variable
-      passedTests += n;
-      return n;
-   }
-
-   /**
-    * get the number of tests that failed within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of tests that failed
-    *
-    */
-   private int getAmtFailed(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      boolean isblocked = false;
-      NodeList nl = d.getElementsByTagName("result");
-      boolean islibfile = false;
-
-      for (int i = 0; i < nl.getLength(); i ++){
-         el = (Element)nl.item(i);
-         if (el.getFirstChild().getNodeValue().compareToIgnoreCase("Failed") == 0) {
-            isrestart = isRestart(nl.item(i));
-            isblocked = isBlocked(nl.item(i));
-            islibfile = isLibTest(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-
-            if (isblocked) {
-               continue;
-            }
-
-            if (islibfile) {
-               continue;
-            }
-
-            n ++;
-         }
-      }
-
-      //global failedTests variable
-      failedTests += n;
-      return n;
-   }
-
-   /**
-    * get the number of tests that was blocked within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of tests that was blocked
-    *
-    */
-   private int getAmtBlocked(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      boolean islibfile = false;
-      NodeList nl = d.getElementsByTagName("blocked");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (el.getFirstChild().getNodeValue().compareToIgnoreCase("1") == 0) {
-            isrestart = isRestart(nl.item(i));
-            islibfile = isLibTest(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-
-            if (islibfile) {
-               continue;
-            }
-
-            n ++;
-         }
-      }
-
-      //global blockedTests variable
-      blockedTests += n;
-      return n;
-   }
-
-   private ArrayList<HashMap<String, String>> getTestLogs(Document d) {
-      ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String,String>>();
-      NodeList nodes = d.getElementsByTagName("test");
-
-      for (int i = 0; i <= nodes.getLength() -1; i++) {
-         Node currNode = nodes.item(i);
-         HashMap<String, String> newHash = new HashMap<String, String>();
-         NodeList kids = currNode.getChildNodes();
-
-         for (int x = 0; x <= kids.getLength() -1; x++) {
-            Node kidNode = kids.item(x);
-            if (kidNode.getNodeName().contains("testlog")) {
-               newHash.put(kidNode.getNodeName(), kidNode.getTextContent());
-            } else if (kidNode.getNodeName().contains("isrestart")) {
-               newHash.put(kidNode.getNodeName(), kidNode.getTextContent().toLowerCase());
-            }
-         }
-         result.add(newHash);
-      }
-
-      return result;
-   }
-
-   /**
-    * get the number of assertions that passed within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of passed assertions
-    *
-    */
-   private int getAmtAsserts(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      NodeList nl = d.getElementsByTagName("passedasserts");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0){
-            isrestart = isRestart(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-            n += Integer.parseInt(el.getFirstChild().getNodeValue());
-         }
-      }
-      //global passedAsserts
-      passedAsserts += n;
-      return n;
-   }
-
-   /**
-    * get the number of assertions that failed within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of failed assertions
-    *
-    */
-   private int getAmtAssertsF(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      NodeList nl = d.getElementsByTagName("failedasserts");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
-            isrestart = isRestart(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-            n += Integer.parseInt(el.getFirstChild().getNodeValue());
-         }
-      }
-      //global failedAsserts
-      failedAsserts += n;
-      return n;
-   }
-
-   /**
-    * get the number of watchdogs within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of watchdogs
-    *
-    */
-   private int getAmtwatchdog(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      NodeList nl = d.getElementsByTagName("watchdog");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
-            isrestart = isRestart(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-            n += Integer.parseInt(el.getFirstChild().getNodeValue());
-         }
-      }
-
-      watchdog += n;
-      return n;
-   }
-
-   /**
-    * get the number of exceptions within this suite document
-    * @ param d - the Document containing suite run data
-    * @ return the number of exceptions
-    *
-    */
-   private int getAmtExceptions(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      NodeList nl = d.getElementsByTagName("exceptions");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
-            isrestart = isRestart(nl.item(i));
-            if (isrestart) {
-              continue;
-            }
-            n += Integer.parseInt(el.getFirstChild().getNodeValue());
-         }
-      }
-      //global exceptions
-      exceptions += n;
-      return n;
-   }
-
-   private int getAmtErrors(Document d) {
-      int n = 0;
-      Element el;
-      boolean isrestart = false;
-      NodeList nl = d.getElementsByTagName("errors");
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         if (Integer.parseInt(el.getFirstChild().getNodeValue()) > 0) {
-            isrestart = isRestart(nl.item(i));
-            if (isrestart) {
-               continue;
-            }
-            n += Integer.parseInt(el.getFirstChild().getNodeValue());
-         }
-      }
-      //global errors
-      errors += n;
-      return n;
-   }
-
-   /**
-    * calculates the running time fromt a suite xml file, and return it in a html-friendly format
-    * @param d - document to get time data from
-    * @return - total run time for this suite test in String
-    */
-   private String getRunTime(Document d) {
-      String  temp;
-      int h = 0, m = 0, s = 0;
-      Element el;
-      NodeList nl = d.getElementsByTagName("totaltesttime");
-
-      for (int i = 0; i < nl.getLength(); i ++) {
-         el = (Element)nl.item(i);
-         temp = el.getFirstChild().getNodeValue();
-         h += Integer.parseInt(temp.substring(0, temp.indexOf(":")));
-         m += Integer.parseInt(temp.substring(2, temp.lastIndexOf(":")));
-         s += Integer.parseInt(temp.substring(temp.lastIndexOf(":")+1, temp.indexOf(".")));
-      }
-
-      this.hours += h;
-      this.minutes += m;
-      this.seconds += s;
-      return printTotalTime(h, m , s);
-   }
-
-   /**
-    * formats and returns a correct String representation from inputs of hours, minutes and seconds
-    * @param hours
-    * @param minutes
-    * @param seconds
-    * @return correctly formatted time in String
-    */
-   private String printTotalTime(int h, int m, int s) {
-      String time = "";
-
-      //carry over seconds
-      while (s >= 60) {
-         m ++;
-         s -= 60;
-      }
-      //carry over minutes
-      while(m >= 60) {
-         h ++;
-         m -= 60;
-      }
-
-      String ms = ""+ m, ss = ""+ s;
-      if (m < 10) {
-         ms = "0"+m;
-      }
-
-      if (s < 10) {
-         ss = "0"+s;
-      }
-      time = "0"+h+":"+ms+":"+ss;
-      return time;
-   }
-
-   /**
-    * get the name of the suite, without extension
-    * @param d
-    * @return
-    */
-   private String getSuiteName(Document d) {
-      String name = "";
-      NodeList nl = d.getElementsByTagName("suitefile");
-
-      if (nl != null && nl.getLength() > 0) {
-         Element el = (Element)nl.item(0);
-         name = el.getFirstChild().getNodeValue();
-      }
-
-      name = name.substring(0, name.indexOf("."));
-      return name;
-   }
-
-   /**
-    * Get whether the log file was truncated
-    */
-   private boolean getTruncated(Document d) {
-      NodeList nl = d.getElementsByTagName("truncated");
-      return nl.getLength() > 0;
+      return dom;
    }
 }
