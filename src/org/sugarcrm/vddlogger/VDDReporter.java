@@ -199,12 +199,8 @@ public class VDDReporter {
       report.print(readFile(HTML_HEADER_RESOURCE));
 
       for (File xml: xmlFiles) {
-         SuiteData suiteData = null;
-         try {
-            suiteData = parseXMLFile(xml);
-         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("(!)Failed to parse " + xml + ": " + e);
+         SuiteData suiteData = readSuiteSummary(xml);
+         if (suiteData == null) {
             continue;
          }
          list.put(suiteData.suitename, suiteData);
@@ -609,6 +605,7 @@ public class VDDReporter {
       return footer;
    }
 
+
    /**
     * Deal with log files that are missing end tags.
     *
@@ -640,7 +637,8 @@ public class VDDReporter {
     * @return an InputSource with added end tags suitable for re-parsing
     */
 
-   private InputSource endTagHack(File xml) throws Exception {
+   private InputSource endTagHack(File xml)
+      throws java.io.FileNotFoundException, java.io.IOException {
       if (xml.length() >= (2L << 31)) {
          /*
           * The CharBuffer below uses an int for its
@@ -693,19 +691,47 @@ public class VDDReporter {
       return new InputSource(new StringReader(mungedXml));
    }
 
-   private SuiteData parseXMLFile(File xml) throws Exception {
+
+   /**
+    * Read the suite summary log file.
+    *
+    * @param  the suite summary log file
+    * @return suite summary data
+    */
+
+   private SuiteData readSuiteSummary(File xml) {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
-      db.setErrorHandler(new VddErrorHandler());
+      DocumentBuilder db = null;
       Document dom = null;
 
       try {
-         dom = db.parse(xml);
-      } catch(SAXParseException e) {
-         System.out.println("(!)Error parsing log file (" + e.getMessage() + ").  Retrying with end tag hack...");
-         InputSource is = endTagHack(xml);
-         dom = db.parse(is);
-         System.out.println("(*)Success!");
+         db = dbf.newDocumentBuilder();
+      } catch (javax.xml.parsers.ParserConfigurationException e) {
+         System.err.println("(!)Failed to instantiate XML DB: " + e);
+         return null;
+      }
+
+      db.setErrorHandler(new VddErrorHandler());
+
+      try {
+         try {
+            dom = db.parse(xml);
+         } catch(SAXParseException e) {
+            System.out.println("(!)Error parsing log file (" + e.getMessage() +
+                               ").  Retrying with end tag hack...");
+            InputSource is = endTagHack(xml);
+            dom = db.parse(is);
+            System.out.println("(*)Success!");
+         }
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Suite file '" + xml + "' not found: " + e);
+         return null;
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Error reading " + xml + ": " + e);
+         return null;
+      } catch (org.xml.sax.SAXException e) {
+         System.err.println("(!)XML error in " + xml + ": " + e);
+         return null;
       }
 
       return getSuiteData(dom);
