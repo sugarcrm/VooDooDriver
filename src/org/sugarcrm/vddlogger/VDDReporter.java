@@ -81,7 +81,7 @@ public class VDDReporter {
     * all suites.
     */
 
-   private VddLogIssues issues;
+   private Issues issues;
 
    /**
     * Running count of the rows being output in summary.html.
@@ -212,7 +212,7 @@ public class VDDReporter {
    public VDDReporter(ArrayList<File> xmlFiles, File path) {
       this.xmlFiles = xmlFiles;
       this.basedir = path;
-      this.issues = new VddLogIssues();
+      this.issues = new Issues();
    }
 
 

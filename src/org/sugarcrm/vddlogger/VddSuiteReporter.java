@@ -34,7 +34,7 @@ public class VddSuiteReporter {
    private FileOutputStream output = null;
    private PrintStream repFile = null;
    private String suiteDir = "";
-   private VddLogIssues issues = null;
+   private Issues issues = null;
 
    public VddSuiteReporter(String suitename, File basedir,
                            ArrayList<File> logfiles) {
@@ -43,7 +43,7 @@ public class VddSuiteReporter {
       String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
       System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
       this.filesList = logfiles;
-      this.issues = new VddLogIssues();
+      this.issues = new Issues();
 
       /**
        * set up file output
@@ -86,6 +86,7 @@ public class VddSuiteReporter {
          if (!file.isFile() ||
              file.isHidden() ||
              !file.getName().endsWith(".log")) {
+            System.out.println("(!)Logfile (" + file + ") is not valid.");
             continue;
          }
 
@@ -117,7 +118,7 @@ public class VddSuiteReporter {
             System.out.println("(*)Log File: " + log);
             VddLogToHTML log2html = new VddLogToHTML(log);
             log2html.generateReport();
-            VddLogIssues tmpissues = log2html.getIssues();
+            Issues tmpissues = log2html.getIssues();
             this.issues.appendIssues(tmpissues);
             tmpissues = null;
          } catch (VDDLogException e) {
@@ -315,7 +316,7 @@ public class VddSuiteReporter {
 
    }
 
-   public VddLogIssues getIssues() {
+   public Issues getIssues() {
       return this.issues;
    }
 
