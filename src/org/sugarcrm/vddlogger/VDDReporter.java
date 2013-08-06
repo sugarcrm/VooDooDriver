@@ -271,430 +271,6 @@ public class VDDReporter {
 
 
    /**
-    * Create summary.html
-    *
-    * @param summaryRows  non-sorted per-suite summary information
-    * @param totals       collated suite data
-    */
-
-   private void createSummary(HashMap<String,String> summaryRows,
-                              SuiteData totals) {
-      File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
-      System.out.println("(*)SummaryFile: " + summaryFile);
-      java.io.PrintStream s = null;
-
-      try {
-         s = new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
-      } catch (java.io.FileNotFoundException e) {
-         System.out.println("(!)Unable to create summary.html: " + e);
-         return;
-      }
-
-      s.print(readFile(SUMMARY_HEADER));
-
-      String suiteNames[] = summaryRows.keySet().toArray(new String[0]);
-      java.util.Arrays.sort(suiteNames);
-
-      for (String suiteName: suiteNames) {
-         s.print(summaryRows.get(suiteName));
-      }
-
-      s.print(summaryTotals(totals));
-      s.print("</table>\n\n</body>\n</html>\n");
-      s.close();
-   }
-
-
-   /**
-    * Read an entire file into a String
-    *
-    * <p>The file will be opened from either the directory tree or
-    * VDDReporter's jar file.</p>
-    *
-    * @param name  name of the file to open
-    * @return the contents of the file
-    */
-
-   private String readFile(String name) {
-      Class c = VDDReporter.class;
-      String nm = c.getName().replace('.', '/');
-      String jar = c.getResource("/" + nm + ".class").toString();
-      java.io.InputStream is = null;
-
-      if (jar.startsWith("jar:")) {
-         is = c.getResourceAsStream(name);
-      } else {
-         try {
-            is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
-         } catch (java.io.FileNotFoundException e) {
-            System.out.println("(!)" + name + " not found: " + e);
-            return "";
-         }
-      }
-
-      java.io.BufferedReader b =
-         new java.io.BufferedReader(new java.io.InputStreamReader(is));
-
-      String out = "", line;
-      try {
-         while ((line = b.readLine()) != null) {
-            out += line + "\n";
-         }
-      } catch (java.io.IOException e) {
-         System.out.println("(!)Error reading " + name + ": " + e);
-      }
-
-      try { b.close(); } catch (java.io.IOException e) {}
-
-      return out;
-   }
-
-
-   private void writeIssues() {
-      String[] errors_keys = null;
-      String[] warnings_keys = null;
-      String[] except_keys = null;
-      String line = "";
-      HashMap<String, Integer> tmpMap = null;
-
-      File issuesFile = new File(this.basedir, ISSUES_FILENAME);
-
-      System.out.println("(*)Writing issues file: " + issuesFile);
-
-      errors_keys = sortIssue(this.issues.getData().get("errors"));
-      warnings_keys = sortIssue(this.issues.getData().get("warnings"));
-      except_keys = sortIssue(this.issues.getData().get("exceptions"));
-
-      try {
-         java.io.BufferedWriter out =
-            new java.io.BufferedWriter(new java.io.FileWriter(issuesFile));
-         out.write(readFile(ISSUES_HEADER));
-
-         tmpMap = this.issues.getData().get("errors");
-         out.write("<table>\n");
-         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = errors_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(errors_keys[i]);
-            errors_keys[i] = errors_keys[i].replaceAll("<", "&lt");
-            errors_keys[i] = errors_keys[i].replaceAll(">", "&gt");
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, errors_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-         out.write("\n<hr></hr>\n");
-
-         tmpMap = this.issues.getData().get("exceptions");
-         out.write("<table>\n");
-         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Exceptions:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = except_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(except_keys[i]);
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            except_keys[i] = except_keys[i].replaceAll("<", "&lt");
-            except_keys[i] = except_keys[i].replaceAll(">", "&gt");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, except_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-         out.write("\n<hr></hr>\n");
-
-         tmpMap = this.issues.getData().get("warnings");
-         out.write("<table>\n");
-         out.write("<tr>\n\t<td class=\"td_header_master\" colspan=\"2\">Warnings:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = warnings_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(warnings_keys[i]);
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            warnings_keys[i] = warnings_keys[i].replaceAll("<", "&lt");
-            warnings_keys[i] = warnings_keys[i].replaceAll(">", "&gt");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, warnings_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-
-         out.write("</body></html>\n");
-         out.close();
-      } catch (Exception exp ) {
-         exp.printStackTrace();
-      }
-
-      System.out.printf("(*)Finished writing issues file.\n");
-
-   }
-
-   private String[] sortIssue(HashMap<String, Integer> map) {
-      String[] keys = null;
-
-      keys = map.keySet().toArray(new String[0]);
-
-      for (int i = 0; i <= keys.length -1; i++) {
-         int count = map.get(keys[i]);
-         keys[i] = String.format("%d:%s", count, keys[i]);
-      }
-
-      java.util.Arrays.sort(keys);
-      for (int i = 0; i <= keys.length -1; i++) {
-         keys[i] = keys[i].replaceFirst("\\d+:", "");
-      }
-
-      return keys;
-   }
-
-
-   /**
-    * Read the summary data from the suite log.
-    *
-    * @param doc  XML document representing the suite log
-    * @return SuiteData object with the data
-    */
-
-   private SuiteData getSuiteData(Node suite) {
-      SuiteData d = new SuiteData();
-      
-      NodeList nodes = suite.getChildNodes();
-      for (int k = 0; k < nodes.getLength(); k++) {
-         Node node = nodes.item(k);
-
-         if (node.getNodeType() != Node.ELEMENT_NODE) {
-            continue;
-         }
-
-         Element e = (Element)node;
-         String nm = e.getNodeName().toLowerCase();
-
-         if (nm.equals("suitefile")) {
-            d.suitename = e.getTextContent().replaceFirst("^(.+).xml$", "$1");
-         } else if (nm.equals("runtime")) {
-            String rt = e.getTextContent();
-
-            d.runtime = (new Double(rt.substring(0, rt.indexOf(":"))) * 3600 +
-                         new Double(rt.substring(2, rt.lastIndexOf(":"))) * 60 +
-                         new Double(rt.substring(rt.lastIndexOf(":") + 1,
-                                                 rt.length())));
-         } else if (nm.equals("test")) {
-            /* per-test values */
-            boolean islib = false;
-            File testlog = null;
-            boolean passed = false;
-            boolean isrestart = false;
-            int failedAsserts = 0;
-            int exceptions = 0;
-            int errors = 0;
-            boolean blocked = false;
-            int asserts = 0;
-            int watchdog = 0;
-            boolean truncated = false;
-            NodeList testNodes = e.getChildNodes();
-
-            for (int t = 0; t < testNodes.getLength(); t++) {
-               Node tn = testNodes.item(t);
-
-               if (tn.getNodeType() != Node.ELEMENT_NODE) {
-                  continue;
-               }
-
-               String tnn = tn.getNodeName().toLowerCase();
-
-               if (tnn.equals("testfile")) {
-                  String p = (new File(tn.getTextContent())).getParent();
-                  islib = (p != null) && p.contains("lib");
-               } else if (tnn.equals("testlog")) {
-                  testlog = new File(tn.getTextContent());
-               } else if (tnn.equals("result")) {
-                  passed = tn.getTextContent().toLowerCase().equals("passed");
-               } else if (tnn.equals("isrestart")) {
-                  isrestart = new Boolean(tn.getTextContent());
-               } else if (tnn.equals("failedasserts")) {
-                  failedAsserts = new Integer(tn.getTextContent());
-               } else if (tnn.equals("exceptions")) {
-                  exceptions = new Integer(tn.getTextContent());
-               } else if (tnn.equals("errors")) {
-                  errors = new Integer(tn.getTextContent());
-               } else if (tnn.equals("blocked")) {
-                  blocked = tn.getTextContent().equals("1");
-               } else if (tnn.equals("passedasserts")) {
-                  asserts = new Integer(tn.getTextContent());
-               } else if (tnn.equals("watchdog")) {
-                  watchdog = new Integer(tn.getTextContent());
-               } else if (tnn.equals("truncated")) {
-                  truncated = true;
-               }
-            }
-
-            d.truncated = d.truncated || truncated;
-
-            if (isrestart) {
-               continue;
-            }
-
-            if (!blocked && !islib) {
-               if (passed) {
-                  d.passed++;
-               } else {
-                  d.failed++;
-               }
-            }
-
-            d.blocked       += blocked ? 1 : 0;
-            d.watchdog      += watchdog;
-            d.asserts       += asserts;
-            d.failedAsserts += failedAsserts;
-            d.exceptions    += exceptions;
-            d.errors        += errors;
-            d.testlogs.add(testlog);
-         }
-      }
-
-      return d;
-   }
-
-
-   /**
-    * Format a runtime value.
-    *
-    * @param tm  runtime in seconds
-    * @return formatted runtime
-    */
-
-   private String fmtTime(double tm) {
-      return String.format("%02.0f:%02.0f:%02d", Math.floor(tm / 3600),
-                           Math.floor((tm % 3600) / 60), Math.round(tm % 60));
-   }
-
-
-   /**
-    * Generate a row in the suite summary report
-    *
-    * @param d data for this test suite
-    * @return a single row for output to summary.html
-    */
-
-   private String processSuite(SuiteData d) {
-      /* Generate the suite report. */
-      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
-                                                this.basedir,
-                                                d.testlogs);
-      r.generateReport();
-      this.issues.appendIssues(r.getIssues());
-
-      return summaryRow(d);
-   }
-
-
-   /**
-    * Generate a row in summary.html
-    *
-    * @param d  data for this row
-    * @return formatted HTML row
-    */
-
-   private String summaryRow(SuiteData d) {
-      int total  = d.failedAsserts + d.exceptions + d.errors;
-      String hl  = "highlight";
-      String uhl = "unhighlight";
-      String row;
-      String cls;
-
-      if (d.truncated || d.passed + d.failed + d.blocked == 0) {
-         hl += "_truncated";
-         uhl += "_truncated";
-      }
-
-      /* Row prologue. */
-      row = ("  <tr id=\"" + this.rowCount++ + "\" class=\"" + uhl + "\"" +
-             " onmouseover=\"this.className='" + hl + "'\"" +
-             " onmouseout=\"this.className='" + uhl + "'\">\n" +
-             "    <td class=\"td_file_data\">\n" +
-             "      <a href=\"" + d.suitename + "/" + d.suitename + ".html\">" +
-             d.suitename + ".xml</a>\n" +
-             "    </td>\n");
-
-      /* Tests column (passed/failed/blocked). */
-      cls = (d.blocked != 0) ? "td_run_data_error" : "td_run_data";
-      row += ("    <td class=\"" + cls + "\">" +
-              (d.passed + d.failed) + "/" + (d.passed + d.failed + d.blocked) +
-              "</td>\n" +
-              "    <td class=\"td_passed_data\">" + d.passed + "</td>\n" + 
-              "    <td class=\"td_failed_data\">" + d.failed + "</td>\n" +
-              "    <td class=\"td_blocked_data\">" + d.blocked + "</td>\n");
-
-      /* Results column */
-
-      /* Watchdog timer expiries */
-      cls = (d.watchdog != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
-      row += "    <td class=\"" + cls + "\">" + d.watchdog + "</td>\n";
-
-      /* Passed asserts */
-      row += "    <td class=\"td_assert_data\">" + d.asserts + "</td>\n";
-
-      /* Failed asserts */
-      cls = (d.failedAsserts != 0) ? "td_assert_error_data" : "td_assert_data";
-      row += "    <td class=\"" + cls + "\">" + d.failedAsserts + "</td>\n";
-
-      /* Exceptions */
-      cls = (d.exceptions != 0) ? "td_exceptions_error_data" :
-                                  "td_exceptions_data";
-      row += "    <td class=\"" + cls + "\">" + d.exceptions + "</td>\n";
-
-      /* Errors */
-      cls = (d.errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
-      row += "    <td class=\"" + cls + "\">" + d.errors + "</td>\n";
-
-      /* Total Failures */
-      cls = (total != 0) ? "td_total_error_data" : "td_total_data";
-      row += "    <td class=\"" + cls + "\">" + total + "</td>\n";
-
-      /* Runtime */
-      row += "    <td class=\"td_time_data\">" + fmtTime(d.runtime) + "</td>\n";
-
-      /* Row epilogue */
-      row += "  </tr>\n";
-
-      return row;
-   }
-
-
-   /**
-    * Create the HTML table footer for the summary report
-    *
-    * @param t  test run totals
-    * @return the table footer
-    */
-
-   private String summaryTotals(SuiteData t) {
-      String footerrun = (t.blocked == 0 ? "td_footer_run" :
-                                           "td_footer_run_err");
-      String failedtd = (t.failed == 0 ? "td_footer_failed_zero" :
-                                         "td_footer_failed");
-      String blockedtd = (t.blocked == 0 ? "td_footer_blocked_zero" :
-                                           "td_footer_blocked");
-
-      return ("  <tr id=\"totals\">\n" +
-              "    <td class=\"td_header_master\">Totals:</td>\n" +
-              "    <td class=\"" + footerrun + "\">" +
-              (t.passed + t.failed) + "/" + (t.passed + t.failed + t.blocked) +
-              "</td>\n" +
-              "    <td class=\"td_footer_passed\">" + t.passed + "</td>\n" +
-              "    <td class=\"" + failedtd + "\">" + t.failed + "</td>\n" +
-              "    <td class=\"" + blockedtd + "\">" + t.blocked + "</td>\n" +
-              "    <td class=\"td_footer_watchdog\">" + t.watchdog + "</td>\n" +
-              "    <td class=\"td_footer_passed\">" + t.asserts + "</td>\n" +
-              "    <td class=\"td_footer_assert\">" + t.failedAsserts + "</td>\n" +
-              "    <td class=\"td_footer_exceptions\">" + t.exceptions + "</td>\n" +
-              "    <td class=\"td_footer_watchdog\">" + t.errors + "</td>\n" +
-              "    <td class=\"td_footer_total\">" +
-              (t.failedAsserts + t.exceptions + t.errors) + "</td>\n" +
-              "    <td class=\"td_footer_times\">" + fmtTime(t.runtime) + "</td>\n" +
-              "  </tr>\n");
-   }
-
-
-   /**
     * Deal with log files that are missing end tags.
     *
     * <p>This is called when xml processing has failed, and that
@@ -821,5 +397,433 @@ public class VDDReporter {
       }
 
       return dom;
+   }
+
+
+   /**
+    * Read the summary data from the suite log.
+    *
+    * @param doc  XML document representing the suite log
+    * @return SuiteData object with the data
+    */
+
+   private SuiteData getSuiteData(Node suite) {
+      SuiteData d = new SuiteData();
+      
+      NodeList nodes = suite.getChildNodes();
+      for (int k = 0; k < nodes.getLength(); k++) {
+         Node node = nodes.item(k);
+
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
+            continue;
+         }
+
+         Element e = (Element)node;
+         String nm = e.getNodeName().toLowerCase();
+
+         if (nm.equals("suitefile")) {
+            d.suitename = e.getTextContent().replaceFirst("^(.+).xml$", "$1");
+         } else if (nm.equals("runtime")) {
+            String rt = e.getTextContent();
+
+            d.runtime = (new Double(rt.substring(0, rt.indexOf(":"))) * 3600 +
+                         new Double(rt.substring(2, rt.lastIndexOf(":"))) * 60 +
+                         new Double(rt.substring(rt.lastIndexOf(":") + 1,
+                                                 rt.length())));
+         } else if (nm.equals("test")) {
+            /* per-test values */
+            boolean islib = false;
+            File testlog = null;
+            boolean passed = false;
+            boolean isrestart = false;
+            int failedAsserts = 0;
+            int exceptions = 0;
+            int errors = 0;
+            boolean blocked = false;
+            int asserts = 0;
+            int watchdog = 0;
+            boolean truncated = false;
+            NodeList testNodes = e.getChildNodes();
+
+            for (int t = 0; t < testNodes.getLength(); t++) {
+               Node tn = testNodes.item(t);
+
+               if (tn.getNodeType() != Node.ELEMENT_NODE) {
+                  continue;
+               }
+
+               String tnn = tn.getNodeName().toLowerCase();
+
+               if (tnn.equals("testfile")) {
+                  String p = (new File(tn.getTextContent())).getParent();
+                  islib = (p != null) && p.contains("lib");
+               } else if (tnn.equals("testlog")) {
+                  testlog = new File(tn.getTextContent());
+               } else if (tnn.equals("result")) {
+                  passed = tn.getTextContent().toLowerCase().equals("passed");
+               } else if (tnn.equals("isrestart")) {
+                  isrestart = new Boolean(tn.getTextContent());
+               } else if (tnn.equals("failedasserts")) {
+                  failedAsserts = new Integer(tn.getTextContent());
+               } else if (tnn.equals("exceptions")) {
+                  exceptions = new Integer(tn.getTextContent());
+               } else if (tnn.equals("errors")) {
+                  errors = new Integer(tn.getTextContent());
+               } else if (tnn.equals("blocked")) {
+                  blocked = tn.getTextContent().equals("1");
+               } else if (tnn.equals("passedasserts")) {
+                  asserts = new Integer(tn.getTextContent());
+               } else if (tnn.equals("watchdog")) {
+                  watchdog = new Integer(tn.getTextContent());
+               } else if (tnn.equals("truncated")) {
+                  truncated = true;
+               }
+            }
+
+            d.truncated = d.truncated || truncated;
+
+            if (isrestart) {
+               continue;
+            }
+
+            if (!blocked && !islib) {
+               if (passed) {
+                  d.passed++;
+               } else {
+                  d.failed++;
+               }
+            }
+
+            d.blocked       += blocked ? 1 : 0;
+            d.watchdog      += watchdog;
+            d.asserts       += asserts;
+            d.failedAsserts += failedAsserts;
+            d.exceptions    += exceptions;
+            d.errors        += errors;
+            d.testlogs.add(testlog);
+         }
+      }
+
+      return d;
+   }
+
+
+   /**
+    * Process a single suite
+    *
+    * <p>This method causes the suite/test report heirarchy to be
+    * generated for a single suite.  It also generates the
+    * corresponding row for the suite summary report.</p>
+    *
+    * @param d data for this test suite
+    * @return a single row for output to summary.html
+    */
+
+   private String processSuite(SuiteData d) {
+      /* Generate the suite report. */
+      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
+                                                this.basedir,
+                                                d.testlogs);
+      r.generateReport();
+      this.issues.appendIssues(r.getIssues());
+
+      return summaryRow(d);
+   }
+
+
+   /**
+    * Read an entire file into a String
+    *
+    * <p>The file will be opened from either the directory tree or
+    * VDDReporter's jar file.</p>
+    *
+    * @param name  name of the file to open
+    * @return the contents of the file
+    */
+
+   private String readFile(String name) {
+      Class c = VDDReporter.class;
+      String nm = c.getName().replace('.', '/');
+      String jar = c.getResource("/" + nm + ".class").toString();
+      java.io.InputStream is = null;
+
+      if (jar.startsWith("jar:")) {
+         is = c.getResourceAsStream(name);
+      } else {
+         try {
+            is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
+         } catch (java.io.FileNotFoundException e) {
+            System.out.println("(!)" + name + " not found: " + e);
+            return "";
+         }
+      }
+
+      java.io.BufferedReader b =
+         new java.io.BufferedReader(new java.io.InputStreamReader(is));
+
+      String out = "", line;
+      try {
+         while ((line = b.readLine()) != null) {
+            out += line + "\n";
+         }
+      } catch (java.io.IOException e) {
+         System.out.println("(!)Error reading " + name + ": " + e);
+      }
+
+      try { b.close(); } catch (java.io.IOException e) {}
+
+      return out;
+   }
+
+
+   /**
+    * Format a runtime value.
+    *
+    * @param tm  runtime in seconds
+    * @return formatted runtime
+    */
+
+   private String fmtTime(double tm) {
+      return String.format("%02.0f:%02.0f:%02d", Math.floor(tm / 3600),
+                           Math.floor((tm % 3600) / 60), Math.round(tm % 60));
+   }
+
+
+   /**
+    * Create summary.html
+    *
+    * @param summaryRows  non-sorted per-suite summary information
+    * @param totals       collated suite data
+    */
+
+   private void createSummary(HashMap<String,String> summaryRows,
+                              SuiteData totals) {
+      File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
+      System.out.println("(*)SummaryFile: " + summaryFile);
+      java.io.PrintStream s = null;
+
+      try {
+         s = new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
+      } catch (java.io.FileNotFoundException e) {
+         System.out.println("(!)Unable to create summary.html: " + e);
+         return;
+      }
+
+      s.print(readFile(SUMMARY_HEADER));
+
+      String suiteNames[] = summaryRows.keySet().toArray(new String[0]);
+      java.util.Arrays.sort(suiteNames);
+
+      for (String suiteName: suiteNames) {
+         s.print(summaryRows.get(suiteName));
+      }
+
+      s.print(summaryTotals(totals));
+      s.print("</table>\n\n</body>\n</html>\n");
+      s.close();
+   }
+
+
+   /**
+    * Generate a row in summary.html
+    *
+    * @param d  data for this row
+    * @return formatted HTML row
+    */
+
+   private String summaryRow(SuiteData d) {
+      int total  = d.failedAsserts + d.exceptions + d.errors;
+      String hl  = "highlight";
+      String uhl = "unhighlight";
+      String row;
+      String cls;
+
+      if (d.truncated || d.passed + d.failed + d.blocked == 0) {
+         hl += "_truncated";
+         uhl += "_truncated";
+      }
+
+      /* Row prologue. */
+      row = ("  <tr id=\"" + this.rowCount++ + "\" class=\"" + uhl + "\"" +
+             " onmouseover=\"this.className='" + hl + "'\"" +
+             " onmouseout=\"this.className='" + uhl + "'\">\n" +
+             "    <td class=\"td_file_data\">\n" +
+             "      <a href=\"" + d.suitename + "/" + d.suitename + ".html\">" +
+             d.suitename + ".xml</a>\n" +
+             "    </td>\n");
+
+      /* Tests column (passed/failed/blocked). */
+      cls = (d.blocked != 0) ? "td_run_data_error" : "td_run_data";
+      row += ("    <td class=\"" + cls + "\">" +
+              (d.passed + d.failed) + "/" + (d.passed + d.failed + d.blocked) +
+              "</td>\n" +
+              "    <td class=\"td_passed_data\">" + d.passed + "</td>\n" + 
+              "    <td class=\"td_failed_data\">" + d.failed + "</td>\n" +
+              "    <td class=\"td_blocked_data\">" + d.blocked + "</td>\n");
+
+      /* Results column */
+
+      /* Watchdog timer expiries */
+      cls = (d.watchdog != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
+      row += "    <td class=\"" + cls + "\">" + d.watchdog + "</td>\n";
+
+      /* Passed asserts */
+      row += "    <td class=\"td_assert_data\">" + d.asserts + "</td>\n";
+
+      /* Failed asserts */
+      cls = (d.failedAsserts != 0) ? "td_assert_error_data" : "td_assert_data";
+      row += "    <td class=\"" + cls + "\">" + d.failedAsserts + "</td>\n";
+
+      /* Exceptions */
+      cls = (d.exceptions != 0) ? "td_exceptions_error_data" :
+                                  "td_exceptions_data";
+      row += "    <td class=\"" + cls + "\">" + d.exceptions + "</td>\n";
+
+      /* Errors */
+      cls = (d.errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
+      row += "    <td class=\"" + cls + "\">" + d.errors + "</td>\n";
+
+      /* Total Failures */
+      cls = (total != 0) ? "td_total_error_data" : "td_total_data";
+      row += "    <td class=\"" + cls + "\">" + total + "</td>\n";
+
+      /* Runtime */
+      row += "    <td class=\"td_time_data\">" + fmtTime(d.runtime) + "</td>\n";
+
+      /* Row epilogue */
+      row += "  </tr>\n";
+
+      return row;
+   }
+
+
+   /**
+    * Create the HTML table footer for the summary report
+    *
+    * @param t  test run totals
+    * @return the table footer
+    */
+
+   private String summaryTotals(SuiteData t) {
+      String footerrun = (t.blocked == 0 ? "td_footer_run" :
+                                           "td_footer_run_err");
+      String failedtd = (t.failed == 0 ? "td_footer_failed_zero" :
+                                         "td_footer_failed");
+      String blockedtd = (t.blocked == 0 ? "td_footer_blocked_zero" :
+                                           "td_footer_blocked");
+
+      return ("  <tr id=\"totals\">\n" +
+              "    <td class=\"td_header_master\">Totals:</td>\n" +
+              "    <td class=\"" + footerrun + "\">" +
+              (t.passed + t.failed) + "/" + (t.passed + t.failed + t.blocked) +
+              "</td>\n" +
+              "    <td class=\"td_footer_passed\">" + t.passed + "</td>\n" +
+              "    <td class=\"" + failedtd + "\">" + t.failed + "</td>\n" +
+              "    <td class=\"" + blockedtd + "\">" + t.blocked + "</td>\n" +
+              "    <td class=\"td_footer_watchdog\">" + t.watchdog + "</td>\n" +
+              "    <td class=\"td_footer_passed\">" + t.asserts + "</td>\n" +
+              "    <td class=\"td_footer_assert\">" + t.failedAsserts + "</td>\n" +
+              "    <td class=\"td_footer_exceptions\">" + t.exceptions + "</td>\n" +
+              "    <td class=\"td_footer_watchdog\">" + t.errors + "</td>\n" +
+              "    <td class=\"td_footer_total\">" +
+              (t.failedAsserts + t.exceptions + t.errors) + "</td>\n" +
+              "    <td class=\"td_footer_times\">" + fmtTime(t.runtime) + "</td>\n" +
+              "  </tr>\n");
+   }
+
+
+   private void writeIssues() {
+      String[] errors_keys = null;
+      String[] warnings_keys = null;
+      String[] except_keys = null;
+      String line = "";
+      HashMap<String, Integer> tmpMap = null;
+
+      File issuesFile = new File(this.basedir, ISSUES_FILENAME);
+
+      System.out.println("(*)Writing issues file: " + issuesFile);
+
+      errors_keys = sortIssue(this.issues.getData().get("errors"));
+      warnings_keys = sortIssue(this.issues.getData().get("warnings"));
+      except_keys = sortIssue(this.issues.getData().get("exceptions"));
+
+      try {
+         java.io.BufferedWriter out =
+            new java.io.BufferedWriter(new java.io.FileWriter(issuesFile));
+         out.write(readFile(ISSUES_HEADER));
+
+         tmpMap = this.issues.getData().get("errors");
+         out.write("<table>\n");
+         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
+         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+         for (int i = errors_keys.length -1; i >= 0 ; i--) {
+            int count = tmpMap.get(errors_keys[i]);
+            errors_keys[i] = errors_keys[i].replaceAll("<", "&lt");
+            errors_keys[i] = errors_keys[i].replaceAll(">", "&gt");
+            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, errors_keys[i]);
+            out.write(n);
+            out.write("</tr>\n");
+         }
+         out.write("</table>\n");
+         out.write("\n<hr></hr>\n");
+
+         tmpMap = this.issues.getData().get("exceptions");
+         out.write("<table>\n");
+         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Exceptions:</td>\n</tr>\n");
+         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+         for (int i = except_keys.length -1; i >= 0 ; i--) {
+            int count = tmpMap.get(except_keys[i]);
+            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+            except_keys[i] = except_keys[i].replaceAll("<", "&lt");
+            except_keys[i] = except_keys[i].replaceAll(">", "&gt");
+            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, except_keys[i]);
+            out.write(n);
+            out.write("</tr>\n");
+         }
+         out.write("</table>\n");
+         out.write("\n<hr></hr>\n");
+
+         tmpMap = this.issues.getData().get("warnings");
+         out.write("<table>\n");
+         out.write("<tr>\n\t<td class=\"td_header_master\" colspan=\"2\">Warnings:</td>\n</tr>\n");
+         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
+         for (int i = warnings_keys.length -1; i >= 0 ; i--) {
+            int count = tmpMap.get(warnings_keys[i]);
+            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
+            warnings_keys[i] = warnings_keys[i].replaceAll("<", "&lt");
+            warnings_keys[i] = warnings_keys[i].replaceAll(">", "&gt");
+            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, warnings_keys[i]);
+            out.write(n);
+            out.write("</tr>\n");
+         }
+         out.write("</table>\n");
+
+         out.write("</body></html>\n");
+         out.close();
+      } catch (Exception exp ) {
+         exp.printStackTrace();
+      }
+
+      System.out.printf("(*)Finished writing issues file.\n");
+
+   }
+
+   private String[] sortIssue(HashMap<String, Integer> map) {
+      String[] keys = null;
+
+      keys = map.keySet().toArray(new String[0]);
+
+      for (int i = 0; i <= keys.length -1; i++) {
+         int count = map.get(keys[i]);
+         keys[i] = String.format("%d:%s", count, keys[i]);
+      }
+
+      java.util.Arrays.sort(keys);
+      for (int i = 0; i <= keys.length -1; i++) {
+         keys[i] = keys[i].replaceFirst("\\d+:", "");
+      }
+
+      return keys;
    }
 }
