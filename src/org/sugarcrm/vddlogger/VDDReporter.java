@@ -17,9 +17,12 @@
 package org.sugarcrm.vddlogger;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -186,7 +189,7 @@ public class VDDReporter {
             System.exit(4);
          }
 
-         xml = new ArrayList<File>(java.util.Arrays.asList(fs));
+         xml = new ArrayList<File>(Arrays.asList(fs));
 
       } else {
          System.out.println("(!)Missing --suitefile or --suitedir!");
@@ -266,7 +269,7 @@ public class VDDReporter {
       }
 
       this.createSummary(summaryRows, totals);
-      this.writeIssues();
+      this.createIssues();
    }
 
 
@@ -600,10 +603,10 @@ public class VDDReporter {
                               SuiteData totals) {
       File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
       System.out.println("(*)SummaryFile: " + summaryFile);
-      java.io.PrintStream s = null;
+      PrintStream s = null;
 
       try {
-         s = new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
+         s = new PrintStream(new java.io.FileOutputStream(summaryFile));
       } catch (java.io.FileNotFoundException e) {
          System.out.println("(!)Unable to create summary.html: " + e);
          return;
@@ -612,7 +615,7 @@ public class VDDReporter {
       s.print(readFile(SUMMARY_HEADER));
 
       String suiteNames[] = summaryRows.keySet().toArray(new String[0]);
-      java.util.Arrays.sort(suiteNames);
+      Arrays.sort(suiteNames);
 
       for (String suiteName: suiteNames) {
          s.print(summaryRows.get(suiteName));
@@ -620,6 +623,11 @@ public class VDDReporter {
 
       s.print(summaryTotals(totals));
       s.print("</table>\n\n</body>\n</html>\n");
+
+      if (s.checkError()) {
+         System.out.println("(!)Error occurred when writing " + summaryFile);
+      }
+
       s.close();
    }
 
@@ -732,98 +740,81 @@ public class VDDReporter {
    }
 
 
-   private void writeIssues() {
-      String[] errors_keys = null;
-      String[] warnings_keys = null;
-      String[] except_keys = null;
-      String line = "";
-      HashMap<String, Integer> tmpMap = null;
+   /**
+    * Create issues.html
+    */
 
+   private void createIssues() {
       File issuesFile = new File(this.basedir, ISSUES_FILENAME);
+      PrintStream i = null;
 
-      System.out.println("(*)Writing issues file: " + issuesFile);
-
-      errors_keys = sortIssue(this.issues.getData().get("errors"));
-      warnings_keys = sortIssue(this.issues.getData().get("warnings"));
-      except_keys = sortIssue(this.issues.getData().get("exceptions"));
+      System.out.println("(*)Issues file: " + issuesFile);
 
       try {
-         java.io.BufferedWriter out =
-            new java.io.BufferedWriter(new java.io.FileWriter(issuesFile));
-         out.write(readFile(ISSUES_HEADER));
-
-         tmpMap = this.issues.getData().get("errors");
-         out.write("<table>\n");
-         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Errors:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = errors_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(errors_keys[i]);
-            errors_keys[i] = errors_keys[i].replaceAll("<", "&lt");
-            errors_keys[i] = errors_keys[i].replaceAll(">", "&gt");
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, errors_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-         out.write("\n<hr></hr>\n");
-
-         tmpMap = this.issues.getData().get("exceptions");
-         out.write("<table>\n");
-         out.write("<tr>\n<td class=\"td_header_master\" colspan=\"2\">Exceptions:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = except_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(except_keys[i]);
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            except_keys[i] = except_keys[i].replaceAll("<", "&lt");
-            except_keys[i] = except_keys[i].replaceAll(">", "&gt");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, except_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-         out.write("\n<hr></hr>\n");
-
-         tmpMap = this.issues.getData().get("warnings");
-         out.write("<table>\n");
-         out.write("<tr>\n\t<td class=\"td_header_master\" colspan=\"2\">Warnings:</td>\n</tr>\n");
-         out.write("<tr>\n\t<td class=\"td_header_count\">Count:</td>\n\t<td class=\"td_header_sub\">Issue:</td>\n</tr>\n");
-         for (int i = warnings_keys.length -1; i >= 0 ; i--) {
-            int count = tmpMap.get(warnings_keys[i]);
-            out.write("<tr class=\"unhighlight\" onmouseout=\"this.className='unhighlight'\" onmouseover=\"this.className='highlight'\">\n");
-            warnings_keys[i] = warnings_keys[i].replaceAll("<", "&lt");
-            warnings_keys[i] = warnings_keys[i].replaceAll(">", "&gt");
-            String n = String.format("\t<td class=\"td_count_data\">%d</td>\n\t<td class=\"td_file_data\">%s</td>\n", count, warnings_keys[i]);
-            out.write(n);
-            out.write("</tr>\n");
-         }
-         out.write("</table>\n");
-
-         out.write("</body></html>\n");
-         out.close();
-      } catch (Exception exp ) {
-         exp.printStackTrace();
+         i = new PrintStream(new java.io.FileOutputStream(issuesFile));
+      } catch (java.io.FileNotFoundException e) {
+         System.out.println("(!)Unable to create " + issuesFile + ": " + e);
+         return;
       }
 
-      System.out.printf("(*)Finished writing issues file.\n");
+      i.print(readFile(ISSUES_HEADER));
+      i.print(issuesTable("Errors"));
+      i.print("<hr/>\n");
+      i.print(issuesTable("Exceptions"));
+      i.print("<hr/>\n");
+      i.print(issuesTable("Warnings"));
+      i.print("</body></html>\n");
 
+      if (i.checkError()) {
+         System.out.println("(*)Error occurred when writing " + issuesFile);
+      }
+
+      i.close();
    }
 
-   private String[] sortIssue(HashMap<String, Integer> map) {
-      String[] keys = null;
 
-      keys = map.keySet().toArray(new String[0]);
+   /**
+    * Create a table of sorted, collated issues.
+    *
+    * @param type  type of issue (errors, exceptions, warnings) in title case
+    * @return formatted HTML table of issues
+    */
 
-      for (int i = 0; i <= keys.length -1; i++) {
-         int count = map.get(keys[i]);
-         keys[i] = String.format("%d:%s", count, keys[i]);
+   private String issuesTable(String type) {
+      final HashMap<String,Integer> m =
+         this.issues.getData().get(type.toLowerCase());
+      String t;
+      String keys[] = m.keySet().toArray(new String[0]);
+
+      Arrays.sort(keys, new Comparator<String>() {
+            public int compare(String o1, String o2) {
+               return m.get(o1).compareTo(m.get(o2));
+            }
+         });
+
+      t = ("<table>\n" +
+           "  <tr>\n" +
+           "    <td class=\"td_header_master\" colspan=\"2\">" + type + ":</td>\n" +
+           "  </tr>\n" +
+           "  <tr>\n" +
+           "    <td class=\"td_header_count\">Count:</td>\n" +
+           "    <td class=\"td_header_sub\">Issue:</td>\n" +
+           "  </tr>\n");
+
+      for (String key: keys) {
+         t += ("  <tr class=\"unhighlight\"" +
+               " onmouseout=\"this.className='unhighlight'\"" +
+               " onmouseover=\"this.className='highlight'\">\n" +
+               "    <td class=\"td_count_data\">" + m.get(key) + "</td>\n" +
+               "    <td class=\"td_file_data\">" + key.replaceAll("&", "&quot;")
+                                                      .replaceAll("<", "&lt;")
+                                                      .replaceAll(">", "&gt;") +
+               "</td>\n" +
+               "  </tr>\n");
       }
 
-      java.util.Arrays.sort(keys);
-      for (int i = 0; i <= keys.length -1; i++) {
-         keys[i] = keys[i].replaceFirst("\\d+:", "");
-      }
+      t += "</table>\n";
 
-      return keys;
+      return t;
    }
 }

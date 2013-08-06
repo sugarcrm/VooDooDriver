@@ -1,5 +1,9 @@
 <html>
-<style stype="text/css">
+<head>
+
+<title>VDD Run Issues</title>
+
+<style type="text/css">
 body {
  background: #e5eef3;
 }
@@ -82,4 +86,6 @@ table {
  border-bottom: 2px solid black;
 }
 </style>
+
+</head>
 <body>
