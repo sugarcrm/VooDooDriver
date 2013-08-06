@@ -41,7 +41,7 @@ public class VDDReporter {
     * File header for summary.html
     */
 
-   private final String HTML_HEADER_RESOURCE = "summaryreporter-header.txt";
+   private final String SUMMARY_HEADER = "summaryreporter-header.txt";
 
    /**
     * Filename of summary.html
@@ -53,7 +53,7 @@ public class VDDReporter {
     * File header for issues.html
     */
 
-   private final String HTML_HEADER_ISSUES_RESOURCE = "issues-header.txt";
+   private final String ISSUES_HEADER = "issues-header.txt";
 
    /**
     * Filename of issues.html
@@ -81,10 +81,10 @@ public class VDDReporter {
    private VddLogIssues issues;
 
    /**
-    * Summary data from all the suites.
+    * Running count of the rows being output in summary.html.
     */
 
-   private SuiteData totals;
+   private int rowCount = 0;
 
 
    /**
@@ -129,12 +129,6 @@ public class VDDReporter {
          this.testlogs.addAll(n.testlogs);
       }
    }
-
-   /**
-    * Running count of the rows being output in summary.html.
-    */
-
-   private int rowCount = 0;
 
 
    /**
@@ -216,7 +210,6 @@ public class VDDReporter {
       this.xmlFiles = xmlFiles;
       this.basedir = path;
       this.issues = new VddLogIssues();
-      this.totals = new SuiteData();
    }
 
 
@@ -225,30 +218,24 @@ public class VDDReporter {
     */
 
    public void generateReport() {
-      HashMap<String,SuiteData> list = new HashMap<String,SuiteData>();
-      java.io.PrintStream report = null;
+      HashMap<String,String> summaryRows = new HashMap<String,String>();
+      SuiteData totals = new SuiteData();
 
-      File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
-      System.out.println("(*)SummaryFile: " + summaryFile);
-
-      try {
-         report =
-            new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
-      } catch (java.io.FileNotFoundException e) {
-         System.err.println("(!)Unable to create summary.html: " + e);
-         return;
-      }
-
-      report.print(readFile(HTML_HEADER_RESOURCE));
-
-      for (File xml: xmlFiles) {
+      for (File xml: this.xmlFiles) {
          boolean truncated = false;
+         ArrayList<SuiteData> suites = new ArrayList<SuiteData>();
+
          Document doc = loadSuiteSummary(xml);
          if (doc == null) {
             continue;
          }
 
-         ArrayList<SuiteData> suites = new ArrayList<SuiteData>();
+         /*
+          * Reading each XML file and processing the results needs to
+          * be done in two steps because the <truncated/> tag, if
+          * present, will be at the bottom of the file but applies to
+          * all entries.
+          */
 
          NodeList suiteNodes = doc.getDocumentElement().getChildNodes();
          for (int k = 0; k < suiteNodes.getLength(); k++) {
@@ -262,36 +249,59 @@ public class VDDReporter {
 
             if (nm.equals("truncated")) {
                truncated = true;
-            } else if (!nm.equals("suite")) {
+            }
+
+            if (!nm.equals("suite")) {
                continue;
             }
 
-            SuiteData suiteData = getSuiteData(suite);
-            if (suiteData == null) {
-               continue;
-            }
-            suites.add(suiteData);
+            suites.add(getSuiteData(suite));
          }
 
          for (SuiteData suiteData: suites) {
             suiteData.truncated = suiteData.truncated || truncated;
-            list.put(suiteData.suitename, suiteData);
-            this.totals.append(suiteData);
+            totals.append(suiteData);
+            summaryRows.put(suiteData.suitename, processSuite(suiteData));
          }
       }
 
-      String keys[] = list.keySet().toArray(new String[0]);
-      java.util.Arrays.sort(keys);
+      this.createSummary(summaryRows, totals);
+      this.writeIssues();
+   }
 
-      for (String key: keys) {
-         report.print(processSuite(key, list.get(key)));
+
+   /**
+    * Create summary.html
+    *
+    * @param summaryRows  non-sorted per-suite summary information
+    * @param totals       collated suite data
+    */
+
+   private void createSummary(HashMap<String,String> summaryRows,
+                              SuiteData totals) {
+      File summaryFile = new File(this.basedir, SUMMARY_FILENAME);
+      System.out.println("(*)SummaryFile: " + summaryFile);
+      java.io.PrintStream s = null;
+
+      try {
+         s = new java.io.PrintStream(new java.io.FileOutputStream(summaryFile));
+      } catch (java.io.FileNotFoundException e) {
+         System.out.println("(!)Unable to create summary.html: " + e);
+         return;
       }
 
-      report.print(generateHTMLFooter());
-      report.print("\n</body>\n</html>\n");
-      report.close();
+      s.print(readFile(SUMMARY_HEADER));
 
-      this.writeIssues();
+      String suiteNames[] = summaryRows.keySet().toArray(new String[0]);
+      java.util.Arrays.sort(suiteNames);
+
+      for (String suiteName: suiteNames) {
+         s.print(summaryRows.get(suiteName));
+      }
+
+      s.print(summaryTotals(totals));
+      s.print("</table>\n\n</body>\n</html>\n");
+      s.close();
    }
 
 
@@ -317,7 +327,7 @@ public class VDDReporter {
          try {
             is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
          } catch (java.io.FileNotFoundException e) {
-            System.err.println("(!)" + name + " not found: " + e);
+            System.out.println("(!)" + name + " not found: " + e);
             return "";
          }
       }
@@ -325,14 +335,13 @@ public class VDDReporter {
       java.io.BufferedReader b =
          new java.io.BufferedReader(new java.io.InputStreamReader(is));
 
-      String out = "";
-      String line;
+      String out = "", line;
       try {
          while ((line = b.readLine()) != null) {
             out += line + "\n";
          }
       } catch (java.io.IOException e) {
-         System.err.println("(!)Error reading " + name + ": " + e);
+         System.out.println("(!)Error reading " + name + ": " + e);
       }
 
       try { b.close(); } catch (java.io.IOException e) {}
@@ -359,7 +368,7 @@ public class VDDReporter {
       try {
          java.io.BufferedWriter out =
             new java.io.BufferedWriter(new java.io.FileWriter(issuesFile));
-         out.write(readFile(HTML_HEADER_ISSUES_RESOURCE));
+         out.write(readFile(ISSUES_HEADER));
 
          tmpMap = this.issues.getData().get("errors");
          out.write("<table>\n");
@@ -541,11 +550,6 @@ public class VDDReporter {
          }
       }
 
-      /* Disallow files with no suitename (they're truncated beyond repair). */
-      if (d.suitename == null) {
-         return null;
-      }
-
       return d;
    }
 
@@ -566,16 +570,34 @@ public class VDDReporter {
    /**
     * Generate a row in the suite summary report
     *
-    * @param suiteName  name of the test suite being processed
-    * @param data       data for this test suite
+    * @param d data for this test suite
     * @return a single row for output to summary.html
     */
 
-   private String processSuite(String suiteName, SuiteData d) {
+   private String processSuite(SuiteData d) {
+      /* Generate the suite report. */
+      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
+                                                this.basedir,
+                                                d.testlogs);
+      r.generateReport();
+      this.issues.appendIssues(r.getIssues());
+
+      return summaryRow(d);
+   }
+
+
+   /**
+    * Generate a row in summary.html
+    *
+    * @param d  data for this row
+    * @return formatted HTML row
+    */
+
+   private String summaryRow(SuiteData d) {
       int total  = d.failedAsserts + d.exceptions + d.errors;
       String hl  = "highlight";
       String uhl = "unhighlight";
-      String html;
+      String row;
       String cls;
 
       if (d.truncated || d.passed + d.failed + d.blocked == 0) {
@@ -584,113 +606,91 @@ public class VDDReporter {
       }
 
       /* Row prologue. */
-      html = ("<tr id=\"" + this.rowCount++ + "\" class=\"" + uhl + "\"" +
-                     "    onmouseover=\"this.className='" + hl + "'\"" +
-              "    onmouseout=\"this.className='" + uhl + "'\">\n" +
-              "   <td class=\"td_file_data\">\n" +
-              "      <a href=\"" + d.suitename+"/"+d.suitename + ".html\">" +
-              d.suitename + ".xml</a>\n" +
-              "   </td>\n");
+      row = ("  <tr id=\"" + this.rowCount++ + "\" class=\"" + uhl + "\"" +
+             " onmouseover=\"this.className='" + hl + "'\"" +
+             " onmouseout=\"this.className='" + uhl + "'\">\n" +
+             "    <td class=\"td_file_data\">\n" +
+             "      <a href=\"" + d.suitename + "/" + d.suitename + ".html\">" +
+             d.suitename + ".xml</a>\n" +
+             "    </td>\n");
 
       /* Tests column (passed/failed/blocked). */
       cls = (d.blocked != 0) ? "td_run_data_error" : "td_run_data";
-      html += ("   <td class=\"" + cls + "\">" +
-               (d.passed + d.failed) + "/" + (d.passed + d.failed + d.blocked) +
-               "</td>\n" +
-               "   <td class=\"td_passed_data\">" + d.passed + "</td>\n" + 
-               "   <td class=\"td_failed_data\">" + d.failed + "</td>\n" +
-               "   <td class=\"td_blocked_data\">" + d.blocked + "</td>\n");
+      row += ("    <td class=\"" + cls + "\">" +
+              (d.passed + d.failed) + "/" + (d.passed + d.failed + d.blocked) +
+              "</td>\n" +
+              "    <td class=\"td_passed_data\">" + d.passed + "</td>\n" + 
+              "    <td class=\"td_failed_data\">" + d.failed + "</td>\n" +
+              "    <td class=\"td_blocked_data\">" + d.blocked + "</td>\n");
 
       /* Results column */
 
       /* Watchdog timer expiries */
       cls = (d.watchdog != 0) ? "td_watchdog_error_data" : "td_watchdog_data";
-      html += "   <td class=\"" + cls + "\">" + d.watchdog + "</td>\n";
+      row += "    <td class=\"" + cls + "\">" + d.watchdog + "</td>\n";
 
       /* Passed asserts */
-      html += "   <td class=\"td_assert_data\">" + d.asserts + "</td>\n";
+      row += "    <td class=\"td_assert_data\">" + d.asserts + "</td>\n";
 
       /* Failed asserts */
       cls = (d.failedAsserts != 0) ? "td_assert_error_data" : "td_assert_data";
-      html += "   <td class=\"" + cls + "\">" + d.failedAsserts + "</td>\n";
+      row += "    <td class=\"" + cls + "\">" + d.failedAsserts + "</td>\n";
 
       /* Exceptions */
       cls = (d.exceptions != 0) ? "td_exceptions_error_data" :
                                   "td_exceptions_data";
-      html += "   <td class=\"" + cls + "\">" + d.exceptions + "</td>\n";
+      row += "    <td class=\"" + cls + "\">" + d.exceptions + "</td>\n";
 
       /* Errors */
       cls = (d.errors != 0) ? "td_exceptions_error_data" : "td_exceptions_data";
-      html += "   <td class=\"" + cls + "\">" + d.errors + "</td>\n";
+      row += "    <td class=\"" + cls + "\">" + d.errors + "</td>\n";
 
       /* Total Failures */
       cls = (total != 0) ? "td_total_error_data" : "td_total_data";
-      html += "   <td class=\"" + cls + "\">" + total + "</td>\n";
+      row += "    <td class=\"" + cls + "\">" + total + "</td>\n";
 
       /* Runtime */
-      html += "   <td class=\"td_time_data\">" + fmtTime(d.runtime) + "</td>\n";
+      row += "    <td class=\"td_time_data\">" + fmtTime(d.runtime) + "</td>\n";
 
       /* Row epilogue */
-      html += "</tr>\n";
+      row += "  </tr>\n";
 
-      /*
-       * Generate the suite report.
-       */
-      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
-                                                this.basedir,
-                                                d.testlogs);
-      r.generateReport();
-      this.issues.appendIssues(r.getIssues());
-
-      return html;
+      return row;
    }
 
 
    /**
     * Create the HTML table footer for the summary report
     *
+    * @param t  test run totals
     * @return the table footer
     */
 
-   private String generateHTMLFooter() {
-      int n1 = 0;
-      int n2 = 0;
-      String footerrun = "td_footer_run";
-      String failedtd = "td_footer_failed";
-      String blockedtd = "td_footer_blocked";
+   private String summaryTotals(SuiteData t) {
+      String footerrun = (t.blocked == 0 ? "td_footer_run" :
+                                           "td_footer_run_err");
+      String failedtd = (t.failed == 0 ? "td_footer_failed_zero" :
+                                         "td_footer_failed");
+      String blockedtd = (t.blocked == 0 ? "td_footer_blocked_zero" :
+                                           "td_footer_blocked");
 
-      n1 = totals.passed + totals.failed;
-      n2 = totals.passed + totals.failed + totals.blocked;
-      if (n1 != n2) {
-         footerrun = "td_footer_run_err";
-      }
-
-      if (totals.failed == 0) {
-         failedtd = "td_footer_failed_zero";
-      }
-
-      if (totals.blocked == 0) {
-         blockedtd = "td_footer_blocked_zero";
-      }
-
-      String footer = "<tr id=\"totals\"> \n" +
-            "\t <td class=\"td_header_master\">Totals:</td>" +
-            String.format("\t <td class=\"%s\">"+(totals.passed + totals.failed)+"/"+(totals.passed + totals.failed + totals.blocked)+"</td>", footerrun) +
-            "\t <td class=\"td_footer_passed\">"+totals.passed+"</td>" +
-            String.format("\t <td class=\"%s\">"+totals.failed+"</td>", failedtd) +
-            String.format("\t <td class=\"%s\">"+totals.blocked+"</td>", blockedtd) +
-            "\t <td class=\"td_footer_watchdog\">"+totals.watchdog+"</td>" +
-            "\t <td class=\"td_footer_passed\">"+totals.asserts+"</td>" +
-            "\t <td class=\"td_footer_assert\">"+totals.failedAsserts+"</td>" +
-            "\t <td class=\"td_footer_exceptions\">"+totals.exceptions+"</td>" +
-            "\t <td class=\"td_footer_watchdog\">"+totals.errors+"</td>" +
-            "\t <td class=\"td_footer_total\">"+(totals.failedAsserts + totals.exceptions + totals.errors)+"</td>" +
-         "\t <td class=\"td_footer_times\">"+fmtTime(totals.runtime)+"</td>" +
-            "</tr>" +
-            "</tbody>" +
-            "</table>";
-
-      return footer;
+      return ("  <tr id=\"totals\">\n" +
+              "    <td class=\"td_header_master\">Totals:</td>\n" +
+              "    <td class=\"" + footerrun + "\">" +
+              (t.passed + t.failed) + "/" + (t.passed + t.failed + t.blocked) +
+              "</td>\n" +
+              "    <td class=\"td_footer_passed\">" + t.passed + "</td>\n" +
+              "    <td class=\"" + failedtd + "\">" + t.failed + "</td>\n" +
+              "    <td class=\"" + blockedtd + "\">" + t.blocked + "</td>\n" +
+              "    <td class=\"td_footer_watchdog\">" + t.watchdog + "</td>\n" +
+              "    <td class=\"td_footer_passed\">" + t.asserts + "</td>\n" +
+              "    <td class=\"td_footer_assert\">" + t.failedAsserts + "</td>\n" +
+              "    <td class=\"td_footer_exceptions\">" + t.exceptions + "</td>\n" +
+              "    <td class=\"td_footer_watchdog\">" + t.errors + "</td>\n" +
+              "    <td class=\"td_footer_total\">" +
+              (t.failedAsserts + t.exceptions + t.errors) + "</td>\n" +
+              "    <td class=\"td_footer_times\">" + fmtTime(t.runtime) + "</td>\n" +
+              "  </tr>\n");
    }
 
 
@@ -795,7 +795,7 @@ public class VDDReporter {
       try {
          db = dbf.newDocumentBuilder();
       } catch (javax.xml.parsers.ParserConfigurationException e) {
-         System.err.println("(!)Failed to instantiate XML DB: " + e);
+         System.out.println("(!)Failed to instantiate XML DB: " + e);
          return null;
       }
 
@@ -813,11 +813,11 @@ public class VDDReporter {
             System.out.println("(*)Success!");
          }
       } catch (java.io.FileNotFoundException e) {
-         System.err.println("(!)Suite file '" + xml + "' not found: " + e);
+         System.out.println("(!)Suite file '" + xml + "' not found: " + e);
       } catch (java.io.IOException e) {
-         System.err.println("(!)Error reading " + xml + ": " + e);
+         System.out.println("(!)Error reading " + xml + ": " + e);
       } catch (org.xml.sax.SAXException e) {
-         System.err.println("(!)XML error in " + xml + ": " + e);
+         System.out.println("(!)XML error in " + xml + ": " + e);
       }
 
       return dom;

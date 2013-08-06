@@ -1,5 +1,9 @@
 <html>
-<style stype="text/css">
+<head>
+
+<title>VDD Run Summary</title>
+
+<style type="text/css">
 body {
  background: #e5eef3;
 }
@@ -484,24 +488,29 @@ table {
  border-bottom: 2px solid black;
 }
 </style>
+
+</head>
 <body>
+
 <table>
-<tr>
- <td class="td_header_master" rowspan="2">Suite</br>
- (click link for full report)</td>
- <td class="td_header_master" colspan="4">Tests</td>
- <td class="td_header_master" colspan="6">Results</td>
- <td class="td_header_master" rowspan="2">Run Time</br>(hh:mm:ss)</td>
-</tr>
-<tr>
- <td class="td_header_sub">Run</td>
- <td class="td_header_sub">Passed</td>
- <td class="td_header_sub">Failed</td>
- <td class="td_header_skipped">Blocked</td>
- <td class="td_header_watchdog">Watchdogs</td>
- <td class="td_header_sub">Passed Asserts</td>
- <td class="td_header_sub">Failed Asserts</td>
- <td class="td_header_sub">Exceptions</td>
- <td class="td_header_sub">Errors</td>
- <td class="td_header_skipped">Total Failures</td>
-</tr>
+  <tr>
+    <td class="td_header_master" rowspan="2">
+      Suite<br/>
+      (click link for full report)
+    </td>
+    <td class="td_header_master" colspan="4">Tests</td>
+    <td class="td_header_master" colspan="6">Results</td>
+    <td class="td_header_master" rowspan="2">Run Time</br>(hh:mm:ss)</td>
+  </tr>
+  <tr>
+    <td class="td_header_sub">Run</td>
+    <td class="td_header_sub">Passed</td>
+    <td class="td_header_sub">Failed</td>
+    <td class="td_header_skipped">Blocked</td>
+    <td class="td_header_watchdog">Watchdogs</td>
+    <td class="td_header_sub">Passed Asserts</td>
+    <td class="td_header_sub">Failed Asserts</td>
+    <td class="td_header_sub">Exceptions</td>
+    <td class="td_header_sub">Errors</td>
+    <td class="td_header_skipped">Total Failures</td>
+  </tr>
