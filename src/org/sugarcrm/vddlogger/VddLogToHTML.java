@@ -31,7 +31,7 @@ public class VddLogToHTML {
    private int backTraceID;
    private int eventDumpID;
 
-   private VddLogIssues issues = null;
+   private Issues issues = null;
 
 
    /**
@@ -55,7 +55,7 @@ public class VddLogToHTML {
          throw new VDDLogException("Unable to resolve " + inputFilename, e);
       }
 
-      this.issues = new VddLogIssues();
+      this.issues = new Issues();
 
       try {
          in = new BufferedReader(new FileReader(infile));
@@ -90,7 +90,7 @@ public class VddLogToHTML {
     *
     */
 
-   public VddLogIssues getIssues() {
+   public Issues getIssues() {
       return this.issues;
    }
 

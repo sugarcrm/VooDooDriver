@@ -1,14 +1,30 @@
+/*
+ * Copyright 2011-2013 SugarCRM Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * Please see the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.sugarcrm.vddlogger;
 
 import java.util.HashMap;
 
-public class VddLogIssues {
+public class Issues {
 
    private HashMap<String, Integer> errors = null;
    private HashMap<String, Integer> wanrings = null;
    private HashMap<String, Integer> exceptions = null;
 
-   public VddLogIssues () {
+   public Issues () {
 
       this.errors = new HashMap<String, Integer>();
       this.wanrings = new HashMap<String, Integer>();
@@ -56,7 +72,7 @@ public class VddLogIssues {
       }
    }
 
-   public void appendIssues(VddLogIssues issues) {
+   public void appendIssues(Issues issues) {
       addIssue(issues.errors, this.errors);
       addIssue(issues.wanrings, this.wanrings);
       addIssue(issues.exceptions, this.exceptions);
