@@ -378,7 +378,7 @@ public class VDDReporter {
          return null;
       }
 
-      db.setErrorHandler(new VddErrorHandler());
+      db.setErrorHandler(new XMLErrorHandler());
 
       try {
          try {
