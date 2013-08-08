@@ -523,10 +523,7 @@ public class VDDReporter {
     */
 
    private String processSuite(SuiteData d) {
-      /* Generate the suite report. */
-      VddSuiteReporter r = new VddSuiteReporter(d.suitename,
-                                                this.basedir,
-                                                d.testlogs);
+      Suite r = new Suite(d.suitename, this.basedir, d.testlogs);
       r.generateReport();
       this.issues.append(r.getIssues());
 

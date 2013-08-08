@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 SugarCRM Inc.
+ * Copyright 2011-2013 SugarCRM Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You
@@ -22,7 +22,12 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class VddSuiteReporter {
+
+/**
+ * Process VDD suite log files.
+ */
+
+public class Suite {
 
    private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
    private ArrayList<File> filesList = null;
@@ -36,7 +41,7 @@ public class VddSuiteReporter {
    private String suiteDir = "";
    private Issues issues = null;
 
-   public VddSuiteReporter(String suitename, File basedir,
+   public Suite(String suitename, File basedir,
                            ArrayList<File> logfiles) {
       String filepath = "";
       this.suiteName = suitename;
