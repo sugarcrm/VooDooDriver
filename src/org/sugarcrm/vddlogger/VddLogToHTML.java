@@ -202,13 +202,13 @@ public class VddLogToHTML {
          if (line.startsWith("--Exception")) {
             return;
          } else if (line.startsWith("Exception")) {
-            this.issues.addException(line);
+            this.issues.exception(line);
          } else {
-            this.issues.addError(line);
+            this.issues.error(line);
          }
       } else if (line.startsWith("(W")) {
          line = line.replaceFirst("\\(W\\)", "");
-         this.issues.addWarning(line);
+         this.issues.warning(line);
       }
    }
 

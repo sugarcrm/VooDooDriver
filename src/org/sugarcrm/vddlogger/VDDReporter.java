@@ -528,7 +528,7 @@ public class VDDReporter {
                                                 this.basedir,
                                                 d.testlogs);
       r.generateReport();
-      this.issues.appendIssues(r.getIssues());
+      this.issues.append(r.getIssues());
 
       return summaryRow(d);
    }
@@ -781,8 +781,7 @@ public class VDDReporter {
     */
 
    private String issuesTable(String type) {
-      final HashMap<String,Integer> m =
-         this.issues.getData().get(type.toLowerCase());
+      final HashMap<String,Integer> m = this.issues.get(type.toLowerCase());
       String t;
       String keys[] = m.keySet().toArray(new String[0]);
 
