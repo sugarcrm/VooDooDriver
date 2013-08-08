@@ -18,77 +18,160 @@ package org.sugarcrm.vddlogger;
 
 import java.util.HashMap;
 
+
+/**
+ * Collection of issues encountered during VDD run
+ *
+ * <p>There are three types of issues tracked here: errors,
+ * exceptions, and warnings.</p>
+ */
+
 public class Issues {
 
-   private HashMap<String, Integer> errors = null;
-   private HashMap<String, Integer> wanrings = null;
-   private HashMap<String, Integer> exceptions = null;
+   /**
+    * Key value pairs of errors and number of appearances.
+    */
+
+   private HashMap<String,Integer> errors;
+
+   /**
+    * Key value pairs of exceptions and number of appearances.
+    */
+
+   private HashMap<String,Integer> exceptions;
+
+   /**
+    * Key value pairs of warnings and number of appearances.
+    */
+
+   private HashMap<String,Integer> warnings;
+
+
+   /**
+    * Instantiate an Issues object.
+    */
 
    public Issues () {
-
-      this.errors = new HashMap<String, Integer>();
-      this.wanrings = new HashMap<String, Integer>();
-      this.exceptions = new HashMap<String, Integer>();
-
+      this.errors = new HashMap<String,Integer>();
+      this.warnings = new HashMap<String,Integer>();
+      this.exceptions = new HashMap<String,Integer>();
    }
 
-   public HashMap<String, HashMap<String, Integer>> getData() {
-      HashMap<String, HashMap<String, Integer>> data = new HashMap<String, HashMap<String,Integer>>();
 
-      data.put("errors", this.errors);
-      data.put("warnings", this.wanrings);
-      data.put("exceptions", this.exceptions);
+   /**
+    * Get the mapping of issues of the specified type
+    *
+    * <p>The type can be &quot;errors&quot;, &quot;exceptions&quot;,
+    * or &quot;warnings&quot;.  <code>null</code> is returned if the
+    * mapping is an unknown type.</p>
+    *
+    * @param type  issue type
+    * @return the issue mapping
+    */
 
-      return data;
+   public HashMap<String,Integer> get(String type) {
+      if (type.equals("errors")) {
+         return this.errors;
+      } else if (type.equals("exceptions")) {
+         return this.exceptions;
+      } else if (type.equals("warnings")) {
+         return this.warnings;
+      }
+
+      return null;
    }
 
-   public void addException(String str) {
-      if (this.exceptions.containsKey(str)) {
-         Integer tmp = this.exceptions.get(str);
-         tmp += 1;
-         this.exceptions.put(str, tmp);
+
+   /**
+    * Add an issue to the appropriate mapping
+    *
+    * <p>This method adds the issue with a count of 1.</p>
+    *
+    * @param m  issue mapping
+    * @param s  the issue
+    */
+
+   private void add(HashMap<String,Integer> m, String s) {
+      add(m, s, 1);
+   }
+
+
+   /**
+    * Add an issue to the appropriate mapping
+    *
+    * <p>This method allows the count to be specified.</p>
+    *
+    * @param m  issue mapping
+    * @param s  the issue
+    * @param c  issue count
+    */
+
+   private void add(HashMap<String,Integer> m, String s, int c) {
+      if (m.containsKey(s)) {
+         m.put(s, m.get(s) + c);
       } else {
-         this.exceptions.put(str, 1);
+         m.put(s, c);
       }
    }
 
-   public void addWarning(String str) {
-      if (this.wanrings.containsKey(str)) {
-         Integer tmp = this.wanrings.get(str);
-         tmp += 1;
-         this.wanrings.put(str, tmp);
-      } else {
-         this.wanrings.put(str, 1);
-      }
+
+   /**
+    * Add an error to the issues mapping
+    *
+    * @param e  the error string
+    */
+
+   public void error(String e) {
+      add(this.errors, e);
    }
 
-   public void addError(String str) {
-      if (this.errors.containsKey(str)) {
-         Integer tmp = this.errors.get(str);
-         tmp += 1;
-         this.errors.put(str, tmp);
-      } else {
-         this.errors.put(str, 1);
-      }
+
+   /**
+    * Add an exception to the issues mapping
+    *
+    * @param e  the exception string
+    */
+
+   public void exception(String e) {
+      add(this.exceptions, e);
    }
 
-   public void appendIssues(Issues issues) {
-      addIssue(issues.errors, this.errors);
-      addIssue(issues.wanrings, this.wanrings);
-      addIssue(issues.exceptions, this.exceptions);
+
+   /**
+    * Add a warning to the issues mapping
+    *
+    * @param w  the warning string
+    */
+
+   public void warning(String w) {
+      add(this.warnings, w);
    }
 
-   private void addIssue(HashMap<String, Integer> src, HashMap<String, Integer> dst) {
-      String[] keys = src.keySet().toArray(new String[0]);
 
-      for (int i = 0; i <= keys.length -1; i++) {
-         if (!dst.containsKey(keys[i])) {
-            dst.put(keys[i], src.get(keys[i]));
-         } else {
-            int srcCount = src.get(keys[i]);
-            int dstCount = dst.get(keys[i]);
-            dst.put(keys[i], (srcCount + dstCount));
-         }
+   /**
+    * Append the mappings from an Issues object to this one
+    *
+    * @param issues  the issues object
+    */
+
+   public void append(Issues issues) {
+      append(this.errors, issues.errors);
+      append(this.exceptions, issues.exceptions);
+      append(this.warnings, issues.warnings);
+   }
+
+
+   /**
+    * Append the issues in the specified mapping
+    *
+    * @param dst  destination issues mapping
+    * @param src  source issues mapping
+    */
+
+   private void append(HashMap<String,Integer> dst,
+                       HashMap<String,Integer> src) {
+      for (String key: src.keySet()) {
+         add(dst, key, src.get(key));
       }
    }
 }

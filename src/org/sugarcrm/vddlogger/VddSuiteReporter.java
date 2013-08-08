@@ -119,7 +119,7 @@ public class VddSuiteReporter {
             VddLogToHTML log2html = new VddLogToHTML(log);
             log2html.generateReport();
             Issues tmpissues = log2html.getIssues();
-            this.issues.appendIssues(tmpissues);
+            this.issues.append(tmpissues);
             tmpissues = null;
          } catch (VDDLogException e) {
             System.err.println("Failed to process " + file + ": " +
