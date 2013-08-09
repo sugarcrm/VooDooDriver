@@ -16,7 +16,16 @@
 
 package org.sugarcrm.vddlogger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -29,49 +38,70 @@ import java.util.regex.Pattern;
 
 public class Suite {
 
-   private static String HTML_HEADER_RESOURCE = "suitereporter-header.txt";
-   private ArrayList<File> filesList = null;
+   /**
+    * File header for per-suite HTML report.
+    */
+
+   private static String SUITE_HEADER = "suitereporter-header.txt";
+
+   /**
+    * Name of the suite being processed.
+    */
+
+   private String suiteName;
+
+   /**
+    * ArrayList of suite log files.
+    */
+
+   private ArrayList<File> logs;
+
+   /**
+    * Directory with suite log files.
+    */
+
+   private File suiteDir;
+
+   /**
+    * Issues in this suite.
+    */
+
+   private Issues issues;
+
+   /**
+    * Output HTML report.
+    */
+
+   private PrintStream repFile;
+
+
    private int count = 0;
-   private String suiteName = null;
    private FileReader input = null;
    private BufferedReader br = null;
    private String strLine, tmp = null;
-   private FileOutputStream output = null;
-   private PrintStream repFile = null;
-   private String suiteDir = "";
-   private Issues issues = null;
 
-   public Suite(String suitename, File basedir,
-                           ArrayList<File> logfiles) {
-      String filepath = "";
-      this.suiteName = suitename;
-      String outputDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
-      System.out.printf("(*)SuiteReporter OutputDir: %s\n", outputDir);
-      this.filesList = logfiles;
+
+   /**
+    * Instantiate a Suite object
+    *
+    * @param nm    name of suite
+    * @param base  base directory of suite
+    * @param logs  ArrayList of log files
+    */
+
+   public Suite(String nm, File base, ArrayList<File> logs) {
+      this.suiteName = nm;
+      this.logs = logs;
       this.issues = new Issues();
+      this.suiteDir = new File(base, nm);
 
-      /**
-       * set up file output
-       */
-      File od = new File(outputDir);
-      if (!od.exists()) {
-         /*
-          * This should only ever happen if the log
-          * file being processed is completely empty.
-          */
-         System.out.println("(!)Warning: Creating missing output directory '" + outputDir + "'.");
-         od.mkdir();
-      }
+      System.out.println("(*)Suite directory: " + this.suiteDir);
 
-      try {
-         // XXX: suiteDir and outputDir are the same
-         this.suiteDir = String.format("%s%s%s", basedir, File.separatorChar, suitename);
-         filepath = String.format("%s%s%s.html", outputDir, File.separatorChar, suitename);
-         output = new FileOutputStream(filepath);
-         repFile = new PrintStream(output);
-      } catch (Exception e) {
-         System.out.printf("(!)Error: Failed trying to write file: '%s'!\n", filepath);
-         e.printStackTrace();
+      if (!this.suiteDir.exists()) {
+         /* The log file being processed is completely empty. */
+         System.out.println("(!)Warning: Creating missing output directory '" +
+                            this.suiteDir + "'.");
+         this.suiteDir.mkdir();
       }
    }
 
@@ -81,10 +111,19 @@ public class Suite {
     */
 
    public void generateReport() {
+
+      File rf = new File(this.suiteDir, this.suiteName + ".html");
+      try {
+         this.repFile = new PrintStream(new FileOutputStream(rf));
+      } catch (FileNotFoundException e) {
+         System.out.println("(!)Failed to create suite report '" + rf + "'.");
+         return;
+      }
+
       generateHTMLHeader();
 
 
-      for (File file: this.filesList) {
+      for (File file: this.logs) {
          /*
           * Skip directories, hidden files, and files without .log extensions.
           */
@@ -119,9 +158,8 @@ public class Suite {
          }
 
          try {
-            String log = this.suiteDir + File.separatorChar + file.getName();
-            System.out.println("(*)Log File: " + log);
-            VddLogToHTML log2html = new VddLogToHTML(log);
+            System.out.println("(*)Log File: " + file);
+            VddLogToHTML log2html = new VddLogToHTML(file.toString());
             log2html.generateReport();
             Issues tmpissues = log2html.getIssues();
             this.issues.append(tmpissues);
@@ -289,9 +327,9 @@ public class Suite {
          String classJar =  this.getClass().getResource("/" + className + ".class").toString();
 
          if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(HTML_HEADER_RESOURCE);
+            stream = getClass().getResourceAsStream(SUITE_HEADER);
          } else {
-            File header_fd = new File(getClass().getResource(HTML_HEADER_RESOURCE).getFile());
+            File header_fd = new File(getClass().getResource(SUITE_HEADER).getFile());
             stream = new FileInputStream(header_fd);
          }
 
