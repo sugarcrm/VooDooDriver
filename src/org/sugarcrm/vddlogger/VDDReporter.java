@@ -541,7 +541,7 @@ public class VDDReporter {
     * @return the contents of the file
     */
 
-   private String readFile(String name) {
+   public static String readFile(String name) {
       Class c = VDDReporter.class;
       String nm = c.getName().replace('.', '/');
       String jar = c.getResource("/" + nm + ".class").toString();

@@ -16,13 +16,9 @@
 
 package org.sugarcrm.vddlogger;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
@@ -118,20 +114,19 @@ public class Suite {
       try {
          this.repFile = new PrintStream(new FileOutputStream(rf));
       } catch (FileNotFoundException e) {
-         System.out.println("(!)Failed to create suite report '" + rf + "'.");
+         System.out.println("(!)Failed to create suite report '" + rf +
+                            "': " + e);
          return;
       }
 
-      generateHTMLHeader();
-
+      this.repFile.print(VDDReporter.readFile(SUITE_HEADER)
+                         .replace("__TITLE__", "Suite " + this.suiteName +
+                                  ".xml test results")
+                         .replace("__SUITENAME__", this.suiteName));
 
       for (File file: this.logs) {
-         /*
-          * Skip directories, hidden files, and files without .log extensions.
-          */
-         if (!file.isFile() ||
-             file.isHidden() ||
-             !file.getName().endsWith(".log")) {
+         /* Skip directories and files without log extensions. */
+         if (!file.isFile() || !file.getName().endsWith(".log")) {
             System.out.println("(!)Log file (" + file + ") is not valid.");
             continue;
          }
@@ -320,53 +315,6 @@ public class Suite {
       repFile.println("</tr>");
    }
 
-   /**
-    * generates the html header for the report file
-    */
-   private void generateHTMLHeader() {
-      String title = "suite "+suiteName+".xml test results";
-      String header = "";
-      InputStream stream = null;
-      String line = null;
-      boolean found_title = false;
-      boolean found_suitename = false;
-
-      try {
-         String className = this.getClass().getName().replace('.', '/');
-         String classJar =  this.getClass().getResource("/" + className + ".class").toString();
-
-         if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(SUITE_HEADER);
-         } else {
-            File header_fd = new File(getClass().getResource(SUITE_HEADER).getFile());
-            stream = new FileInputStream(header_fd);
-         }
-
-         InputStreamReader in = new InputStreamReader(stream);
-         BufferedReader br = new BufferedReader(in);
-
-         while ((line = br.readLine()) != null) {
-            if ( (found_title != true) && (line.contains("__TITLE__"))) {
-               line = line.replace("__TITLE__", title);
-               found_title = true;
-            }
-
-            if ((found_suitename != true) && (line.contains("__SUITENAME__")) ) {
-               line = line.replace("__SUITENAME__", suiteName);
-               found_suitename = true;
-            }
-
-            header += line;
-            header += "\n";
-         }
-
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
-
-      repFile.print(header);
-
-   }
 
    public Issues getIssues() {
       return this.issues;
