@@ -65,18 +65,10 @@ public class Suite {
    private Issues issues;
 
    /**
-    * Output HTML report.
-    */
-
-   private PrintStream repFile;
-
-   /**
     * Maximium length of the results line in the VDD log file.
     */
 
    private final int RESULTS_LINE_LENGTH = 320;
-
-   private int count = 0;
 
 
    /**
@@ -105,24 +97,72 @@ public class Suite {
 
 
    /**
-    * Generate an HTML report file.
+    * Read the summary line from the bottom of the log file.
+    *
+    * @param f  the log file
+    * @return the last line in the file
     */
 
-   public void generateReport() {
+   private String readSummary(File f) {
+      byte b[] = new byte[RESULTS_LINE_LENGTH];;
 
-      File rf = new File(this.suiteDir, this.suiteName + ".html");
       try {
-         this.repFile = new PrintStream(new FileOutputStream(rf));
+         RandomAccessFile lf = new RandomAccessFile(f, "r");
+
+         if (lf.length() > RESULTS_LINE_LENGTH) {
+            lf.seek(lf.length() - RESULTS_LINE_LENGTH);
+         }
+
+         lf.readFully(b);
+      } catch (FileNotFoundException e) {
+         System.out.println("(!)Could not open " + f + ": " + e);
+      } catch (IOException e) {
+         System.out.println("(!)Failed to read " + f + ": " + e);
+      }
+
+      return new String(b);
+   }
+
+
+
+   /**
+    * Write a file
+    *
+    * @param file   the file to create
+    * @param lines  the contents of the file
+    */
+
+   private void writeFile(File file, ArrayList<String> lines) {
+      PrintStream rf = null;
+
+      try {
+         rf = new PrintStream(new FileOutputStream(file));
       } catch (FileNotFoundException e) {
          System.out.println("(!)Failed to create suite report '" + rf +
                             "': " + e);
          return;
       }
 
-      this.repFile.print(VDDReporter.readFile(SUITE_HEADER)
-                         .replace("__TITLE__", "Suite " + this.suiteName +
-                                  ".xml test results")
-                         .replace("__SUITENAME__", this.suiteName));
+      for (String line: lines) {
+         rf.print(line);
+      }
+
+      rf.close();
+   }
+
+
+   /**
+    * Generate an HTML report file.
+    */
+
+   public void generateReport() {
+      ArrayList<String> report = new ArrayList<String>();
+
+      report.add(VDDReporter.readFile(SUITE_HEADER)
+                 .replace("__TITLE__", "Suite " + this.suiteName +
+                          ".xml test results")
+                 .replace("__SUITENAME__", this.suiteName));
+      int n = 0;
 
       for (File file: this.logs) {
          /* Skip directories and files without log extensions. */
@@ -131,52 +171,38 @@ public class Suite {
             continue;
          }
 
-         String baseName = file.getName().replaceAll(".log$", "");
-         byte b[] = new byte[RESULTS_LINE_LENGTH];;
+         System.out.println("(*)Log File: " + file);
+
+         String summary = readSummary(file);
+         report.add(testSummary(++n,
+                                file.getName().replaceAll(".log$", ""),
+                                summary));
+
+         VddLogToHTML log2html = null;
 
          try {
-            RandomAccessFile lf = new RandomAccessFile(file, "r");
-
-            if (lf.length() > RESULTS_LINE_LENGTH) {
-               lf.seek(lf.length() - RESULTS_LINE_LENGTH);
-            }
-
-            lf.readFully(b);
-         } catch (FileNotFoundException e) {
-            System.out.println("(!)Could not open " + file + ": " + e);
-            continue;
-         } catch (IOException e) {
-            System.out.println("(*)Failed to read " + file + ": " + e);
-            continue;
-         }
-
-         String strLine = new String(b);
-
-         if (strLine.contains("blocked:1")) {
-            generateTableRow(baseName, 2, null);
-         } else if (strLine.contains("result:-1")) {
-            generateTableRow(baseName, 0, strLine);
-         } else {
-            generateTableRow(baseName, 1, null);
-         }
-
-         try {
-            System.out.println("(*)Log File: " + file);
-            VddLogToHTML log2html = new VddLogToHTML(file.toString());
-            log2html.generateReport();
-            Issues tmpissues = log2html.getIssues();
-            this.issues.append(tmpissues);
-            tmpissues = null;
+            log2html = new VddLogToHTML(file.toString());
          } catch (VDDLogException e) {
-            System.err.println("Failed to process " + file + ": " +
-                               e.getMessage());
+            System.err.println("Failed to process " + file + ": " + e);
+            continue;
          }
+
+         log2html.generateReport();
+         this.issues.append(log2html.getIssues());
       }
 
-      repFile.print("\n</table>\n</body>\n</html>\n");
-      repFile.close();
+      report.add("  </table>\n" +
+                 "</body>\n" +
+                 "</html>\n");
+
+      writeFile(new File(this.suiteDir, this.suiteName + ".html"),
+                report);
    }
 
+
+   /**
+    *
+    */
 
    private HashMap<String, String>findErrorInfo(String line) {
       HashMap<String, String> result = new HashMap<String, String>();
@@ -208,6 +234,11 @@ public class Suite {
 
       return result;
    }
+
+
+   /**
+    *
+    */
 
    private String GenMiniErrorTable(String line) {
       String result = "";
@@ -277,44 +308,47 @@ public class Suite {
    /**
     * Generate an HTML table row based on data from .log report file.
     *
-    * @param fileName name of the .log report file this table row represents
-    * @param status   0 == passed, 1 == failed, otherwise == blocked
-    * @param line     line in log file
+    * @param n        one-up number of the current file
+    * @param file     name of the current log report file
+    * @param summary  summary line from log file
+    * @return a formatted HTML row for the suite summary file
     */
 
-   public void generateTableRow(String fileName, int status, String line){
-      String html = "\t<td class=\"td_issues_data\"></td>\n";
-      String tmp_filename = fileName;
+   public String testSummary(int n, String file, String summary) {
+      String sf = file.replaceAll("-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+", "");
 
-      tmp_filename = tmp_filename.replaceAll("-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+", "");
+      String html = ("    <tr id=\"" + n + "\"" +
+                     " onMouseOver=\"this.className='highlight'\"" +
+                     " onMouseOut=\"this.className='tr_normal'\"" +
+                     " class=\"tr_normal\">\n" +
+                     "      <td class=\"td_file_data\">" + n + "</td>\n" +
+                     "      <td class=\"td_file_data\">" + sf + ".xml</td>\n");
 
-      count ++;
-      repFile.println("<tr id=\""+count+"\" onMouseOver=\"this.className='highlight'\" "+
-            "onMouseOut=\"this.className='tr_normal'\" class=\"tr_normal\" >");
-      repFile.println("\t<td class=\"td_file_data\">"+count+"</td>");
-      repFile.println("\t<td class=\"td_file_data\">"+tmp_filename+".xml</td>");
-
-      switch (status) {
-         case 0:
-            html = GenMiniErrorTable(line);
-            html += "\t<td class=\"td_failed_data\">Failed</td>";
-            repFile.println(html);
-         break;
-
-         case 1:
-            html += "\t<td class=\"td_passed_data\">Passed</td>";
-            repFile.println(html);
-         break;
-
-         default:
-            html += "\t<td class=\"_data\">Blocked</td>";
-            repFile.println(html);
+      if (summary.contains("blocked:1")) {
+         html += ("      <td class=\"td_issues_data\"></td>\n" +
+                  "      <td class=\"_data\">Blocked</td>\n");
+      } else if (summary.contains("result:-1")) {
+         html += GenMiniErrorTable(summary);
+         html += "      <td class=\"td_failed_data\">Failed</td>\n";
+      } else {
+         html += ("      <td class=\"td_issues_data\"></td>\n" +
+                  "      <td class=\"td_passed_data\">Passed</td>\n");
       }
 
-      repFile.println("\t<td class=\"td_report_data\"><a href='Report-"+fileName+".html'>Report Log</a></td>");
-      repFile.println("</tr>");
+      html += ("      <td class=\"td_report_data\">\n" +
+               "        <a href='Report-" + file + ".html'>Report Log</a>\n" +
+               "      </td>\n" +
+               "    </tr>\n");
+
+      return html;
    }
 
+
+   /**
+    * Get this suite's Issues data structure
+    *
+    * @return  Issues for this suite
+    */
 
    public Issues getIssues() {
       return this.issues;
