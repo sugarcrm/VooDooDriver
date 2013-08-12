@@ -21,11 +21,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -74,11 +74,13 @@ public class Suite {
 
    private PrintStream repFile;
 
+   /**
+    * Maximium length of the results line in the VDD log file.
+    */
+
+   private final int RESULTS_LINE_LENGTH = 320;
 
    private int count = 0;
-   private FileReader input = null;
-   private BufferedReader br = null;
-   private String strLine, tmp = null;
 
 
    /**
@@ -130,24 +132,30 @@ public class Suite {
          if (!file.isFile() ||
              file.isHidden() ||
              !file.getName().endsWith(".log")) {
-            System.out.println("(!)Logfile (" + file + ") is not valid.");
+            System.out.println("(!)Log file (" + file + ") is not valid.");
             continue;
          }
 
-         readNextLog(file);
-
          String baseName = file.getName().replaceAll(".log$", "");
+         byte b[] = new byte[RESULTS_LINE_LENGTH];;
 
-         /* XXX: Wow. Just wow. */
-         //get last line
          try {
-            while ((tmp = br.readLine()) != null) {
-               strLine = tmp;
+            RandomAccessFile lf = new RandomAccessFile(file, "r");
+
+            if (lf.length() > RESULTS_LINE_LENGTH) {
+               lf.seek(lf.length() - RESULTS_LINE_LENGTH);
             }
+
+            lf.readFully(b);
+         } catch (FileNotFoundException e) {
+            System.out.println("(!)Could not open " + file + ": " + e);
+            continue;
          } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("(*)Failed to read " + file + ": " + e);
+            continue;
          }
-         //find log status, generate table row
+
+         String strLine = new String(b);
 
          if (strLine.contains("blocked:1")) {
             generateTableRow(baseName, 2, null);
@@ -173,6 +181,7 @@ public class Suite {
       repFile.print("\n</table>\n</body>\n</html>\n");
       repFile.close();
    }
+
 
    private HashMap<String, String>findErrorInfo(String line) {
       HashMap<String, String> result = new HashMap<String, String>();
@@ -362,21 +371,4 @@ public class Suite {
    public Issues getIssues() {
       return this.issues;
    }
-
-   /**
-    * sets up FileReader and BufferedReader for the next report file
-    * @param inputFile - a properly formatted .log SODA report file
-    */
-   private void readNextLog(File inputFile) {
-
-      try {
-         input = new FileReader(inputFile);
-         br = new BufferedReader(input);
-      } catch (FileNotFoundException e) {
-         System.out.printf("(!)Error: Failed to find file: '%s'!\n", inputFile);
-      } catch (Exception e) {
-         System.out.printf("(!)Error: Reading file: '%s'!\n", inputFile);
-      }
-   }
-
 }
