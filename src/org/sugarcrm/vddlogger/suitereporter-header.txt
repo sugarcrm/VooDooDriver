@@ -1,5 +1,9 @@
 <html>
-<style type="text/css"> 
+<head>
+
+  <title>__TITLE__</title> 
+
+  <style type="text/css"> 
 .table_master { 
 width: 100%; 
 border: 2px solid black; 
@@ -162,43 +166,42 @@ background-color: #e5eef3;
    background: #FFFFAA; 
    border: 1px solid #FFAD33; 
 }
-</style> 
-<title>__TITLE__</title> 
+  </style> 
+
+</head>
 <body> 
-<table id="tests" class="table_master"> 
-<tr id="header"> 
-	<td class="td_header_master" colspan="5">
-	Suite: __SUITENAME__.xml Test Results 
-	</td>
-</tr>
-	
-<tr id="header_key"> 
-	<td class="td_header_master"></td> 
-	<td class="td_header_master">Test File</td>
-	<td class="td_header_master">
-	   <a href="#" class="tooltip">Issues Key
-      <span class="classic">
-      <table>
-      <tr>
-         <td><b>WD:</b></td>
-        <td>Watchdog</td>
-      </tr>
-      <tr>
-         <td><b>Exp:</b></td>
-         <td>Exceptions</td>
-      </tr>
-      <tr>
-         <td><b>FA:</b></td>
-         <td>Failed Asserts</td>
-      </tr>
-      <tr>
-         <td><b>E:</b></td>
-         <td>Errors</td>
-      </tr>
-      </table>
-      </span>
-      </a>
-	</td>
-	<td class="td_header_master">Status</td> 
-	<td class="td_header_master">Report Log</td> 
-</tr>
+
+  <table id="tests" class="table_master">
+    <tr id="header">
+      <td class="td_header_master" colspan="5">Suite: __SUITENAME__.xml Test Results</td>
+    </tr>
+    <tr id="header_key"> 
+      <td class="td_header_master"></td>
+      <td class="td_header_master">Test File</td>
+      <td class="td_header_master">
+        <a href="#" class="tooltip">Issues Key
+          <span class="classic">
+            <table>
+              <tr>
+                <td><b>WD:</b></td>
+                <td>Watchdog</td>
+              </tr>
+              <tr>
+                <td><b>Exp:</b></td>
+                <td>Exceptions</td>
+              </tr>
+              <tr>
+                <td><b>FA:</b></td>
+                <td>Failed Asserts</td>
+              </tr>
+              <tr>
+                <td><b>E:</b></td>
+                <td>Errors</td>
+              </tr>
+            </table>
+          </span>
+        </a>
+      </td>
+      <td class="td_header_master">Status</td> 
+      <td class="td_header_master">Report Log</td> 
+    </tr>
