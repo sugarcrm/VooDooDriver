@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 SugarCRM Inc.
+ * Copyright 2011-2013 SugarCRM Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You
@@ -20,7 +20,7 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class VddLogToHTML {
+public class Test {
 
    private final String HTML_HEADER_RESOURCE = "reportlogheader.txt";
    private File outfile;
@@ -35,7 +35,7 @@ public class VddLogToHTML {
 
 
    /**
-    * Create a VddLogToHTML object.
+    * Create a Test object.
     *
     * This constructor opens both the input and output files.
     *
@@ -43,7 +43,7 @@ public class VddLogToHTML {
     * @throws VDDLogException for any I/O exception
     */
 
-   public VddLogToHTML(String inputFilename) throws VDDLogException {
+   public Test(String inputFilename) throws VDDLogException {
       File infile;
 
       backTraceID = 0;
