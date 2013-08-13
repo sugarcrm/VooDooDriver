@@ -17,6 +17,7 @@
 package org.sugarcrm.vddlogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.nio.CharBuffer;
@@ -532,51 +533,6 @@ public class VDDReporter {
 
 
    /**
-    * Read an entire file into a String
-    *
-    * <p>The file will be opened from either the directory tree or
-    * VDDReporter's jar file.</p>
-    *
-    * @param name  name of the file to open
-    * @return the contents of the file
-    */
-
-   public static String readFile(String name) {
-      Class c = VDDReporter.class;
-      String nm = c.getName().replace('.', '/');
-      String jar = c.getResource("/" + nm + ".class").toString();
-      java.io.InputStream is = null;
-
-      if (jar.startsWith("jar:")) {
-         is = c.getResourceAsStream(name);
-      } else {
-         try {
-            is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
-         } catch (java.io.FileNotFoundException e) {
-            System.out.println("(!)" + name + " not found: " + e);
-            return "";
-         }
-      }
-
-      java.io.BufferedReader b =
-         new java.io.BufferedReader(new java.io.InputStreamReader(is));
-
-      String out = "", line;
-      try {
-         while ((line = b.readLine()) != null) {
-            out += line + "\n";
-         }
-      } catch (java.io.IOException e) {
-         System.out.println("(!)Error reading " + name + ": " + e);
-      }
-
-      try { b.close(); } catch (java.io.IOException e) {}
-
-      return out;
-   }
-
-
-   /**
     * Format a runtime value.
     *
     * @param tm  runtime in seconds
@@ -812,5 +768,75 @@ public class VDDReporter {
       t += "</table>\n";
 
       return t;
+   }
+
+
+   /**
+    * Read an entire file into a String
+    *
+    * <p>The file will be opened from either the directory tree or
+    * VDDReporter's jar file.</p>
+    *
+    * @param name  name of the file to open
+    * @return the contents of the file
+    */
+
+   public static String readFile(String name) {
+      Class c = VDDReporter.class;
+      String nm = c.getName().replace('.', '/');
+      String jar = c.getResource("/" + nm + ".class").toString();
+      java.io.InputStream is = null;
+
+      if (jar.startsWith("jar:")) {
+         is = c.getResourceAsStream(name);
+      } else {
+         try {
+            is = new java.io.FileInputStream(new File(c.getResource(name).getFile()));
+         } catch (java.io.FileNotFoundException e) {
+            System.out.println("(!)" + name + " not found: " + e);
+            return "";
+         }
+      }
+
+      java.io.BufferedReader b =
+         new java.io.BufferedReader(new java.io.InputStreamReader(is));
+
+      String out = "", line;
+      try {
+         while ((line = b.readLine()) != null) {
+            out += line + "\n";
+         }
+      } catch (java.io.IOException e) {
+         System.out.println("(!)Error reading " + name + ": " + e);
+      }
+
+      try { b.close(); } catch (java.io.IOException e) {}
+
+      return out;
+   }
+
+
+   /**
+    * Write a file
+    *
+    * @param file   the file to create
+    * @param lines  the contents of the file
+    */
+
+   public static void writeFile(File file, ArrayList<String> lines) {
+      PrintStream rf = null;
+
+      try {
+         rf = new PrintStream(new java.io.FileOutputStream(file));
+      } catch (FileNotFoundException e) {
+         System.out.println("(!)Failed to create report '" + rf + "': " + e);
+         return;
+      }
+
+      for (String line: lines) {
+         rf.print(line);
+      }
+
+      rf.close();
    }
 }

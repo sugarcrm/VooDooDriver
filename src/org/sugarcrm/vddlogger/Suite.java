@@ -19,7 +19,6 @@ package org.sugarcrm.vddlogger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -122,32 +121,6 @@ public class Suite {
    }
 
 
-
-   /**
-    * Write a file
-    *
-    * @param file   the file to create
-    * @param lines  the contents of the file
-    */
-
-   public static void writeFile(File file, ArrayList<String> lines) {
-      PrintStream rf = null;
-
-      try {
-         rf = new PrintStream(new java.io.FileOutputStream(file));
-      } catch (FileNotFoundException e) {
-         System.out.println("(!)Failed to create report '" + rf + "': " + e);
-         return;
-      }
-
-      for (String line: lines) {
-         rf.print(line);
-      }
-
-      rf.close();
-   }
-
-
    /**
     * Generate an HTML report file.
     */
@@ -184,8 +157,8 @@ public class Suite {
                  "</body>\n" +
                  "</html>\n");
 
-      writeFile(new File(this.suiteDir, this.suiteName + ".html"),
-                report);
+      VDDReporter.writeFile(new File(this.suiteDir, this.suiteName + ".html"),
+                            report);
    }
 
 
