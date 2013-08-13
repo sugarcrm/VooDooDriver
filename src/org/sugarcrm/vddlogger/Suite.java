@@ -176,17 +176,17 @@ public class Suite {
                                 file.getName().replaceAll(".log$", ""),
                                 summary));
 
-         VddLogToHTML log2html = null;
+         Test t = null;
 
          try {
-            log2html = new VddLogToHTML(file.toString());
+            t = new Test(file.toString());
          } catch (VDDLogException e) {
             System.err.println("Failed to process " + file + ": " + e);
             continue;
          }
 
-         log2html.generateReport();
-         this.issues.append(log2html.getIssues());
+         t.generateReport();
+         this.issues.append(t.getIssues());
       }
 
       report.add("  </table>\n" +
