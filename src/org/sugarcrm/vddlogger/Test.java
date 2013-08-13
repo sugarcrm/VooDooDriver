@@ -83,6 +83,17 @@ public class Test {
 
 
    /**
+    * Get the report file.
+    *
+    * @return the report file
+    */
+
+   public File getReport() {
+      return this.output;
+   }
+
+
+   /**
     * Generate an HTML report file.
     */
 
@@ -166,6 +177,7 @@ public class Test {
     * index 1 = message type
     * index 2 = message
     */
+
    private String processLine(String line){
       String htmlRow = "";
       String[] rowData = new String[3];
@@ -173,11 +185,6 @@ public class Test {
       char msgType = line.charAt(line.indexOf("(")+1);
       String message = line.substring(line.indexOf(")")+1, line.length());
 
-      /**
-       * case switches for different message types
-       */
-
-      //assertion passed
       if (message.contains("Assert Passed")) {
          rowData = formatAssertionPassed(line, message);
          trStyle = "tr_assert_passed";
@@ -216,14 +223,6 @@ public class Test {
          }
       } else{
          rowData = formatDefaultLine(line, message);
-      }
-
-      /**
-       * if there are no data for some reason, return empty html row
-       */
-      if (rowData[0].isEmpty() && rowData[2].isEmpty()){
-            System.out.printf("Empty...\n");
-            return "";
       }
 
       /**
@@ -594,12 +593,13 @@ public class Test {
 
 
    /**
-    * Generates html code formatted to display date and time of log message from a raw .log file line
+    * Format the date/time string from the log
     *
     * @param line - A line from the raw .log file
     * @return A string of html that is the date and time of the log line
     */
-   private String generateDateTime (String line){
+
+   private String generateDateTime(String line) {
       String htmlDateTime = line.substring(1, line.indexOf("]"));
       return htmlDateTime.replaceFirst("-", "- <br/>");
    }
