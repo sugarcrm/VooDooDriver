@@ -77,8 +77,8 @@ public class Test {
        * .html.
        */
       this.output = new File(input.getParent(),
-                             "Report-" + input.getName().replaceAll(".log$",
-                                                                    ".html"));
+                             "Report-" +
+                             input.getName().replaceAll(".log$", ".html"));
    }
 
 
@@ -112,7 +112,7 @@ public class Test {
 
       report.add("\n</table>\n</center>\n</body>\n</html>\n");
 
-      Suite.writeFile(this.output, report);
+      VDDReporter.writeFile(this.output, report);
    }
 
 
@@ -154,6 +154,7 @@ public class Test {
    public Issues getIssues() {
       return this.issues;
    }
+
 
    /**
     * Generates a new html table row from a raw .log file line
