@@ -20,69 +20,104 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * Process results from an individual VDD test.
+ */
+
 public class Test {
 
-   private final String HTML_HEADER_RESOURCE = "reportlogheader.txt";
-   private File outfile;
+   /**
+    * File header for per-test HTML report.
+    */
+
+   private final String TEST_HEADER = "reportlogheader.txt";
+
+   /**
+    * Input file.
+    */
+
+   private File input;
+
+   /**
+    * Output file.
+    */
+
+   private File output;
+
+   /**
+    * Issues in this test.
+    */
+
+   private Issues issues;
+
 
    private PrintStream out;
    private BufferedReader in;
-
-   private int backTraceID;
-   private int eventDumpID;
-
-   private Issues issues = null;
+   private int backTraceID = 0;
+   private int eventDumpID = 0;
 
 
    /**
     * Create a Test object.
     *
-    * This constructor opens both the input and output files.
-    *
-    * @param inputFilename  VDD log file to be converted
-    * @throws VDDLogException for any I/O exception
+    * @param input  VDD per-test log file
     */
 
-   public Test(String inputFilename) throws VDDLogException {
-      File infile;
-
-      backTraceID = 0;
-      eventDumpID = 0;
-
-      try {
-         infile = (new File(inputFilename)).getCanonicalFile();
-      } catch (IOException e) {
-         throw new VDDLogException("Unable to resolve " + inputFilename, e);
-      }
-
+   public Test(File input) {
       this.issues = new Issues();
-
-      try {
-         in = new BufferedReader(new FileReader(infile));
-      } catch (FileNotFoundException e) {
-         throw new VDDLogException("Failed to find input file " + infile, e);
-      }
+      this.input = input;
 
       /*
        * The output file name is the same as the input file name with
        * "Report-" prepended and the extension changed from .log to
        * .html.
        */
+      this.output = new File(input.getParent(),
+                             "Report-" + input.getName().replaceAll(".log$",
+                                                                    ".html"));
+   }
 
-      String fn = infile.getName();
-      if (!fn.endsWith(".log")) {
-         throw new VDDLogException(inputFilename + " is not a VDD log file");
+
+   /**
+    * Generate an HTML report file.
+    *
+    * @throws VDDLogException for problems with the input or output files
+    */
+
+   public void generateReport() throws VDDLogException {
+      try {
+         in = new BufferedReader(new FileReader(this.input));
+      } catch (FileNotFoundException e) {
+         throw new VDDLogException("Failed to find input file " + this.input, e);
       }
-      outfile = new File(infile.getParent() + File.separator +
-                         "Report-" + fn.replaceAll(".log$", ".html"));
 
-      System.out.println("(*)Generating report: " + outfile);
+      System.out.println("(*)Generating report: " + this.output);
 
       try {
-         out = new PrintStream(new FileOutputStream(outfile));
+         out = new PrintStream(new FileOutputStream(this.output));
       } catch (FileNotFoundException e) {
-         throw new VDDLogException("Unable to write to " + outfile, e);
+         throw new VDDLogException("Unable to write to " + this.output, e);
       }
+
+
+      out.print(VDDReporter.readFile(TEST_HEADER));
+
+      try {
+         String strLine = in.readLine();
+         while (strLine != null){
+            processIssues(strLine);
+            out.println(generateTableRow(strLine));
+            strLine = in.readLine();
+         }
+
+      } catch (Exception e) {
+         System.err.println("error reading input file");
+         e.printStackTrace();
+      }
+
+      out.print("\n</table>\n</center>\n</body>\n</html>\n");
+      out.close();
    }
 
 
@@ -210,36 +245,6 @@ public class Test {
          line = line.replaceFirst("\\(W\\)", "");
          this.issues.warning(line);
       }
-   }
-
-
-   /**
-    * Generate an HTML report file.
-    */
-
-   public void generateReport(){
-      String strLine = "";
-
-      generateHtmlHeader();
-
-      try{
-         /**
-          * read first line
-          */
-         strLine = in.readLine();
-         while (strLine != null){
-            processIssues(strLine);
-            out.println(generateTableRow(strLine));
-            strLine = in.readLine();
-         }
-
-      }catch (Exception e){
-         System.err.println("error reading input file");
-         e.printStackTrace();
-      }
-
-      out.print("\n</table>\n</center>\n</body>\n</html>\n");
-      out.close();
    }
 
 
@@ -583,40 +588,6 @@ public class Test {
       return rowData;
    }
 
-   /**
-    * Generates the proper html header for the report file
-    *
-    */
-   private void generateHtmlHeader() {
-      String header = "";
-      String line = "";
-      InputStream stream = null;
-
-      try {
-         String className = this.getClass().getName().replace('.', '/');
-         String classJar =  this.getClass().getResource("/" + className + ".class").toString();
-
-         if (classJar.startsWith("jar:")) {
-            stream = getClass().getResourceAsStream(this.HTML_HEADER_RESOURCE);
-         } else {
-            File header_fd = new File(getClass().getResource(this.HTML_HEADER_RESOURCE).getFile());
-            stream = new FileInputStream(header_fd);
-         }
-
-         /* XXX: This name masks the class variable in. */
-         BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-
-         while ((line = in.readLine()) != null) {
-            header += line;
-            header += "\n";
-         }
-
-      } catch (Exception exp ) {
-         exp.printStackTrace();
-      }
-
-      out.print(header);
-   }
 
    /**
     * Generates html code formatted to display date and time of log message from a raw .log file line
@@ -640,17 +611,4 @@ public class Test {
       str = str.replaceAll(">", "&gt;");
       return str;
    }
-
-
-   /**
-    * Return the output .html file name.
-    *
-    * @return  output file name
-    */
-
-   public String getFileName(){
-      return outfile.toString();
-   }
 }
-
-
