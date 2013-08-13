@@ -601,6 +601,21 @@ public class VooDooDriver {
 
       System.out.printf("(*)Running Soda Tests...\n");
 
+
+      FileOutputStream summary = null;
+      try {
+         File sf = new File((String)config.get("resultdir"),
+                            "command-line.xml");
+         summary = new FileOutputStream(sf);
+      } catch (java.io.FileNotFoundException e) {
+         System.err.println("(!)Failed to create suite log: " + e);
+      }
+
+      writeSummary(summary,
+                   "<data>\n" +
+                   "  <suite>\n" +
+                   "    <suitefile>command-line.xml</suitefile>\n");
+
       for (String testn: tests) {
          File test = new File(testn);
          System.out.println("Starting Test " + test);
@@ -609,16 +624,61 @@ public class VooDooDriver {
             browser.newBrowser();
          }
 
+         writeSummary(summary,
+                      "    <test>\n" +
+                      "      <testfile>" + test + "</testfile>\n");
+         Date start = new Date();
+
          Test t = new Test(config, test);
          t.runTest(false);
 
+         Date stop = new Date();
+         writeSummary(summary,
+                      "      <starttime>" + tfmt(start) + "</starttime>\n" +
+                      "      <stoptime>" + tfmt(stop) + "</stoptime>\n" +
+                      "      <totaltesttime>" +
+                      Utils.GetRunTime(start, stop) + "</totaltesttime>\n");
+
+         TestResults tr = t.getReporter().getResults();
+
+         for (String rk: tr.keySet()) {
+            Object rv = tr.get(rk);
+            if (rk.equals("result")) {
+               rv = (Integer)rv == 0 ? "Passed" : "Failed";
+            }
+
+            writeSummary(summary,
+                         "      <" + rk + ">" + rv + "</" + rk + ">\n");
+         }
+
+         writeSummary(summary,
+                      "    </test>\n");
+
          if (haltOnFailure &&
-             (Integer)t.getReporter().getResults().get("result") != 0) {
+             (Integer)tr.get("result") != 0) {
             System.out.println("(*)Test failed and --haltOnFailure is set. " +
                                "Terminating run...");
             break;
          }
       }
+
+      writeSummary(summary,
+                   "  </suite>\n" +
+                   "</data>\n");
+      try { summary.close(); } catch (java.io.IOException e) {}
+   }
+
+
+   /**
+    * Format a Date.
+    *
+    * @param t  the Date
+    * @return the formatted date
+    */
+
+   private static String tfmt(Date t) {
+      return (String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", t) +
+              "." + String.format("%1$tN", t).subSequence(0, 3));
    }
 
 
@@ -627,6 +687,7 @@ public class VooDooDriver {
     */
 
    private static void writeSummary(FileOutputStream in, String msg) {
+      if (in == null) return;
       try {
          in.write(msg.getBytes());
       } catch (Exception exp) {
