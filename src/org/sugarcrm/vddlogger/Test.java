@@ -52,8 +52,6 @@ public class Test {
    private Issues issues;
 
 
-   private PrintStream out;
-   private BufferedReader in;
    private int backTraceID = 0;
    private int eventDumpID = 0;
 
@@ -81,26 +79,27 @@ public class Test {
 
    /**
     * Generate an HTML report file.
-    *
-    * @throws VDDLogException for problems with the input or output files
     */
 
-   public void generateReport() throws VDDLogException {
+   public void generateReport() {
+      BufferedReader in = null;
+      PrintStream out = null;
+
       try {
          in = new BufferedReader(new FileReader(this.input));
       } catch (FileNotFoundException e) {
-         throw new VDDLogException("Failed to find input file " + this.input, e);
+         System.out.println("(!)Failed to open input " + this.input + ": " + e);
+         return;
       }
-
-      System.out.println("(*)Generating report: " + this.output);
 
       try {
          out = new PrintStream(new FileOutputStream(this.output));
       } catch (FileNotFoundException e) {
-         throw new VDDLogException("Unable to write to " + this.output, e);
+         System.out.println("(!)Unable to write to " + this.output + ": " + e);
+         return;
       }
 
-
+      System.out.println("(*)Generating report: " + this.output);
       out.print(VDDReporter.readFile(TEST_HEADER));
 
       try {
