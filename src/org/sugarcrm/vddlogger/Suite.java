@@ -142,13 +142,11 @@ public class Suite {
          }
 
          System.out.println("(*)Log File: " + file);
+         Test t = new Test(file);
 
          String summary = readSummary(file);
-         report.add(testSummary(++n,
-                                file.getName().replaceAll(".log$", ""),
-                                summary));
+         report.add(testSummary(++n, file, t.getReport(), summary));
 
-         Test t = new Test(file);
          t.generateReport();
          this.issues.append(t.getIssues());
       }
@@ -215,19 +213,21 @@ public class Suite {
     * Generate an HTML table row based on data from .log report file.
     *
     * @param n        one-up number of the current file
-    * @param file     name of the current log report file
+    * @param logfile  the current log file
+    * @param report   the current report file
     * @param summary  summary line from log file
     * @return a formatted HTML row for the suite summary file
     */
 
-   public String testSummary(int n, String file, String summary) {
-      String sf = file.replaceAll("-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+", "");
+   public String testSummary(int n, File logfile, File report, String summary) {
       String html = ("    <tr id=\"" + n + "\"" +
                      " onMouseOver=\"this.className='highlight'\"" +
                      " onMouseOut=\"this.className='tr_normal'\"" +
                      " class=\"tr_normal\">\n" +
                      "      <td class=\"td_file_data\">" + n + "</td>\n" +
-                     "      <td class=\"td_file_data\">" + sf + ".xml</td>\n");
+                     "      <td class=\"td_file_data\">" +
+                     logfile.getName().replaceAll("(-\\d+)*\\.log$", ".xml") +
+                     "</td>\n");
 
       if (summary.contains("blocked:1")) {
          html += ("      <td class=\"td_issues_data\"></td>\n" +
@@ -241,7 +241,7 @@ public class Suite {
       }
 
       html += ("      <td class=\"td_report_data\">\n" +
-               "        <a href='Report-" + file + ".html'>Report Log</a>\n" +
+               "        <a href=\"" + report + "\">Report Log</a>\n" +
                "      </td>\n" +
                "    </tr>\n");
 
