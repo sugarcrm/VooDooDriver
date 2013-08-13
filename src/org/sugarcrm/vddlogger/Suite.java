@@ -18,12 +18,10 @@ package org.sugarcrm.vddlogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,7 +134,7 @@ public class Suite {
       PrintStream rf = null;
 
       try {
-         rf = new PrintStream(new FileOutputStream(file));
+         rf = new PrintStream(new java.io.FileOutputStream(file));
       } catch (FileNotFoundException e) {
          System.out.println("(!)Failed to create suite report '" + rf +
                             "': " + e);
@@ -201,107 +199,51 @@ public class Suite {
 
 
    /**
+    * Create a per-test summary error table for the suite report
     *
+    * @param summary  summary line from log file
+    * @return a formatted HTML table within a cell of error info
     */
 
-   private HashMap<String, String>findErrorInfo(String line) {
-      HashMap<String, String> result = new HashMap<String, String>();
-      String[] items = {
-         "failedasserts",
-         "exceptions",
-         "errors",
-         "watchdog"
-      };
-      Pattern p = null;
-      Matcher m = null;
-
-      for (int i = 0; i <= items.length -1; i++) {
-         String value = "";
-         String reg = String.format("%s:(\\d+)", items[i]);
-         p = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
-
-         m = p.matcher(line);
-         if (!m.find()) {
-            System.out.printf("(!)Error: Failed to find needed matches when parsing a failed tests results line!\n");
-            System.out.printf("--)Line: '%s'\n\n", line);
-            value = "";
-         } else {
-            value = m.group(1);
-         }
-
-         result.put(items[i], value);
+   private String errorSummary(String summary) {
+      Pattern p = Pattern.compile("--failedasserts:(\\d+)" +
+                                  "--exceptions:(\\d+)" +
+                                  "--errors:(\\d+)" +
+                                  "--blocked:(\\d+)" +
+                                  "--passedasserts:(\\d+)" +
+                                  "--watchdog:(\\d+)");
+      Matcher m = p.matcher(summary);
+      if (!m.find() || m.groupCount() != 6) {
+         return ("      <td class=\"td_issues_data\">\n" +
+                 "        <span style=\"font-weight: bold; color: red;\">\n" +
+                 "          Invalid results summary line in log file.\n" +
+                 "        </span>\n" +
+                 "      </td>\n");
       }
 
-      return result;
-   }
+      int fa  = Integer.valueOf(m.group(1));
+      int exc = Integer.valueOf(m.group(2));
+      int err = Integer.valueOf(m.group(3));
+      int wd  = Integer.valueOf(m.group(6));
 
-
-   /**
-    *
-    */
-
-   private String GenMiniErrorTable(String line) {
-      String result = "";
-      String exceptions = "";
-      String watchdog = "";
-      String fasserts = "";
-      String errors = "";
-      String color = "";
-
-      findErrorInfo(line); // XXX
-
-      try {
-         HashMap<String, String> data = this.findErrorInfo(line);
-         fasserts = data.get("failedasserts");
-         exceptions = data.get("exceptions");
-         watchdog = data.get("watchdog");
-         errors = data.get("errors");
-
-         result = "\t<td class=\"td_issues_data\">\n\t<table class=\"table_sub\">\n"+
-         "\t<tr>\n";
-
-         if (Integer.valueOf(watchdog) > 0) {
-            color = "#FF0000";
-         } else {
-            color = "#000000";
-         }
-
-         result += "\t\t<td class=\"td_sub\">"+
-               "WD:&nbsp;<font color=\"" + color + "\">" + watchdog + "</font></td>\n";
-
-         if (Integer.valueOf(exceptions) > 0) {
-            color = "#FF0000";
-         } else {
-            color = "#000000";
-         }
-
-         result += "\t\t<td class=\"td_sub\">Exp:&nbsp;<font color=\"" +
-               color + "\">" + exceptions + "</font></td>\n";
-
-         if (Integer.valueOf(fasserts) > 0) {
-            color = "#FF0000";
-         } else {
-            color = "#000000";
-         }
-
-         result += "\t\t<td class=\"td_sub\">"+
-               "FA:&nbsp;<font color=\"" + color + "\">" + fasserts + "</font></td>\n";
-
-         if (Integer.valueOf(errors) > 0) {
-            color = "#FF0000";
-         } else {
-            color = "#000000";
-         }
-
-         result += "\t\t<td class=\"td_sub\">"+
-               "E:&nbsp;<font color=\"" + color + "\">" + errors + "</font></td>\n"+
-               "\t</tr>\n\t</table>\n\t</td>\n";
-
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
-
-      return result;
+      return ("      <td class=\"td_issues_data\">\n" +
+              "        <table class=\"table_sub\">\n" +
+              "          <tr>\n" +
+              "            <td class=\"td_sub\">" +
+              "WD:&nbsp;<span style=\"color: " + (wd == 0 ? "black" : "red") +
+              ";\">" + wd + "</span></td>\n" +
+              "            <td class=\"td_sub\">" +
+              "Exp:&nbsp;<span style=\"color: " + (exc == 0 ? "black" : "red") +
+              ";\">" + exc + "</span></td>\n" +
+              "            <td class=\"td_sub\">" +
+              "FA:&nbsp;<span style=\"color: " + (fa == 0 ? "black" : "red") +
+              ";\">" + fa + "</span></td>\n" +
+              "            <td class=\"td_sub\">" +
+              "E:&nbsp;<span style=\"color: " + (err == 0 ? "black" : "red") +
+              ";\">" + err + "</span></td>\n" +
+              "          </tr>\n" +
+              "         </table\n" +
+              "      </td>\n");
    }
 
 
@@ -316,7 +258,6 @@ public class Suite {
 
    public String testSummary(int n, String file, String summary) {
       String sf = file.replaceAll("-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+-\\d+", "");
-
       String html = ("    <tr id=\"" + n + "\"" +
                      " onMouseOver=\"this.className='highlight'\"" +
                      " onMouseOut=\"this.className='tr_normal'\"" +
@@ -328,8 +269,8 @@ public class Suite {
          html += ("      <td class=\"td_issues_data\"></td>\n" +
                   "      <td class=\"_data\">Blocked</td>\n");
       } else if (summary.contains("result:-1")) {
-         html += GenMiniErrorTable(summary);
-         html += "      <td class=\"td_failed_data\">Failed</td>\n";
+         html += (errorSummary(summary) +
+                  "      <td class=\"td_failed_data\">Failed</td>\n");
       } else {
          html += ("      <td class=\"td_issues_data\"></td>\n" +
                   "      <td class=\"td_passed_data\">Passed</td>\n");
