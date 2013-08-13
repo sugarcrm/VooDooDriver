@@ -16,7 +16,12 @@
 
 package org.sugarcrm.vddlogger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +88,7 @@ public class Test {
 
    public void generateReport() {
       BufferedReader in = null;
-      PrintStream out = null;
+      ArrayList<String> report = new ArrayList<String>();
 
       try {
          in = new BufferedReader(new FileReader(this.input));
@@ -92,36 +97,58 @@ public class Test {
          return;
       }
 
-      try {
-         out = new PrintStream(new FileOutputStream(this.output));
-      } catch (FileNotFoundException e) {
-         System.out.println("(!)Unable to write to " + this.output + ": " + e);
-         return;
-      }
-
       System.out.println("(*)Generating report: " + this.output);
-      out.print(VDDReporter.readFile(TEST_HEADER));
+      report.add(VDDReporter.readFile(TEST_HEADER));
 
       try {
-         String strLine = in.readLine();
-         while (strLine != null){
-            processIssues(strLine);
-            out.println(generateTableRow(strLine));
-            strLine = in.readLine();
+         String line;
+         while ((line = in.readLine()) != null) {
+            processIssues(line);
+            report.add(processLine(line));
          }
-
-      } catch (Exception e) {
-         System.err.println("error reading input file");
-         e.printStackTrace();
+      } catch (IOException e) {
+         System.out.println("(!)Input error in " + this.input + ": " + e);
       }
 
-      out.print("\n</table>\n</center>\n</body>\n</html>\n");
-      out.close();
+      report.add("\n</table>\n</center>\n</body>\n</html>\n");
+
+      Suite.writeFile(this.output, report);
    }
 
 
    /**
+    * Add issues to the Issues data structure as they're found
     *
+    * @param line  the current log file line
+    */
+
+   private void processIssues(String line) {
+      if (line.contains("(*")) {
+         return;
+      }
+
+      line = line.replaceFirst("\\[.*\\]", "");
+
+      if (line.startsWith("(!")) {
+         line = line.replaceFirst("\\(\\!\\)", "");
+         if (line.startsWith("--Exception")) {
+            return;
+         } else if (line.startsWith("Exception")) {
+            this.issues.exception(line);
+         } else {
+            this.issues.error(line);
+         }
+      } else if (line.startsWith("(W")) {
+         line = line.replaceFirst("\\(W\\)", "");
+         this.issues.warning(line);
+      }
+   }
+
+
+   /**
+    * Get the Issues data structure
+    *
+    * @return Issues data structure
     */
 
    public Issues getIssues() {
@@ -138,7 +165,7 @@ public class Test {
     * index 1 = message type
     * index 2 = message
     */
-   private String generateTableRow(String line){
+   private String processLine(String line){
       String htmlRow = "";
       String[] rowData = new String[3];
       String trStyle = "tr_normal";
@@ -223,29 +250,6 @@ public class Test {
 
       return htmlRow;
    }
-
-   private void processIssues(String line) {
-      if (line.contains("(*")) {
-         return;
-      }
-
-      line = line.replaceFirst("\\[.*\\]", "");
-
-      if (line.startsWith("(!")) {
-         line = line.replaceFirst("\\(\\!\\)", "");
-         if (line.startsWith("--Exception")) {
-            return;
-         } else if (line.startsWith("Exception")) {
-            this.issues.exception(line);
-         } else {
-            this.issues.error(line);
-         }
-      } else if (line.startsWith("(W")) {
-         line = line.replaceFirst("\\(W\\)", "");
-         this.issues.warning(line);
-      }
-   }
-
 
    ////////////////////////////////////////////
    //line cases

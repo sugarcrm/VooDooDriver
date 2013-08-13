@@ -130,14 +130,13 @@ public class Suite {
     * @param lines  the contents of the file
     */
 
-   private void writeFile(File file, ArrayList<String> lines) {
+   public static void writeFile(File file, ArrayList<String> lines) {
       PrintStream rf = null;
 
       try {
          rf = new PrintStream(new java.io.FileOutputStream(file));
       } catch (FileNotFoundException e) {
-         System.out.println("(!)Failed to create suite report '" + rf +
-                            "': " + e);
+         System.out.println("(!)Failed to create report '" + rf + "': " + e);
          return;
       }
 
