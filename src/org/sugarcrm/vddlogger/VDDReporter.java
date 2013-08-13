@@ -191,10 +191,14 @@ public class VDDReporter {
          }
 
          xml = new ArrayList<File>(Arrays.asList(fs));
-
       } else {
          System.out.println("(!)Missing --suitefile or --suitedir!");
          System.exit(2);
+      }
+
+      if (xml.size() == 0) {
+         System.out.println("(!)No suite files found");
+         System.exit(1);
       }
 
       System.out.println("(*)Generating Summary file...");
