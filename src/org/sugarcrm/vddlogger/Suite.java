@@ -177,14 +177,7 @@ public class Suite {
                                 summary));
 
          Test t = new Test(file);
-
-         try {
-            t.generateReport();
-         } catch (VDDLogException e) {
-            System.err.println("Failed to process " + file + ": " + e);
-            continue;
-         }
-
+         t.generateReport();
          this.issues.append(t.getIssues());
       }
 
