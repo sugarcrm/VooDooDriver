@@ -50,10 +50,18 @@ public class Suite {
    private ArrayList<File> logs;
 
    /**
-    * Directory with suite log files.
+    * Output results file.
     */
 
-   private File suiteDir;
+   private File reportFile;
+
+
+   /**
+    * Relative path to suite and test output files.
+    */
+
+   private String htmlPath;
+
 
    /**
     * Issues in this suite.
@@ -71,25 +79,34 @@ public class Suite {
    /**
     * Instantiate a Suite object
     *
-    * @param nm    name of suite
-    * @param base  base directory of suite
-    * @param logs  ArrayList of log files
+    * @param suiteName  name of suite
+    * @param base       base directory of suite
+    * @param logs       ArrayList of log files
     */
 
-   public Suite(String nm, File base, ArrayList<File> logs) {
-      this.suiteName = nm;
+   public Suite(String suiteName, File base, ArrayList<File> logs) {
+      this.suiteName = suiteName;
       this.logs = logs;
       this.issues = new Issues();
-      this.suiteDir = new File(base, nm);
 
-      System.out.println("(*)Suite directory: " + this.suiteDir);
-
-      if (!this.suiteDir.exists()) {
-         /* The log file being processed is completely empty. */
-         System.out.println("(!)Warning: Creating missing output directory '" +
-                            this.suiteDir + "'.");
-         this.suiteDir.mkdir();
+      /*
+       * If there is a suite directory (VDD was running against suites
+       * instead of just tests), then the HTML relative path will have
+       * the the suite name prepended and the report file path will
+       * also incorporate it.  If there is no such directory, then the
+       * suite name must be absent.
+       */
+      File suiteDir = new File(base, suiteName);
+      this.htmlPath = suiteName + "/";
+      if (!suiteDir.exists()) {
+         suiteDir = base;
+         this.htmlPath = "";
       }
+
+      this.reportFile = new File(suiteDir, this.suiteName + ".html");
+
+      System.out.println("(*)Suite directory: " + suiteDir);
+      System.out.println("(*)Suite report file: " + this.reportFile);
    }
 
 
@@ -155,8 +172,7 @@ public class Suite {
                  "</body>\n" +
                  "</html>\n");
 
-      VDDReporter.writeFile(new File(this.suiteDir, this.suiteName + ".html"),
-                            report);
+      VDDReporter.writeFile(this.reportFile, report);
    }
 
 
@@ -219,7 +235,8 @@ public class Suite {
     * @return a formatted HTML row for the suite summary file
     */
 
-   public String testSummary(int n, File logfile, File report, String summary) {
+   public String testSummary(int n, File logfile, String report,
+                             String summary) {
       String html = ("    <tr id=\"" + n + "\"" +
                      " onMouseOver=\"this.className='highlight'\"" +
                      " onMouseOut=\"this.className='tr_normal'\"" +
@@ -257,5 +274,16 @@ public class Suite {
 
    public Issues getIssues() {
       return this.issues;
+   }
+
+
+   /**
+    * Get the path to this suite's report.
+    *
+    * @return path to the suite report
+    */
+
+   public String getReport() {
+      return this.htmlPath + this.reportFile.getName();
    }
 }
