@@ -79,17 +79,19 @@ public class Test {
       this.output = new File(input.getParent(),
                              "Report-" +
                              input.getName().replaceAll(".log$", ".html"));
+
+      System.out.println("(*)Test report file: " + this.output);
    }
 
 
    /**
-    * Get the report file.
+    * Get the HTML relative path to the report file.
     *
-    * @return the report file
+    * @return the report path
     */
 
-   public File getReport() {
-      return this.output;
+   public String getReport() {
+      return this.output.getName();
    }
 
 

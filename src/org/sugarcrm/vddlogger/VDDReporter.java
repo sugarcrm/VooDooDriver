@@ -409,6 +409,44 @@ public class VDDReporter {
 
 
    /**
+    * Rebase a File as specified in the suite log from basedir.
+    *
+    * @param f  the path from the suite log
+    * @return rebased path
+    */
+
+   private File rebase(File f) {
+      /*
+       * VDD generated files are structured like so:
+       *
+       * suite file:  resultdir/<file>.xml
+       * test logs:   resultdir/<suite>/<test>.log
+       *  -- or --    resultdir/<test>.log
+       *
+       * This routine doesn't need to worry about suite files (since
+       * nothing refers to them), but both test cases must be handled.
+       */
+
+      /* Try 1: no suite dir */
+      String n1 = f.getName();
+      File rb = new File(this.basedir, n1);
+      if (rb.exists()) {
+         return rb;
+      }
+
+      /* Try 2: suite dir */
+      String n2 = f.getParentFile().getName();
+      rb = new File(new File(this.basedir, n2), n1);
+      if (rb.exists()) {
+         return rb;
+      }
+
+      System.out.println("(!)Unable to rebase " + f);
+      return f;
+   }
+
+
+   /**
     * Read the summary data from the suite log.
     *
     * @param doc  XML document representing the suite log
@@ -466,7 +504,7 @@ public class VDDReporter {
                   String p = (new File(tn.getTextContent())).getParent();
                   islib = (p != null) && p.contains("lib");
                } else if (tnn.equals("testlog")) {
-                  testlog = new File(tn.getTextContent());
+                  testlog = rebase(new File(tn.getTextContent()));
                } else if (tnn.equals("result")) {
                   passed = tn.getTextContent().toLowerCase().equals("passed");
                } else if (tnn.equals("isrestart")) {
@@ -532,7 +570,7 @@ public class VDDReporter {
       r.generateReport();
       this.issues.append(r.getIssues());
 
-      return summaryRow(d);
+      return summaryRow(d, r.getReport());
    }
 
 
@@ -596,7 +634,7 @@ public class VDDReporter {
     * @return formatted HTML row
     */
 
-   private String summaryRow(SuiteData d) {
+   private String summaryRow(SuiteData d, String htmlReport) {
       int total  = d.failedAsserts + d.exceptions + d.errors;
       String hl  = "highlight";
       String uhl = "unhighlight";
@@ -613,7 +651,7 @@ public class VDDReporter {
              " onmouseover=\"this.className='" + hl + "'\"" +
              " onmouseout=\"this.className='" + uhl + "'\">\n" +
              "    <td class=\"td_file_data\">\n" +
-             "      <a href=\"" + d.suitename + "/" + d.suitename + ".html\">" +
+             "      <a href=\"" + htmlReport + "\">" +
              d.suitename + ".xml</a>\n" +
              "    </td>\n");
 
