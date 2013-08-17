@@ -782,7 +782,7 @@ public class VDDReporter {
 
       Arrays.sort(keys, new Comparator<String>() {
             public int compare(String o1, String o2) {
-               return m.get(o1).compareTo(m.get(o2));
+               return m.get(o2).compareTo(m.get(o1));
             }
          });
 
