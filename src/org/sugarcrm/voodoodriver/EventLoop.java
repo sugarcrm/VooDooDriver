@@ -3651,11 +3651,9 @@ public class EventLoop implements Runnable {
     * @return the element found or null
     */
 
-   @SuppressWarnings("unchecked")
-      private WebElement slowFindElement(String tag, String type, String how,
-                                         WebElement parent, int index) {
+   private WebElement slowFindElement(String tag, String type, String how,
+                                      WebElement parent, int index) {
       WebElement element = null;
-      ArrayList<WebElement> list = new ArrayList<WebElement>();
       String msg = "";
       String js = "";
 
@@ -3728,7 +3726,12 @@ public class EventLoop implements Runnable {
                             root, selectors);
       }
 
-      list = (ArrayList<WebElement>)this.Browser.executeJS(js, parent);
+      Object obj = this.Browser.executeJS(js, parent);
+      if (!(obj instanceof ArrayList)) {
+         return null;
+      }
+      @SuppressWarnings("unchecked")
+         List<WebElement> list = (List<WebElement>)obj;
 
       if (list.size() > 0) {
          element = list.get(index < 0 ? 0 : index);
