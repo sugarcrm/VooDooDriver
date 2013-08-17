@@ -158,7 +158,6 @@ public class Suite {
             continue;
          }
 
-         System.out.println("(*)Log File: " + file);
          Test t = new Test(file);
 
          String summary = readSummary(file);
