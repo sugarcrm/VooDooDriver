@@ -74,6 +74,42 @@ public class Test {
 
    private boolean eof = false;
 
+   /**
+    * The numeric result of this test.
+    */
+
+   private int result = 0;
+
+   /**
+    * The count of failed assertions.
+    */
+
+   private int assertions = 0;
+
+   /**
+    * The count of exceptions.
+    */
+
+   private int exceptions = 0;
+
+   /**
+    * The count of errors.
+    */
+
+   private int errors = 0;
+
+   /**
+    * The value of blocked (whether this test was on the block list).
+    */
+
+   private int blocked = 0;
+
+   /**
+    * Watchdog timer expiries.
+    */
+
+   private int watchdog = 0;
+
 
    /**
     * Create a Test object.
@@ -401,15 +437,14 @@ public class Test {
    /**
     * Format the test results line into a nested table.
     *
+    * <p>This routine also stores the values from the results line for
+    * later access when creating the suite summary in {@link Suite}.</p>
+    *
     * @param msg  the test results line
     * @return an HTML table with the test results
     */
 
    private String formatResults(String msg) {
-      /*
-       * XXX: Parse the string in this less-efficient manner to enable
-       * passing values to Suite in a future change.
-       */
       Pattern p = Pattern.compile("--testlog:(([^-]|-[^-])+)" +
                                   "--result:(-?\\d+)" +
                                   "--isrestart:(true|false)" +
@@ -424,12 +459,12 @@ public class Test {
          return msg;
       }
 
-      int res = Integer.valueOf(m.group(3));
-      int fa  = Integer.valueOf(m.group(5));
-      int exc = Integer.valueOf(m.group(6));
-      int err = Integer.valueOf(m.group(7));
-      int b   = Integer.valueOf(m.group(8));
-      int wd  = Integer.valueOf(m.group(10));
+      this.result     = Integer.valueOf(m.group(3));
+      this.assertions = Integer.valueOf(m.group(5));
+      this.exceptions = Integer.valueOf(m.group(6));
+      this.errors     = Integer.valueOf(m.group(7));
+      this.blocked    = Integer.valueOf(m.group(8));
+      this.watchdog   = Integer.valueOf(m.group(10));
 
       String rs = ("          <tr class=\"tr_normal\"" +
                    " onMouseOver=\"this.className='highlight_report'\"" +
@@ -442,21 +477,98 @@ public class Test {
               rs + i + "<td>Test Log:</td>\n" +
               i + "<td>" + m.group(1) + "</td>" + re +
               rs + i + "<td>Result:</td>\n" +
-              i + checkedTD(res) + re +
+              i + checkedTD(this.result) + re +
               rs + i + "<td>Restart:</td>\n" +
               i + "<td>" + m.group(4) + "</td>" + re +
               rs + i + "<td>Failed Asserts:</td>\n" +
-              i + checkedTD(fa) + re +
+              i + checkedTD(this.assertions) + re +
               rs + i + "<td>Exceptions:</td>\n" +
-              i + checkedTD(exc) + re +
+              i + checkedTD(this.exceptions) + re +
               rs + i + "<td>Errors:</td>\n" +
-              i + checkedTD(err) + re +
+              i + checkedTD(this.errors) + re +
               rs + i + "<td>Blocked:</td>\n" +
-              i + checkedTD(b) + re +
+              i + checkedTD(this.blocked) + re +
               rs + i + "<td>Passed Asserts:</td>\n" +
               i + "<td>" + m.group(9) + "</td>" + re +
               rs + i + "<td>Watchdog:</td>\n" +
-              i + checkedTD(wd) + re +
+              i + checkedTD(this.watchdog) + re +
               "        </table>\n");
+   }
+
+
+   /**
+    * Return the name of the log file.
+    *
+    * @return the name of the log file
+    */
+
+   public String getLogfileName() {
+      return this.input.getName();
+   }
+
+
+   /**
+    * Return the result value from the log file
+    *
+    * @return the result
+    */
+
+   public int getResult() {
+      return this.result;
+   }
+
+
+   /**
+    * Return the number of failed asserts from this test
+    *
+    * @return the number of failed asserts
+    */
+
+   public int getFailedAssertCount() {
+      return this.assertions;
+   }
+
+
+   /**
+    * Return the number of exceptions from this test
+    *
+    * @return the number of exceptions
+    */
+
+   public int getExceptionCount() {
+      return this.exceptions;
+   }
+
+
+   /**
+    * Return the number of errors from this test
+    *
+    * @return the number of errors
+    */
+
+   public int getErrorCount() {
+      return this.errors;
+   }
+
+
+   /**
+    * Return whether this test was on the block list
+    *
+    * @return whether this test was blocked
+    */
+
+   public boolean getBlocked() {
+      return this.blocked != 0;
+   }
+
+
+   /**
+    * Get the watchdog count from this test
+    *
+    * @return the number of watchdog timer expiries
+    */
+
+   public int getWatchdogCount() {
+      return this.watchdog;
    }
 }
