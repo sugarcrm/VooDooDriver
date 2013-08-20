@@ -800,9 +800,7 @@ public class VDDReporter {
                " onmouseout=\"this.className='unhighlight'\"" +
                " onmouseover=\"this.className='highlight'\">\n" +
                "    <td class=\"td_count_data\">" + m.get(key) + "</td>\n" +
-               "    <td class=\"td_file_data\">" + key.replaceAll("&", "&quot;")
-                                                      .replaceAll("<", "&lt;")
-                                                      .replaceAll(">", "&gt;") +
+               "    <td class=\"td_file_data\">" + key +
                "</td>\n" +
                "  </tr>\n");
       }
