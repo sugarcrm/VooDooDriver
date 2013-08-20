@@ -62,6 +62,18 @@ public class Test {
 
    private int backTraceID = 0;
 
+   /**
+    * The lookahead buffer used in reading the input file.
+    */
+
+   private String lookahead = null;
+
+   /**
+    * True if the input file has reached EOF.
+    */
+
+   private boolean eof = false;
+
 
    /**
     * Create a Test object.
@@ -98,6 +110,17 @@ public class Test {
 
 
    /**
+    * Get the Issues data structure
+    *
+    * @return Issues data structure
+    */
+
+   public Issues getIssues() {
+      return this.issues;
+   }
+
+
+   /**
     * Generate an HTML report file.
     */
 
@@ -114,14 +137,9 @@ public class Test {
 
       report.add(VDDReporter.readFile(TEST_HEADER));
 
-      try {
-         String line;
-         while ((line = in.readLine()) != null) {
-            processIssues(line);
-            report.add(processLine(line));
-         }
-      } catch (IOException e) {
-         System.out.println("(!)Input error in " + this.input + ": " + e);
+      String line;
+      while ((line = readLine(in)) != null) {
+         report.add(processLine(line));
       }
 
       report.add("  </table>\n" +
@@ -134,44 +152,105 @@ public class Test {
 
 
    /**
-    * Add issues to the Issues data structure as they're found
+    * Helper method to read from the input file.
     *
-    * XXX: Fold this into processLine
+    * <p>This method handles <code>IOException</code> and tracks
+    * whether <code>EOF</code> has been reached.</p>
     *
-    * @param line  the current log file line
     */
 
-   private void processIssues(String line) {
-      if (line.contains("(*")) {
-         return;
+   private String _doread(BufferedReader in) {
+      String line = null;
+      try {
+         line = in.readLine();
+      } catch (IOException e) {
+         System.out.println("(!)Input error in " + this.input + ": " + e);
       }
 
-      line = line.replaceFirst("\\[.*\\]", "");
-
-      if (line.startsWith("(!")) {
-         line = line.replaceFirst("\\(\\!\\)", "");
-         if (line.startsWith("--Exception")) {
-            return;
-         } else if (line.startsWith("Exception")) {
-            this.issues.exception(line);
-         } else {
-            this.issues.error(line);
-         }
-      } else if (line.startsWith("(W")) {
-         line = line.replaceFirst("\\(W\\)", "");
-         this.issues.warning(line);
+      if (line == null) {
+         this.eof = true;
       }
+
+      return line;
    }
 
 
    /**
-    * Get the Issues data structure
+    * Get the next line of input
     *
-    * @return Issues data structure
+    * <p>This incorporates a lookahead buffer so that exception
+    * checking can see the next line to determine whether it's an
+    * exception or merely an error.  As with the underlying
+    * <code>readLine</code>, <code>null</code> is returned on
+    * <code>EOF</code>.</p>
+    *
+    * @param in  <code>BufferedReader</code> of the input file
+    * @return the next input line
     */
 
-   public Issues getIssues() {
-      return this.issues;
+   private String readLine(BufferedReader in) {
+      if (this.eof) {
+         return null;
+      }
+
+      if (this.lookahead == null) {
+         /* Prefill on first read */
+         this.lookahead = _doread(in);
+      }
+
+      String cur = this.lookahead;
+      this.lookahead = _doread(in);
+
+      return cur;
+   }
+
+
+   /**
+    * Peek at the next input line
+    *
+    * <p>This is intended for use by exception checking.</p>
+    *
+    * @return the next line from the input file or <code>null</code>
+    */
+
+   private String peekLine() {
+      return this.lookahead;
+   }
+
+
+   /**
+    * Determine whether the current line is an exception
+    *
+    * <p>The most reliable method to determine whether the current
+    * line of input is an exception is to look at the next line in the
+    * input.  That line will be the backtrace if the current line is
+    * an exception.</p>
+    *
+    * @return whether the current line is an exception
+    */
+
+   private boolean isException() {
+      String next = peekLine();
+      return next != null && next.contains("--Exception Backtrace");
+   }
+
+
+   /**
+    * Remove extraneous information from exception strings.
+    *
+    * <p>Selenium exceptions include command duration and build
+    * information in their strings.  While this is probably nice for
+    * debugging, it makes tracking exceptions by type a chore since
+    * the timeout information is nearly always different.</p>
+    *
+    * @param exc  the exception string
+    * @return the exception string with additional information removed
+    */
+
+   private String cleanExceptions(String exc) {
+      return (exc.replaceFirst("(timeout:) \\d+ (milliseconds)",
+                               "$1 X $2")
+                 .replaceFirst("(Session ID:) [^ ]+", "$1 X"));
    }
 
 
@@ -232,6 +311,17 @@ public class Test {
       /* Bold Test/Lib/Module and everything in single quotes. */
       if (!logType.equals("Backtrace")) {
          msg = msg.replaceAll("(^(Test|Lib|Module):|'[^']+')", "<b>$1</b>");
+      }
+
+      /* Issues processing */
+      if (logType.equals("Failure")) {
+         if (isException()) {
+            this.issues.exception(cleanExceptions(msg));
+         } else {
+            this.issues.error(cleanExceptions(msg));
+         }
+      } else if (logType.equals("Warning")) {
+         this.issues.warning(cleanExceptions(msg));
       }
 
       return ("    <tr class=\"" + trStyle + "\"" +
