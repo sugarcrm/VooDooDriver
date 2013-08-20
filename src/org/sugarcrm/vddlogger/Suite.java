@@ -111,34 +111,6 @@ public class Suite {
 
 
    /**
-    * Read the summary line from the bottom of the log file.
-    *
-    * @param f  the log file
-    * @return the last line in the file
-    */
-
-   private String readSummary(File f) {
-      byte b[] = new byte[RESULTS_LINE_LENGTH];;
-
-      try {
-         RandomAccessFile lf = new RandomAccessFile(f, "r");
-
-         if (lf.length() > RESULTS_LINE_LENGTH) {
-            lf.seek(lf.length() - RESULTS_LINE_LENGTH);
-         }
-
-         lf.readFully(b);
-      } catch (FileNotFoundException e) {
-         System.out.println("(!)Could not open " + f + ": " + e);
-      } catch (IOException e) {
-         System.out.println("(!)Failed to read " + f + ": " + e);
-      }
-
-      return new String(b);
-   }
-
-
-   /**
     * Generate an HTML report file.
     */
 
@@ -159,11 +131,8 @@ public class Suite {
          }
 
          Test t = new Test(file);
-
-         String summary = readSummary(file);
-         report.add(testSummary(++n, file, t.getReport(), summary));
-
          t.generateReport();
+         report.add(testSummary(++n, t));
          this.issues.append(t.getIssues());
       }
 
@@ -178,30 +147,15 @@ public class Suite {
    /**
     * Create a per-test summary error table for the suite report
     *
-    * @param summary  summary line from log file
+    * @param t  the test being processed
     * @return a formatted HTML table within a cell of error info
     */
 
-   private String errorSummary(String summary) {
-      Pattern p = Pattern.compile("--failedasserts:(\\d+)" +
-                                  "--exceptions:(\\d+)" +
-                                  "--errors:(\\d+)" +
-                                  "--blocked:(\\d+)" +
-                                  "--passedasserts:(\\d+)" +
-                                  "--watchdog:(\\d+)");
-      Matcher m = p.matcher(summary);
-      if (!m.find() || m.groupCount() != 6) {
-         return ("      <td class=\"td_issues_data\">\n" +
-                 "        <span style=\"font-weight: bold; color: red;\">\n" +
-                 "          Invalid results summary line in log file.\n" +
-                 "        </span>\n" +
-                 "      </td>\n");
-      }
-
-      int fa  = Integer.valueOf(m.group(1));
-      int exc = Integer.valueOf(m.group(2));
-      int err = Integer.valueOf(m.group(3));
-      int wd  = Integer.valueOf(m.group(6));
+   private String errorSummary(Test t) {
+      int fa  = t.getFailedAssertCount();
+      int exc = t.getExceptionCount();
+      int err = t.getErrorCount();
+      int wd  = t.getWatchdogCount();
 
       return ("      <td class=\"td_issues_data\">\n" +
               "        <table class=\"table_sub\">\n" +
@@ -227,29 +181,26 @@ public class Suite {
    /**
     * Generate an HTML table row based on data from .log report file.
     *
-    * @param n        one-up number of the current file
-    * @param logfile  the current log file
-    * @param report   the current report file
-    * @param summary  summary line from log file
+    * @param n  one-up number of the current file
+    * @param t  the test being processed
     * @return a formatted HTML row for the suite summary file
     */
 
-   public String testSummary(int n, File logfile, String report,
-                             String summary) {
+   public String testSummary(int n, Test t) {
       String html = ("    <tr id=\"" + n + "\"" +
                      " onMouseOver=\"this.className='highlight'\"" +
                      " onMouseOut=\"this.className='tr_normal'\"" +
                      " class=\"tr_normal\">\n" +
                      "      <td class=\"td_file_data\">" + n + "</td>\n" +
                      "      <td class=\"td_file_data\">" +
-                     logfile.getName().replaceAll("(-\\d+)*\\.log$", ".xml") +
+                     t.getLogfileName().replaceAll("(-\\d+)*\\.log$", ".xml") +
                      "</td>\n");
 
-      if (summary.contains("blocked:1")) {
+      if (t.getBlocked()) {
          html += ("      <td class=\"td_issues_data\"></td>\n" +
                   "      <td class=\"_data\">Blocked</td>\n");
-      } else if (summary.contains("result:-1")) {
-         html += (errorSummary(summary) +
+      } else if (t.getResult() == -1) {
+         html += (errorSummary(t) +
                   "      <td class=\"td_failed_data\">Failed</td>\n");
       } else {
          html += ("      <td class=\"td_issues_data\"></td>\n" +
@@ -257,7 +208,7 @@ public class Suite {
       }
 
       html += ("      <td class=\"td_report_data\">\n" +
-               "        <a href=\"" + report + "\">Report Log</a>\n" +
+               "        <a href=\"" + t.getReport() + "\">Report Log</a>\n" +
                "      </td>\n" +
                "    </tr>\n");
 
