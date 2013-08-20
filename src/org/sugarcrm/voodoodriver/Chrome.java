@@ -17,7 +17,7 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
-import org.openqa.selenium.Mouse;
+import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 

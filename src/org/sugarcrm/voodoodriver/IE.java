@@ -16,7 +16,7 @@
 
 package org.sugarcrm.voodoodriver;
 
-import org.openqa.selenium.Mouse;
+import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 

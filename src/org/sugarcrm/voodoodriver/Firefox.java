@@ -17,8 +17,7 @@
 package org.sugarcrm.voodoodriver;
 
 import java.io.File;
-import java.util.Date;
-import org.openqa.selenium.Mouse;
+import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
