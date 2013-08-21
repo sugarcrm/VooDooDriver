@@ -101,6 +101,10 @@ public class Firefox extends Browser {
          System.setProperty("webdriver.firefox.logfile", fl.toString());
       }
 
+      /* Allow scripts to run until finished. */
+      p.setPreference("dom.max_script_run_time", 0);
+      p.setPreference("dom.max_chrome_script_run_time", 0);
+
       DesiredCapabilities c = DesiredCapabilities.firefox();
       c.setCapability("unexpectedAlertBehaviour", "ignore");
 
