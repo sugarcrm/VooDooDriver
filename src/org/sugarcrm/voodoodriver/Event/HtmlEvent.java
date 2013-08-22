@@ -554,7 +554,7 @@ abstract class HtmlEvent extends Event {
       if (this.parent != null) {
          ef.setParentElement(this.parent);
       }
-      ef.setEventName(this.testEvent.getNodeName().toLowerCase());
+      ef.setEventName(this.getName().toLowerCase());
 
       WebElement element = ef.findElement();
 

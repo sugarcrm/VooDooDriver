@@ -17,6 +17,7 @@
 package org.sugarcrm.voodoodriver.Event;
 
 import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.WebElement;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.w3c.dom.Element;
 
@@ -31,6 +32,7 @@ import org.w3c.dom.Element;
  *   <dt>index</dt><dd>Zero-based index of iframes on the page.</dd>
  *   <dt>name</dt><dd>Value of the iframe's name attribute.</dd>
  *   <dt>id</dt><dd>Synonym for name</dd>
+ *   <dt>xpath</dt><dd>XPath to the iframe</dd>
  * </dl>
  *
  * @author Jon duSaint
@@ -54,8 +56,7 @@ class Iframe extends Event {
    /**
     * Switch to an iframe by its index.
     *
-    * @throws VDDException if the index is not an integer or the iframe
-    *                      doesn't exist
+    * @throws VDDException if the specified index is not an integer
     */
 
    private void switchByIndex() throws VDDException {
@@ -72,8 +73,9 @@ class Iframe extends Event {
       try {
          this.eventLoop.Browser.getDriver().switchTo().frame(index);
       } catch (NoSuchFrameException e) {
-         throw new VDDException("No iframe with index '" + index + "' found",
-                                e);
+         this.eventLoop.report.error("No iframe with index '" +
+                                     index + "' found");
+         throw new StopEventException();
       }
    }
 
@@ -82,18 +84,48 @@ class Iframe extends Event {
     * Switch to an iframe by its name.
     *
     * @param sel  selector key with the frame name
-    * @throws VDDException if an exception occurs
     */
 
-   private void switchByName(String sel) throws VDDException {
+   private void switchByName(String sel) {
       String name = replaceString((String)this.selectors.get(sel));
 
       log("Switching to iframe by name '" + name + "'");
       try {
          this.eventLoop.Browser.getDriver().switchTo().frame(name);
       } catch (NoSuchFrameException e) {
-         throw new VDDException("No iframe with name '" + name + "' found", e);
+         this.eventLoop.report.error("No iframe with name '" +
+                                     name + "' found");
+         throw new StopEventException();
       }
+   }
+
+
+   /**
+    * Switch to an iframe by its xpath.
+    *
+    * @throws VDDException if the frame doesn't exist
+    */
+
+   private void switchByXPath() {
+      ElementFinder ef =
+         new ElementFinder(this.eventLoop.Browser,
+                           this.selectors,
+                           this.eventLoop.report,
+                           this.eventLoop.getElementTimeout(),
+                           this.parent,
+                           this.getName().toLowerCase());
+      WebElement element = ef.findElement();
+
+      try {
+         this.eventLoop.Browser.getDriver().switchTo().frame(element);
+         return;
+      } catch (NoSuchFrameException e) {
+         /* Unlikely to occur. */
+      } catch (NullPointerException e) {
+         /* Iframe was not located by ElementFinder. */
+      }
+
+      throw new StopEventException();
    }
 
 
@@ -110,8 +142,10 @@ class Iframe extends Event {
          switchByName("id");
       } else if (this.selectors.containsKey("name")) {
          switchByName("name");
+      } else if (this.selectors.containsKey("xpath")) {
+         switchByXPath();
       } else {
-         throw new VDDException("Missing index, id, or name attribute.");
+         throw new VDDException("Missing index, id, name, or xpath attribute.");
       }
    }
 

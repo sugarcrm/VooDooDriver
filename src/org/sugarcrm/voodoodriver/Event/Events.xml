@@ -1765,6 +1765,7 @@
          <accessor type="string">id</accessor>
          <accessor type="string">index</accessor>
          <accessor type="string">name</accessor>
+         <accessor type="string">xpath</accessor>
       </selectors>
    </frame>
 

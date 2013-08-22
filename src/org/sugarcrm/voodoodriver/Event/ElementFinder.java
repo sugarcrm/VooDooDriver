@@ -21,6 +21,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.sugarcrm.voodoodriver.Browser;
 import org.sugarcrm.voodoodriver.Reporter;
 import org.sugarcrm.voodoodriver.VDDHash;
 
@@ -38,7 +39,7 @@ class ElementFinder {
     * Browser object.
     */
 
-   private org.sugarcrm.voodoodriver.Browser browser;
+   private Browser browser;
 
 
    /**
@@ -83,12 +84,37 @@ class ElementFinder {
 
 
    /**
+    * Instantiate an ElementFinder object.
+    *
+    * <p>This constructor accepts the various arguments needed for
+    * ElementFinder to work as a convenience.</p>
+    *
+    * @param browser    the current browser
+    * @param selectors  element selectors
+    * @param r          the {@link Reporter} object
+    * @param timeout    the search timeout in seconds
+    * @param parent     the parent element
+    * @param event      the name of the event
+    */
+
+   public ElementFinder(Browser browser, VDDHash selectors, Reporter r,
+                        int timeout, WebElement parent, String event) {
+      this.browser = browser;
+      this.selectors = selectors;
+      this.r = r;
+      this.timeout = timeout;
+      this.parent = parent;
+      this.event = event;
+   }
+
+
+   /**
     * Set the current browser.
     *
     * @param browser  the current browser
     */
 
-   public void setBrowser(org.sugarcrm.voodoodriver.Browser browser) {
+   public void setBrowser(Browser browser) {
       this.browser = browser;
    }
 
