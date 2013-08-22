@@ -142,6 +142,8 @@ public abstract class Event {
          event = new Pluginloader(element);
       } else if (tagName.equals("puts")) {
          event = new Puts(element);
+      } else if (tagName.equals("savehtml")) {
+         event = new Savehtml(element);
       } else if (tagName.equals("screenshot")) {
          event = new Screenshot(element);
       } else if (tagName.equals("script")) {

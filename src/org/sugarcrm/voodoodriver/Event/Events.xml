@@ -112,6 +112,9 @@
       </actions>
    </puts>
 
+   <savehtml>
+   </savehtml>
+
    <screenshot>
       <actions>
          <accessor type="string">file</accessor>
