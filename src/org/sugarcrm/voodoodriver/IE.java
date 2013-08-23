@@ -56,7 +56,7 @@ public class IE extends Browser {
     */
 
    public void forceClose() {
-      OSInfo.killProcesses(OSInfo.getProcessIDs("iexplorer"));
+      OSInfo.killProcess("iexplorer");
       this.setBrowserClosed();
    }
 
