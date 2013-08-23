@@ -362,9 +362,14 @@ class ElementFinder {
                             root, selectors);
       }
 
+      Object o = this.browser.executeJS(js, this.parent);
+      
+      if (!(o instanceof List)) {
+         return new ArrayList<WebElement>(0);
+      }
+
       @SuppressWarnings("unchecked")
-         ArrayList<WebElement> lst =
-         (ArrayList<WebElement>)this.browser.executeJS(js, this.parent);
+      List<WebElement> lst = (List<WebElement>)o;
 
       return lst;
    }
