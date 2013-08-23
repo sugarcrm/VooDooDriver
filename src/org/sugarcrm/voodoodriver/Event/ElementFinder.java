@@ -255,7 +255,7 @@ class ElementFinder {
       this.r.log("Searching for " + tag + " with text '" + text + "'");
 
       if (tag.equals("a")) {
-         by = By.linkText(text);
+         by = By.partialLinkText(text);
       } else {
          by = By.tagName(tag);
       }
