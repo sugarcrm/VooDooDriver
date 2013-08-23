@@ -718,7 +718,7 @@ public class VooDooDriver {
       System.out.println("(*)Running Soda Tests...");
 
       summary.openTag("suite");
-      summary.writeData("suitefile", "Command Line Tests");
+      summary.writeData("suitefile", "Command_line");
       startTime = new Date();
 
       for (String test: tests) {
@@ -728,7 +728,7 @@ public class VooDooDriver {
             browser.newBrowser();
          }
 
-         boolean testPassed = runOneTest(new File(test), "Command line", config,
+         boolean testPassed = runOneTest(new File(test), "Command_line", config,
                                          vars, false);
 
          if (haltOnFailure && !testPassed) {
