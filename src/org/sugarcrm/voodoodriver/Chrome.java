@@ -106,7 +106,7 @@ public class Chrome extends Browser {
     */
 
    public void forceClose() {
-      OSInfo.killProcesses(OSInfo.getProcessIDs("Google Chrome"));
+      OSInfo.killProcess("Google Chrome");
       this.setBrowserClosed();
    }
 
