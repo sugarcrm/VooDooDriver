@@ -1194,50 +1194,27 @@ public class EventLoop implements Runnable {
    }
 
    private boolean executeEvent(VDDHash event) {
-      boolean result = false;
-      java.lang.Process proc = null;
-      int proc_ret = 0;
-
-      this.report.Log("Execute event starting...\n");
+      this.report.Log("Execute event starting...");
       this.resetThreadTime();
 
-      if (event.containsKey("args")) {
-         String[] list = (String[]) event.get("args");
-         int len = list.length - 1;
-
-         for (int i = 0; i <= len; i++) {
-            System.out.printf("(%s) => '%s'\n", i, list[i]);
-         }
-
-         try {
-            this.report.Log("Executing process now...");
-            proc = Runtime.getRuntime().exec(list);
-            this.resetThreadTime();
-            proc.waitFor();
-            this.resetThreadTime();
-            this.report.Log("Process finished executing.");
-            proc_ret = proc.exitValue();
-            if (proc_ret != 0) {
-               String msg = String.format(
-                     "Error the command being executed returned a non-zero value: '%s'!",
-                     proc_ret);
-               this.report.ReportError(msg);
-            } else {
-               this.report.Log("Execute was successful.");
-               result = true;
-            }
-         } catch (Exception exp) {
-            this.report.ReportException(exp);
-            result = false;
-         }
-      } else {
+      if (!event.containsKey("args")) {
          this.report.ReportError("Error no args for Execute Event!");
-         result = false;
          this.report.Log("Execute event finished.");
-         return result;
+         return false;
       }
 
-      return result;
+      this.report.Log("Executing process now...");
+      this.resetThreadTime();
+      ArrayList<String> output = Process.exec((String[])event.get("args"));
+      this.resetThreadTime();
+      this.report.Log("Process finished executing.  Output:");
+
+      for (String line: output) {
+         this.report.Log(line);
+      }
+
+      this.report.Log("Execute event finished.");
+      return true;
    }
 
    private boolean dndEvent(VDDHash event) {

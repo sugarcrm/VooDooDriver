@@ -37,7 +37,7 @@ public class Process {
     * Our <code>Process</code> object.
     */
 
-   private static Process osinfo;
+   private static Process process;
 
 
    /**
@@ -45,7 +45,7 @@ public class Process {
     */
 
    static {
-      osinfo = new Process();
+      process = new Process();
    }
 
 
@@ -95,13 +95,13 @@ public class Process {
 
 
    /**
-    * Get the entire output of a command.
+    * Execute a process and return its output.
     *
-    * @param cmd  the command
-    * @return the output
+    * @param cmd  String array of process name and command line arguments
+    * @return an ArrayList of process output
     */
 
-   private ArrayList<String> exec(String cmd[]) {
+   private ArrayList<String> exec1(String cmd[]) {
       ArrayList<String> lines = new ArrayList<String>();
       BufferedReader r;
 
@@ -124,18 +124,30 @@ public class Process {
 
 
    /**
+    * Execute a process and return its output.
+    *
+    * @param cmd  String array of process name and command line arguments
+    * @return an ArrayList of process output
+    */
+
+   static public ArrayList<String> exec(String cmd[]) {
+      return process.exec1(cmd);
+   }
+
+
+   /**
     * Get a list of process ids with the specified process name.
     *
-    * @param process  process name
+    * @param name  process name
     * @return a list of process ids
     */
 
-   private ArrayList<String> unixPids(String process) {
+   private ArrayList<String> unixPids(String name) {
       ArrayList<String> pids = new ArrayList<String>();
       String cmd[] = {"ps", "x", "-o", "pid,comm"};
-      Pattern p = Pattern.compile("^\\s*(\\d+)\\s+.*" + process);
+      Pattern p = Pattern.compile("^\\s*(\\d+)\\s+.*" + name);
 
-      for (String line: exec(cmd)) {
+      for (String line: exec1(cmd)) {
          Matcher m = p.matcher(line);
          if (m.find()) {
             pids.add(m.group(1));
@@ -149,18 +161,18 @@ public class Process {
    /**
     * Get a list of process ids with the specified process name.
     *
-    * @param process  process name
+    * @param name  process name
     * @return a list of process ids
     */
 
-   private ArrayList<String> windPids(String process) {
+   private ArrayList<String> windPids(String name) {
       ArrayList<String> pids = new ArrayList<String>();
       String[] cmd = {"tasklist.exe", "/FO", "CSV", "/NH"};
 
-      for (String line: exec(cmd)) {
+      for (String line: exec1(cmd)) {
          String data[] = line.split(",", 3);
 
-         if (data[0].contains(process)) {
+         if (data[0].contains(name)) {
             pids.add(data[1].replaceAll("^\"(.+)\"$", "$1"));
          }
       }
@@ -224,10 +236,10 @@ public class Process {
    /**
     * Kill a process with the specified name
     *
-    * @param proc  the process name
+    * @param name  the process name
     */
 
-   public static void killProcess(String proc) {
-      osinfo.killProcess1(proc);
+   public static void killProcess(String name) {
+      process.killProcess1(name);
    }
 }
