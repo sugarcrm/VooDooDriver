@@ -23,6 +23,14 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * Static class to kill a running process.
+ *
+ * @author Trampus
+ * @author Jon duSaint
+ */
+
 public class OSInfo {
 
    /**
