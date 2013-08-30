@@ -1195,7 +1195,7 @@ public class EventLoop implements Runnable {
 
    private boolean executeEvent(VDDHash event) {
       boolean result = false;
-      Process proc = null;
+      java.lang.Process proc = null;
       int proc_ret = 0;
 
       this.report.Log("Execute event starting...\n");
