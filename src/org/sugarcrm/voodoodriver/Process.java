@@ -193,6 +193,7 @@ public class Process {
 
    private boolean killProcess(String[] killCmd) {
       java.lang.Process p = null;
+      int ev;
 
       try {
          p = Runtime.getRuntime().exec(killCmd);
@@ -209,7 +210,18 @@ public class Process {
          }
       }
 
-      return p.exitValue() == 0;
+
+      try {
+         /*
+          * Since waitFor() blocks, we skip it and just optimistically
+          * request the exit value, risking the exception.
+          */
+         ev = p.exitValue();
+      } catch (IllegalThreadStateException e) {
+         ev = -1;
+      }
+
+      return ev == 0;
    }
 
 
