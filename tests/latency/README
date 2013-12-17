@@ -1,0 +1,16 @@
+This is the VDD latency test suite.
+
+The purpose of this suite is to synthetically stress VDD using a
+variety of techniques for simulating operation in a high-latency
+environment.
+
+In order to use, set up a web server to allow access to this
+directory.  With apache, this directive works:
+
+    <Alias "/latency/" "</path/to/latency/>">
+    <Directory "</path/to/latency/>">
+        Options +ExecCGI
+        AddHandler cgi-script pl
+    </Directory>
+
+Then, run VDD using the provided test scripts (the XML files).

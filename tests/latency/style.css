@@ -1,0 +1,15 @@
+/*
+ * style.css --
+ *
+ *      Styles for the latency test suite.
+ */
+
+
+body {
+  background-color: white;
+  color:            black;
+}
+
+span.error {
+  color:            red;
+}
