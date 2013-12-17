@@ -1,0 +1,16 @@
+<voodoo>
+   <!-- VDD test to correspond with the slow page load test. -->
+
+   <browser url="http://localhost/latency"/>
+   <radio id="slow" click="true"/>
+   <button id="run"/>
+
+   <link id="slowload"/>
+   <attach title="This will take a while...">
+      <link id="end_of_test"/>
+   </attach>
+
+   <browser action="close"/>
+
+   <puts txt="There should have been no errors during this test."/>
+</voodoo>
