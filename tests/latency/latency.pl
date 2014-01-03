@@ -97,7 +97,7 @@ RADIO
   my $testlist = join("<br/>\n  ", @tests);
 
   my $form = <<"FORM";
-<form">
+<form>
   $testlist
   <br/>
   <button type="submit" name="run" id="run" onclick="return runtests();">
@@ -144,5 +144,10 @@ SLOWLOAD
 #
 
 sub dyn_delay {
-  output('<p>Dynamic object delay test.</p>');
+  output(<<"DYNDELAY");
+<div style="border: 1px solid; text-align: center;">
+Dynamic object delay test.<br/>
+<a href="dyndelay.html" target="_blank" id="dyndelay">Click Here</a>
+</div>
+DYNDELAY
 }
