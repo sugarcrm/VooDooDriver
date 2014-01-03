@@ -1,0 +1,21 @@
+<voodoo>
+   <!-- VDD test to correspond with the dyndelay test. -->
+
+   <browser url="http://localhost/latency"/>
+   <radio id="dyn" click="true"/>
+   <button id="run"/>
+
+   <link id="dyndelay"/>
+
+   <attach title="Dynamic Delay">
+      <!-- More than five seconds will (currently) cause a timeout. -->
+      <textfield id="time" set="4"/>
+      <button id="clickme"/>
+      <div id="lousy" assert="seconds"/>
+      <link id="end_of_test"/>
+   </attach>
+
+   <browser action="close"/>
+
+   <puts txt="There should have been no errors during this test."/>
+</voodoo>

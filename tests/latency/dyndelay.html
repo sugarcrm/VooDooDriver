@@ -1,0 +1,32 @@
+<html>
+<head>
+
+<!-- Page for the dyndelay test. -->
+
+<title>Dynamic Delay</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-Style-Type" content="text/css"/>
+
+<link rel="stylesheet" type="text/css" href="style.css"/>
+
+<script type="text/javascript" language="javascript" src="index.js"></script>
+<script type="text/javascript" language="javascript" src="dyndelay.js"></script>
+
+</head>
+<body>
+
+<form>
+  <input type="text" name="time" id="time" value="120"/>
+  <br/>
+  <button type="submit" name="clickme" id="clickme" onclick="return clicked();">
+    Click Me
+  </button>
+</form>
+
+<p><a href="#" id="end_of_test" onclick="window.close();">End of Test</a></p>
+
+<div id="target"></div>
+
+</body>
+</html>
