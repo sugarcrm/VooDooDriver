@@ -136,7 +136,7 @@ public class Firefox extends Browser {
     */
 
    public void forceClose() {
-      OSInfo.killProcess("firefox");
+      Process.killProcess("firefox");
       this.setBrowserClosed();
    }
 

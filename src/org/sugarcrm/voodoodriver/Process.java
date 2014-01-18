@@ -31,21 +31,21 @@ import java.util.regex.Pattern;
  * @author Jon duSaint
  */
 
-public class OSInfo {
+public class Process {
 
    /**
-    * Our <code>OSInfo</code> object.
+    * Our <code>Process</code> object.
     */
 
-   private static OSInfo osinfo;
+   private static Process osinfo;
 
 
    /**
-    * Initialize our <code>OSInfo</code> object.
+    * Initialize our <code>Process</code> object.
     */
 
    static {
-      osinfo = new OSInfo();
+      osinfo = new Process();
    }
 
 
@@ -63,10 +63,10 @@ public class OSInfo {
 
 
    /**
-    * Instantiate an OSInfo object.
+    * Instantiate an Process object.
     */
 
-   private OSInfo() {
+   private Process() {
       String osname = System.getProperty("os.name").toLowerCase();
       if (osname.contains("win")) {
          this.os = OS.WINDOWS;
@@ -180,7 +180,7 @@ public class OSInfo {
     */
 
    private boolean killProcess(String[] killCmd) {
-      Process p = null;
+      java.lang.Process p = null;
 
       try {
          p = Runtime.getRuntime().exec(killCmd);
