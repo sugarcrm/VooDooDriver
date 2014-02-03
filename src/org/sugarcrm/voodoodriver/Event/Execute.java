@@ -16,6 +16,8 @@
 
 package org.sugarcrm.voodoodriver.Event;
 
+import java.util.ArrayList;
+import org.sugarcrm.voodoodriver.Process;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.w3c.dom.Element;
 
@@ -66,29 +68,13 @@ class Execute extends Event {
       }
       
       this.eventLoop.updateThreadTime();
-      try {
-         p = Runtime.getRuntime().exec(args);
-      } catch (java.io.IOException e) {
-         throw new VDDException("Failed to exec child process", e);
-      }
-
-      while (true) {
-         try {
-            rv = p.waitFor();
-            break;
-         } catch (InterruptedException e) {
-            // ignore
-         }
-      }
-
+      ArrayList<String> output = Process.exec(args);
       this.eventLoop.updateThreadTime();
-      log("Child process finished.");
 
-      if (rv != 0) {
-         error("Error code from child process: '" +
-               (new Integer(rv)).toString() + "'");
-      } else {
-         log("Child process was successful.");
+      log("Child process finished.  Output:");
+
+      for (String line: output) {
+         log(line);
       }
    }
 }
