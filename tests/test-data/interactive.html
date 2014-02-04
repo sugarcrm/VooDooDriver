@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <title>Test page full of interactive HTML elements</title>
+
+    <script type="text/javascript">
+      function clickTest(which) {
+         document.getElementById("click_test").innerHTML = which;
+      }
+
+      function doCheckboxes(checkboxes) {
+         var n = 0;
+         for (i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked == true) {
+               n++;
+            }
+         }
+         document.getElementById('checkbox_output').innerHTML = "checked " +
+                                                                n + " boxes";
+         return true;
+      }
+
+      function doRadios(radios) {
+         var which = "none";
+         for (k = 0; k < radios.length; k++) {
+            if (radios[k].checked) {
+               which = radios[k].id;
+            }
+         }
+
+         document.getElementById('radio_output').innerHTML = which;
+      }
+
+      function buttonClick(b) {
+         document.getElementById('button_out').innerHTML = "button" + b;
+
+         if (b == 3) {
+            alert("Button 3 was clicked!");
+         }
+
+         return false;
+      }
+
+      function checkFile() {
+         document.getElementById('file_out').innerHTML =
+            document.getElementById('file').value;
+      }
+
+      function checkTextarea() {
+         document.getElementById('textarea_out').innerHTML =
+            document.getElementById('textarea').value;
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <div id="click_test">some text</div>
+
+    <form id="form1" onsubmit="return false;">
+      <input id="input" type="button" value="click"
+             onclick="clickTest('INPUT');"/>
+      <input id="text" type="text" value="zzzz"
+             onclick="clickTest(this.value)"/>
+      <input id="password" type="password" onclick="clickTest(this.value)"/>
+      <input id="disabled" type="button" value="Disabled" disabled/>
+      <input id="email1" type="email" onclick="clickTest(this.value)"/>
+      <input id="email2" type="email" multiple="true"
+             onclick="clickTest(this.value)"/>
+    </form>
+
+    <form id="form2" onsubmit="return false;">
+      <p id="checkbox_output">empty</p>
+      <button id="check_checkboxes"
+              onclick="doCheckboxes(document.getElementsByName('checkbox'));">
+        check the checkboxes
+      </button>
+      <label for="cb1">one</label>
+      <input id="cb1" type="checkbox" name="checkbox" value="1"/>
+      <label for="cb2">two</label>
+      <input id="cb2" type="checkbox" name="checkbox" value="2"/>
+      <label for="cb3">three</label>
+      <input id="cb3" type="checkbox" name="checkbox" value="3"/>
+    </form>
+
+    <form id="form3" onsubmit="return false;">
+      <p id="radio_output">empty</p>
+      <button id="check_radios"
+              onclick="doRadios(document.getElementsByName('radio'));">
+        check the checkboxes
+      </button>
+      <label for="radio0">0</label>
+      <input type="radio" value="0" id="radio0" name="radio"/>
+      <label for="radio1">1</label>
+      <input type="radio" value="1" id="radio1" name="radio"/>
+      <label for="radio2">2</label>
+      <input type="radio" value="2" id="radio2" name="radio"/>
+      <label for="radio3">3</label>
+      <input type="radio" value="3" id="radio3" name="radio"/>
+    </form>
+
+    <form id="form4" onsubmit="return false;">
+      <p id="button_out">empty</p>
+      <button type="submit" id="button1" disabled onclick="buttonClick(1);">
+        Button 1!
+      </button>
+      <button type="cancel" id="button2" onclick="buttonClick(2);">
+        Button 2!
+      </button>
+      <input type="button" id="button3" value="Button 3!" onclick="buttonClick(3);"/>
+    </form>
+
+    <form id="form5" onsubmit="return false;">
+      <p id="file_out">empty</p>
+      <input type="file" id="file"/>
+      <button type="button" id="check_file" onclick="checkFile();">
+        Check!
+      </button>
+      <input type="hidden" value="hidden!" id="hidden" disabled/>
+    </form>
+
+    <form id="form6" onsubmit="return false;">
+      <p id="textarea_out">empty</p>
+      <textarea id="textarea">zzzz</textarea>
+      <button type="button" id="check_textarea" onclick="checkTextarea()">
+        Check Textarea!
+      </button>
+    </form>
+
+    <form id="form7">
+      <label for="label_target">label</label>
+      <input type="text" id="label_target"/>
+    </form>
+
+  </body>
+</html>

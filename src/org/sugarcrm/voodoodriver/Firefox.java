@@ -40,13 +40,6 @@ public class Firefox extends Browser {
    private String downloadDirectory = null;
 
    /**
-    * Directory into which to save the web driver logs.
-    */
-
-   private File webDriverLogDirectory = null;
-
-
-   /**
     * Set this object's download directory.
     *
     * @param dir  path to the download directory

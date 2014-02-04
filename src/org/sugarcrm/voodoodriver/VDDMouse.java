@@ -1,18 +1,18 @@
 /*
-Copyright 2011-2012 SugarCRM Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Please see the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2011-2013 SugarCRM Inc.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License.  You
+ * may may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  Please see the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package org.sugarcrm.voodoodriver;
 
@@ -35,7 +35,7 @@ public class VDDMouse {
       try {
          this.robo = new Robot();
       } catch (Exception exp) {
-         this.reporter.ReportException(exp);
+         this.reporter.exception(exp);
          this.robo = null;
       }
    }
@@ -50,7 +50,7 @@ public class VDDMouse {
          return;
       }
 
-      this.reporter.Log("Starting DnD.");
+      this.reporter.log("Starting DnD.");
 
       if (!(wsrc instanceof RemoteWebElement) ||
           !(wdst instanceof RemoteWebElement)) {
@@ -72,8 +72,8 @@ public class VDDMouse {
       dst_x = dstPoint.getX() + (dstDim.getWidth() / 2);
       dst_y = dstPoint.getY() + (dstDim.getHeight() / 2);
 
-      this.reporter.Log(String.format("DnD Source Screen Coordinates: X => '%d' Y => '%d'", src_x, src_y));
-      this.reporter.Log(String.format("DnD Dest Screen Coordinates: X => '%d' Y => '%d'", dst_x, dst_y));
+      this.reporter.log(String.format("DnD Source Screen Coordinates: X => '%d' Y => '%d'", src_x, src_y));
+      this.reporter.log(String.format("DnD Dest Screen Coordinates: X => '%d' Y => '%d'", dst_x, dst_y));
 
       this.robo.mouseMove(srcPoint.x / 2, srcPoint.y / 2);
       this.robo.delay(800);
@@ -84,7 +84,7 @@ public class VDDMouse {
       this.robo.mouseRelease(InputEvent.BUTTON1_MASK);
       this.robo.delay(500);
 
-      this.reporter.Log("DnD Finished.");
+      this.reporter.log("DnD Finished.");
    }
 
    private void Move(int cur_x, int cur_y, int x, int y) {

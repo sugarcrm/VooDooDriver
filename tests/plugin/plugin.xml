@@ -1,0 +1,8 @@
+<data>
+   <plugin>
+      <classname>javaplugins.JavaPluginTest</classname>
+      <control>link,div,alert</control>
+      <event>alwaysfire,afterclose</event>
+      <classfile>plugins/java/JavaPluginTest.class</classfile>
+   </plugin>
+</data>

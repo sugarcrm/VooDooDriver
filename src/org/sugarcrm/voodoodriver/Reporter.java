@@ -203,9 +203,22 @@ public class Reporter {
    }
 
 
+   /**
+    * Return the name of the log file.
+    *
+    * @return the name of the log file
+    */
+
    public String getLogFileName() {
       return this.reportLog;
    }
+
+
+   /**
+    * Return the results of this VDD run.
+    *
+    * @return VDD test results
+    */
 
    public TestResults getResults() {
       TestResults result = null;
@@ -221,7 +234,10 @@ public class Reporter {
       result.put("errors", this.OtherErrors);
       result.put("isrestart", this.isRestart);
 
-      if (this.Blocked > 0 || this.Exceptions > 0 || this.FailedAsserts > 0 || this.OtherErrors > 0) {
+      if (this.Blocked > 0 ||
+          this.Exceptions > 0 ||
+          this.FailedAsserts > 0 ||
+          this.OtherErrors > 0) {
          res = -1;
       }
 
@@ -250,10 +266,26 @@ public class Reporter {
    }
 
 
+   /**
+    * Escape the ASCII character 0xa.
+    *
+    * @param str  string with possibly unescaped line feeds
+    * @return string with all line feeds replaced by '\n'
+    */
+
    private String replaceLineFeed(String str) {
       str = str.replaceAll("\n", "\\\\n");
       return str;
    }
+
+
+   /**
+    * Write a string to the log file.
+    *
+    * <p>This is the only routine that writes to the log file.</p>
+    *
+    * @param msg  string to log
+    */
 
    private void _log(String msg) {
       Date now = new Date();
@@ -279,6 +311,11 @@ public class Reporter {
       }
    }
 
+
+   /**
+    * Close the log file.
+    */
+
    public void closeLog() {
       try {
          this.reportFD.close();
@@ -288,11 +325,30 @@ public class Reporter {
       this.reportFD = null;
    }
 
-   public void Log(String msg) {
+
+   /**
+    * Log a normal message.
+    *
+    * <p>Normal messages are prepended with '(*)'.</p>
+    *
+    * @param msg  the message to be logged
+    */
+
+   public void log(String msg) {
       this._log("(*)" + msg);
    }
 
-   public void Warn(String msg, boolean savePage) {
+
+   /**
+    * Log a warning.
+    *
+    * <p>Warning messages are prepended with '(W)'.</p>
+    *
+    * @param msg       the warning to be logged
+    * @param savePage  whether to save the page on warnings
+    */
+
+   public void warning(String msg, boolean savePage) {
       this._log("(W)" + msg);
 
       if (savePage && (Boolean)this.saveHtmlOn.get("warning")) {
@@ -303,11 +359,29 @@ public class Reporter {
       }
    }
 
-   public void Warn(String msg) {
-      Warn(msg, true);
+
+   /**
+    * Log a warning.
+    *
+    * <p>Warning messages are prepended with '(W)'.</p>
+    *
+    * @param msg  the warning to be logged
+    */
+
+   public void warning(String msg) {
+      warning(msg, true);
    }
 
-   public void ReportError(String msg) {
+
+   /**
+    * Log an error.
+    *
+    * <p>Error messages are prepended with '(!)'.</p>
+    *
+    * @param msg  the error to be logged.
+    */
+
+   public void error(String msg) {
       this._log(String.format("(!)%s", msg));
       this.OtherErrors += 1;
 
@@ -323,7 +397,20 @@ public class Reporter {
       }
    }
 
-   public void ReportWatchDog(long seconds) {
+
+   /**
+    * Log the expiration of the watchdog timer.
+    *
+    * <p>The watchdog timer runs in the main VDD thread.
+    * Periodically, the <code>threadTime</code> value of the test
+    * thread is polled.  If the last update time is over the watchdog
+    * threshold, then the thread is terminated and this method is
+    * called.</p>
+    *
+    * @param seconds  the time since last update of <code>threadTime</code>
+    */
+
+   public void watchdog(long seconds) {
       this._log(String.format("(!)Test watchdogged out after: '%d' seconds!",
                               seconds));
 
@@ -337,7 +424,12 @@ public class Reporter {
       }
    }
 
-   public void ReportBlocked() {
+
+   /**
+    * Indicate that the current test is on the block list.
+    */
+
+   public void setBlocked() {
       this.Blocked = 1;
    }
 
@@ -361,9 +453,11 @@ public class Reporter {
     */
 
    public void unhandledAlert(org.openqa.selenium.WebDriverException e) {
+      String alertText = "";
+
       try {
          Alert alert = this.browser.getDriver().switchTo().alert();
-         String alertText = alert.getText();
+         alertText = alert.getText();
          /*
           * Presumably, accept will be more likely to Do The Right
           * Thing(TM) WRT getting rid of alerts and moving on, but it
@@ -371,10 +465,9 @@ public class Reporter {
           */
          alert.accept();
 
-         this._log("(!)Unhandled alert found and dismissed.  Alert text is \"" +
-                   alertText + "\"");
       } finally {
-         justReportTheException(e);
+         justLogTheException("(!)Unhandled alert found and dismissed. " +
+                             "Alert text is \"" + alertText + "\"", e);
       }
    }
 
@@ -387,14 +480,23 @@ public class Reporter {
     *
     */
 
-   private void justReportTheException(Exception e) {
-      this.Exceptions += 1;
+   private void justLogTheException(String msg, Throwable e) {
+      String em = e.getMessage();
+      String estr = "ReportException: Exception message is null!";
 
-      if (e.getMessage() == null) {
-         this._log("(!)ReportException: Exception message is null!");
-      } else {
-         this._log("(!)" + e.getMessage().replaceAll("\\n", "  "));
+      if (em != null) {
+         em = em.replaceAll("\\n", "  ");
+
+         if (msg == null) {
+            estr = em;
+         } else {
+            estr = msg + ": " + em;
+         }
+      } else if (msg != null) {
+         estr = msg;
       }
+
+      this._log("(!)" + estr);
 
       String bt = "--Exception Backtrace: ";
       for (StackTraceElement el: e.getStackTrace()) {
@@ -402,6 +504,7 @@ public class Reporter {
       }
 
       this._log("(!)" + bt);
+      this.Exceptions += 1;
    }
 
 
@@ -415,8 +518,24 @@ public class Reporter {
     * @param e  the exception to report
     */
 
-   public void ReportException(Exception e) {
-      justReportTheException(e);
+   public void exception(Throwable e) {
+      this.exception(null, e);
+   }
+
+
+   /**
+    * Log an exception and additional information.
+    *
+    * This method formats a java exception into a log entry.  Both the
+    * message and the stack trace are reformatted and printed to the
+    * SODA log file and the console.
+    *
+    * @param msg  additional information about the exception
+    * @param e    the exception to report
+    */
+
+   public void exception(String msg, Throwable e) {
+      justLogTheException(msg, e);
 
       if ((Boolean)this.saveHtmlOn.get("exception")) {
          this.SavePage();
@@ -430,6 +549,18 @@ public class Reporter {
       }
    }
 
+
+   /**
+    * Assert that two boolean values are equal to each other.
+    *
+    * <p>As with all Assert* methods, this logs failures as assertion
+    * failures which are treated specially.</p>
+    *
+    * @param msg  string to log along with the results of the assert
+    * @param state  the value under test
+    * @param expected  the expected value
+    * @return whether the assertion passed
+    */
 
    public boolean Assert(String msg, boolean state, boolean expected) {
       boolean result = false;
@@ -461,13 +592,25 @@ public class Reporter {
       return result;
    }
 
+
+   /**
+    * Assert that one string is found within another.
+    *
+    * <p>As with all Assert* methods, this logs failures as assertion
+    * failures which are treated specially.</p>
+    *
+    * @param search  the search string
+    * @param src     the string in which to search
+    * @return whether the assertion passed
+    */
+
    public boolean Assert(String search, String src) {
       TextFinder f = new TextFinder(search);
       boolean found = f.find(src);
 
       if (found) {
          this.PassedAsserts += 1;
-         this.Log("Assert Passed, found: '" + search + "'.");
+         this.log("Assert Passed, found: '" + search + "'.");
       } else {
          this.FailedAsserts += 1;
          this._log("(!)Assert Failed for: '" + search + "'!");
@@ -486,6 +629,18 @@ public class Reporter {
       return found;
    }
 
+
+   /**
+    * Assert that one string is not found within another.
+    *
+    * <p>As with all Assert* methods, this logs failures as assertion
+    * failures which are treated specially.</p>
+    *
+    * @param search  the search string
+    * @param src     the string in which to search
+    * @return whether the assertion passed
+    */
+
    public boolean AssertNot(String search, String src) {
       TextFinder f = new TextFinder(search);
       boolean found = f.find(src);
@@ -495,7 +650,7 @@ public class Reporter {
          this._log("(!)Assert Failed, found unexpected text: '" + search + "'.");
       } else {
          this.PassedAsserts += 1;
-         this.Log("Assert Passed, did not find: '" + search + "'!");
+         this.log("Assert Passed, did not find: '" + search + "'!");
       }
 
       if (found && (Boolean)this.saveHtmlOn.get("assertfail")) {
@@ -564,9 +719,9 @@ public class Reporter {
          BufferedWriter bw = new BufferedWriter(new FileWriter(f));
          bw.write(pageSource);
          bw.close();
-         this.Log(String.format("HTML Saved: %s", htmlFile));
+         this.log(String.format("HTML Saved: %s", htmlFile));
       } catch (java.io.IOException e) {
-         this.justReportTheException(e);
+         this.justLogTheException("Failed to save HTML", e);
       }
    }
 
@@ -599,5 +754,50 @@ public class Reporter {
        } finally {
            super.finalize();
        }
+   }
+
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #log}
+    */
+
+   @Deprecated
+   public void Log(String m) {
+      log(m);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #error}
+    */
+
+   @Deprecated
+   public void ReportError(String m) {
+      error(m);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #exception}
+    */
+
+   @Deprecated
+   public void ReportException(Throwable e) {
+      exception(e);
+   }
+
+   /**
+    * Compatibility method for SugarWait.
+    *
+    * @deprecated Replaced by {@link #warning}
+    */
+
+   @Deprecated
+   public void Warn(String m) {
+      warning(m);
    }
 }

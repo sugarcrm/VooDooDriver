@@ -18,6 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -175,9 +176,9 @@ public class PageAsserter {
     * @param whitelist  HashMap whose values are whitelist entries
     */
 
-   private void addWhitelistEntries(VDDHash whitelist) {
-      for (Object entry: whitelist.values()) {
-         this.whitelist.add(new TextFinder((String)entry));
+   private void addWhitelistEntries(HashMap<String,String> whitelist) {
+      for (String entry: whitelist.values()) {
+         this.whitelist.add(new TextFinder(entry));
       }
    }
 
@@ -194,7 +195,7 @@ public class PageAsserter {
     * @param whitelist  new whitelist entries
     */
 
-   public void assertPage(String page, VDDHash whitelist) {
+   public void assertPage(String page, HashMap<String,String> whitelist) {
       this.addWhitelistEntries(whitelist);
       assertPage(page);
    }

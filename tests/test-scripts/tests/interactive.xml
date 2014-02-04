@@ -1,0 +1,121 @@
+<voodoo>
+   <!-- This script tests all "interactive" HTML events, those that
+        can accept user input of some type.
+   -->
+
+   <browser url="{@global.url}/tests/test-data/interactive.html"/>
+
+   <!-- input -->
+
+   <form id="form1">
+      <input id="input" click="true"/>
+   </form>
+   <div id="click_test" assert="INPUT"/>
+
+   <form id="form1">
+      <input id="text" set="foo bar"/>
+      <input id="text" append=" baz"/>
+      <input id="text" click="true"/>
+   </form>
+   <div id="click_test" assert="foo bar baz"/>
+
+   <form id="form1">
+      <input id="disabled" disabled="true"/>
+   </form>
+
+   <!-- email -->
+
+   <form id="form1">
+      <email id="email1" set="foo@bar.com"/>
+      <email id="email1" click="true"/>
+   </form>
+   <div id="click_test" assert="foo@bar.com"/>
+
+   <form id="form1">
+      <email id="email2" set="foo@bar.com,bar@baz"/>
+      <email id="email2" click="true"/>
+   </form>
+   <div id="click_test" assert="bar@baz"/>
+
+   <!-- text -->
+
+   <form id="form1">
+      <textfield id="text" set="text field"/>
+      <textfield id="text" click="true"/>
+   </form>
+   <div id="click_test" assert="text field"/>
+
+   <!-- password -->
+
+   <form id="form1">
+      <password id="password" set="verysecret"/>
+      <password id="password" click="true"/>
+   </form>
+   <div id="click_test" assert="verysecret"/>
+
+   <!-- checkbox -->
+
+   <checkbox value="1" click="true"/>
+   <button id="check_checkboxes"/>
+   <p id="checkbox_output" assert="checked 1 boxes"/>
+   
+   <checkbox value="2" set="true"/>
+   <button id="check_checkboxes"/>
+   <p id="checkbox_output" assert="checked 2 boxes"/>
+   
+   <checkbox value="3" click="true"/>
+   <button id="check_checkboxes"/>
+   <p id="checkbox_output" assert="checked 3 boxes"/>
+   
+   <checkbox name="checkbox" set="false" />
+   <button id="check_checkboxes"/>
+   <p id="checkbox_output" assert="checked 2 boxes"/>
+
+   <!-- radio -->
+
+   <radio id="radio0" click="true"/>
+   <button id="check_radios"/>
+   <p id="radio_output" assert="radio0"/>
+
+   <radio id="radio1" set="true"/>
+   <button id="check_radios"/>
+   <p id="radio_output" assert="radio1"/>
+
+   <radio id="radio2" click="true"/>
+   <button id="check_radios"/>
+   <p id="radio_output" assert="radio2"/>
+
+   <radio id="radio3" set="true"/>
+   <button id="check_radios"/>
+   <p id="radio_output" assert="radio3"/>
+
+   <!-- button -->
+
+   <button id="button1" disabled="true" click="false"/>
+   <p id="button_out" assertnot="button1"/>
+   <button id="button2" assertpage="true"/>
+   <p id="button_out" assert="button2"/>
+   <button id="button3" alert="true"/>
+   <p id="button_out" assert="button3"/>
+
+   <!-- filefield -->
+
+   <filefield id="file" set="../../test-data/interactive.html"/>
+   <button id="check_file"/>
+   <p id="file_out" assert="interactive.html$"/>
+
+   <!-- hidden -->
+
+   <hidden id="hidden" disabled="true"/>
+
+   <!-- textarea -->
+
+   <textarea id="textarea" set="text area"/>
+   <button id="check_textarea" click="true"/>
+   <p id="textarea_out" assert="text area"/>
+
+   <!-- label -->
+
+   <label for="label_target" assert="label"/>
+
+</voodoo>

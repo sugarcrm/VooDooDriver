@@ -1,0 +1,5 @@
+<voodoo>
+   <javascript>
+      document.getElementById('div').innerHTML = '{@set.to}';
+   </javascript>
+</voodoo>

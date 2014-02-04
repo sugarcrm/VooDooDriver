@@ -9,7 +9,7 @@
    <property name="dist"  location="VooDooDriver"/>
    <property name="lib" location="./lib"/>
    <property name="product-zip" location="${bin}/VooDooDriver.zip"/>
-   <property name="sodaelements" location="${src}/org/sugarcrm/voodoodriver/Events.xml"/>
+   <property name="events" location="${src}/org/sugarcrm/voodoodriver/Event/Events.xml"/>
    <property name="suitereport-header" location="${src}/org/sugarcrm/vddlogger/suitereporter-header.txt" />
    <property name="issuesreport-header" location="${src}/org/sugarcrm/vddlogger/issues-header.txt" />
    <property name="summaryreport-header" location="${src}/org/sugarcrm/vddlogger/summaryreporter-header.txt" />
@@ -132,7 +132,7 @@
          <compilerarg value="-Xlint:unchecked"/>
       </javac>
 
-      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${sodaelements}" />
+      <copy todir="${build}/org/sugarcrm/voodoodriver/Event" file="${events}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${suitereport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />
@@ -183,7 +183,7 @@
          <fileset dir="lib/libs" />
       </copy>
 
-      <copy todir="${build}/org/sugarcrm/voodoodriver" file="${sodaelements}"/>
+      <copy todir="${build}/org/sugarcrm/voodoodriver/Event" file="${events}"/>
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${suitereport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${issuesreport-header}" />
       <copy todir="${build}/org/sugarcrm/vddlogger" file="${summaryreport-header}" />

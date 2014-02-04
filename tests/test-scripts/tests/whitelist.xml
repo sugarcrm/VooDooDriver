@@ -1,0 +1,10 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/whitelist.html"/>
+
+   <!-- Uncomment this and an error should result -->
+   <!-- <browser assertpage="true"/> -->
+
+   <whitelist name="one" action="add" content="one"/>
+   <link assertpage="true" id="a" click="false"/>
+
+</voodoo>

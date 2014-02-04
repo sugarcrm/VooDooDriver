@@ -1,0 +1,5 @@
+<soda>
+   <browser url="{@global.url}/js-plugin.html"/>
+   <div id="foo" click="true"/>
+   <browser action="close"/>
+</soda>

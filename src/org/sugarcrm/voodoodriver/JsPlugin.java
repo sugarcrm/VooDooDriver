@@ -72,30 +72,28 @@ public class JsPlugin extends Plugin {
       }
 
       if (err != null) {
-         report.ReportError(err);
+         report.error(err);
          return false;
       }
 
-      report.Log("Plugin event started.");
+      report.log("Plugin event started.");
 
       try {
          res = browser.executeJS(js, element);
          rv = Integer.valueOf(String.valueOf(res));
       } catch (org.openqa.selenium.WebDriverException e) {
-         report.ReportError("Exception executing JS plugin " + jsFile);
-         report.ReportException(e);
+         report.exception("Exception executing JS plugin " + jsFile, e);
          return false;
       } catch (java.lang.NumberFormatException e) {
-         report.ReportError("JS Plugin '" + jsFile +
-                                 "' return value is not an integer (" +
-                                 String.valueOf(res) + ")");
+         report.error("JS Plugin '" + jsFile +
+                      "' return value is not an integer (" +
+                      String.valueOf(res) + ")");
       }
-      report.Log("Plugin event finished.");
+      report.log("Plugin event finished.");
 
       if (rv != 0) {
-         String msg = String.format("Plugin Event failed (return value = %d)",
-                                    rv);
-         report.ReportError(msg);
+         report.error(String.format("Plugin Event failed (return value = %d)",
+                                    rv));
       }
 
       return rv == 0;

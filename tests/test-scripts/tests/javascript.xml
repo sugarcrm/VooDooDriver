@@ -1,0 +1,14 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/javascript.html"/>
+
+   <browser assert="foo"/>
+   <browser assertnot="bar"/>
+
+   <javascript content="tickle();"/>
+   <browser assert="bar"/>
+   <browser assertnot="foo"/>
+
+   <javascript file="{@global.scriptsdir}/tests/test-data/javascript.js"/>
+   <browser assert="foo"/>
+   <browser assertnot="bar"/>
+</voodoo>

@@ -1,0 +1,5 @@
+<voodoo>
+   <puts text="Initial timestamp is {@stamp}"/>"
+   <timestamp/>
+   <puts text="Current timestamp is {@stamp}"/>"
+</voodoo>

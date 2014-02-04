@@ -1,0 +1,7 @@
+<voodoo>
+   <puts text="Prior to setting: The value of 'foo' is {@foo}"/>
+   <var var="foo" set="bar"/>
+   <puts text="After setting: The value of 'foo' is {@foo}"/>
+   <var var="foo" unset="true"/>
+   <puts text="After unsetting: The value of 'foo' is {@foo}"/>
+</voodoo>

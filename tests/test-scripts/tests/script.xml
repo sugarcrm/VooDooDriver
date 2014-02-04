@@ -1,0 +1,11 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/script.html"/>
+
+   <var var="set.to" set="one"/>
+   <script file="{@global.scriptsdir}/tests/test-scripts/tests/script/set.xml"/>
+   <browser assert="one"/>
+
+   <var var="set.to" set="two"/>
+   <script fileset="{@global.scriptsdir}/tests/test-scripts/tests/script"/>
+   <browser assert="two"/>
+</voodoo>

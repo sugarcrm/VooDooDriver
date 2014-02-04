@@ -1,0 +1,16 @@
+<voodoo>
+   <!-- Test for the frame event -->
+   <browser url="{@global.url}/tests/test-data/iframe.html"/>
+
+   <browser assertnot="first iframe"/>
+   <browser assertnot="second iframe"/>
+
+   <frame name="iframe_one">
+      <div id="iframe_one_div" assert="first iframe"/>
+   </frame>
+
+   <frame index="1">
+      <div id="iframe_two_div" assert="second iframe"/>
+   </frame>
+
+</voodoo>

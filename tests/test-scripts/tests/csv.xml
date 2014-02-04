@@ -1,0 +1,34 @@
+<voodoo>
+   <csv file="{@global.scriptsdir}/tests/test-scripts/csvs/csv-test.csv" var="csv">
+      <puts text="Start CSV loop"/>
+      <puts text="Field 1: {@csv.field1}"/>
+      <puts text="Field 2: {@csv.field2}"/>
+      <puts text="Field 3: {@csv.field3}"/>
+      <puts text="Field 4: {@csv.field4}"/>
+      <puts text="Field 5: {@csv.field5}"/>
+      <puts text="End CSV loop"/>
+   </csv>
+
+   <csv file="{@global.scriptsdir}/tests/test-scripts/csvs/csv-test.csv">
+      <puts text="Start CSV loop"/>
+      <puts text="Field 1: {@field1}"/>
+      <puts text="Field 2: {@field2}"/>
+      <puts text="Field 3: {@field3}"/>
+      <puts text="Field 4: {@field4}"/>
+      <puts text="Field 5: {@field5}"/>
+      <puts text="End CSV loop"/>
+   </csv>
+
+   <csv override="{@global.scriptsdir}/tests/test-scripts/csvs/csv-bad.csv"/>
+   <csv file="{@global.scriptsdir}/tests/test-scripts/csvs/csv-test.csv" var="csv">
+      <puts text="Start CSV loop"/>
+      <puts text="Field 1: {@csv.field1}"/>
+      <puts text="Field 2: {@csv.field2}"/>
+      <puts text="Field 3: {@csv.field3}"/>
+      <puts text="Field 4: {@csv.field4}"/>
+      <puts text="Field 5: {@csv.field5}"/>
+      <puts text="End CSV loop"/>
+   </csv>
+
+   <browser action="close"/>
+</voodoo>

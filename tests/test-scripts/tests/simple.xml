@@ -1,0 +1,148 @@
+<voodoo>
+   <!-- This script tests all "simple" HTML events, which is most of them -->
+
+   <browser url="{@global.url}/tests/test-data/simple.html"/>
+
+   <!-- DIV -->
+   <div id="div" assert="div text"/>
+   <div id="div" assertnot="foobar"/>
+   <div id="div" click="true"/>
+   <div id="div" assert="clicked"/>
+   <div id="div" jscriptevent="onmousedown"/>
+   <div id="div" assert="mousedown"/>
+   <div id="div" save="mydiv"/>
+   <div id="div" var="mydiv"/>
+   <!-- This div is not visible, but required is true - shouldn't be an error-->
+   <div id="InvisibleDiv" required="false"/>
+
+   <!-- SPAN -->
+   <span id="span" assert="span text"/>
+   <span id="span" assertnot="foobar"/>
+   <span id="span" click="true"/>
+   <span id="span" assert="clicked"/>
+   <span id="span" jscriptevent="onmousedown"/>
+   <span id="span" assert="mousedown"/>
+   <span id="span" save="myspan"/>
+   <span id="span" var="myspan"/>
+
+   <!-- Simple HTML elements -->
+
+   <h1 id="h1" click="true"/><div id="click_test" assert="H1"/>
+   <h2 id="h2" click="true"/><div id="click_test" assert="H2"/>
+   <h3 id="h3" click="true"/><div id="click_test" assert="H3"/>
+   <h4 id="h4" click="true"/><div id="click_test" assert="H4"/>
+   <h5 id="h5" click="true"/><div id="click_test" assert="H5"/>
+   <h6 id="h6" click="true"/><div id="click_test" assert="H6"/>
+   <address click="true"/><div id="click_test" assert="ADDRESS"/>
+
+   <!-- Text -->
+   <em         click="true"/><div id="click_test" assert="EM"/>
+   <strong     click="true"/><div id="click_test" assert="STRONG"/>
+   <dfn        click="true"/><div id="click_test" assert="DFN"/>
+   <code       click="true"/><div id="click_test" assert="CODE"/>
+   <samp       click="true"/><div id="click_test" assert="SAMP"/>
+   <kbd        click="true"/><div id="click_test" assert="KBD"/>
+   <cite       click="true"/><div id="click_test" assert="CITE"/>
+   <abbr       click="true"/><div id="click_test" assert="ABBR"/>
+   <acronym    click="true"/><div id="click_test" assert="ACRONYM"/>
+   <blockquote click="true"/><div id="click_test" assert="BLOCKQUOTE"/>
+   <q          click="true"/><div id="click_test" assert="Q"/>
+   <sub        click="true"/><div id="click_test" assert="SUB"/>
+   <sup        click="true"/><div id="click_test" assert="SUP"/>
+   <p          click="true"/><div id="click_test" assert="P"/>
+   <br jscriptevent="click"/><div id="click_test" assert="BR"/>
+   <pre        click="true"/><div id="click_test" assert="PRE"/>
+   <ins        click="true"/><div id="click_test" assert="INS"/>
+   <del        click="true"/><div id="click_test" assert="DEL"/>
+
+   <!-- Lists -->
+   <ul id="ul">
+      <li id="ulli" click="true"/>
+   </ul>
+   <div id="click_test" assert="ULLI"/>
+
+   <ol id="ol">
+      <li id="olli" click="true"/>
+   </ol>
+   <div id="click_test" assert="OLLI"/>
+
+   <dl id="dl">
+      <dt id="dt" click="true"/>
+   </dl>
+   <div id="click_test" assert="DT"/>
+
+   <dl id="dl">
+      <dd id="dd" click="true"/>
+   </dl>
+   <div id="click_test" assert="DD"/>
+
+   <!-- Tables -->
+   <table id="table">
+      <!-- COLGROUP and COL provide information to the rendering
+           engine about other elements and, as such, don't render and
+           don't really do anything. -->
+      <colgroup id="colgroup">
+         <col id="col1"/>
+      </colgroup>
+   </table>
+
+   <table id="table">
+      <caption id="caption" click="true"/>
+   </table>
+   <div id="click_test" assert="CAPTION"/>
+
+   <table id="table">
+      <thead id="thead">
+         <td id="thead_td" click="true"/>
+      </thead>
+   </table>
+   <div id="click_test" assert="THEAD_TD"/>
+
+   <table id="table">
+      <tfoot id="tfoot">
+         <td id="tfoot_td" click="true"/>
+      </tfoot>
+   </table>
+   <div id="click_test" assert="TFOOT_TD"/>
+
+   <table id="table">
+      <tbody id="tbody">
+         <tr id="trh">
+            <th id="th1" click="true"/>
+         </tr>
+      </tbody>
+   </table>
+   <div id="click_test" assert="TH1"/>
+
+   <!-- Objects, images, and applets -->
+   <image src="N5629N.jpg" click="true"/><div id="click_test" assert="IMG"/>
+   <object id="object" click="true"/><div id="click_test" assert="OBJECT"/>
+   <map id="map" click="true"/><div id="click_test" assert="MAP"/>
+   <area alt="area1" jscriptevent="mouseover"/><div id="over" assert="AREA1"/>
+
+   <!-- The simple elements are divided between two pages.  This is
+        primarily so that inevitable Selenium scrolling bugs don't
+        affect the test suite. -->
+
+   <browser url="{@global.url}/tests/test-data/simple2.html"/>
+
+   <!-- Alignment, font styles, and horizontal rules -->
+   <tt     click="true"/><div id="click_test" assert="TT"/>
+   <i      click="true"/><div id="click_test" assert="I"/>
+   <b      click="true"/><div id="click_test" assert="B"/>
+   <big    click="true"/><div id="click_test" assert="BIG"/>
+   <small  click="true"/><div id="click_test" assert="SMALL"/>
+   <strike click="true"/><div id="click_test" assert="STRIKE"/>
+   <s      click="true"/><div id="click_test" assert="S"/>
+   <u      click="true"/><div id="click_test" assert="U"/>
+   <hr     click="true"/><div id="click_test" assert="HR"/>
+
+   <!-- Forms -->
+   <form name="form" method="post">
+      <p assert="A POST form"/>
+   </form>
+   <form id="form1">
+      <p assert="A GET form"/>
+   </form>
+
+</voodoo>

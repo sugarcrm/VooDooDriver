@@ -150,7 +150,7 @@ public class JavaPlugin extends Plugin {
       int rv = 0;
       PluginData localData = new PluginData(data);
 
-      report.Log("Plugin event " + className + " started.");
+      report.log("Plugin event " + className + " started.");
 
       localData.setArgs(this.mergeArgs(localData.getArgs()));
 
@@ -160,19 +160,17 @@ public class JavaPlugin extends Plugin {
          /*
           * Because all software can't be perfect ;)
           */
-         report.ReportError("Exception during plugin (" + className +
-                            ") execution.");
-         report.ReportException(e);
+         report.exception("Exception during plugin (" + className +
+                          ") execution.", e);
          return false;
       }
 
       if (rv != 0) {
-         report.ReportError("Plugin " + className +
-                            " failed (error code " + rv + ").");
+         report.error("Plugin " + className + " failed (error code " + rv + ").");
          return false;
       }
 
-      report.Log("Plugin event " + className + " finished.");
+      report.log("Plugin event " + className + " finished.");
    
       return true;
    }

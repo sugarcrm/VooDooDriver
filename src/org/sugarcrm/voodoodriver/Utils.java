@@ -126,22 +126,21 @@ public class Utils {
                                         boolean logOK) {
       Robot r = null;
 
-      reporter.Log("Taking Screenshot.");
+      reporter.log("Taking Screenshot.");
 
       File tmp = new File(outputFile);
       if (tmp.exists() && logOK) {
          String msg;
          msg = String.format("Existing screenshot '%s' will be overwritten.",
                              outputFile);
-         reporter.Warn(msg);
+         reporter.warning(msg);
       }
 
       try {
          r = new Robot();
       } catch (java.awt.AWTException e) {
          if (logOK) {
-            reporter.ReportError("Screenshot failed (running headless?)");
-            reporter.ReportException(e);
+            reporter.exception("Screenshot failed (running headless?)", e);
          }
          return false;
       }
@@ -156,14 +155,13 @@ public class Utils {
          ImageIO.write(img, "png", new File(outputFile));
       } catch (java.io.IOException e) {
          if (logOK) {
-            reporter.ReportError("Screenshot failed (I/O Error)");
-            reporter.ReportException(e);
+            reporter.exception("Screenshot failed (I/O Error)", e);
          }
          return false;
       }
 
-      reporter.Log(String.format("Screenshot file: %s", outputFile));
-      reporter.Log("Screenshot finished.");
+      reporter.log(String.format("Screenshot file: %s", outputFile));
+      reporter.log("Screenshot finished.");
 
       return true;
    }
@@ -225,24 +223,6 @@ public class Utils {
       result = result.replaceAll("\\\\n", "\n");
 
       return result;
-   }
-
-   public static void isEnabled(WebElement element, Reporter reporter, boolean state) {
-      boolean eleState = false;
-      String msg = "";
-
-      if (element == null) {
-         return;
-      }
-
-      if (state) {
-         state = false;
-      } else {
-         state = true;
-      }
-
-      msg = String.format("Element Enabled => '%s' was expecting Enabled => '%s'!", eleState, state);
-      reporter.Assert(msg, eleState, state);
    }
 
 }

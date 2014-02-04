@@ -14,13 +14,16 @@
  * governing permissions and limitations under the License.
  */
 
-package org.sugarcrm.voodoodriver;
+package org.sugarcrm.voodoodriver.Event;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.sugarcrm.voodoodriver.VDDException;
+import org.sugarcrm.voodoodriver.VDDHash;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -31,6 +34,7 @@ import org.w3c.dom.NodeList;
  * Class that loads VDD events and metadata from Events.xml.
  *
  * @author Trampus
+ * @author Jon duSaint
  */
 
 public class EventLoader {
@@ -39,39 +43,42 @@ public class EventLoader {
     * XML file containing descriptions of all events.
     */
 
-   private final String EVENTS = "Events.xml";
+   private static final String EVENTS = "Events.xml";
 
    /**
-    * Processed list of events from Events.xml.
+    * Processed list of kvps events from Events.xml.
+    *
+    * The keys are the event names, the values are VDDHashes
+    * containing all the event metadata.
     */
 
-   private ElementsList events;
-
-   /**
-    * Names of events.  Redundantly stored here to speed lookup in isValid.
-    */
-
-   private VDDHash eventNames;
+   private VDDHash events;
 
 
    /**
-    * Instantiate EventLoader class and load Events.xml.
+    * Instantiate EventLoader class.
     */
 
-   public EventLoader() throws VDDException {
+   public EventLoader() {
+      this.events = new VDDHash();
+   }
+
+
+   private Document loadEventsXml() throws VDDException {
       Class c = getClass();
       String className = c.getName().replace('.', '/');
       String classJar =  c.getResource("/" + className + ".class").toString();
-
+      InputStream eis = null;
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = null;
+      Document d = null;
+
       try {
          db = dbf.newDocumentBuilder();
       } catch (javax.xml.parsers.ParserConfigurationException e) {
          throw new VDDException("Failed to load XML parser for Events.xml", e);
       }
 
-      InputStream eis = null;
       if (classJar.startsWith("jar:")) {
          eis = c.getResourceAsStream(EVENTS);
       } else {
@@ -82,7 +89,6 @@ public class EventLoader {
          }
       }
 
-      Document d = null;
       try {
          d = db.parse(eis);
       } catch (java.io.IOException e) {
@@ -91,36 +97,25 @@ public class EventLoader {
          throw new VDDException("Illegal XML in Events.xml", e);
       }
 
-      this.loadEvents(d.getDocumentElement().getChildNodes());
+      return d;
    }
 
 
    /**
     * Load all events from the {@link NodeList} created from Events.xml.
-    *
-    * @param nodes  {@link NodeList} of event nodes
     */
 
-   private void loadEvents(NodeList nodes) throws VDDException {
-      this.events = new ElementsList();
-      this.eventNames = new VDDHash();
+   public void loadEvents() throws VDDException {
+      Document d = loadEventsXml();
+      NodeList nodes = d.getDocumentElement().getChildNodes();
 
       for (int k = 0; k < nodes.getLength(); k++) {
          Node node = nodes.item(k);
-         VDDHash data = new VDDHash();
-         String name = node.getNodeName();
+         VDDHash event = new VDDHash();
 
-         if (name.startsWith("#") || name.contains("comment")) {
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
             continue;
          }
-
-         if (!Elements.isMember(name.toUpperCase())) {
-            throw new VDDException("Unknown type '" + name + "' in Events.xml");
-         }
-
-         eventNames.put(name.toUpperCase(), true);
-         data.put(name, 0);
-         data.put("type", Elements.valueOf(name.toUpperCase()));
 
          if (node.hasAttributes()) {
             NamedNodeMap attrs = node.getAttributes();
@@ -128,7 +123,7 @@ public class EventLoader {
             for (String key: validAttrs) {
                Node value = attrs.getNamedItem(key);
                if (value != null) {
-                  data.put(key, value.getNodeValue());
+                  event.put(key, value.getNodeValue());
                }
             }
          }
@@ -139,14 +134,14 @@ public class EventLoader {
                Node child = children.item(m);
                String childName = child.getNodeName();
 
-               if (childName.equals("soda_attributes") ||
-                   childName.equals("accessor_attributes")) {
-                  data.put(childName, parseAccessors(child.getChildNodes()));
+               if (childName.equals("selectors") ||
+                   childName.equals("actions")) {
+                  event.put(childName, parseAccessors(child.getChildNodes()));
                }
             }
          }
 
-         this.events.add(data);
+         this.events.put(node.getNodeName(), event);
       }
    }
 
@@ -162,20 +157,24 @@ public class EventLoader {
       VDDHash hash = new VDDHash();
 
       for (int i = 0; i < nodes.getLength(); i++) {
-         String node_name = nodes.item(i).getNodeName();
-         if (node_name == "#text") {
+         Node node = nodes.item(i);
+         String nodeName = node.getNodeName();
+
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
             continue;
          }
 
-         if (node_name != "action") {
-            String value = nodes.item(i).getTextContent();
+         if (nodeName.equals("accessor")) {
+            String value = node.getTextContent();
             if (value.isEmpty() || value.startsWith("\n")) {
                continue;
             }
-            hash.put(value, 0);
-         } else {
+            
+            hash.put(value,
+                     node.getAttributes().getNamedItem("type").getNodeValue());
+         } else if (nodeName.equals("action")) {
             VDDHash act_hash = new VDDHash();
-            NodeList actions = nodes.item(i).getChildNodes();
+            NodeList actions = node.getChildNodes();
             int actlen = actions.getLength() -1;
 
             for(int x = 0; x <= actlen; x++) {
@@ -186,7 +185,7 @@ public class EventLoader {
                   act_hash.put(act_name, act);
                }
             }
-            hash.put(node_name, act_hash);
+            hash.put(nodeName, act_hash);
          }
       }
 
@@ -197,22 +196,10 @@ public class EventLoader {
    /**
     * Get the list of events processed from Events.xml.
     *
-    * @return {@link ElementsList} of processed events
+    * @return {@link ArrayList} of processed events
     */
 
-   public ElementsList getTypes() {
+   public VDDHash getEvents() {
       return events;
-   }
-
-
-   /**
-    * Verify that an event from a test script is valid.
-    *
-    * @param event  event from a test script
-    * @return whether that event is found in Events.xml
-    */
-
-   public boolean isValid(String event) {
-      return eventNames.containsKey(event.toUpperCase());
    }
 }

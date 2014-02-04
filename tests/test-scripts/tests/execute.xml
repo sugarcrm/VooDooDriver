@@ -1,0 +1,6 @@
+<voodoo>
+   <execute>
+      <arg>ls</arg>
+      <arg>-l</arg>
+   </execute>
+</voodoo>

@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.io.FilenameUtils;
 import org.sugarcrm.voodoodriver.BlockList;
 import org.sugarcrm.voodoodriver.BlockListParser;
 import org.sugarcrm.voodoodriver.Browser;
@@ -40,6 +37,7 @@ import org.sugarcrm.voodoodriver.SupportedBrowser;
 import org.sugarcrm.voodoodriver.Test;
 import org.sugarcrm.voodoodriver.TestResults;
 import org.sugarcrm.voodoodriver.Utils;
+import org.sugarcrm.voodoodriver.Vars;
 import org.sugarcrm.voodoodriver.VDDException;
 import org.sugarcrm.voodoodriver.VDDHash;
 
@@ -63,6 +61,12 @@ public class VooDooDriver {
     */
 
    final static String vddLogFilename = "voodoo.log";
+
+   /**
+    * VDD summary file.
+    */
+
+   private static VDDSummary summary;
 
 
    /**
@@ -278,7 +282,7 @@ public class VooDooDriver {
    private static String defaultResultDir() {
       Date now = new Date();
       String frac = String.format("%1$tN", now);
-      String dstr = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", now);
+      String dstr = String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS", now);
       frac = frac.subSequence(0, 3).toString();
       dstr += String.format(".%s", frac);
 
@@ -548,6 +552,11 @@ public class VooDooDriver {
     */
 
    public static void main(String[] args) {
+      Thread shutdown = new Thread() {
+            public void run() {
+               System.out.println("(!)VDD terminated prematurely");
+            }
+         };
 
       earlyLog();
 
@@ -569,6 +578,16 @@ public class VooDooDriver {
       loadPlugins(config);
       loadBlocklist(config);
 
+      try {
+         summary = new VDDSummary(config);
+      } catch (java.io.IOException e) {
+         System.err.println("(!)Failed to create summary file: " + e);
+         System.exit(1);
+      }
+      System.out.println("(*)Report: " + summary.getFilename());
+
+      Runtime.getRuntime().addShutdownHook(shutdown);
+
       if (config.containsKey("suite")) {
          RunSuites(config);
       }
@@ -577,9 +596,105 @@ public class VooDooDriver {
          RunTests(config);
       }
 
+      Runtime.getRuntime().removeShutdownHook(shutdown);
+
+      summary.close();
+
       System.out.println("(*)VooDooDriver Finished.");
       closeLog();
       System.exit(0);
+   }
+
+
+   /**
+    * Create a vars object and populate its base context.
+    *
+    * @param config  VDD config object
+    * @return populated Vars object
+    */
+
+   private static Vars createVars(VDDHash config) {
+      Vars v = new Vars();
+      v.setFlat(true);
+
+      VDDHash gvars = (VDDHash)config.get("gvar");
+      if (gvars == null) {
+         return v;
+      }
+
+      for (String key: gvars.keySet()) {
+         v.put(key, gvars.get(key).toString());
+      }
+
+      return v;
+   }
+
+
+   /**
+    * Format a date into a string.
+    *
+    * @param d  Date to be formatted
+    */
+
+   private static String formatDate(Date d) {
+      return String.format("%1$tm-%1$td-%1$tY-%1$tH-%1$tM-%1$tS.%1$tL", d);
+   }
+
+
+   /**
+    * Run a single test and record its results.
+    *
+    * @param test       the test to run
+    * @param isRestart  true if this is a restart test
+    * @return true if the test passed, false otherwise
+    */
+
+   private static boolean runOneTest(File test, String suite, VDDHash config,
+                                     Vars vars, boolean isRestart) {
+      Date startTime, stopTime;
+      boolean result = true;
+
+      System.out.println("(*)Executing " + (isRestart ? "restart " : "") +
+                         "test: " + test);
+
+      summary.openTag("test");
+      summary.writeData("testfile", test.toString());
+
+      startTime = new Date();
+
+      Test t = new Test(config, test, suite, vars);
+      t.setIsRestartTest(isRestart);
+      t.runTest();
+
+      stopTime = new Date();
+
+      summary.writeData("starttime", formatDate(startTime));
+      summary.writeData("stoptime", formatDate(stopTime));
+      summary.writeData("totaltesttime", Utils.GetRunTime(startTime, stopTime));
+
+      TestResults r = t.getReporter().getResults();
+
+      for (String key: r.keySet()) {
+         String value = "";
+
+         if (key.equals("result")) {
+            if ((Integer)r.get(key) == 0) {
+               value =  "Passed";
+               result = true;
+            } else {
+               value = "Failed";
+               result = false;
+            }
+         } else {
+            value = String.valueOf(r.get(key));
+         }
+
+         summary.writeData(key, value);
+      }
+
+      summary.closeTag();
+
+      return result;
    }
 
 
@@ -594,105 +709,42 @@ public class VooDooDriver {
          ArrayList<String> tests = (ArrayList<String>)config.get("test");
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
       Browser browser = (Browser)config.get("browser");
+      Date startTime, stopTime;
 
       if (tests.size() == 0) {
          return;
       }
 
-      System.out.printf("(*)Running Soda Tests...\n");
+      System.out.println("(*)Running Soda Tests...");
 
+      summary.openTag("suite");
+      summary.writeData("suitefile", "Command_line");
+      startTime = new Date();
 
-      FileOutputStream summary = null;
-      try {
-         File sf = new File((String)config.get("resultdir"),
-                            "command-line.xml");
-         summary = new FileOutputStream(sf);
-      } catch (java.io.FileNotFoundException e) {
-         System.err.println("(!)Failed to create suite log: " + e);
-      }
-
-      writeSummary(summary,
-                   "<data>\n" +
-                   "  <suite>\n" +
-                   "    <suitefile>command-line.xml</suitefile>\n");
-
-      for (String testn: tests) {
-         File test = new File(testn);
-         System.out.println("Starting Test " + test);
+      for (String test: tests) {
+         Vars vars = createVars(config);
 
          if (browser.isClosed()) {
             browser.newBrowser();
          }
 
-         writeSummary(summary,
-                      "    <test>\n" +
-                      "      <testfile>" + test + "</testfile>\n");
-         Date start = new Date();
+         boolean testPassed = runOneTest(new File(test), "Command_line", config,
+                                         vars, false);
 
-         Test t = new Test(config, test);
-         t.runTest(false);
-
-         Date stop = new Date();
-         writeSummary(summary,
-                      "      <starttime>" + tfmt(start) + "</starttime>\n" +
-                      "      <stoptime>" + tfmt(stop) + "</stoptime>\n" +
-                      "      <totaltesttime>" +
-                      Utils.GetRunTime(start, stop) + "</totaltesttime>\n");
-
-         TestResults tr = t.getReporter().getResults();
-
-         for (String rk: tr.keySet()) {
-            Object rv = tr.get(rk);
-            if (rk.equals("result")) {
-               rv = (Integer)rv == 0 ? "Passed" : "Failed";
-            }
-
-            writeSummary(summary,
-                         "      <" + rk + ">" + rv + "</" + rk + ">\n");
-         }
-
-         writeSummary(summary,
-                      "    </test>\n");
-
-         if (haltOnFailure &&
-             (Integer)tr.get("result") != 0) {
+         if (haltOnFailure && !testPassed) {
             System.out.println("(*)Test failed and --haltOnFailure is set. " +
                                "Terminating run...");
             break;
          }
       }
 
-      writeSummary(summary,
-                   "  </suite>\n" +
-                   "</data>\n");
-      try { summary.close(); } catch (java.io.IOException e) {}
-   }
+      stopTime = new Date();
 
+      summary.writeData("starttime", formatDate(startTime));
+      summary.writeData("stoptime", formatDate(stopTime));
+      summary.writeData("runtime", Utils.GetRunTime(startTime, stopTime));
 
-   /**
-    * Format a Date.
-    *
-    * @param t  the Date
-    * @return the formatted date
-    */
-
-   private static String tfmt(Date t) {
-      return (String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", t) +
-              "." + String.format("%1$tN", t).subSequence(0, 3));
-   }
-
-
-   /**
-    * Helper function to log summary data.
-    */
-
-   private static void writeSummary(FileOutputStream in, String msg) {
-      if (in == null) return;
-      try {
-         in.write(msg.getBytes());
-      } catch (Exception exp) {
-         exp.printStackTrace();
-      }
+      summary.closeTag();
    }
 
 
@@ -705,103 +757,52 @@ public class VooDooDriver {
    private static void RunSuites(VDDHash config) {
       @SuppressWarnings("unchecked")
          ArrayList<String> suites = (ArrayList<String>)config.get("suite");
-      String restartTest = (String)config.get("restarttest");
+      File restartTest = null;
       int restartCount = (Integer)config.get("restartcount");
       Boolean haltOnFailure = (Boolean)config.get("haltOnFailure");;
-      int len = suites.size() -1;
-      String report_file_name = (String)config.get("resultdir");
-      String hostname = "";
-      FileOutputStream suiteRptFD = null;
       Browser browser = (Browser)config.get("browser");
-      Date now = null;
-      Date suiteStartTime = null;
-      Date suiteStopTime = null;
-      Boolean terminateRun = false;
+      boolean testPassed = true;
 
       if (suites.size() == 0) {
          return;
       }
 
+      if (config.containsKey("restarttest")) {
+         restartTest = new File((String)config.get("restarttest"));
+      }
+
       System.out.println("(*)Running Suite files...");
-
-      try {
-         InetAddress addr = InetAddress.getLocalHost();
-         hostname = addr.getHostName();
-         addr.getHostAddress();
-
-         if (hostname.isEmpty()) {
-            hostname = addr.getHostAddress();
-         }
-      } catch (Exception exp) {
-         System.out.printf("(!)Error: %s!\n", exp.getMessage());
-         System.exit(4);
-      }
-
-      now = new Date();
-      String frac = String.format("%1$tN", now);
-      String date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                      now);
-      frac = frac.subSequence(0, 3).toString();
-      date_str += String.format(".%s", frac);
-
-      report_file_name += "/"+ hostname + "-" + date_str + ".xml";
-      report_file_name = FilenameUtils.separatorsToSystem(report_file_name);
-
-      try {
-         suiteRptFD = new FileOutputStream(report_file_name);
-         System.out.printf("(*)Report: %s\n", report_file_name);
-      } catch (Exception exp) {
-         System.out.printf("(!)Error: %s!\n", exp.getMessage());
-         System.exit(5);
-      }
 
       browser.newBrowser();
 
-      writeSummary(suiteRptFD, "<data>\n");
-
       /* Loop over suites */
-      for (int i = 0; i <= len; i++) {
-         String suite_base_noext = "";
-         String suite_name = suites.get(i);
-         File suite = new File(suite_name);
-         String suite_base_name = suite.getName();
-         int testRanCount = 0;
+      for (String suiteStr: suites) {
+         File suite = new File(suiteStr);
+         String baseName = suite.getName().replaceAll("\\.xml$", "");
+         int testsRan = 0;
+         Date suiteStartTime, suiteStopTime;
+         SuiteParser sp = null;
+         Vars vars = createVars(config);
 
-         writeSummary(suiteRptFD, "\t<suite>\n\n");
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<suitefile>%s</suitefile>\n",
-                                    suite_base_name));
+         System.out.println("(*)Executing Suite: " + baseName);
 
-         Pattern p = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
-         Matcher m = p.matcher(suite_base_name);
-         suite_base_noext = m.replaceAll("");
+         suiteStartTime = new Date();
 
-         Test testobj = null;
-         System.out.printf("(*)Executing Suite: %s\n", suite_base_name);
-         System.out.printf("(*)Parsing Suite file...\n");
-         ArrayList<File> suite_test_list;
+         summary.openTag("suite");
+         summary.writeData("suitefile", suite.getName());
+
          try {
-            SuiteParser s = new SuiteParser(suite, (VDDHash)config.get("gvar"));
-            suite_test_list = s.getTests();
+            sp = new SuiteParser(suite, (VDDHash)config.get("gvar"));
          } catch (VDDException e) {
             System.err.println("Failed to load " + suite + ": " + e);
             continue;
          }
-         VDDHash vars = null;
-         TestResults test_results_hash = null;
-         ArrayList<TestResults> test_resultsStore =
-            new ArrayList<TestResults>();
 
-         /* Loop over tests within each suite. */
-         suiteStartTime = new Date();
-         for (int test_index = 0;
-              test_index <= suite_test_list.size() - 1;
-              test_index++) {
-            Date test_start_time = null;
-            Boolean testPassed = false;
-
-            if ( (restartCount > 0) && (testRanCount >= restartCount)) {
-               System.out.printf("(*))Auto restarting browser.\n");
+         /* Loop over tests within each suite */
+         for (File test: sp.getTests()) {
+            /* Restart browser and run restart test if required */
+            if ((restartCount > 0) && (testsRan >= restartCount)) {
+               System.out.println("(*))Auto restarting browser.");
                if (!browser.isClosed()) {
                   try {
                      browser.close();
@@ -814,195 +815,54 @@ public class VooDooDriver {
                browser.newBrowser();
 
                if (restartTest != null) {
-                  System.out.printf("(*)Executing Restart Test: '%s'\n",
-                                    restartTest);
-                  writeSummary(suiteRptFD, "\t\t<test>\n");
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<testfile>%s</testfile>\n",
-                                             restartTest));
-                  now = new Date();
-                  test_start_time = now;
-                  frac = String.format("%1$tN", now);
-                  date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                           now);
-                  frac = frac.subSequence(0, 3).toString();
-                  date_str += String.format(".%s", frac);
+                  testPassed = runOneTest(restartTest, baseName, config,
+                                          vars, true);
 
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<starttime>%s</starttime>\n",
-                                             date_str));
-
-                  testobj = new Test(config, new File(restartTest),
-                                     suite_base_noext, vars);
-                  testobj.setIsRestartTest(true);
-
-                  testobj.runTest(false);
-                  now = new Date();
-                  frac = String.format("%1$tN", now);
-                  date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                           now);
-                  frac = frac.subSequence(0, 3).toString();
-                  date_str += String.format(".%s", frac);
-
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<stoptime>%s</stoptime>\n",
-                                             date_str));
-                  String msg = Utils.GetRunTime(test_start_time, now);
-                  writeSummary(suiteRptFD,
-                               String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
-
-                  if (testobj.getEventLoop() != null) {
-                     vars = testobj.getEventLoop().getSodaVars();
+                  if (haltOnFailure && !testPassed) {
+                     break;
                   }
-
-                  test_results_hash = testobj.getReporter().getResults();
-                  test_resultsStore.add(test_results_hash);
-                  for (int res_index = 0;
-                       res_index <= test_results_hash.keySet().size() - 1;
-                       res_index++) {
-                     String key = test_results_hash.keySet().toArray()[res_index].toString();
-                     String value = test_results_hash.get(key).toString();
-
-                     if (key.contains("result")) {
-                        if (Integer.valueOf(value) != 0) {
-                           value = "Failed";
-                        } else {
-                           value = "Passed";
-                        }
-                     }
-                     writeSummary(suiteRptFD,
-                                  String.format("\t\t\t<%s>%s</%s>\n",
-                                                key, value, key));
-                  }
-                  writeSummary(suiteRptFD, "\t\t</test>\n\n");
                }
 
-               testRanCount = 0;
+               testsRan = 0;
             }
 
-            writeSummary(suiteRptFD, "\t\t<test>\n");
-            File current_test = suite_test_list.get(test_index);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<testfile>%s</testfile>\n",
-                                       current_test));
-            System.out.printf("(*)Executing Test: '%s'\n", current_test);
-            now = new Date();
-            test_start_time = now;
-            frac = String.format("%1$tN", now);
-            date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                     now);
-            frac = frac.subSequence(0, 3).toString();
-            date_str += String.format(".%s", frac);
-
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<starttime>%s</starttime>\n",
-                                       date_str));
+            /* Run test */
 
             if (browser.isClosed()) {
-               System.out.printf("(*)Browser was closed by another suite, creating new browser...\n");
+               System.out.println("(*)Browser was closed by another suite, creating new browser...");
                browser.newBrowser();
-               System.out.printf("(*)New browser created.\n");
             }
 
-            testobj = new Test(config, current_test, suite_base_noext, vars);
-
-            testobj.runTest(false);
-
-            now = new Date();
-            frac = String.format("%1$tN", now);
-            date_str = String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                                     now);
-            frac = frac.subSequence(0, 3).toString();
-            date_str += String.format(".%s", frac);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<stoptime>%s</stoptime>\n",
-                                       date_str));
-            String msg = Utils.GetRunTime(test_start_time, now);
-            writeSummary(suiteRptFD,
-                         String.format("\t\t\t<totaltesttime>%s</totaltesttime>\n", msg));
-
-            if (testobj.getEventLoop() != null) {
-               vars = testobj.getEventLoop().getSodaVars();
-            }
-
-            test_results_hash = testobj.getReporter().getResults();
-            test_resultsStore.add(test_results_hash);
-            for (int res_index = 0;
-                 res_index <= test_results_hash.keySet().size() - 1;
-                 res_index++) {
-               String key =
-                  test_results_hash.keySet().toArray()[res_index].toString();
-               String value = test_results_hash.get(key).toString();
-
-               if (key.contains("result")) {
-                  if (Integer.valueOf(value) != 0) {
-                     value = "Failed";
-                  } else {
-                     value = "Passed";
-                     testPassed = true;
-                  }
-               }
-               writeSummary(suiteRptFD, String.format("\t\t\t<%s>%s</%s>\n",
-                                                      key, value, key));
-            }
-            writeSummary(suiteRptFD, "\t\t</test>\n\n");
+            testPassed = runOneTest(test, baseName, config, vars, false);
 
             if (restartCount > 0) {
-               File pF = current_test.getParentFile();
+               File pf = test.getParentFile();
 
-               if (pF != null) {
-                  String path = pF.getAbsolutePath();
-                  path = path.toLowerCase();
-                  if (!path.contains("lib")) {
-                     testRanCount += 1;
-                     System.out.printf("(*)Tests ran since last restart: '%d'\n",
-                                       testRanCount);
-                  }
-               } else {
-                  testRanCount += 1;
-                  System.out.printf("(*)Tests ran since last restart: '%d'\n",
-                                    testRanCount);
+               if (pf == null ||
+                   !pf.getAbsolutePath().toLowerCase().contains("lib")) {
+                  testsRan += 1;
+                  System.out.println("(*)Tests ran since last restart: " +
+                                     testsRan);
                }
             }
 
-            if (haltOnFailure && testPassed == false) {
-               System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
-               terminateRun = true;
+            if (haltOnFailure && !testPassed) {
                break;
             }
          }
 
          suiteStopTime = new Date();
-         frac = String.format("%1$tN", suiteStopTime);
-         frac = frac.subSequence(0, 3).toString();
-         String stopTimeStr =
-            String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS", suiteStopTime);
-         stopTimeStr += String.format(".%s", frac);
 
-         frac = String.format("%1$tN", suiteStartTime);
-         frac = frac.subSequence(0, 3).toString();
-         String startTimeStr =
-            String.format("%1$tm-%1$td-%1$tY-%1$tI-%1$tM-%1$tS",
-                          suiteStartTime);
-         startTimeStr += String.format(".%s", frac);
+         summary.writeData("starttime", formatDate(suiteStartTime));
+         summary.writeData("stoptime", formatDate(suiteStopTime));
+         summary.writeData("runtime", Utils.GetRunTime(suiteStartTime,
+                                                       suiteStopTime));
+         summary.closeTag();
 
-
-         String msg = String.format("\t\t<runtime>%s</runtime>\n",
-                                    Utils.GetRunTime(suiteStartTime,
-                                                     suiteStopTime));
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<starttime>%s</starttime>\n",
-                                    startTimeStr));
-         writeSummary(suiteRptFD,
-                      String.format("\t\t<stoptime>%s</stoptime>\n",
-                                    stopTimeStr));
-         writeSummary(suiteRptFD, msg);
-         writeSummary(suiteRptFD, "\t</suite>\n");
-
-         if (terminateRun) {
+         if (haltOnFailure && !testPassed) {
+            System.out.printf("(*)Test failed and --haltOnFailure is set. Terminating run...\n");
             break;
          }
       }
-      writeSummary(suiteRptFD, "</data>\n\n");
    }
 }

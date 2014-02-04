@@ -1,0 +1,2189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<voodoo>
+   <!--
+      Copyright 2011-2012 SugarCRM Inc.
+
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0 
+   
+      Unless required by applicable law or agreed to in writing,
+      software distributed under the License is distributed on an "AS
+      IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+      express or implied.  Please see the License for the specific
+      language governing permissions and limitations under the
+      License.
+   -->
+
+
+   <!-- VooDooDriver Events
+
+        These events are actions within VooDooDriver itself.  They
+        correspond to test events, rather than to events on the page.
+   -->
+
+   <arg>
+   </arg>
+
+   <attach>
+      <actions>
+         <accessor type="string">var</accessor>
+         <accessor type="string">title</accessor>
+         <accessor type="string">url</accessor>
+         <accessor type="integer">index</accessor>
+      </actions>
+   </attach>
+
+   <browser>
+      <actions>
+         <action type="selection">
+            <name>back</name>
+            <name>close</name>
+            <name>forward</name>
+            <name>maximize</name>
+            <name>refresh</name>
+            <name>restore</name>
+         </action>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertpage</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">exist</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">send_keys</accessor>
+         <accessor type="string">url</accessor>
+      </actions>
+   </browser>
+
+   <csv>
+      <actions>
+         <accessor type="string">file</accessor>
+         <accessor type="string">override</accessor>
+         <accessor type="string">var</accessor>
+      </actions> 
+   </csv>
+
+   <delete>
+      <actions>
+         <accessor type="string">name</accessor>
+      </actions>
+   </delete>
+
+   <dnd>
+      <actions>
+         <accessor type="string">src</accessor>
+         <accessor type="string">dst</accessor>
+      </actions>
+   </dnd>
+
+   <execute>
+      <actions>
+         <accessor type="string">name</accessor>
+      </actions>
+   </execute>
+
+   <javaplugin>
+      <actions>
+         <accessor type="string">classname</accessor>
+      </actions>
+   </javaplugin>
+
+   <javascript>
+      <actions>
+         <accessor type="string">content</accessor>
+         <accessor type="string">file</accessor>
+      </actions>
+   </javascript>
+
+   <pluginloader>
+      <actions>
+         <accessor type="string">classname</accessor>
+         <accessor type="string">file</accessor>
+      </actions>
+   </pluginloader>
+
+   <puts>
+      <actions>
+         <accessor type="string">text</accessor>
+         <accessor type="string">txt</accessor>
+      </actions>
+   </puts>
+
+   <savehtml>
+   </savehtml>
+
+   <screenshot>
+      <actions>
+         <accessor type="string">file</accessor>
+      </actions>
+   </screenshot>
+
+   <script>
+      <actions>
+         <accessor type="string">file</accessor>
+         <accessor type="string">fileset</accessor>
+      </actions>
+   </script>
+
+   <timestamp>
+      <actions>
+         <accessor type="string">format</accessor>
+      </actions>
+   </timestamp>
+
+   <var>
+      <actions>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+         <accessor type="string">unset</accessor>
+      </actions> 
+   </var>
+
+   <wait>
+       <actions>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">condition</accessor>
+      </actions>
+   </wait>
+
+   <whitelist>
+      <actions>
+         <accessor type="string">action</accessor>
+         <accessor type="string">content</accessor>
+         <accessor type="string">name</accessor>
+      </actions>
+   </whitelist>
+
+   <!-- HTML Events
+
+        These events correspond directly to HTML elements on the page.
+        The ordering of HTML events corresponds to the order they
+        appear on W3C's HTML4 page: http://www.w3.org/TR/html4.
+   -->
+
+   <!-- ALERT is an orphan event.  It corresponds to a javascript
+        action, so it isn't an HTML event, but it's a property of the
+        page, so it isn't a VooDooDriver event.  It's most sensible
+        just to stick it here.
+   -->
+   <alert>
+      <actions>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
+      </actions>
+   </alert>
+
+   <!-- The global structure of an HTML document: The document body. -->
+
+   <div html_tag="div">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">href</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </div>
+
+   <span html_tag="span">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">href</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </span>
+
+   <h1 html_tag="h1">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h1>
+
+   <h2 html_tag="h2">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h2>
+
+   <h3 html_tag="h3">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h3>
+
+   <h4 html_tag="h4">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h4>
+
+   <h5 html_tag="h5">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h5>
+
+   <h6 html_tag="h6">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </h6>
+
+   <address html_tag="address">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </address>
+
+   <!-- Text -->
+
+   <em html_tag="em">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </em>
+
+   <strong html_tag="strong">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </strong>
+
+   <dfn html_tag="dfn">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </dfn>
+
+   <code html_tag="code">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </code>
+
+   <samp html_tag="samp">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </samp>
+
+   <kbd html_tag="kbd">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </kbd>
+
+   <!-- Missing text event: VAR.  There is already a VAR event above.
+        As with the LINK event, a poor design decision. -->
+
+   <cite html_tag="cite">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </cite>
+
+   <abbr html_tag="abbr">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </abbr>
+
+   <acronym html_tag="acronym">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </acronym>
+
+   <blockquote html_tag="blockquote">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </blockquote>
+
+   <q html_tag="q">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </q>
+
+   <sub html_tag="sub">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </sub>
+
+   <sup html_tag="sup">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </sup>
+
+   <p html_tag="p">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </p>
+
+   <br html_tag="br">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </br>
+
+   <pre html_tag="pre">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </pre>
+
+   <ins html_tag="ins">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </ins>
+
+   <del html_tag="del">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </del>
+
+   <!-- Lists -->
+
+   <ul html_tag="ul">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </ul>
+
+   <ol html_tag="ol">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </ol>
+
+   <li html_tag="li">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </li>
+
+   <dl html_tag="dl">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </dl>
+
+   <dt html_tag="dt">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </dt>
+
+   <dd html_tag="dd">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </dd>
+
+   <!-- Tables -->
+
+   <table html_tag="table">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </table>
+
+   <caption html_tag="caption">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </caption>
+
+   <thead html_tag="thead">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </thead>
+
+   <tfoot html_tag="tfoot">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </tfoot>
+
+   <tbody html_tag="tbody">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </tbody>
+
+   <colgroup html_tag="colgroup">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </colgroup>
+
+   <col html_tag="col">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </col>
+
+   <tr html_tag="tr">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </tr>
+
+   <th html_tag="th">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </th>
+
+   <td html_tag="td">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </td>
+
+   <!-- Links -->
+
+   <!-- Ugh.  For historical reasons, the A tag is called "LINK".
+        Nevermind that there already exists a LINK tag in HTML.
+        Unfortunately, changing this will be annoying at best.
+   -->
+   <link html_tag="a">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">href</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertpage</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </link>
+
+   <!-- Missing LINK and BASE events - neither will be implemented;
+        they provide only meta-information about a page and aren't
+        rendered. -->
+
+   <!-- Objects, images, and applets -->
+
+   <image html_tag="img">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">src</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </image>
+
+   <!-- There are a number of attributes unique to OBJECT, but it's
+        unclear whether adding them as event attributes, either for
+        searching or for matching, would be useful. -->
+   <object html_tag="object">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </object>
+
+   <!-- APPLET will not be implemented.  It's been deprecated since 1999. -->
+
+   <map html_tag="map">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </map>
+
+   <area html_tag="area">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </area>
+
+   <!-- Alignment, font styles, and horizontal rules -->
+
+   <tt html_tag="tt">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </tt>
+
+   <i html_tag="i">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </i>
+
+   <b html_tag="b">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </b>
+
+   <big html_tag="big">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </big>
+
+   <small html_tag="small">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </small>
+
+   <strike html_tag="strike">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </strike>
+
+   <s html_tag="s">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </s>
+
+   <u html_tag="u">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </u>
+
+   <!-- FONT and BASEFONT have been deprecated since 1999 and will not
+        be implemented. -->
+
+   <hr html_tag="hr">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </hr>
+
+   <!-- Frames -->
+
+   <!-- FRAMESET and NOFRAMES won't be implemented unless needed. -->
+
+   <!-- FRAME should actually be IFRAME.  Should FRAME be implemented,
+        this will have to be renamed and the test suite updated. -->
+   <frame html_tag="iframe">
+      <selectors>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+   </frame>
+
+   <!-- Forms -->
+
+   <form html_tag="form">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">method</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </form>
+
+   <input html_tag="input">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">append</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </input>
+
+   <email html_tag="input" html_type="email">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">append</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </email>
+
+   <textfield html_tag="input" html_type="text|password">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">append</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </textfield>
+
+   <password html_tag="input" html_type="password">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">append</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </password>
+
+   <checkbox html_tag="input" html_type="checkbox">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="boolean">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </checkbox>
+
+   <radio html_tag="input" html_type="radio">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="boolean">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </radio>
+
+   <button html_tag="input|button" html_type="button|submit|reset">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="boolean">alert</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertpage</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="boolean">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </button>
+
+   <filefield html_tag="input" html_type="file">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </filefield>
+
+   <hidden html_tag="input" html_type="hidden">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </hidden>
+
+   <!-- Missing input type=image -->
+
+   <select html_tag="select">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">assertselected</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">included</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="boolean">multiselect</accessor>
+         <accessor type="string">notincluded</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">setreal</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </select>
+
+   <!-- OPTGROUP and OPTION unimplemented. -->
+
+   <textarea html_tag="textarea">
+      <selectors>
+         <accessor type="string">alt</accessor>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">name</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="string">text</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">value</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">append</accessor>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">clear</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">default</accessor>
+         <accessor type="boolean">disabled</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">set</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </textarea>
+
+   <label html_tag="label">
+      <selectors>
+         <accessor type="string">class</accessor>
+         <accessor type="string">css</accessor>
+         <accessor type="boolean">exists</accessor>
+         <accessor type="string">id</accessor>
+         <accessor type="string">index</accessor>
+         <accessor type="string">for</accessor>
+         <accessor type="boolean">required</accessor>
+         <accessor type="integer">timeout</accessor>
+         <accessor type="string">xpath</accessor>
+      </selectors>
+
+      <actions>
+         <accessor type="string">assert</accessor>
+         <accessor type="string">assertnot</accessor>
+         <accessor type="boolean">click</accessor>
+         <accessor type="string">cssprop</accessor>
+         <accessor type="string">cssvalue</accessor>
+         <accessor type="string">jscriptevent</accessor>
+         <accessor type="string">save</accessor>
+         <accessor type="string">var</accessor>
+      </actions>
+   </label>
+
+   <!-- FIELDSET and LEGEND unimplemented. -->
+
+   <!-- Scripts -->
+
+   <!-- Missing SCRIPT and NOSCRIPT events -->
+</voodoo>

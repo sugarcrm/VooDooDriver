@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>Test page full of simple HTML elements</title>
+
+    <script type="text/javascript">
+      function clickTest(which) {
+         document.getElementById("click_test").innerHTML = which;
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <div id="click_test">some text</div>
+
+    <p>
+      Some text samples: 
+      <tt     id="tt"     onclick="clickTest('TT')">tt</tt>
+      <i      id="i"      onclick="clickTest('I')">i</i>
+      <b      id="b"      onclick="clickTest('B')">b</b>
+      <big    id="big"    onclick="clickTest('BIG')">big</big>
+      <small  id="small"  onclick="clickTest('SMALL')">small</small>
+      <strike id="strike" onclick="clickTest('STRIKE')">strike</strike>
+      <s      id="s"      onclick="clickTest('S')">s</s>
+      <u      id="u"      onclick="clickTest('U')">u</u>
+    </p>
+
+    <hr id="hr" onclick="clickTest('HR')"/>
+
+    <form id="form1" name="form" method="get">
+      <p>A GET form.</p>
+      <input id="input" type="button" value="click"
+             onclick="clickTest('INPUT');"/>
+    </form>
+
+    <form id="form2" name="form" method="post">
+      <p>A POST form.</p>
+    </form>
+
+  </body>
+</html>

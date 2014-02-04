@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <title>Test page full of simple HTML elements</title>
+
+    <script type="text/javascript">
+      ////////// DIV //////////
+      function divClick() {
+         document.getElementById("div").innerHTML = "clicked";
+      }
+      function divMouse() {
+         document.getElementById("div").innerHTML = "mousedown";
+      }
+
+      ////////// SPAN //////////
+      function spanClick() {
+         document.getElementById("span").innerHTML = "clicked";
+      }
+      function spanMouse() {
+         document.getElementById("span").innerHTML = "mousedown";
+      }
+
+      ////////// Simple HTML elements //////////
+      function clickTest(which) {
+         document.getElementById("click_test").innerHTML = which;
+      }
+      function overTest(which) {
+         document.getElementById("over").innerHTML = which;
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <div id="div" onclick="divClick();" onmousedown="divMouse();">div text</div>
+    <div id="InvisibleDiv" style="display: none;">div text</div>
+    <span id="span" onclick="spanClick();" onmousedown="spanMouse();">
+      span text
+    </span>
+
+    <div id="click_test">some text</div>
+
+    <h1 id="h1" onclick="clickTest('H1');">h1</h1>
+    <h2 id="h2" onclick="clickTest('H2');">h2</h2>
+    <h3 id="h3" onclick="clickTest('H3');">h3</h3>
+    <h4 id="h4" onclick="clickTest('H4');">h4</h4>
+    <h5 id="h5" onclick="clickTest('H5');">h5</h5>
+    <h6 id="h6" onclick="clickTest('H6');">h6</h6>
+
+    <address id="address" onclick="clickTest('ADDRESS');">
+      <a href="mailto:jdusaint@sugarcrm.com">Jon duSaint</a>
+    </address>
+
+    <em         id="em"         onclick="clickTest('EM');">em</em>
+    <strong     id="strong"     onclick="clickTest('STRONG');">strong</strong>
+    <dfn        id="dfn"        onclick="clickTest('DFN');">dfn</dfn>
+    <code       id="code"       onclick="clickTest('CODE');">code</code>
+    <samp       id="samp"       onclick="clickTest('SAMP');">samp</samp>
+    <kbd        id="kbd"        onclick="clickTest('KBD');">kbd</kbd>
+    <cite       id="cite"       onclick="clickTest('CITE');">cite</cite>
+    <abbr       id="abbr"       onclick="clickTest('ABBR');">abbr</abbr>
+    <acronym    id="acronym"    onclick="clickTest('ACRONYM');">acronym</acronym>
+    <blockquote id="blockquote" onclick="clickTest('BLOCKQUOTE');">blockquote</blockquote>
+    <q          id="q"          onclick="clickTest('Q');">q</q>
+    <sub        id="sub"        onclick="clickTest('SUB');">sub</sub>
+    <sup        id="sup"        onclick="clickTest('SUP');">sup</sup>
+    <p          id="p"          onclick="clickTest('P');">p</p>
+    <br         id="br"         onclick="clickTest('BR');"/>
+    <pre        id="pre"        onclick="clickTest('PRE');">pre</pre>
+    <ins        id="ins"        onclick="clickTest('INS');">ins</ins>
+    <del        id="del"        onclick="clickTest('DEL');">del</del>
+
+    <ul id="ul">
+      <li id="ulli" onclick="clickTest('ULLI');">ul li</li>
+    </ul>
+
+    <ol id="ol">
+      <li id="olli" onclick="clickTest('OLLI');">ol li</li>
+    </ol>
+
+    <dl id="dl">
+      <dt id="dt" onclick="clickTest('DT');">dt</dt>
+      <dd id="dd" onclick="clickTest('DD');">dd</dd>
+    </dl>
+
+    <table id="table" border="1">
+      <colgroup id="colgroup">
+        <col id="col1"/>
+        <col id="col2"/>
+      </colgroup>
+      <caption id="caption" onclick="clickTest('CAPTION')">caption</caption>
+      <thead id="thead">
+        <tr>
+          <td id="thead_td" onclick="clickTest('THEAD_TD');">thead_td</td>
+        </tr>
+      </thead>
+      <tfoot id="tfoot">
+        <tr>
+          <td id="tfoot_td" onclick="clickTest('TFOOT_TD');">tfoot_td</td>
+        </tr>
+      </tfoot>
+      <tbody id="tbody">
+        <tr id="trh">
+          <th id="th1" onclick="clickTest('TH1');">th1</th>
+          <th id="th2" onclick="clickTest('TH2');">th2</th>
+        </tr>
+        <tr id="tr">
+          <td id="td1" onclick="clickTest('TD1');">td1</td>
+          <td id="td2" onclick="clickTest('TD2');">td2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <img id="img" src="N5629N.jpg" width="240" height="180"
+         onclick="clickTest('IMG');" alt="N5629N"
+         style="position: absolute; top: 5px; right: 5px;"/>
+
+    <object id="object" data="N5629N.jpg" type="image/jpeg"
+            style="position: absolute; top: 190px; right: 5px;"
+            onclick="clickTest('OBJECT');">
+    </object>
+
+    <img id="map_img" src="N5629N.jpg" width="240" height="180"
+         usemap="#map" alt="Image Map"
+         style="position: absolute; top: 375px; right: 5px;"/>
+
+    <map id="map" name="map" onclick="clickTest('MAP');">
+      <area id="area1" shape="circle" coords="45,45,45"
+            nohref="true" alt="area1"
+            onmouseout="overTest('');"
+            onmouseover="overTest('AREA1');"/>
+      <area id="area2" shape="circle" coords="135,45,45"
+            nohref="true" alt="area2"
+            onmouseout="overTest('');"
+            onmouseover="overTest('AREA2');"/>
+    </map>
+
+    <div id="over"></div>
+
+  </body>
+</html>

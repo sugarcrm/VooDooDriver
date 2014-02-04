@@ -25,16 +25,59 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<soda>     
+<voodoo>     
+   <!-- VDD events -->
+
+   <script file="tests/test-scripts/tests/browser.xml"/>
+   <script file="tests/test-scripts/tests/csv.xml"/>
+   <script file="tests/test-scripts/tests/delete.xml"/>
+   <script file="tests/test-scripts/tests/dnd.xml"/>
+   <script file="tests/test-scripts/tests/execute.xml"/>
+   <script file="tests/test-scripts/tests/javaplugin.xml"/>
+   <script file="tests/test-scripts/tests/javascript.xml"/>
+   <script file="tests/test-scripts/tests/pluginloader.xml"/>
+   <script file="tests/test-scripts/tests/screenshot.xml"/>
+   <script file="tests/test-scripts/tests/script.xml"/>
+   <script file="tests/test-scripts/tests/timestamp.xml"/>
+   <script file="tests/test-scripts/tests/var.xml"/>
+   <script file="tests/test-scripts/tests/whitelist.xml"/>
+
+   <!-- HTML events -->
+
+   <script file="tests/test-scripts/tests/find-elements.xml"/>
+   <script file="tests/test-scripts/tests/link.xml"/>
+   <script file="tests/test-scripts/tests/alert.xml"/>
+   <script file="tests/test-scripts/tests/iframe.xml"/>
+
+   <!-- simple.xml tests support for the following HTML events: div,
+        span, h1, h2, h3, h4, h5, h6, address, em, strong, dfn, code,
+        samp, kbd, cite, abbr, acronym, blockquote, q, sub, sup, p,
+        br, pre, ins, del, ul, ol, li, dl, dt, dd, table, caption,
+        thead, tfoot, tbody, colgroup, col, tr, th, td, image, object,
+        map, area, tt, i, b, big, small, strike, s, u, hr, frame,
+        form.
+   -->
+   <script file="tests/test-scripts/tests/simple.xml"/>
+
+   <!-- interactive.xml tests support for the following HTML elements:
+        input, email, text, password, checkbox, radio, button,
+        filefield, hidden.
+   -->
+   <script file="tests/test-scripts/tests/interactive.xml"/>
+
+   <!-- select-test.xml tests support for the select event -->
+   <script file="tests/test-scripts/tests/select-test.xml"/>
+
+   <!--
    <script file="tests/test-scripts/tests/buttons-test.xml"/>
    <script file="tests/test-scripts/tests/radio-test.xml"/>
    <script file="tests/test-scripts/tests/field-test.xml"/>
    <script file="tests/test-scripts/tests/misc-test.xml"/>
    <script file="tests/test-scripts/tests/table-test.xml"/>
    <script file="tests/test-scripts/tests/checkbox-test.xml"/>
-   <script file="tests/test-scripts/tests/select-test.xml"/>
    <script file="tests/test-scripts/tests/list-test.xml"/>
    <script file="tests/test-scripts/tests/image-test.xml"/>
    <script file="tests/test-scripts/tests/javaplugin-test.xml"/>
+   -->
    <script file="tests/test-scripts/tests/cleanup.xml"/>
-</soda>
+</voodoo>

@@ -1,0 +1,14 @@
+<voodoo>
+   <browser url="{@global.url}/tests/test-data/alert.html"/>
+
+   <alert alert="true" required="false"/>
+   <alert exists="false"/>
+
+   <link id="a" click="false" jscriptevent="onmousedown"/>
+   <alert assert="alert" alert="true"/>
+   <browser assert="OK"/>
+
+   <link id="a" click="false" jscriptevent="onmousedown"/>
+   <alert assertnot="foo" alert="false"/>
+   <browser assert="Cancel"/>
+</voodoo>

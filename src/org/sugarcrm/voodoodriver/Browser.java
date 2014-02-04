@@ -18,6 +18,7 @@ package org.sugarcrm.voodoodriver;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -85,7 +86,6 @@ public abstract class Browser {
     */
 
    private boolean maximizeWindows = false;
-
 
    /**
     * Directory into which to save the web driver logs.
@@ -345,10 +345,11 @@ public abstract class Browser {
       try {
          return this.Driver.getPageSource();
       } catch (org.openqa.selenium.UnhandledAlertException e) {
-         this.reporter.Warn("Unhandled alert when getting page source", false);
+         this.reporter.warning("Unhandled alert when getting page source",
+                               false);
       } catch (org.openqa.selenium.WebDriverException e) {
-         this.reporter.Warn("WebDriverException when getting page source" + e,
-                            false);
+         this.reporter.warning("WebDriverException when getting page source" + e,
+                               false);
       }
 
       return "";
@@ -364,7 +365,8 @@ public abstract class Browser {
     *
     * @param script  The javascript to run in the browser.
     * @param element The Element to use on the page as the CONTROL var.
-    * @return the {@link Object} returned by the javascript code
+    * @return the {@link Object} returned by the javascript code or
+    *         null if the script throws an exception
     */
 
    public Object executeJS(String script, WebElement element) {
@@ -565,7 +567,7 @@ public abstract class Browser {
     * @param whitelist  {@link VDDHash} with values to ignore
     */
 
-   public boolean assertPage(VDDHash whitelist) {
+   public boolean assertPage(HashMap<String,String> whitelist) {
       boolean result = false;
 
       if (this.asserter == null && this.assertPageFile != null) {
@@ -573,7 +575,7 @@ public abstract class Browser {
             this.asserter = new PageAsserter(this.assertPageFile,
                                              this.reporter);
          } catch (VDDException e) {
-            this.reporter.ReportException(e);
+            this.reporter.exception(e);
          }
       }
 
@@ -588,16 +590,15 @@ public abstract class Browser {
    /**
     * Load the page assert file.
     *
-    * @param f         the file of page asserts
-    * @param reporter  {@link Reporter} object to use
+    * @param f  the file of page asserts
     */
 
-   public void setAssertPageFile(File f, Reporter reporter) {
+   public void setAssertPageFile(File f) {
       this.assertPageFile = f;
       try {
          this.asserter = new PageAsserter(f, reporter);
       } catch (VDDException e) {
-         this.reporter.ReportException(e);
+         this.reporter.exception(e);
       }
    }
 
