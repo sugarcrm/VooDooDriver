@@ -53,7 +53,7 @@ class Var extends Event {
       String var = (String)this.actions.get("var");
 
       if (this.actions.containsKey("set")) {
-         String val = (String)this.actions.get("set");
+         String val = replaceString((String)this.actions.get("set"));
          log("Setting variable '" + var + "' => '" + val + "'.");
          this.eventLoop.vars.put(var, val);
       } else if (this.actions.containsKey("unset")) {
