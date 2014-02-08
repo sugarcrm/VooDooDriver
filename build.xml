@@ -115,6 +115,11 @@
          <entry key="version" value="${timestamp} 1.5.1" />
          <entry key="commit" value="VDD commit ${vdd.commit}"/>
       </propertyfile>
+		
+      <propertyfile file="${build}/org/sugarcrm/vddlogger/vdd.properties" comment="VooDooDriver Properties">
+         <entry key="version" value="${timestamp} 1.5.1" />
+         <entry key="commit" value="VDD commit ${vdd.commit}"/>
+      </propertyfile>
    </target>
 	
    <target name="debug"

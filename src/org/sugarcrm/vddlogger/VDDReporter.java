@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 SugarCRM Inc.
+ * Copyright 2011-2014 SugarCRM Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -588,6 +588,17 @@ public class VDDReporter {
 
 
    /**
+    * Generate HTML with the VDD git revision.
+    *
+    * @param formatted git revision
+    */
+
+   private String vddVersion() {
+      return "<p>" + (new VersionInfo()).getVDDCommit() + "</p>\n";
+   }
+
+
+   /**
     * Create summary.html
     *
     * @param summaryRows  non-sorted per-suite summary information
@@ -617,7 +628,9 @@ public class VDDReporter {
       }
 
       s.print(summaryTotals(totals));
-      s.print("</table>\n\n</body>\n</html>\n");
+      s.print("</table>\n");
+      s.print(vddVersion());
+      s.print("\n</body>\n</html>\n");
 
       if (s.checkError()) {
          System.out.println("(!)Error occurred when writing " + summaryFile);
