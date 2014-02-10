@@ -707,33 +707,28 @@ public abstract class Event {
     */
 
    protected String replaceString(String str) {
-      String result = str;
+      Matcher m = Pattern.compile("\\{@[^}]+\\}").matcher(str);
+      String replaced = str;
 
-      Pattern patt = Pattern.compile("\\{@[\\w\\.]+\\}",
-                                     Pattern.CASE_INSENSITIVE);
-      Matcher matcher = patt.matcher(str);
+      while (m.find()) {
+         String var = m.group().substring(2, m.group().length() - 1);
+         String val = null;
 
-      while (matcher.find()) {
-         String m = matcher.group();
-         String tmp = m;
-         tmp = tmp.replace("{@", "");
-         tmp = tmp.replace("}", "");
-
-         if (this.eventLoop.hijacks.containsKey(tmp)) {
-            String value = this.eventLoop.hijacks.get(tmp).toString();
-            result = result.replace(m, value);
+         if (this.eventLoop.hijacks.containsKey(var)) {
+            val = this.eventLoop.hijacks.get(var).toString();
          } else {
             try {
-               String value = this.eventLoop.vars.get(tmp);
-               result = result.replace(m, value);
+               val = this.eventLoop.vars.get(var);
             } catch (NoSuchFieldException e) {
             }
          }
+
+         if (val != null) {
+            replaced = replaced.replace(m.group(), val);
+         }
       }
 
-      result = result.replaceAll("\\\\n", "\n");
-
-      return result;
+      return replaced.replaceAll("\\\\n", "\n");
    }
 
 
