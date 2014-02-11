@@ -126,32 +126,36 @@ abstract class HtmlEvent extends Event {
       public void action(Object val) {
          boolean click = (Boolean)val;
 
-         if (click) {
-            log("Clicking element");
-            firePlugin(PluginEvent.BEFORECLICK);
+         if (!click) {
+            log("Not clicking element, click => false");
+            return;
+         }
+
+         log("Clicking element");
+
+         firePlugin(PluginEvent.BEFORECLICK);
+
+         try {
+            element.click();
+         } catch (WebDriverException e) {
+            /*
+             * This is most likely caused by the element being
+             * slightly out of the view port.  Attempt to scroll it
+             * into view and then retry the click.
+             */
+            log("Click failed: scrolling window to retry.");
+            String js = String.format("window.scrollTo(0, %d);",
+                                      element.getLocation().x);
+            eventLoop.Browser.executeJS(js, element);
+
             try {
                element.click();
-            } catch (WebDriverException e) {
-               /*
-                * This is most likely caused by the element being
-                * slightly out of the view port.  Attempt to scroll it
-                * into view and then retry the click.
-                */
-               log("Click failed: scrolling window to retry.");
-               String js = String.format("window.scrollTo(0, %d);",
-                                         element.getLocation().x);
-               eventLoop.Browser.executeJS(js, element);
-
-               try {
-                  element.click();
-               } catch (WebDriverException e2) {
-                  exception("Failed to click element", e2);
-               }
+            } catch (WebDriverException e2) {
+               exception("Failed to click element", e2);
             }
-            firePlugin(PluginEvent.AFTERCLICK);
-         } else {
-            log("Not clicking element, click => false");
          }
+
+         firePlugin(PluginEvent.AFTERCLICK);
       }
    }
 
