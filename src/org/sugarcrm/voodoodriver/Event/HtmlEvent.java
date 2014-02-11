@@ -79,7 +79,7 @@ abstract class HtmlEvent extends Event {
        */
 
       public void action(Object val) {
-         String a = (String)actions.get(polarity ? "assert" : "assertnot");
+         String a = (String)val;
          String e = element.getText();
 
          if (polarity) {
